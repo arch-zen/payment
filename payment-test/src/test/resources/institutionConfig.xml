@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<institutionConfigCollection>
+	<!--AliPay Pc -->
+	<config payType="10" merchantId="2088701734809577" signType="MD5" instName="AliPay" />
+	<!--AliPay Wap -->
+	<config payType="11" merchantId="2088701734809577" signType="MD5" instName="AliPay" />
+	<!--AliPay App -->
+	<config payType="13" merchantId="2088701734809577" signType="RSA" instName="AliPay" 
+		instPublicKey="instPublicKey" 
+		instYmtPrivateKey="instYmtPrivateKey" />
+	<!--WeiXin JSAPI -->
+	<config payType="14" merchantId="1278350701" signType="MD5"	instName="Weixin" md5Key="es839gnc8451lp0s943n568xzskjgdbv"
+		appId="wxa06ebe9f39751792" thumbprint="‎5AA48296D4035EE700FA858F3B3D32711DCF6C3F" />
+	<!--weixin App-->
+	<config payType="15" merchantId="1234079001" signType="MD5"	instName="WeixinApp" md5Key="c5781df6b8f149adca6094cdac4ac684"
+		appId="wxf51a439c0416f182" thumbprint="5875E2EFDF497320417CC8C9B554E83BA486E498" />
+</institutionConfigCollection>

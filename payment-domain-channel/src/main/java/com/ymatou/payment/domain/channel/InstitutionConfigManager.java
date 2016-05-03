@@ -2,7 +2,6 @@ package com.ymatou.payment.domain.channel;
 
 import java.io.File;
 import java.io.FileReader;
-import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -14,43 +13,46 @@ import com.baidu.disconf.client.common.annotations.DisconfUpdateService;
 import com.baidu.disconf.client.common.update.IDisconfUpdate;
 
 /**
- * 第三方机构配置文件监听
- * 
+ * 第三方机构配置文件管理器
  * @author wangxudong
  *
  */
-@DisconfUpdateService(confFileKeys = { "institution.xml" })
+@DisconfUpdateService(confFileKeys = { InstitutionConfigManager.CONFIG_FILE })
 @Component
-public class InstitutionConfigListener implements IDisconfUpdate {
-
-	private final String CONFIG_FILE = "institution.xml";
+public class InstitutionConfigManager implements IDisconfUpdate {
 
 	/**
-	 * 第三方机构配置列表
+	 * 第三方机构配置文件
 	 */
-	private List<InstitutionConfig> institutionConfigList;
-
+	public static final String CONFIG_FILE = "institutionConfig.xml";
+	
+	/**
+	 * 第三方机构配置
+	 */
+	private InstitutionConfigCollection instConfigCollection;
+	
 	/**
 	 * 重新加载配置文件
 	 */
 	@Override
 	public void reload() throws Exception {
-		init();
+		init(true);
 
 	}
 
 	/**
 	 * 初始化配置文件
 	 */
-	private void init() {
-		if (institutionConfigList != null)
+	private void init(boolean isReload) {
+		if (instConfigCollection != null && isReload == false)
 			return;
+		
 		try {
 			File configFile = DisConf.getLocalConfig(CONFIG_FILE);
-			JAXBContext context = JAXBContext.newInstance(InstitutionConfigListener.class);
+			JAXBContext context = JAXBContext.newInstance(InstitutionConfigCollection.class);
 			Unmarshaller unmarshaller = context.createUnmarshaller();
 
-			InstitutionConfigListener instConfigContainer = (InstitutionConfigListener) unmarshaller.unmarshal(new FileReader(configFile));
+			instConfigCollection = (InstitutionConfigCollection) unmarshaller.unmarshal(new FileReader(configFile));
 
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
@@ -63,14 +65,15 @@ public class InstitutionConfigListener implements IDisconfUpdate {
 	 * @param payType
 	 * @return
 	 */
-	public InstitutionConfig getInstitutionConfig(String payType) {
-		init();
+	public InstitutionConfig getConfig(String payType) {
+		init(false);
 
-		for (InstitutionConfig institutionConfig : institutionConfigList) {
+		for (InstitutionConfig institutionConfig : instConfigCollection) {
 			if (institutionConfig.getPayType().equals(payType))
 				return institutionConfig;
 		}
 		return null;
 	}
+
 
 }

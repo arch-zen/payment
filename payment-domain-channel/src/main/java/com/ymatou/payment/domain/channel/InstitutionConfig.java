@@ -1,55 +1,63 @@
 package com.ymatou.payment.domain.channel;
 
-import org.springframework.stereotype.Component;
-
-import com.baidu.disconf.client.common.annotations.DisconfFile;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /**
  * 第三方支付机构配置（Disconf托管）
  * @author wangxudong
  *
  */
-@Component
+@XmlAccessorType(XmlAccessType.FIELD)
 public class InstitutionConfig {
 
 	/**
 	 * 支付渠道代码
 	 */
+	@XmlAttribute(name = "payType")
 	private String payType;
 	
 	/**
 	 * 商户号
 	 */
+	@XmlAttribute(name = "merchantId")
 	private String merchantId;
 	
 	/**
 	 * 签名方式
 	 */
+	@XmlAttribute(name = "signType")
 	private String signType;
 	
 	/**
 	 * 第三方机构名称
 	 */
+	@XmlAttribute(name = "instName")
 	private String instName;
 	
 	/**
 	 * 微信AppId
 	 */
+	@XmlAttribute(name = "appId")
 	private String appId;
 	
 	/**
 	 * 第三方机构公钥
 	 */
+	@XmlAttribute(name = "instPublicKey")
 	private String instPublicKey;
 	
 	/**
 	 * YMT私钥
 	 */
+	@XmlAttribute(name = "instYmtPrivateKey")
 	private String instYmtPrivateKey;
 	
 	/**
 	 * MD5盐值
 	 */
+	@XmlAttribute(name = "md5Key")
 	private String md5Key;
 
 	/**
