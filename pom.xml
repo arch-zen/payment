@@ -345,6 +345,7 @@
 		<module>payment-domain-pay</module>
 		<module>payment-domain-channel</module>
 		<module>payment-domain-refund</module>
+		<module>payment-integration</module>
 	</modules>
 
 	<distributionManagement>
