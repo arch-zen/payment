@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://code.alibabatech.com/schema/dubbo        
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+	<context:annotation-config />
+
+	<aop:aspectj-autoproxy />
+
+	<context:component-scan base-package="com.ymatou.payment" />
+
+	<!-- 使用disconf必须添加以下配置 -->
+	<bean id="disconfMgrBean" class="com.baidu.disconf.client.DisconfMgrBean"
+		destroy-method="destroy">
+		<property name="scanPackage" value="com.ymatou.payment" />
+	</bean>
+	<bean id="disconfMgrBean2" class="com.baidu.disconf.client.DisconfMgrBeanSecond"
+		init-method="init" destroy-method="destroy">
+	</bean>
+
+	<bean id="propertiesDisconf"
+		class="com.baidu.disconf.client.addons.properties.ReloadablePropertiesFactoryBean">
+		<property name="locations">
+			<list>
+				<value>dubbo.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="propertyPlaceholderConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="propertiesArray">
+			<list>
+				<ref bean="propertiesDisconf" />
+			</list>
+		</property>
+		<property name="locations">
+			<list>
+				<value>classpath:db.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<import resource="classpath:spring/persistence.xml" />
+
+
+
+	<!-- 提供方应用信息，用于计算依赖关系 -->
+	<dubbo:application name="payment" />
+
+	<dubbo:registry address="zookeeper://${dubbo.zoo}" />
+
+	<!-- 用dubbo协议在20880端口暴露服务 -->
+	<dubbo:protocol name="dubbo" port="30880" serialization="kryo" />
+
+	<dubbo:protocol name="rest" server="tomcat" port="8899" extension="com.ymatou.payment.infrastructure.serialize.JacksonConfig" />
+
+
+	<dubbo:service
+		interface="com.ymatou.payment.facade.impl.rest.PaymentResource"
+		ref="paymentResource" protocol="rest" />
+
+
+</beans>
