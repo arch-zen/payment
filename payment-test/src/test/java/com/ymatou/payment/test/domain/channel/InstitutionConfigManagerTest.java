@@ -9,8 +9,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
-import com.ymatou.payment.test.BaseTest;
-import com.ymatou.payment.test.WithDubboProviderBaseTest;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/applicationContextDisconfTest.xml"})

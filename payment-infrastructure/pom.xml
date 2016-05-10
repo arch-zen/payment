@@ -8,7 +8,7 @@
 		<artifactId>payment</artifactId>
 		<version>1.0.0</version>
 	</parent>
-	
+
 	<artifactId>payment-infrastructure</artifactId>
 	<name>payment-infrastructure</name>
 	<url>http://www.ymatou.com</url>
