@@ -63,11 +63,11 @@
 	<!-- 用dubbo协议在20880端口暴露服务 -->
 	<dubbo:protocol name="dubbo" port="30880" serialization="kryo" />
 
-	<dubbo:protocol name="rest" server="tomcat" port="8899" extension="com.ymatou.payment.infrastructure.serialize.JacksonConfig" />
+	<dubbo:protocol name="rest" server="tomcat" port="8899"
+		extension="com.ymatou.payment.infrastructure.serialize.JacksonConfig" />
 
 
-	<dubbo:service
-		interface="com.ymatou.payment.facade.impl.rest.PaymentResource"
+	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.PaymentResource"
 		ref="paymentResource" protocol="rest" />
 
 

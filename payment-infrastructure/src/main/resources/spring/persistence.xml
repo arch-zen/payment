@@ -6,14 +6,12 @@
          http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
          http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd"
 	default-autowire="byName">
-	
-	<mybatis:scan
-		base-package="com.ymatou.payment.infrastructure.db.mapper"
+
+	<mybatis:scan base-package="com.ymatou.payment.infrastructure.db.mapper"
 		template-ref="sqlSession" />
 
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-		<property name="configLocation"
-			value="classpath:spring/mybatis-settings.xml" />
+		<property name="configLocation" value="classpath:spring/mybatis-settings.xml" />
 		<property name="dataSource" ref="dataSource" />
 		<property name="mapperLocations" value="classpath*:sqlmap/**/*.xml" />
 	</bean>
