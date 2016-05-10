@@ -18,5 +18,13 @@
 			<groupId>com.ymatou.payment</groupId>
 			<artifactId>payment-infrastructure</artifactId>
 		</dependency>
+		<dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+        </dependency>
+        <dependency>
+			<groupId>dom4j</groupId>
+			<artifactId>dom4j</artifactId>
+		</dependency>
 	</dependencies>
 </project>
