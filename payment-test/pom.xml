@@ -42,5 +42,9 @@
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-logging-juli</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.ymatou.payment</groupId>
+			<artifactId>payment-integration</artifactId>
+		</dependency>
 	</dependencies>
 </project>
