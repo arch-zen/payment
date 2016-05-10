@@ -47,6 +47,9 @@
 		<commons-io.version>2.4</commons-io.version>
 
 		<el-api.version>2.2</el-api.version>
+		
+		<thoughtworks.xstream.version>1.4.7</thoughtworks.xstream.version>
+		<dom4j.version>1.6.1</dom4j.version>
 
 		<!-- self version -->
 		<payment.version>1.0.0</payment.version>
@@ -261,6 +264,18 @@
 				<groupId>javax.el</groupId>
 				<artifactId>el-api</artifactId>
 				<version>${el-api.version}</version>
+			</dependency>
+			
+			<dependency>
+	            <groupId>com.thoughtworks.xstream</groupId>
+	            <artifactId>xstream</artifactId>
+	            <version>${thoughtworks.xstream.version}</version>
+	        </dependency>
+	        
+	        <dependency>
+				<groupId>dom4j</groupId>
+				<artifactId>dom4j</artifactId>
+				<version>${dom4j.version}</version>
 			</dependency>
 
 			<!-- self -->
