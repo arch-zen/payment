@@ -38,6 +38,16 @@ public class PayServiceImpl implements PayService {
         return paymentRepository.getByPaymentId(paymentId);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.ymatou.payment.domain.pay.service.PayService#GetPaymentByBussinessOrderId(java.lang.
+     * String)
+     */
+    @Override
+    public Payment GetPaymentByBussinessOrderId(String bussinessOrderId) {
+        return paymentRepository.getByBussinessOrderId(bussinessOrderId);
+    }
 
     @Override
     public BussinessOrder GetBussinessOrderByOrderId(String orderId) {

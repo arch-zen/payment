@@ -44,6 +44,8 @@ public enum ErrorCode {
 
     NOT_EXIST_BUSSINESS_ORDERID(1004, "商户订单不存在"),
 
+    INVALID_PAYTYPE(1005, "无效的支付渠道"),
+
     FAIL(5000, "请求处理失败"),
 
     UNKNOWN(9999, "未知错误，系统异常");

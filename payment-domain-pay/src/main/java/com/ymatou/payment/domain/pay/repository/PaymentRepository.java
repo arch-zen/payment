@@ -1,5 +1,6 @@
 package com.ymatou.payment.domain.pay.repository;
 
+import java.util.List;
 import java.util.Random;
 
 import javax.annotation.Resource;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
 import com.ymatou.payment.infrastructure.db.model.BussinessorderPo;
+import com.ymatou.payment.infrastructure.db.model.PaymentExample;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 import com.ymatou.payment.infrastructure.util.StringUtil;
 
@@ -41,7 +43,24 @@ public class PaymentRepository {
     public Payment getByPaymentId(String paymentId) {
         PaymentPo payment = paymentMapper.selectByPrimaryKey(paymentId);
 
-        return convert(payment);
+        return Payment.convertFromPo(payment);
+    }
+
+    /**
+     * 根据BussinessId获取到支付单信息
+     * 
+     * @param bussinessId
+     * @return
+     */
+    public Payment getByBussinessOrderId(String bussinessId) {
+        PaymentExample example = new PaymentExample();
+        example.createCriteria().andBussinessorderidEqualTo(bussinessId);
+
+        List<PaymentPo> poList = paymentMapper.selectByExample(example);
+        if (poList.size() == 0)
+            return null;
+        else
+            return Payment.convertFromPo(poList.get(0));
     }
 
 
@@ -82,19 +101,6 @@ public class PaymentRepository {
         logger.debug("genPaymentId:" + paymentId);
 
         return paymentId;
-    }
-
-    /**
-     * PO转换成Model
-     * 
-     * @param po
-     * @return
-     */
-    public Payment convert(PaymentPo po) {
-        Payment payment = new Payment();
-        payment.setPayerid(po.getPaymentid());
-
-        return payment;
     }
 
 }

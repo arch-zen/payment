@@ -21,6 +21,14 @@ public interface PayService {
     Payment GetPaymentByPaymentId(String paymentId);
 
     /**
+     * 根据BussinessOrderId获取到支付单信息
+     * 
+     * @param bussinessOrderId
+     * @return
+     */
+    Payment GetPaymentByBussinessOrderId(String bussinessOrderId);
+
+    /**
      * 根据OrderId获取到商户订单信息
      * 
      * @param orderId
