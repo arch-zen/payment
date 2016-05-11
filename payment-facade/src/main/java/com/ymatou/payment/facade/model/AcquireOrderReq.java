@@ -22,6 +22,11 @@ public class AcquireOrderReq extends BaseRequest {
     private static final long serialVersionUID = -3983050225255199358L;
 
     /**
+     * 接口版本
+     */
+    private Integer version;
+
+    /**
      * 调用方AppId
      */
     private String appId;
@@ -44,7 +49,7 @@ public class AcquireOrderReq extends BaseRequest {
     /**
      * 编码方式
      */
-    private String encoding;
+    private Integer encoding;
 
     /**
      * 支付金额
@@ -138,7 +143,7 @@ public class AcquireOrderReq extends BaseRequest {
     /// <summary>
     /// 1为定金或者支付。2为充值 3为补款 4为卖家保证金充值 5为卖家余额充值
     /// </summary>
-    private int bizCode;
+    private Integer bizCode;
 
     /**
      * @return the appId
@@ -423,14 +428,14 @@ public class AcquireOrderReq extends BaseRequest {
     /**
      * @return the bizCode
      */
-    public int getBizCode() {
+    public Integer getBizCode() {
         return bizCode;
     }
 
     /**
      * @param bizCode the bizCode to set
      */
-    public void setBizCode(int bizCode) {
+    public void setBizCode(Integer bizCode) {
         this.bizCode = bizCode;
     }
 
@@ -444,14 +449,14 @@ public class AcquireOrderReq extends BaseRequest {
     /**
      * @return the encoding
      */
-    public String getEncoding() {
+    public Integer getEncoding() {
         return encoding;
     }
 
     /**
      * @param encoding the encoding to set
      */
-    public void setEncoding(String encoding) {
+    public void setEncoding(Integer encoding) {
         this.encoding = encoding;
     }
 
@@ -467,6 +472,20 @@ public class AcquireOrderReq extends BaseRequest {
      */
     public void setSignMethod(String signMethod) {
         this.signMethod = signMethod;
+    }
+
+    /**
+     * @return the version
+     */
+    public Integer getVersion() {
+        return version;
+    }
+
+    /**
+     * @param version the version to set
+     */
+    public void setVersion(Integer version) {
+        this.version = version;
     }
 
 

@@ -1,61 +1,79 @@
 package com.ymatou.payment.facade;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * 
  * @author tuwenjie
  *
  */
 public enum ErrorCode {
-	
-    //请求参数非法
-    ILLEGAL_ARGUMENT("01", "请求参数非法"),
-    
-    /**
-     * 客户端需要知道的具体错误码定义在这里
-     * 譬如，账户余额不足, 账户不存在等
-     */
-    BALANCE_NOT_ENOUGH("02", "余额不足"),
-    ACCT_NOT_EXIST("03", "余额不足"),
-    
-    //明确知道失败原因，但客户端不关心，统一返回请求处理失败
-    FAIL("98", "请求处理失败"),
-    
-    //请求处理过程中，出现未知错误
-    UNKNOWN("99", "未知错误，系统异常"),
-    
-    ;
-    
-    private String code;
-    
+    SIGN_NOT_MATCH(-2001, "验签失败"),
+
+    NOT_SUPPORT_VERSION_OBJECT(-2002, "余额不足"),
+
+    NOT_SUPPORT_VERSION(-2003, "不支持的版本"),
+
+    EXT_MESSAGE_NOT_RECOGNIZE(-2004, "不可识别的扩展信息"),
+
+    SERVER_SIDE_ACQUIRE_ORDER_FAILED(-2100, "第三方收单失败"),
+
+    USER_ID_SHOULD_NOT_BE_EMPTY(-2101, "用户ID不能为空"),
+
+    NOTIFY_VERIFY_FAILED(-2101, "通知验证失败"),
+
+    UNKNOWN_ERROR(-2103, "未知的异常"),
+
+    DATA_NOT_FOUND(-2104, "数据未找到"),
+
+    EXCHANGE_RATE_CHECK_FAILED(-2105, "汇率检测失败"),
+
+    DB_ERROR(-2106, "数据库异常"),
+
+    REFUND_FAILED(-2107, "退款失败"),
+
+    CERTIFICATION_NOT_FOUND(-2108, "证书未找到"),
+
+    CHECK_PAY_NOT_MATCH(-3000, "对账不匹配"),
+
+    ILLEGAL_ARGUMENT(1000, "参数异常"),
+
+    NOT_EXIST_PAYMENTID(1001, "支付单号不存在"),
+
+    INCONSISTENT_PAYMENTID_AND_TRADINGID(1002, "支付单号和交易号不一致"),
+
+    INVALID_PAYMENT_STATUS(1003, "支付单状态不正确"),
+
+    NOT_EXIST_BUSSINESS_ORDERID(1004, "商户订单不存在"),
+
+    FAIL(5000, "请求处理失败"),
+
+    UNKNOWN(9999, "未知错误，系统异常");
+
+    private int code;
+
     private String message;
-    
-    private ErrorCode( String code, String message ) {
+
+    private ErrorCode(int code, String message) {
         this.code = code;
         this.message = message;
     }
 
-    public String getCode() {
+    public int getCode() {
         return code;
     }
 
     public String getMessage() {
         return message;
     }
-    
+
     /**
      * 通过代码获取枚举项
+     * 
      * @param code
      * @return
      */
-    public static ErrorCode getByCode(String code) {
-        if (StringUtils.isEmpty(code)) {
-            return null;
-        }
-
+    public static ErrorCode getByCode(int code) {
         for (ErrorCode errorCode : ErrorCode.values()) {
-            if (errorCode.getCode().equals(code)) {
+            if (errorCode.getCode() == code) {
                 return errorCode;
             }
         }

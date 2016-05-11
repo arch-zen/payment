@@ -198,27 +198,15 @@
 			MyBatis Generator, do not modify. This element was generated on Wed May 04 
 			11:33:50 CST 2016. -->
 		insert into PP_Payment (PaymentId, BussinessOrderId,
-		InstitutionPaymentId,
-		PayType, PayPrice, ActualPayPrice,
-		PayCurrencyType, ActualPayCurrencyType,
-		ExchangeRate, BankId, CardType,
-		PayerId, CreatedTime, PayStatus,
-		PayTime, LastUpdatedTime, CheckStatus,
-		DataVersion)
+		PayType, PayPrice, 
+		PayCurrencyType, BankId, PayStatus)
 		values (#{paymentid,jdbcType=VARCHAR},
-		#{bussinessorderid,jdbcType=CHAR},
-		#{institutionpaymentid,jdbcType=VARCHAR},
+		#{bussinessorderid,jdbcType=VARCHAR},
 		#{paytype,jdbcType=VARCHAR},
-		#{payprice,jdbcType=DECIMAL}, #{actualpayprice,jdbcType=DECIMAL},
+		#{payprice,jdbcType=DECIMAL}, 
 		#{paycurrencytype,jdbcType=VARCHAR},
-		#{actualpaycurrencytype,jdbcType=VARCHAR},
-		#{exchangerate,jdbcType=DOUBLE}, #{bankid,jdbcType=VARCHAR},
-		#{cardtype,jdbcType=INTEGER},
-		#{payerid,jdbcType=VARCHAR},
-		#{createdtime,jdbcType=TIMESTAMP}, #{paystatus,jdbcType=INTEGER},
-		#{paytime,jdbcType=TIMESTAMP}, #{lastupdatedtime,jdbcType=TIMESTAMP},
-		#{checkstatus,jdbcType=INTEGER},
-		#{dataversion,jdbcType=BINARY})
+		#{bankid,jdbcType=VARCHAR},
+		#{paystatus,jdbcType=INTEGER})
 	</insert>
 	<insert id="insertSelective"
 		parameterType="com.ymatou.payment.infrastructure.db.model.PaymentPo">
@@ -233,53 +221,20 @@
 			<if test="bussinessorderid != null">
 				BussinessOrderId,
 			</if>
-			<if test="institutionpaymentid != null">
-				InstitutionPaymentId,
-			</if>
 			<if test="paytype != null">
 				PayType,
 			</if>
 			<if test="payprice != null">
 				PayPrice,
 			</if>
-			<if test="actualpayprice != null">
-				ActualPayPrice,
-			</if>
 			<if test="paycurrencytype != null">
 				PayCurrencyType,
-			</if>
-			<if test="actualpaycurrencytype != null">
-				ActualPayCurrencyType,
-			</if>
-			<if test="exchangerate != null">
-				ExchangeRate,
 			</if>
 			<if test="bankid != null">
 				BankId,
 			</if>
-			<if test="cardtype != null">
-				CardType,
-			</if>
-			<if test="payerid != null">
-				PayerId,
-			</if>
-			<if test="createdtime != null">
-				CreatedTime,
-			</if>
 			<if test="paystatus != null">
 				PayStatus,
-			</if>
-			<if test="paytime != null">
-				PayTime,
-			</if>
-			<if test="lastupdatedtime != null">
-				LastUpdatedTime,
-			</if>
-			<if test="checkstatus != null">
-				CheckStatus,
-			</if>
-			<if test="dataversion != null">
-				DataVersion,
 			</if>
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -287,10 +242,7 @@
 				#{paymentid,jdbcType=VARCHAR},
 			</if>
 			<if test="bussinessorderid != null">
-				#{bussinessorderid,jdbcType=CHAR},
-			</if>
-			<if test="institutionpaymentid != null">
-				#{institutionpaymentid,jdbcType=VARCHAR},
+				#{bussinessorderid,jdbcType=VARCHAR},
 			</if>
 			<if test="paytype != null">
 				#{paytype,jdbcType=VARCHAR},
@@ -298,44 +250,14 @@
 			<if test="payprice != null">
 				#{payprice,jdbcType=DECIMAL},
 			</if>
-			<if test="actualpayprice != null">
-				#{actualpayprice,jdbcType=DECIMAL},
-			</if>
 			<if test="paycurrencytype != null">
 				#{paycurrencytype,jdbcType=VARCHAR},
-			</if>
-			<if test="actualpaycurrencytype != null">
-				#{actualpaycurrencytype,jdbcType=VARCHAR},
-			</if>
-			<if test="exchangerate != null">
-				#{exchangerate,jdbcType=DOUBLE},
 			</if>
 			<if test="bankid != null">
 				#{bankid,jdbcType=VARCHAR},
 			</if>
-			<if test="cardtype != null">
-				#{cardtype,jdbcType=INTEGER},
-			</if>
-			<if test="payerid != null">
-				#{payerid,jdbcType=VARCHAR},
-			</if>
-			<if test="createdtime != null">
-				#{createdtime,jdbcType=TIMESTAMP},
-			</if>
 			<if test="paystatus != null">
 				#{paystatus,jdbcType=INTEGER},
-			</if>
-			<if test="paytime != null">
-				#{paytime,jdbcType=TIMESTAMP},
-			</if>
-			<if test="lastupdatedtime != null">
-				#{lastupdatedtime,jdbcType=TIMESTAMP},
-			</if>
-			<if test="checkstatus != null">
-				#{checkstatus,jdbcType=INTEGER},
-			</if>
-			<if test="dataversion != null">
-				#{dataversion,jdbcType=BINARY},
 			</if>
 		</trim>
 	</insert>

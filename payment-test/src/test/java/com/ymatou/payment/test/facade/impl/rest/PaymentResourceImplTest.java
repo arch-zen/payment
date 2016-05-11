@@ -5,6 +5,10 @@
  */
 package com.ymatou.payment.test.facade.impl.rest;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -13,24 +17,80 @@ import java.util.UUID;
 import javax.annotation.Resource;
 
 import org.junit.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
 
+import com.ymatou.payment.domain.pay.model.BussinessOrder;
+import com.ymatou.payment.domain.pay.service.PayService;
 import com.ymatou.payment.facade.impl.rest.PaymentResource;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
-import com.ymatou.payment.test.WithDubboProviderBaseTest;
+import com.ymatou.payment.facade.model.AcquireOrderResp;
+import com.ymatou.payment.test.RestBaseTest;
 
 /**
  * 
  * @author wangxudong 2016年5月10日 下午12:10:19
  *
  */
-public class PaymentResourceImplTest {
+public class PaymentResourceImplTest extends RestBaseTest {
 
     @Resource
     private PaymentResource paymentResource;
 
+    @Resource
+    private PayService payService;
+
     @Test
     public void testAcquireOrder() {
         AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+
+        req.setPayType("10");
+        req.setPayPrice("1.01");
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        assertEquals("验证返回码", 0, res.getErrorCode());
+        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
+
+        BussinessOrder bo = payService.GetBussinessOrderByOrderId(req.orderId);
+        assertNotNull("验证商户订单", bo);
+
+        System.out.println(bo.getOrderid());
+        System.out.println(bo.getBussinessorderid());
+
+        assertEquals("验证PayType", req.getPayType(), bo.getPaytype());
+        assertEquals("验证OrderPrice", new BigDecimal(req.getPayPrice()).doubleValue(), bo.getOrderprice().doubleValue(),
+                0.00001);
+        assertEquals("验证CurrencyType", req.getCurrency(), bo.getCurrencytype());
+        assertEquals("验证TraceId", req.getTraceId(), bo.getTraceid());
+        assertEquals("验证OrderTime", req.getOrderTime(), bo.getOrdertime());
+        assertEquals("验证ClientIP", req.getUserIp(), bo.getClientip());
+        assertEquals("验证CallbackUrl", req.getCallbackUrl(), bo.getCallbackurl());
+        assertEquals("验证NotifyUrl", req.getNotifyUrl(), bo.getNotifyurl());
+        assertEquals("验证ProductName", req.getProductName(), bo.getProductname());
+        assertEquals("验证ProductDesc", req.getProductDesc(), bo.getProductdesc());
+        assertEquals("验证ProductUrl", req.getProductUrl(), bo.getProducturl());
+        assertEquals("验证CodePage", req.getEncoding(), bo.getCodepage());
+        assertEquals("验证Ext", req.getExt(), bo.getExt());
+        assertEquals("验证Memo", req.getMemo(), bo.getMemo());
+        assertEquals("验证SignMethod", req.getSignMethod(), bo.getSignmethod());
+        assertEquals("验证BizCode", req.getBizCode(), bo.getBizcode());
+        assertEquals("验证OrderStatus", new Integer(0), bo.getOrderstatus());
+        assertEquals("验证NotifyStatus", new Integer(0), bo.getNotifystatus());
+    }
+
+    @Test
+    public void testAcquireOrderFailedWhenOrderIdDuplicate() {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+
+        req.setOrderId("20160510180328297");
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        assertEquals("验证返回码", -2106, res.getErrorCode());
     }
 
     /**
@@ -39,19 +99,25 @@ public class PaymentResourceImplTest {
      * @param req
      */
     private void buildBaseRequest(AcquireOrderReq req) {
+        req.setVersion(1);
+        req.setBizCode(3);
         req.setOriginAppId("JavaTest");
         req.setAppId("AutoTest");
         req.setCallbackUrl("http://www.ymatou.com/pay/result");
         req.setTraceId(UUID.randomUUID().toString());
         req.setCurrency("CNY");
-        req.setEncoding("65001");
+        req.setEncoding(65001);
         req.setNotifyUrl("http://api.trading.operate.ymatou.com/api/Trading/TradingCompletedNotify");
-        req.setOrderId(getDateFormatString("yyyyMMddHHmmssfff"));
+        req.setOrderId(getDateFormatString("yyyyMMddHHmmssSSS"));
         req.setOrderTime(getDateFormatString("yyyyMMddHHmmss"));
         req.setPayPrice("0.01");
         req.setPayType("10");
         req.setProductName("测试商品");
+        req.setProductDesc("商品描述");
+        req.setProductUrl("www.ymatou.com");
+        req.setMemo("备注");
         req.setSignMethod("MD5");
+        req.setExt("{\"SHOWMODE\":\"2\",\"PAYMETHOD\":\"2\", \"IsHangZhou\":0}");
         req.setUserId(12345);
         req.setUserIp("127.0.0.1");
         req.setBankId("CMB");
