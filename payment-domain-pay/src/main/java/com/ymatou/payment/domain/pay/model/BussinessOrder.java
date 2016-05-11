@@ -11,6 +11,12 @@ import java.util.Date;
 import com.ymatou.payment.facade.PrintFriendliness;
 import com.ymatou.payment.infrastructure.db.model.BussinessorderPo;
 
+/**
+ * 商户订单模型
+ * 
+ * @author wangxudong 2016年5月11日 下午4:19:36
+ *
+ */
 public class BussinessOrder extends PrintFriendliness {
 
     /**
