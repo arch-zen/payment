@@ -6,22 +6,26 @@
 		<artifactId>payment</artifactId>
 		<version>1.0.0</version>
 	</parent>
-	<artifactId>payment-domain-pay</artifactId>
-	<name>payment-domain-pay</name>
-	<description>支付领域模型</description>
-
+	<artifactId>payment-facade-model</artifactId>
+	<name>payment-facade-model</name>
+	<version>${payment-facade.version}</version>
+	<url>http://www.ymatou.com</url>
+	<description>对外API。发布到Maven私服。版本会不断升级</description>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>com.ymatou.payment</groupId>
-			<artifactId>payment-facade-model</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.ymatou.payment</groupId>
-			<artifactId>payment-infrastructure</artifactId>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>el-api</artifactId>
 		</dependency>
 	</dependencies>
-
 </project>

@@ -16,7 +16,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.ymatou.payment</groupId>
-			<artifactId>payment-facade</artifactId>
+			<artifactId>payment-facade-model</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.ymatou.payment</groupId>

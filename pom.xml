@@ -290,6 +290,11 @@
 				<artifactId>payment-facade</artifactId>
 				<version>${payment-facade.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.ymatou.payment</groupId>
+				<artifactId>payment-facade-model</artifactId>
+				<version>${payment-facade.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>com.ymatou.payment</groupId>
@@ -367,6 +372,7 @@
 		<module>payment-domain-channel</module>
 		<module>payment-domain-refund</module>
 		<module>payment-integration</module>
+		<module>payment-facade-model</module>
 	</modules>
 
 	<distributionManagement>
