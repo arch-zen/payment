@@ -43,4 +43,12 @@ public interface PayService {
      * @return
      */
     Payment CreatePayment(AcquireOrderReq req);
+
+    /**
+     * 根据bussinessOrderId获取BussinessOrder
+     * 
+     * @param bussinessOrderId
+     * @return
+     */
+    BussinessOrder getBussinessOrderById(String bussinessOrderId);
 }

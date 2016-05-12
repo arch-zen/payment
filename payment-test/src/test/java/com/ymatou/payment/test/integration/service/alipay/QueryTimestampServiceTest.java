@@ -1,4 +1,4 @@
-package com.ymatou.payment.integration.service.alipay.test;
+package com.ymatou.payment.test.integration.service.alipay;
 
 import java.util.HashMap;
 
@@ -22,8 +22,8 @@ public class QueryTimestampServiceTest {
     @Test
     public void testDoServiceSuccess() throws Exception {
         HashMap<String, String> header = new HashMap<>();
-        header.put("Mock", "1");
-        header.put("MockId", "888888");
+        // header.put("Mock", "1");
+        // header.put("MockId", "888888");
         QueryTimestampResponse response =
                 queryTimestampService.doService("query_timestamp", "2088701734809577", header);
         Assert.assertNotNull(response);
@@ -35,8 +35,8 @@ public class QueryTimestampServiceTest {
     @Test
     public void testDoServiceFail() throws Exception {
         HashMap<String, String> header = new HashMap<>();
-        header.put("Mock", "1");
-        header.put("MockId", "888888");
+        // header.put("Mock", "1");
+        // header.put("MockId", "888888");
         QueryTimestampResponse response =
                 queryTimestampService.doService("query_timestamp", "20887017348095771", header);
         Assert.assertNotNull(response);

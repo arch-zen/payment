@@ -6,7 +6,6 @@ import java.util.UUID;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.OrderStatus;
@@ -119,6 +118,12 @@ public class PayServiceImpl implements PayService {
         bo.setVersion(req.getVersion());
 
         return bo;
+    }
+
+
+    @Override
+    public BussinessOrder getBussinessOrderById(String bussinessOrderId) {
+        return bussinessOrderRepository.getBussinessOrderById(bussinessOrderId);
     }
 
 }

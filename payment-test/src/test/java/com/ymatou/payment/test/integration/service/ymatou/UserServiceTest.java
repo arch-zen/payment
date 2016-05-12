@@ -1,4 +1,4 @@
-package com.ymatou.payment.integration.service.ymatou;
+package com.ymatou.payment.test.integration.service.ymatou;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -11,6 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.ymatou.payment.integration.model.UserServiceResponse;
+import com.ymatou.payment.integration.service.ymatou.UserService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/applicationContext.xml"})

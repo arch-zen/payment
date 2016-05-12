@@ -14,15 +14,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
-import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.infrastructure.db.mapper.BussinessorderMapper;
 import com.ymatou.payment.infrastructure.db.model.BussinessorderExample;
 import com.ymatou.payment.infrastructure.db.model.BussinessorderPo;
-import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 
 /**
  * 商户订单仓储类
- * 
+ *
  * @author wangxudong 2016年5月10日 下午5:06:39
  *
  */
@@ -35,7 +33,7 @@ public class BussinessOrderRepository {
 
     /**
      * 根据商户订单（交易号）获取到商户订单信息
-     * 
+     *
      * @param orderId
      * @return
      */
@@ -53,11 +51,30 @@ public class BussinessOrderRepository {
 
     /**
      * 保存商户订单
-     * 
+     *
      * @param po
      * @return
      */
     public int insert(BussinessorderPo po) {
         return mapper.insert(po);
+    }
+
+    /**
+     * 根据Id获取BussinessOrder
+     * 
+     * @param bussinessorderid
+     * @return
+     */
+    public BussinessOrder getBussinessOrderById(String bussinessorderid) {
+        BussinessorderExample example = new BussinessorderExample();
+        example.createCriteria().andBussinessorderidEqualTo(bussinessorderid);
+        List<BussinessorderPo> opList = mapper.selectByExample(example);
+        if (opList.size() == 0)
+            return null;
+        return BussinessOrder.convertFromPo(opList.get(0));
+
+        // TODO
+        // BussinessorderPo bussinessorderPo = mapper.selectByPrimaryKey(bussinessorderid);
+        // return BussinessOrder.convertFromPo(bussinessorderPo);
     }
 }

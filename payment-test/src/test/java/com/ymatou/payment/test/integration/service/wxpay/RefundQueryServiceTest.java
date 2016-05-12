@@ -1,4 +1,4 @@
-package com.ymatou.payment.integration.service.wxpay.test;
+package com.ymatou.payment.test.integration.service.wxpay;
 
 import java.util.HashMap;
 import java.util.Random;

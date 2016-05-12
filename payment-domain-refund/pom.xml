@@ -22,6 +22,14 @@
 			<groupId>com.ymatou.payment</groupId>
 			<artifactId>payment-infrastructure</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.ymatou.payment</groupId>
+			<artifactId>payment-domain-pay</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.ymatou.payment</groupId>
+			<artifactId>payment-integration</artifactId>
+		</dependency>
 	</dependencies>
 
 </project>

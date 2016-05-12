@@ -28,12 +28,68 @@ public class IntegrationConfig {
     private String wxAppMchId; // 微信App的商户号(1234079001)
     private String aliQueryTimestampUrl; // 支付宝防钓鱼时间戳url
     private String ymtUserServiceUrl; // 用户服务url
+    private String ymtNotifyRefundUrl; // 通知退款url
+    private String ymtNotifytradingeventUrl; // 通知用户交易信息url
 
     private String openMock;
     private String aliQueryTimestampUrlMock; // 支付宝防钓鱼时间戳url(mock)
     private String wxUnifiedOrderUrlMock; // 微信统一下单url(mock)
     private String wxRefundQueryUrlMock; // 微信退款查询url(mock)
     private String ymtUserServiceUrlMock; // 用户服务url(mock)
+    private String ymtNotifyRefundUrlMock; // 通知退款url(mock)
+    private String ymtNotifytradingeventUrlMock; // 通知用户交易信息url(mock)
+
+    public String getYmtNotifyRefundUrl(String isMock) {
+        if (isMock(isMock)) {
+            return getYmtNotifyRefundUrlMock();
+        } else {
+            return getYmtNotifyRefundUrl();
+        }
+    }
+
+    public String getYmtNotifytradingeventUrl(String isMock) {
+        if (isMock(isMock)) {
+            return getYmtNotifytradingeventUrlMock();
+        } else {
+            return getYmtNotifytradingeventUrl();
+        }
+    }
+
+    @DisconfFileItem(name = "ymt.notifyrefund.url")
+    public String getYmtNotifyRefundUrl() {
+        return ymtNotifyRefundUrl;
+    }
+
+    public void setYmtNotifyRefundUrl(String ymtNotifyRefundUrl) {
+        this.ymtNotifyRefundUrl = ymtNotifyRefundUrl;
+    }
+
+    @DisconfFileItem(name = "ymt.notifytradingevent.url")
+    public String getYmtNotifytradingeventUrl() {
+        return ymtNotifytradingeventUrl;
+    }
+
+    public void setYmtNotifytradingeventUrl(String ymtNotifytradingeventUrl) {
+        this.ymtNotifytradingeventUrl = ymtNotifytradingeventUrl;
+    }
+
+    @DisconfFileItem(name = "ymt.notifyrefund.url.mock")
+    public String getYmtNotifyRefundUrlMock() {
+        return ymtNotifyRefundUrlMock;
+    }
+
+    public void setYmtNotifyRefundUrlMock(String ymtNotifyRefundUrlMock) {
+        this.ymtNotifyRefundUrlMock = ymtNotifyRefundUrlMock;
+    }
+
+    @DisconfFileItem(name = "ymt.notifytradingevent.url.mock")
+    public String getYmtNotifytradingeventUrlMock() {
+        return ymtNotifytradingeventUrlMock;
+    }
+
+    public void setYmtNotifytradingeventUrlMock(String ymtNotifytradingeventUrlMock) {
+        this.ymtNotifytradingeventUrlMock = ymtNotifytradingeventUrlMock;
+    }
 
     @DisconfFileItem(name = "wx.unifiedorder.url")
     public String getWxUnifiedOrderUrl() {
