@@ -17,6 +17,8 @@ import com.ymatou.payment.domain.refund.service.RefundService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.RefundFacade;
+import com.ymatou.payment.facade.model.AcquireRefundRequest;
+import com.ymatou.payment.facade.model.AcquireRefundResponse;
 import com.ymatou.payment.facade.model.FastRefundRequest;
 import com.ymatou.payment.facade.model.FastRefundResponse;
 
@@ -38,12 +40,14 @@ public class RefundFacadeImpl implements RefundFacade {
 
     @Override
     public FastRefundResponse fastRefund(FastRefundRequest req) {
+        // query and verify payment
         Payment payment = payService.GetPaymentByPaymentId(req.getPaymentId());
         if (payment == null) {
             throw new BizException(ErrorCode.NOT_EXIST_PAYMENTID, "Payment not exist");
         }
         logger.info("Payment result: {}", payment);
 
+        // query and verify bussinessorder
         BussinessOrder bussinessorder = payService.getBussinessOrderById(payment.getBussinessorderid());
         if (bussinessorder == null) {
             throw new BizException(ErrorCode.NOT_EXIST_BUSSINESS_ORDERID, "businessOrderId not exist");
@@ -66,16 +70,26 @@ public class RefundFacadeImpl implements RefundFacade {
         refundInfo.setPaymentId(req.getPaymentId());
         refundInfo.setTraceId(req.getTraceId());
 
-        refundService.saveRefundRequest(payment, bussinessorder, refundInfo); // 退款请求落地
+        // 退款请求落地
+        refundService.saveRefundRequest(payment, bussinessorder, refundInfo);
 
-        refundService.notifyRefund(refundInfo, req.getHeader());// 通知退款
+        // 通知退款
+        refundService.notifyRefund(refundInfo, req.getHeader());
 
+        // 发送交易信息
         for (String orderId : req.getOrderIdList()) {
             refundService.sendFastRefundTradingMessage(bussinessorder.getUserid().toString(), orderId,
-                    req.getHeader()); // 发送交易信息
+                    req.getHeader());
         }
 
         return new FastRefundResponse();
+    }
+
+    @Override
+    public AcquireRefundResponse submitRefund(AcquireRefundRequest req) {
+        // verify traceId length TODO
+
+        return null;
     }
 
 }

@@ -3,6 +3,7 @@
  */
 package com.ymatou.payment.facade.model;
 
+import java.util.HashMap;
 import java.util.List;
 
 import com.ymatou.payment.facade.BaseRequest;
@@ -22,6 +23,7 @@ public class AcquireRefundRequest extends BaseRequest {
     private String appId;
     private String traceId;
     private String sign;
+    private HashMap<String, String> header;
 
     public String getOrderId() {
         return orderId;
@@ -62,4 +64,13 @@ public class AcquireRefundRequest extends BaseRequest {
     public void setSign(String sign) {
         this.sign = sign;
     }
+
+    public HashMap<String, String> getHeader() {
+        return header;
+    }
+
+    public void setHeader(HashMap<String, String> header) {
+        this.header = header;
+    }
+
 }

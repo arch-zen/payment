@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.facade.RefundFacade;
+import com.ymatou.payment.facade.model.AcquireRefundRequest;
+import com.ymatou.payment.facade.model.AcquireRefundResponse;
 import com.ymatou.payment.facade.model.FastRefundRequest;
 import com.ymatou.payment.facade.model.FastRefundResponse;
 
@@ -40,6 +42,29 @@ public class RefundResourceImpl implements RefundResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Override
     public FastRefundResponse fastRefund(FastRefundRequest req, @Context HttpServletRequest servletRequest) {
+        req.setHeader(generateHttpHeader(servletRequest));
+
+        return refundFacade.fastRefund(req);
+    }
+
+    @POST
+    @Path("/Refund/SubmitRefund")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Override
+    public AcquireRefundResponse submitRefund(AcquireRefundRequest req, HttpServletRequest servletRequest) {
+        req.setHeader(generateHttpHeader(servletRequest));
+
+        return refundFacade.submitRefund(req);
+    }
+
+    /**
+     * 获取请求中的HttpHeader
+     * 
+     * @param servletRequest
+     * @return
+     */
+    private HashMap<String, String> generateHttpHeader(HttpServletRequest servletRequest) {
         // generate http header
         Enumeration<String> headerNames = servletRequest.getHeaderNames();
         HashMap<String, String> header = new HashMap<>();
@@ -47,9 +72,6 @@ public class RefundResourceImpl implements RefundResource {
             String headerName = (String) headerNames.nextElement();
             header.put(headerName, servletRequest.getHeader(headerName));
         }
-        req.setHeader(header);
-
-        return refundFacade.fastRefund(req);
+        return header;
     }
-
 }

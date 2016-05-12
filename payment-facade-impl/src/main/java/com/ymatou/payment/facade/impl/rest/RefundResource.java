@@ -5,6 +5,8 @@ package com.ymatou.payment.facade.impl.rest;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.ymatou.payment.facade.model.AcquireRefundRequest;
+import com.ymatou.payment.facade.model.AcquireRefundResponse;
 import com.ymatou.payment.facade.model.FastRefundRequest;
 import com.ymatou.payment.facade.model.FastRefundResponse;
 
@@ -24,4 +26,13 @@ public interface RefundResource {
      * @return
      */
     FastRefundResponse fastRefund(FastRefundRequest req, HttpServletRequest servletRequest);
+
+    /**
+     * 退款收单
+     * 
+     * @param req
+     * @param servletRequest
+     * @return
+     */
+    AcquireRefundResponse submitRefund(AcquireRefundRequest req, HttpServletRequest servletRequest);
 }

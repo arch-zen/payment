@@ -3,6 +3,7 @@
  */
 package com.ymatou.payment.facade.model;
 
+import java.util.HashMap;
 import java.util.List;
 
 import com.ymatou.payment.facade.BaseRequest;
@@ -19,6 +20,7 @@ public class ApproveRefundRequest extends BaseRequest {
 
     private List<String> paymentIds;
     private String approveUser;
+    private HashMap<String, String> header;
 
     public List<String> getPaymentIds() {
         return paymentIds;
@@ -35,4 +37,13 @@ public class ApproveRefundRequest extends BaseRequest {
     public void setApproveUser(String approveUser) {
         this.approveUser = approveUser;
     }
+
+    public HashMap<String, String> getHeader() {
+        return header;
+    }
+
+    public void setHeader(HashMap<String, String> header) {
+        this.header = header;
+    }
+
 }
