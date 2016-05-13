@@ -17,7 +17,8 @@ import com.ymatou.payment.domain.pay.model.PayStatus;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.service.PayService;
 import com.ymatou.payment.domain.refund.model.Refund;
-import com.ymatou.payment.domain.refund.service.RefundService;
+import com.ymatou.payment.domain.refund.service.FastRefundService;
+import com.ymatou.payment.domain.refund.service.SubmitRefundService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.RefundFacade;
@@ -43,7 +44,10 @@ public class RefundFacadeImpl implements RefundFacade {
     private PayService payService;
 
     @Autowired
-    private RefundService refundService;
+    private FastRefundService fastRefundService;
+
+    @Autowired
+    private SubmitRefundService submitRefundService;
 
     @Override
     public FastRefundResponse fastRefund(FastRefundRequest req) {
@@ -78,14 +82,14 @@ public class RefundFacadeImpl implements RefundFacade {
         refundInfo.setTraceId(req.getTraceId());
 
         // Save RefundRequest And CompensateProcessInfo
-        refundService.saveRefundRequest(payment, bussinessorder, refundInfo);
+        fastRefundService.saveRefundRequest(payment, bussinessorder, refundInfo);
 
         // notify refund service
-        refundService.notifyRefund(refundInfo, req.getHeader());
+        fastRefundService.notifyRefund(refundInfo, req.getHeader());
 
         // send trading message
         for (String orderId : req.getOrderIdList()) {
-            refundService.sendFastRefundTradingMessage(bussinessorder.getUserid().toString(), orderId,
+            fastRefundService.sendFastRefundTradingMessage(bussinessorder.getUserid().toString(), orderId,
                     req.getHeader());
         }
 
@@ -103,7 +107,7 @@ public class RefundFacadeImpl implements RefundFacade {
         List<TradeRefundDetail> refundableTrades = new ArrayList<>();
 
         // 获取退款的相关的交易信息
-        List<TradeRefundDetail> tradeRefundDetails = refundService.generateTradeRefundDetailList(tradeDetails);
+        List<TradeRefundDetail> tradeRefundDetails = submitRefundService.generateTradeRefundDetailList(tradeDetails);
         for (TradeRefundDetail tradeRefundDetail : tradeRefundDetails) {
             if (tradeRefundDetail.isRefundable()) { // 筛选出可退款的交易信息
                 refundableTrades.add(tradeRefundDetail);
@@ -117,7 +121,8 @@ public class RefundFacadeImpl implements RefundFacade {
         }
 
         // 检查是否已经生成RefundRequest，若未生成则生成RefundRequest，并生成相应应答
-        List<AcquireRefundDetail> acquireRefundDetails = refundService.checkAndSaveRefundRequest(refundableTrades, req);
+        List<AcquireRefundDetail> acquireRefundDetails =
+                submitRefundService.checkAndSaveRefundRequest(refundableTrades, req);
 
         response.setDetails(acquireRefundDetails);
 

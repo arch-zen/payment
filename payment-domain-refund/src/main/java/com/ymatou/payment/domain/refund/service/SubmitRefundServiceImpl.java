@@ -6,7 +6,6 @@ package com.ymatou.payment.domain.refund.service;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +21,6 @@ import com.ymatou.payment.domain.pay.repository.BussinessOrderRepository;
 import com.ymatou.payment.domain.pay.repository.PaymentRepository;
 import com.ymatou.payment.domain.refund.DomainConfig;
 import com.ymatou.payment.domain.refund.constants.RefundStatusEnum;
-import com.ymatou.payment.domain.refund.model.Refund;
 import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.model.AcquireRefundDetail;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
@@ -30,15 +28,16 @@ import com.ymatou.payment.facade.model.TradeDetail;
 import com.ymatou.payment.facade.model.TradeRefundDetail;
 import com.ymatou.payment.infrastructure.db.model.RefundrequestPo;
 import com.ymatou.payment.infrastructure.db.model.RefundrequestWithBLOBs;
-import com.ymatou.payment.integration.common.constants.BusinessTypeEnum;
-import com.ymatou.payment.integration.model.NotifyUserRequest;
-import com.ymatou.payment.integration.service.ymatou.NotifyRefundService;
-import com.ymatou.payment.integration.service.ymatou.NotifyUserService;
 
+/**
+ * 
+ * @author qianmin 2016年5月13日 上午11:01:57
+ * 
+ */
 @Component
-public class RefundServiceImpl implements RefundService {
+public class SubmitRefundServiceImpl implements SubmitRefundService {
 
-    private static final Logger logger = LoggerFactory.getLogger(RefundServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(SubmitRefundServiceImpl.class);
 
     @Autowired
     private RefundPository refundPository;
@@ -50,43 +49,7 @@ public class RefundServiceImpl implements RefundService {
     private PaymentRepository paymentRepository;
 
     @Autowired
-    private NotifyRefundService notifyRefundService;
-
-    @Autowired
-    private NotifyUserService notifyUserService;
-
-    @Autowired
     private DomainConfig domainConfig;
-
-    public void saveRefundRequest(Payment payment, BussinessOrder bussinessorder, Refund refundInfo) {
-        logger.info("Save RefundRequest And Compensateprocessinfo begin");
-        refundPository.addRefundrequestAndCompensateprocessinfo(payment, bussinessorder, refundInfo);
-        logger.info("Save RefundRequest And Compensateprocessinfo end");
-    }
-
-    public void notifyRefund(Refund refundInfo, HashMap<String, String> header) {
-        try {
-            logger.info("async notify refund begin");
-            notifyRefundService.doService(refundInfo.getPaymentId(), refundInfo.getTraceId(), header);
-        } catch (Exception e) {
-            // 异步通知，发完通知就行
-        }
-    }
-
-    @Override
-    public void sendFastRefundTradingMessage(String userId, String orderId, HashMap<String, String> header) {
-        try {
-            NotifyUserRequest request = new NotifyUserRequest();
-            request.setBusinessType(BusinessTypeEnum.FAST_REFUND.getCode());
-            request.setBuyerId(userId);
-            request.setIsShangouOrder(true);
-            request.setOrderId(orderId);
-            logger.info("async send trading message");
-            notifyUserService.sendTradingMessage(request, header);
-        } catch (Exception e) {
-            // 异步通知，发完通知就行
-        }
-    }
 
     @Override
     public List<TradeRefundDetail> generateTradeRefundDetailList(List<TradeDetail> traderDetails) {
