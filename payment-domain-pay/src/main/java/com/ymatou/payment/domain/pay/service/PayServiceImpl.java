@@ -55,12 +55,15 @@ public class PayServiceImpl implements PayService {
 
     @Override
     public Payment CreatePayment(AcquireOrderReq req) {
-        BussinessorderPo bussinessOrder = buildBussinessOrder(req);
-        PaymentPo payment = buildPayment(req, bussinessOrder);
+        BussinessorderPo bussinessOrderPo = buildBussinessOrder(req);
+        PaymentPo paymentPo = buildPayment(req, bussinessOrderPo);
 
-        paymentRepository.acquireOrder(payment, bussinessOrder);
+        paymentRepository.acquireOrder(paymentPo, bussinessOrderPo);
 
-        return Payment.convertFromPo(payment);
+        Payment payment = Payment.convertFromPo(paymentPo);
+        payment.setBussinessOrder(BussinessOrder.convertFromPo(bussinessOrderPo));
+
+        return payment;
     }
 
     /**

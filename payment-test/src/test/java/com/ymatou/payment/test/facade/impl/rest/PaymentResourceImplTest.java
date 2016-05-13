@@ -25,6 +25,7 @@ import com.ymatou.payment.domain.pay.service.PayService;
 import com.ymatou.payment.facade.impl.rest.PaymentResource;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
+import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.test.RestBaseTest;
 
 
@@ -41,8 +42,13 @@ public class PaymentResourceImplTest extends RestBaseTest {
     @Resource
     private PayService payService;
 
+    @Resource
+    private IntegrationConfig config;
+
     @Test
     public void testAcquireOrderPC() {
+        System.out.println(config);
+        System.out.println(config.getAliPayBaseUrl());
         AcquireOrderReq req = new AcquireOrderReq();
         buildBaseRequest(req);
 
@@ -128,6 +134,24 @@ public class PaymentResourceImplTest extends RestBaseTest {
         AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
 
         assertEquals("验证返回码", -2106, res.getErrorCode());
+    }
+
+    @Test
+    public void testAcquireOrderFailedWhenInvalidArgument() {
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+
+        req.setVersion(2);
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+        assertEquals("验证无效版本返回码", -2003, res.getErrorCode());
+        System.out.println(res.getErrorMessage());
+
+        req.setVersion(1);
+        req.setPayType("99");
+        res = paymentResource.acquireOrder(req, servletRequest);
+        assertEquals("验证无效PayType返回码", 1005, res.getErrorCode());
+        System.out.println(res.getErrorMessage());
     }
 
     /**

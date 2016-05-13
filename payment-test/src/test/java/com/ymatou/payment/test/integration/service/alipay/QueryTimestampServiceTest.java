@@ -4,17 +4,13 @@ import java.util.HashMap;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.ymatou.payment.integration.model.QueryTimestampResponse;
 import com.ymatou.payment.integration.service.alipay.QueryTimestampService;
+import com.ymatou.payment.test.RestBaseTest;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/applicationContext.xml"})
-public class QueryTimestampServiceTest {
+public class QueryTimestampServiceTest extends RestBaseTest {
 
     @Autowired
     private QueryTimestampService queryTimestampService;
@@ -25,7 +21,7 @@ public class QueryTimestampServiceTest {
         // header.put("Mock", "1");
         // header.put("MockId", "888888");
         QueryTimestampResponse response =
-                queryTimestampService.doService("query_timestamp", "2088701734809577", header);
+                queryTimestampService.doService("query_timestamp", "2088701734809577", null);
         Assert.assertNotNull(response);
         Assert.assertEquals("T", response.getIsSuccess());
         Assert.assertNotNull(response.getTimestampEncryptKey());
@@ -38,7 +34,7 @@ public class QueryTimestampServiceTest {
         // header.put("Mock", "1");
         // header.put("MockId", "888888");
         QueryTimestampResponse response =
-                queryTimestampService.doService("query_timestamp", "20887017348095771", header);
+                queryTimestampService.doService("query_timestamp", "20887017348095771", null);
         Assert.assertNotNull(response);
         Assert.assertEquals("F", response.getIsSuccess());
         Assert.assertNull(response.getTimestampEncryptKey());

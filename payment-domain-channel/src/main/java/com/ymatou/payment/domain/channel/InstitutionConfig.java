@@ -31,6 +31,12 @@ public class InstitutionConfig {
     private String merchantId;
 
     /**
+     * Ymt支付宝账号
+     */
+    @XmlAttribute(name = "sellerEmail")
+    private String sellerEmail;
+
+    /**
      * 签名方式
      */
     @XmlAttribute(name = "signType")
@@ -65,6 +71,12 @@ public class InstitutionConfig {
      */
     @XmlAttribute(name = "md5Key")
     private String md5Key;
+
+    /**
+     * MD5Key连接字符
+     */
+    @XmlAttribute(name = "md5KeyConnector")
+    private String md5KeyConnector;
 
     /**
      * @return the payType
@@ -176,6 +188,34 @@ public class InstitutionConfig {
      */
     public void setMd5Key(String md5Key) {
         this.md5Key = md5Key;
+    }
+
+    /**
+     * @return the sellerEmail
+     */
+    public String getSellerEmail() {
+        return sellerEmail;
+    }
+
+    /**
+     * @param sellerEmail the sellerEmail to set
+     */
+    public void setSellerEmail(String sellerEmail) {
+        this.sellerEmail = sellerEmail;
+    }
+
+    /**
+     * @return the md5KeyConnector
+     */
+    public String getMd5KeyConnector() {
+        return md5KeyConnector;
+    }
+
+    /**
+     * @param md5KeyConnector the md5KeyConnector to set
+     */
+    public void setMd5KeyConnector(String md5KeyConnector) {
+        this.md5KeyConnector = md5KeyConnector;
     }
 
 

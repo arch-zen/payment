@@ -5,17 +5,13 @@ import java.util.HashMap;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.ymatou.payment.integration.model.UserServiceResponse;
 import com.ymatou.payment.integration.service.ymatou.UserService;
+import com.ymatou.payment.test.RestBaseTest;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/applicationContext.xml"})
-public class UserServiceTest {
+public class UserServiceTest extends RestBaseTest {
 
     @Autowired
     private UserService userService;

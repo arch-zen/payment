@@ -26,13 +26,14 @@ public class IntegrationConfig {
     private String wxAppCertPath; // 微信APP(1234079001)对应的证书路径
     private String wxAppCertPass; // 微信APP(1234079001)对应的证书密码
     private String wxAppMchId; // 微信App的商户号(1234079001)
-    private String aliQueryTimestampUrl; // 支付宝防钓鱼时间戳url
+    private String aliPayBaseUrl; // 支付宝防钓鱼时间戳url
     private String ymtUserServiceUrl; // 用户服务url
     private String ymtNotifyRefundUrl; // 通知退款url
     private String ymtNotifytradingeventUrl; // 通知用户交易信息url
+    private String ymtPaymentBaseUrl; // ymt.payment.baseurl
 
     private String openMock;
-    private String aliQueryTimestampUrlMock; // 支付宝防钓鱼时间戳url(mock)
+    private String aliPayBaseUrlMock; // 支付宝网关url(mock)
     private String wxUnifiedOrderUrlMock; // 微信统一下单url(mock)
     private String wxRefundQueryUrlMock; // 微信退款查询url(mock)
     private String ymtUserServiceUrlMock; // 用户服务url(mock)
@@ -127,13 +128,13 @@ public class IntegrationConfig {
         this.wxAppCertPath = wxAppCertPath;
     }
 
-    @DisconfFileItem(name = "ali.query.timestamp.url")
-    public String getAliQueryTimestampUrl() {
-        return aliQueryTimestampUrl;
+    @DisconfFileItem(name = "ali.base.url")
+    public String getAliPayBaseUrl() {
+        return aliPayBaseUrl;
     }
 
-    public void setAliQueryTimestampUrl(String aliQueryTimestampUrl) {
-        this.aliQueryTimestampUrl = aliQueryTimestampUrl;
+    public void setAliPayBaseUrl(String aliPayBaseUrl) {
+        this.aliPayBaseUrl = aliPayBaseUrl;
     }
 
     @DisconfFileItem(name = "ymt.userservice.url")
@@ -181,13 +182,13 @@ public class IntegrationConfig {
         this.wxAppMchId = wxAppMchId;
     }
 
-    @DisconfFileItem(name = "ali.query.timestamp.url.mock")
-    public String getAliQueryTimestampUrlMock() {
-        return aliQueryTimestampUrlMock;
+    @DisconfFileItem(name = "ali.base.url.mock")
+    public String getAliPayBaseUrlMock() {
+        return aliPayBaseUrlMock;
     }
 
-    public void setAliQueryTimestampUrlMock(String aliQueryTimestampUrlMock) {
-        this.aliQueryTimestampUrlMock = aliQueryTimestampUrlMock;
+    public void setAliPayBaseUrlMock(String aliPayBaseUrlMock) {
+        this.aliPayBaseUrlMock = aliPayBaseUrlMock;
     }
 
     @DisconfFileItem(name = "wx.unifiedorder.url.mock")
@@ -241,11 +242,11 @@ public class IntegrationConfig {
         }
     }
 
-    public String getAliQueryTimestampUrl(String isMock) {
+    public String getAliPayBaseUrl(String isMock) {
         if (isMock(isMock)) {
-            return getAliQueryTimestampUrlMock();
+            return getAliPayBaseUrlMock();
         } else {
-            return getAliQueryTimestampUrl();
+            return getAliPayBaseUrl();
         }
     }
 
@@ -260,5 +261,20 @@ public class IntegrationConfig {
 
     private boolean isMock(String isMock) {
         return "1".equals(isMock) && "true".equals(getOpenMock());
+    }
+
+    /**
+     * @return the ymtPaymentBaseUrl
+     */
+    @DisconfFileItem(name = "ymt.payment.baseurl")
+    public String getYmtPaymentBaseUrl() {
+        return ymtPaymentBaseUrl;
+    }
+
+    /**
+     * @param ymtPaymentBaseUrl the ymtPaymentBaseUrl to set
+     */
+    public void setYmtPaymentBaseUrl(String ymtPaymentBaseUrl) {
+        this.ymtPaymentBaseUrl = ymtPaymentBaseUrl;
     }
 }

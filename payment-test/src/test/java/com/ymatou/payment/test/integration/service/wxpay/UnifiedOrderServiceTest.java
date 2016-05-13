@@ -5,21 +5,16 @@ import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.ymatou.payment.integration.common.Signature;
 import com.ymatou.payment.integration.common.constants.WxReturnCodeEnum;
 import com.ymatou.payment.integration.model.UnifiedOrderRequest;
 import com.ymatou.payment.integration.model.UnifiedOrderResponse;
 import com.ymatou.payment.integration.service.wxpay.UnifiedOrderService;
+import com.ymatou.payment.test.RestBaseTest;
 
-
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/applicationContext.xml"})
-public class UnifiedOrderServiceTest {
+public class UnifiedOrderServiceTest extends RestBaseTest {
 
     @Autowired
     private UnifiedOrderService unifiedOrderService;

@@ -14,10 +14,9 @@ import com.ymatou.payment.integration.common.Signature;
 import com.ymatou.payment.integration.model.RefundQueryRequest;
 import com.ymatou.payment.integration.model.RefundQueryResponse;
 import com.ymatou.payment.integration.service.wxpay.RefundQueryService;
+import com.ymatou.payment.test.RestBaseTest;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/applicationContext.xml"})
-public class RefundQueryServiceTest {
+public class RefundQueryServiceTest extends RestBaseTest {
 
     @Autowired
     private RefundQueryService refundQueryService;
