@@ -50,6 +50,8 @@ public enum ErrorCode {
 
     INVALID_ORDER_ID(-2, "订单号非法"),
 
+    REFUND_REQUEST_NOT_EXIST(-2, "退款请求不存在"),
+
     FAIL_QUERY_ANTI_FISHING_KEY(1006, "获取防钓鱼参数失败"),
 
     INVALID_SIGN_TYPE(1007, "无效的签名方式"),

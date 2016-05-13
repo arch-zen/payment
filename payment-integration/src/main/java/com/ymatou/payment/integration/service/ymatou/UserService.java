@@ -46,7 +46,7 @@ public class UserService implements InitializingBean {
      */
     public UserServiceResponse doService(String userId, String reqSource, HashMap<String, String> header)
             throws IOException {
-        String url = new StringBuilder(128).append(integrationConfig.getYmtUserServiceUrl(header.get("Mock")))
+        String url = new StringBuilder(128).append(integrationConfig.getYmtUserServiceUrl(header))
                 .append("?UserId=").append(userId).append("&ReqSource=").append(reqSource).toString();
 
         try {

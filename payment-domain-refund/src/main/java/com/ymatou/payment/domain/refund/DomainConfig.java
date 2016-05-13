@@ -18,6 +18,7 @@ import com.baidu.disconf.client.common.annotations.DisconfFileItem;
 public class DomainConfig {
 
     private String refundSupportDays;
+    private String notSupportRefundPayType;
 
     @DisconfFileItem(name = "refundsupportdays")
     public String getRefundSupportDays() {
@@ -26,5 +27,14 @@ public class DomainConfig {
 
     public void setRefundSupportDays(String refundSupportDays) {
         this.refundSupportDays = refundSupportDays;
+    }
+
+    @DisconfFileItem(name = "not.support.refund.paytype")
+    public String getNotSupportRefundPayType() {
+        return notSupportRefundPayType;
+    }
+
+    public void setNotSupportRefundPayType(String notSupportRefundPayType) {
+        this.notSupportRefundPayType = notSupportRefundPayType;
     }
 }

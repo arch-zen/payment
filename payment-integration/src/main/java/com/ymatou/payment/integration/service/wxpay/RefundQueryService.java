@@ -89,7 +89,7 @@ public class RefundQueryService {
             }
             header.put("Content-Type", "text/xml");
 
-            String respXmlStr = HttpClientUtil.sendPost(integrationConfig.getWxRefundQueryUrl(header.get("Mock")),
+            String respXmlStr = HttpClientUtil.sendPost(integrationConfig.getWxRefundQueryUrl(header),
                     getPostDataXml(request), header, getHttpClient(mchId));
             if (!StringUtils.isEmpty(respXmlStr)) {
                 Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);

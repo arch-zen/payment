@@ -3,6 +3,8 @@
  */
 package com.ymatou.payment.integration;
 
+import java.util.HashMap;
+
 import org.springframework.stereotype.Component;
 
 import com.baidu.disconf.client.common.annotations.DisconfFile;
@@ -40,16 +42,16 @@ public class IntegrationConfig {
     private String ymtNotifyRefundUrlMock; // 通知退款url(mock)
     private String ymtNotifytradingeventUrlMock; // 通知用户交易信息url(mock)
 
-    public String getYmtNotifyRefundUrl(String isMock) {
-        if (isMock(isMock)) {
+    public String getYmtNotifyRefundUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
             return getYmtNotifyRefundUrlMock();
         } else {
             return getYmtNotifyRefundUrl();
         }
     }
 
-    public String getYmtNotifytradingeventUrl(String isMock) {
-        if (isMock(isMock)) {
+    public String getYmtNotifytradingeventUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
             return getYmtNotifytradingeventUrlMock();
         } else {
             return getYmtNotifytradingeventUrl();
@@ -218,32 +220,32 @@ public class IntegrationConfig {
         this.ymtUserServiceUrlMock = ymtUserServiceUrlMock;
     }
 
-    public String getWxRefundQueryUrl(String isMock) {
-        if (isMock(isMock)) {
+    public String getWxRefundQueryUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
             return getWxRefundQueryUrlMock();
         } else {
             return getWxRefundQueryUrl();
         }
     }
 
-    public String getWxUnifiedOrderUrl(String isMock) {
-        if (isMock(isMock)) {
+    public String getWxUnifiedOrderUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
             return getWxUnifiedOrderUrlMock();
         } else {
             return getWxUnifiedOrderUrl();
         }
     }
 
-    public String getYmtUserServiceUrl(String isMock) {
-        if (isMock(isMock)) {
+    public String getYmtUserServiceUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
             return getYmtUserServiceUrlMock();
         } else {
             return getYmtUserServiceUrl();
         }
     }
 
-    public String getAliPayBaseUrl(String isMock) {
-        if (isMock(isMock)) {
+    public String getAliPayBaseUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
             return getAliPayBaseUrlMock();
         } else {
             return getAliPayBaseUrl();
@@ -259,8 +261,10 @@ public class IntegrationConfig {
         this.openMock = openMock;
     }
 
-    private boolean isMock(String isMock) {
-        return "1".equals(isMock) && "true".equals(getOpenMock());
+    private boolean isMock(HashMap<String, String> header) {
+        return header != null
+                && "1".equals(header.get("Mock"))
+                && "true".equals(getOpenMock());
     }
 
     /**

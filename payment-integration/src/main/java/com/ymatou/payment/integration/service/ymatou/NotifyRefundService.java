@@ -46,16 +46,18 @@ public class NotifyRefundService implements InitializingBean {
      * @return
      * @throws IOException
      */
-    public String doService(String paymentId, String traceId, HashMap<String, String> header) throws Exception {
+    public void doService(String paymentId, String traceId, HashMap<String, String> header) throws Exception {
         try {
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair("PaymentId", paymentId));
             params.add(new BasicNameValuePair("TraceId", traceId));
-            String result = HttpClientUtil.sendPost(integrationConfig.getYmtNotifyRefundUrl(header.get("Mock")),
+            String result = HttpClientUtil.sendPost(integrationConfig.getYmtNotifyRefundUrl(header),
                     params, header, httpClient);
-            return result;
+            if (!"OK".equalsIgnoreCase(result)) {
+                logger.info("refund compensate call failed on {0},{1}", paymentId, result);
+            }
         } catch (Exception e) {
-            logger.error("async notify refund failed", e);
+            logger.error("refund compensate call failed on {0}", paymentId, e);
             throw e;
         }
     }
