@@ -105,6 +105,7 @@ public class PaymentResourceImplTest extends RestBaseTest {
         assertEquals("验证返回码", 0, res.getErrorCode());
         assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
         assertEquals("验证ResultType", "JSON", res.getResultType());
+        assertNotNull("验证Result", res.getResult());
 
         BussinessOrder bo = payService.GetBussinessOrderByOrderId(req.orderId);
         assertNotNull("验证商户订单", bo);

@@ -59,6 +59,7 @@ public class PaymentFacadeImpl implements PaymentFacade {
         resp.setTraceId(req.getTraceId());
         resp.setAppId(req.getAppId());
         resp.setVersion(req.getVersion());
+        resp.setResult(packageResp.getResult());
         resp.setResultType(packageResp.getResultType().name());
 
         return resp;

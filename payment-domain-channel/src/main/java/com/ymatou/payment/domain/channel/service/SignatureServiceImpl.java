@@ -52,7 +52,8 @@ public class SignatureServiceImpl implements SignatureService {
     public String signMessage(Map<String, String> rawMapData, InstitutionConfig instConfig,
             Boolean isMock) {
         // 拼装加签报文
-        String rawMessage = mapToString(rawMapData, instConfig);
+        boolean needSort = !"13".equals(instConfig.getPayType()); // 13- AliPay App 的收单加签不需要对参数排序
+        String rawMessage = mapToString(rawMapData, instConfig, needSort);
         String sign = null;
 
         if ("MD5".equals(instConfig.getSignType()))
@@ -74,7 +75,7 @@ public class SignatureServiceImpl implements SignatureService {
     @Override
     public boolean validateSign(Map<String, String> signMapData, InstitutionConfig instConfig, Boolean isMock) {
         // 拼装待延签签报文
-        String rawMessage = mapToString(signMapData, instConfig);
+        String rawMessage = mapToString(signMapData, instConfig, true);
         String sign = signMapData.get("sign").toString();
 
         if ("MD5".equals(instConfig.getSignType())) {
@@ -96,7 +97,7 @@ public class SignatureServiceImpl implements SignatureService {
      * @param instConfig
      * @return
      */
-    private String mapToString(Map<String, String> map, InstitutionConfig instConfig) {
+    private String mapToString(Map<String, String> map, InstitutionConfig instConfig, boolean needSort) {
         ArrayList<String> list = new ArrayList<String>();
         for (Map.Entry<String, String> entry : map.entrySet()) {
             if (entry.getValue() != "" && !entry.getKey().equals("sign") && !entry.getKey().equals("sign_type")) {
@@ -106,7 +107,10 @@ public class SignatureServiceImpl implements SignatureService {
 
         int size = list.size();
         String[] arrayToSort = list.toArray(new String[size]);
-        Arrays.sort(arrayToSort, String.CASE_INSENSITIVE_ORDER);
+
+        if (needSort)
+            Arrays.sort(arrayToSort, String.CASE_INSENSITIVE_ORDER);
+
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < size; i++) {
             sb.append(arrayToSort[i]);

@@ -48,13 +48,13 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
     @Resource
     private InstitutionConfigManager instConfigManager;
 
-    @Autowired
+    @Resource
     private IntegrationConfig integrationConfig;
 
-    @Autowired
+    @Resource
     private QueryTimestampService queryTimestampService;
 
-    @Autowired
+    @Resource
     private SignatureService signatureService;
 
     /*
