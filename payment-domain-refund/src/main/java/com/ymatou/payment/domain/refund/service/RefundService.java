@@ -4,10 +4,15 @@
 package com.ymatou.payment.domain.refund.service;
 
 import java.util.HashMap;
+import java.util.List;
 
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.refund.model.Refund;
+import com.ymatou.payment.facade.model.AcquireRefundDetail;
+import com.ymatou.payment.facade.model.AcquireRefundRequest;
+import com.ymatou.payment.facade.model.TradeDetail;
+import com.ymatou.payment.facade.model.TradeRefundDetail;
 
 /**
  * 退款服务
@@ -44,4 +49,21 @@ public interface RefundService {
      * @return
      */
     public void sendFastRefundTradingMessage(String userId, String orderId, HashMap<String, String> header);
+
+    /**
+     * 获取可以退款的交易
+     * 
+     * @param traderDetails
+     * @return
+     */
+    public List<TradeRefundDetail> generateTradeRefundDetailList(List<TradeDetail> traderDetails);
+
+    /**
+     * 检查RefundRequest是否存在， 若不存在则插入
+     * 
+     * @param tradeRefundDetail
+     * @param refund
+     */
+    public List<AcquireRefundDetail> checkAndSaveRefundRequest(List<TradeRefundDetail> tradeRefundDetail,
+            AcquireRefundRequest req);
 }

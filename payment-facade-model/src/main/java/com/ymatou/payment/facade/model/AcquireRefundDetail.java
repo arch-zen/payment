@@ -10,8 +10,14 @@ package com.ymatou.payment.facade.model;
  * 
  */
 public class AcquireRefundDetail {
+    /**
+     * 交易号
+     */
     private String tradeNo;
-    private String isRefundable;
+    /**
+     * 是否可以退款
+     */
+    private boolean isRefundable;
 
     public String getTradeNo() {
         return tradeNo;
@@ -21,11 +27,11 @@ public class AcquireRefundDetail {
         this.tradeNo = tradeNo;
     }
 
-    public String getIsRefundable() {
+    public boolean isRefundable() {
         return isRefundable;
     }
 
-    public void setIsRefundable(String isRefundable) {
+    public void setRefundable(boolean isRefundable) {
         this.isRefundable = isRefundable;
     }
 }

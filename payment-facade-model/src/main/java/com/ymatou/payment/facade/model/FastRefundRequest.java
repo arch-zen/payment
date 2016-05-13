@@ -6,6 +6,12 @@ package com.ymatou.payment.facade.model;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
+
 import com.ymatou.payment.facade.BaseRequest;
 
 /**
@@ -18,12 +24,25 @@ public class FastRefundRequest extends BaseRequest {
 
     private static final long serialVersionUID = -7414443014183140909L;
 
+    @NotBlank
     private String paymentId;
+
+    @NotBlank
     private String tradingId;
+
+    @Max(2)
+    @Min(1)
     private int tradeType;
+
+    @NotEmpty
     private List<String> orderIdList;
+
+    @NotBlank
     private String appId;
+
+    @NotBlank
     private String traceId;
+
     private HashMap<String, String> header;
 
     public String getPaymentId() {

@@ -27,6 +27,7 @@ import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
 import com.ymatou.payment.test.RestBaseTest;
 
+
 /**
  * 
  * @author wangxudong 2016年5月10日 下午12:10:19

@@ -6,6 +6,8 @@ package com.ymatou.payment.facade.model;
 import java.util.HashMap;
 import java.util.List;
 
+import org.hibernate.validator.constraints.Length;
+
 import com.ymatou.payment.facade.BaseRequest;
 
 /**
@@ -18,11 +20,28 @@ public class AcquireRefundRequest extends BaseRequest {
 
     private static final long serialVersionUID = -5683980381688847121L;
 
+    /**
+     * 订单号
+     */
     private String orderId;
+    /**
+     * 交易信息
+     */
     private List<TradeDetail> tradeDetails;
+    /**
+     * 应用编号
+     */
     private String appId;
+    /**
+     * 跟踪Id
+     */
+    @Length(min = 1, max = 32, message = "traceid not valid")
     private String traceId;
+    /**
+     * 签名
+     */
     private String sign;
+
     private HashMap<String, String> header;
 
     public String getOrderId() {

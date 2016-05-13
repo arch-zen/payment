@@ -10,8 +10,14 @@ package com.ymatou.payment.facade.model;
  * 
  */
 public class TradeDetail {
+    /**
+     * 交易号
+     */
     private String tradeNo;
-    private String tradeType;
+    /**
+     * 交易类型
+     */
+    private int tradeType;
 
     public String getTradeNo() {
         return tradeNo;
@@ -21,11 +27,11 @@ public class TradeDetail {
         this.tradeNo = tradeNo;
     }
 
-    public String getTradeType() {
+    public int getTradeType() {
         return tradeType;
     }
 
-    public void setTradeType(String tradeType) {
+    public void setTradeType(int tradeType) {
         this.tradeType = tradeType;
     }
 }

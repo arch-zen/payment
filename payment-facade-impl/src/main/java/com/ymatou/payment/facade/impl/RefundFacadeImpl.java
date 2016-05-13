@@ -3,6 +3,10 @@
  */
 package com.ymatou.payment.facade.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +21,13 @@ import com.ymatou.payment.domain.refund.service.RefundService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.RefundFacade;
+import com.ymatou.payment.facade.model.AcquireRefundDetail;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
 import com.ymatou.payment.facade.model.AcquireRefundResponse;
 import com.ymatou.payment.facade.model.FastRefundRequest;
 import com.ymatou.payment.facade.model.FastRefundResponse;
+import com.ymatou.payment.facade.model.TradeDetail;
+import com.ymatou.payment.facade.model.TradeRefundDetail;
 
 /**
  * 
@@ -70,13 +77,13 @@ public class RefundFacadeImpl implements RefundFacade {
         refundInfo.setPaymentId(req.getPaymentId());
         refundInfo.setTraceId(req.getTraceId());
 
-        // 退款请求落地
+        // Save RefundRequest And CompensateProcessInfo
         refundService.saveRefundRequest(payment, bussinessorder, refundInfo);
 
-        // 通知退款
+        // notify refund service
         refundService.notifyRefund(refundInfo, req.getHeader());
 
-        // 发送交易信息
+        // send trading message
         for (String orderId : req.getOrderIdList()) {
             refundService.sendFastRefundTradingMessage(bussinessorder.getUserid().toString(), orderId,
                     req.getHeader());
@@ -87,9 +94,34 @@ public class RefundFacadeImpl implements RefundFacade {
 
     @Override
     public AcquireRefundResponse submitRefund(AcquireRefundRequest req) {
-        // verify traceId length TODO
+        if (StringUtils.isEmpty(req.getOrderId())) {
+            throw new BizException(ErrorCode.INVALID_ORDER_ID, "order id is empty.");
+        }
 
-        return null;
+        AcquireRefundResponse response = new AcquireRefundResponse();
+        List<TradeDetail> tradeDetails = req.getTradeDetails();
+        List<TradeRefundDetail> refundableTrades = new ArrayList<>();
+
+        // 获取退款的相关的交易信息
+        List<TradeRefundDetail> tradeRefundDetails = refundService.generateTradeRefundDetailList(tradeDetails);
+        for (TradeRefundDetail tradeRefundDetail : tradeRefundDetails) {
+            if (tradeRefundDetail.isRefundable()) { // 筛选出可退款的交易信息
+                refundableTrades.add(tradeRefundDetail);
+            }
+        }
+
+        if (refundableTrades.size() != tradeDetails.size()) { // 若有不能被退款的，报错
+            logger.info("request refund trades size {}", tradeDetails.size());
+            logger.info("refundableTrades size {} ", refundableTrades.size());
+            throw new BizException(ErrorCode.NOT_ALL_TRADE_CAN_REFUND, "not all trade can be refunded.");
+        }
+
+        // 检查是否已经生成RefundRequest，若未生成则生成RefundRequest，并生成相应应答
+        List<AcquireRefundDetail> acquireRefundDetails = refundService.checkAndSaveRefundRequest(refundableTrades, req);
+
+        response.setDetails(acquireRefundDetails);
+
+        return response;
     }
 
 }

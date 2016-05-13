@@ -103,4 +103,21 @@ public class PaymentRepository {
         return paymentId;
     }
 
+    /**
+     * 查找可以退款的Payment
+     * 
+     * @param bussinessOrderId
+     * @param payStatus
+     * @return
+     */
+    public Payment getPaymentCanRefund(String bussinessOrderId, Integer payStatus) {
+        PaymentExample example = new PaymentExample();
+        example.createCriteria().andBussinessorderidEqualTo(bussinessOrderId)
+                .andPaystatusEqualTo(payStatus);
+        List<PaymentPo> pos = paymentMapper.selectByExample(example);
+        if (pos == null || pos.size() == 0) {
+            return null;
+        }
+        return Payment.convertFromPo(pos.get(0));
+    }
 }

@@ -46,6 +46,10 @@ public enum ErrorCode {
 
     INVALID_PAYTYPE(1005, "无效的支付渠道"),
 
+    NOT_ALL_TRADE_CAN_REFUND(-3, "非所有订单都可退款"),
+
+    INVALID_ORDER_ID(-2, "订单号非法"),
+
     FAIL(5000, "请求处理失败"),
 
     UNKNOWN(9999, "未知错误，系统异常");

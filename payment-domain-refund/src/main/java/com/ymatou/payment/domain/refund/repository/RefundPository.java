@@ -4,6 +4,7 @@
 package com.ymatou.payment.domain.refund.repository;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,8 @@ import com.ymatou.payment.domain.refund.model.Refund;
 import com.ymatou.payment.infrastructure.db.mapper.CompensateprocessinfoMapper;
 import com.ymatou.payment.infrastructure.db.mapper.RefundrequestMapper;
 import com.ymatou.payment.infrastructure.db.model.PpCompensateprocessinfoWithBLOBs;
+import com.ymatou.payment.infrastructure.db.model.RefundrequestExample;
+import com.ymatou.payment.infrastructure.db.model.RefundrequestPo;
 import com.ymatou.payment.infrastructure.db.model.RefundrequestWithBLOBs;
 
 /**
@@ -45,33 +48,47 @@ public class RefundPository {
         refundrequest.setPaytype(payment.getPaytype());
         refundrequest.setRefundamount(payment.getPayprice());
         refundrequest.setCurrencytype(payment.getPaycurrencytype());
-        refundrequest.setApprovestatus(ApproveStatusEnum.FAST_REFUND.getCode()); // TODO
+        refundrequest.setApprovestatus(ApproveStatusEnum.FAST_REFUND.getCode());
         refundrequest.setApprovedtime(new Date());
-        refundrequest.setSoftdeleteflag(false); // TODO
-        refundrequest.setCreatedtime(new Date());
-        refundrequest.setApproveduser("");// TODO
-        refundrequest.setRefundstatus(RefundStatusEnum.INIT.getCode()); // TODO
-        refundrequest.setRefundtime(null);
-        refundrequest.setRefundbatchno(null);
-        refundrequest.setInstpaymentid(null);
-        refundrequest.setMemo(null);
+        refundrequest.setApproveduser("system");
+        refundrequest.setRefundstatus(RefundStatusEnum.INIT.getCode());
         refundrequest.setTradetype(refundInfo.getTradeType());
 
         PpCompensateprocessinfoWithBLOBs compensateprocessinfo = new PpCompensateprocessinfoWithBLOBs();
         compensateprocessinfo.setCorrelateid(payment.getPaymentid());
         compensateprocessinfo.setAppid(refundInfo.getAppId());
-        compensateprocessinfo.setPaytype(null); // TODO
+        compensateprocessinfo.setPaytype(null);
         compensateprocessinfo.setMethodname("Refund");
         compensateprocessinfo.setRequesturl("");
         compensateprocessinfo.setRequestdata(payment.getPaymentid());
-        compensateprocessinfo.setRetrycount(0); // TODO
-        compensateprocessinfo.setCreatedtime(new Date());
         compensateprocessinfo.setProcessmachinename(null);
         compensateprocessinfo.setLastprocessedtime(null);
-        compensateprocessinfo.setProcessstatus(0);// TODO
         compensateprocessinfo.setCompensatetype(1); // 退款
 
         compensateprocessinfoMapper.insertSelective(compensateprocessinfo);
         refundrequestMapper.insertSelective(refundrequest);
+    }
+
+    /**
+     * 根据paymentId获取Refundrequest
+     * 
+     * @param paymentId
+     * @return
+     */
+    public RefundrequestPo getRefundRequestByPaymentId(String paymentId) {
+        RefundrequestExample example = new RefundrequestExample();
+        example.createCriteria().andPaymentidEqualTo(paymentId);
+        List<RefundrequestPo> pos = refundrequestMapper.selectByExample(example);
+        if (pos == null || pos.size() == 0) {
+            return null;
+        }
+        return pos.get(0);
+    }
+
+    @Transactional
+    public void batchSaveRefundRequest(List<RefundrequestWithBLOBs> refundrequestWithBLOBs) {
+        for (RefundrequestWithBLOBs refundrequest : refundrequestWithBLOBs) {
+            refundrequestMapper.insertSelective(refundrequest);
+        }
     }
 }

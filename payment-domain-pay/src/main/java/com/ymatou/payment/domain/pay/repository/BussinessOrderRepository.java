@@ -5,6 +5,7 @@
  */
 package com.ymatou.payment.domain.pay.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -69,12 +70,28 @@ public class BussinessOrderRepository {
         BussinessorderExample example = new BussinessorderExample();
         example.createCriteria().andBussinessorderidEqualTo(bussinessorderid);
         List<BussinessorderPo> opList = mapper.selectByExample(example);
-        if (opList.size() == 0)
+        if (opList == null || opList.size() == 0)
             return null;
         return BussinessOrder.convertFromPo(opList.get(0));
+    }
 
-        // TODO
-        // BussinessorderPo bussinessorderPo = mapper.selectByPrimaryKey(bussinessorderid);
-        // return BussinessOrder.convertFromPo(bussinessorderPo);
+    /**
+     * 根据traceNo找到可以退款的订单
+     * 
+     * @param traceNo
+     * @param orderStatus
+     * @param valideDate
+     * @return
+     */
+    public BussinessOrder getBussinessOrderCanRefund(String tradeNo, Integer orderStatus, Date validDate) {
+        BussinessorderExample example = new BussinessorderExample();
+        example.createCriteria().andOrderidEqualTo(tradeNo)
+                .andOrderstatusEqualTo(orderStatus)
+                .andCreatedtimeGreaterThanOrEqualTo(validDate);
+        List<BussinessorderPo> pos = mapper.selectByExample(example);
+        if (pos == null || pos.size() == 0) {
+            return null;
+        }
+        return BussinessOrder.convertFromPo(pos.get(0));
     }
 }
