@@ -59,7 +59,9 @@ public class QueryTimestampService implements InitializingBean {
      */
     public QueryTimestampResponse doService(String service, String partner, HashMap<String, String> header)
             throws Exception {
-        String url = new StringBuilder(100).append(integrationConfig.getAliQueryTimestampUrl(header.get("Mock")))
+        String aliPayUrl = (header == null) ? integrationConfig.getAliPayBaseUrl()
+                : integrationConfig.getAliPayBaseUrl(header.get("Mock"));
+        String url = new StringBuilder(100).append(aliPayUrl)
                 .append("?service=").append(service).append("&partner=").append(partner).toString();
 
         try {

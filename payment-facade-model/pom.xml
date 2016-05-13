@@ -27,5 +27,9 @@
 			<groupId>javax.el</groupId>
 			<artifactId>el-api</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jackson-provider</artifactId>
+		</dependency>
 	</dependencies>
 </project>

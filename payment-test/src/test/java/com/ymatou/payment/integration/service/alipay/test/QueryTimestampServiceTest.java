@@ -25,7 +25,7 @@ public class QueryTimestampServiceTest {
         header.put("Mock", "1");
         header.put("MockId", "888888");
         QueryTimestampResponse response =
-                queryTimestampService.doService("query_timestamp", "2088701734809577", header);
+                queryTimestampService.doService("query_timestamp", "2088701734809577", null);
         Assert.assertNotNull(response);
         Assert.assertEquals("T", response.getIsSuccess());
         Assert.assertNotNull(response.getTimestampEncryptKey());
@@ -38,7 +38,7 @@ public class QueryTimestampServiceTest {
         header.put("Mock", "1");
         header.put("MockId", "888888");
         QueryTimestampResponse response =
-                queryTimestampService.doService("query_timestamp", "20887017348095771", header);
+                queryTimestampService.doService("query_timestamp", "20887017348095771", null);
         Assert.assertNotNull(response);
         Assert.assertEquals("F", response.getIsSuccess());
         Assert.assertNull(response.getTimestampEncryptKey());

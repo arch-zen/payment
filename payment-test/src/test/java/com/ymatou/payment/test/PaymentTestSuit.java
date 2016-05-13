@@ -13,7 +13,8 @@ import com.googlecode.junittoolbox.SuiteClasses;
 import com.googlecode.junittoolbox.WildcardPatternSuite;
 
 @RunWith(WildcardPatternSuite.class)
-@SuiteClasses({"**/*Test.class",
+@SuiteClasses({
+        "**/*Test.class",
         "!*BaseTest.class"})
 public class PaymentTestSuit {
 }

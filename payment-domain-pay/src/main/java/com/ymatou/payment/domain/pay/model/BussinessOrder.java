@@ -685,4 +685,19 @@ public class BussinessOrder extends PrintFriendliness {
         return model;
     }
 
+    /**
+     * 返回商品描述
+     * 
+     * @return
+     */
+    public String getSubject() {
+        if (productname != null && !productname.isEmpty())
+            return productname;
+
+        if (productdesc != null && !productdesc.isEmpty())
+            return productdesc;
+
+        return null;
+    }
+
 }

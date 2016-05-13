@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <institutionConfigCollection>
 	<!--AliPay Pc -->
-	<config payType="10" merchantId="2088701734809577" signType="MD5"
-		instName="AliPay" />
+	<config payType="10" merchantId="2088701734809577" signType="MD5" sellerEmail="ap.ymt@ymatou.com"
+		instName="AliPay"
+		md5Key="l9d4rmadb6viepgot7i1i131yilo09vm" />
 	<!--AliPay Wap -->
-	<config payType="11" merchantId="2088701734809577" signType="MD5"
+	<config payType="11" merchantId="2088701734809577" signType="MD5" sellerEmail="ap.ymt@ymatou.com"
 		instName="AliPay" />
 	<!--AliPay App -->
-	<config payType="13" merchantId="2088701734809577" signType="RSA"
-		instName="AliPay" instPublicKey="instPublicKey" instYmtPrivateKey="instYmtPrivateKey" />
+	<config payType="13" merchantId="2088701734809577" signType="RSA" sellerEmail="ap.ymt@ymatou.com"
+		instName="AliPay" 
+		instPublicKey="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCnxj/9qwVfgoUh/y2W89L6BkRAFljhNhgPdyPuBV64bfQNN1PjbCzkIM6qRdKBoLPXmKKMiFYnkd6rAoprih3/PrQEB/VsW8OoM8fxn67UDYuyBTqA23MML9q1+ilIZwBC2AQ2UBVOrFXfFl75p6/B5KsiNG9zpgmLCUYuLkxpLQIDAQAB" 
+		instYmtPrivateKey="MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAL8wWBw7xJpKI/CKnU6C2YC6QHN4AvdxMWBUunLny0lshqZyZad2JQp7nsmMgPPeAxtXpzOvGovi6uXxtjs7iW+BccK5PmSkp4A3EdSvmbgOSe5j17Bf4VYM0lUfQo24L9T39bwO5T+AZu+VwNz6MYgzc47STmcAzrEqgp4EjKBJAgMBAAECgYEAhExJzE+3fiSrtfnVXMzDAYbgroZvVxam2kgHNRgc3dQRYQBsQ3NHsndUq5dkbFxGvhbrhqI2tnHxpeia92X9dU9aDZRAFlqb0rGOHRpqA+LdY15NAT6LkR1064jT8LnygWw0Ao6ktNEBCMDDH9pSoN3X9MBo2bKFagNohurnnZkCQQDhnpHN95K35XUad/HKLnGAXP0qPpQVeT9uygIwqK8EGpppD5aDkRIWBrkbPgM4tc3IWLlTsgfluxh8/IeP4+AjAkEA2O7nF509xiJOO+0cu0/8bkisBO2kHIrLrhYutDZZ9Ocobw2flcmYmqcPCFYdxQl0qpKG3oKSxa8rS8WuqLEOowJBAL2MLayfiPjMYpSJHm6glCSmet7J0jk0MxGNz0c4AElvXDhVqzr/XvV4Un1LnQNA4hCmUZS6Jh5gEBO5SN6fMIcCQQDDydLeODeBtIKhiV5uHEG7E3HVvNlqPUaZJ0IduhQ0edC/ci8/FETcB70EjBywMdmO/VImTvjC3FcaOx9o9uw7AkA17XhfgF19E5fJUwR/YM9J2whVXObvTUgc8YwTmWXMMziSXCr2eSCK/4cLLBCRv4N9A/hqVx5PyICTC2GqKBUN" />
 	<!--WeiXin JSAPI -->
 	<config payType="14" merchantId="1278350701" signType="MD5"
 		instName="Weixin" md5Key="es839gnc8451lp0s943n568xzskjgdbv" appId="wxa06ebe9f39751792"
-		thumbprint="‎5AA48296D4035EE700FA858F3B3D32711DCF6C3F" />
+		md5KeyConnector="&amp;key=" />
 	<!--weixin App -->
 	<config payType="15" merchantId="1234079001" signType="MD5"
 		instName="WeixinApp" md5Key="c5781df6b8f149adca6094cdac4ac684" appId="wxf51a439c0416f182"
-		thumbprint="5875E2EFDF497320417CC8C9B554E83BA486E498" />
+		md5KeyConnector="&amp;key=" />
 </institutionConfigCollection>

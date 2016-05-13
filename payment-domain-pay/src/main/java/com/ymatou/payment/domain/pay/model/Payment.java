@@ -20,6 +20,11 @@ public class Payment extends PrintFriendliness {
     private static final long serialVersionUID = 2524661669277166299L;
 
     /**
+     * 商户订单
+     */
+    private BussinessOrder bussinessOrder;
+
+    /**
      * VARCHAR(32) 必填<br>
      * 
      */
@@ -420,4 +425,19 @@ public class Payment extends PrintFriendliness {
 
         return model;
     }
+
+    /**
+     * @return the bussinessOrder
+     */
+    public BussinessOrder getBussinessOrder() {
+        return bussinessOrder;
+    }
+
+    /**
+     * @param bussinessOrder the bussinessOrder to set
+     */
+    public void setBussinessOrder(BussinessOrder bussinessOrder) {
+        this.bussinessOrder = bussinessOrder;
+    }
+
 }
