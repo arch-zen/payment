@@ -77,7 +77,7 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
         reqMap.put("sign", sign);
 
         // 拼装请求报文
-        String reqForm = AliPayFormBuilder.buildForm(reqMap, integrationConfig.getAliPayBaseUrl("1"));
+        String reqForm = AliPayFormBuilder.buildForm(reqMap, integrationConfig.getAliPayBaseUrl(null));
 
         // 返回报文结果
         AcquireOrderPackageResp resp = new AcquireOrderPackageResp();
