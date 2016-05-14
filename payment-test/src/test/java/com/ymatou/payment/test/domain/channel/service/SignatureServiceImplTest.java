@@ -5,14 +5,17 @@
  */
 package com.ymatou.payment.test.domain.channel.service;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
+
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.integration.IntegrationConfig;
@@ -132,6 +135,32 @@ public class SignatureServiceImplTest extends RestBaseTest {
 
         assertEquals("验证MD5签名", true, signResult);
     }
+
+    @Test
+    public void testAliPayAppSign() {
+        String payType = "13";
+        Map<String, String> notifyMap = new LinkedHashMap<String, String>();
+        notifyMap.put("partner", "\"2088701734809577\"");
+        notifyMap.put("seller_id", "\"ap.ymt@ymatou.com\"");
+        notifyMap.put("out_trade_no", "\"2016051317583592700920947\"");
+        notifyMap.put("subject", "\"你好\"");
+        notifyMap.put("body", "\"你好\"");
+        notifyMap.put("rn_check", "\"T\"");
+        notifyMap.put("total_fee", "\"10.00\"");
+        notifyMap.put("notify_url", "\"http://localhost:12345/notify/13\"");
+        notifyMap.put("service", "\"mobile.securitypay.pay\"");
+        notifyMap.put("payment_type", "\"1\"");
+        notifyMap.put("_input_charset", "\"utf-8\"");
+        notifyMap.put("it_b_pay", "\"10d\"");
+        notifyMap.put("show_url", "\"m.alipay.com\"");
+
+        String assertSign =
+                "DtbWbaOFCZO4k5TBOHTtNQpuz8Sejpq/xnYa2eHlOJaQm1Cr90/zNGFBL0SBb80uQ2ilQ+1myFbTG9e6EmIo3B/2a3LBGFMEbVWJn5lb2ibRB7+u55yQWekaGcfGIg8z97PbIZBhD+bQxLYpOWoWg8hh1VFQDDaYeVW5o9tk3xc=";
+        String sign = signatureService.signMessage(notifyMap, instConfigManager.getConfig(payType), false);
+
+        assertEquals("验证RSA签名", assertSign, sign);
+    }
+
 
     /**
      * 将url字符串转成Map
