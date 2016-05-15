@@ -51,7 +51,7 @@ public class SignatureServiceImplTest extends RestBaseTest {
                 "discount=0.00&payment_type=1&subject=3252820.weixin%E7%9A%84%E8%AE%A2%E5%8D%95&trade_no=2016051321001004220248687425&buyer_email=ki.doshi%40hotmail.com&gmt_create=2016-05-13+11%3A33%3A21&notify_type=trade_status_sync&quantity=1&out_trade_no=21897556000062808&seller_id=2088701734809577&notify_time=2016-05-13+11%3A33%3A23&body=3252820.weixin%E7%9A%84%E8%AE%A2%E5%8D%95&trade_status=TRADE_SUCCESS&is_total_fee_adjust=N&total_fee=33.00&gmt_payment=2016-05-13+11%3A33%3A23&seller_email=ap.ymt%40ymatou.com&price=33.00&buyer_id=2088002653527220&notify_id=fb493a38a9b5e24bc53ba1d8ce158c7hp6&use_coupon=N&sign_type=RSA&sign=itrjn%2FrbQFi4oC1RQoaXxjtvA2AvNk2H%2Bc7Kou%2FC%2BNZql04G7wI2bdY5QSyPVu1xZ28A%2FAIW1qkcUQltDDY%2BmR9G%2BbWTePHxI5C0Zjfsur%2FKyMikG21NvwjmsViKp2irVtUtnDPoWr8BwRt7rbD74cXsaVfHbKPj%2B0GjJCRB1xk%3D";
         Map<String, String> signMap = parseQueryStringToMap(notifyMessage);
 
-        boolean signResult = signatureService.validateSign(signMap, instConfigManager.getConfig(payType), false);
+        boolean signResult = signatureService.validateSign(signMap, instConfigManager.getConfig(payType), null);
 
         assertEquals("验证RSA签名", true, signResult);
     }
@@ -69,7 +69,7 @@ public class SignatureServiceImplTest extends RestBaseTest {
                 "discount=0.00&payment_type=1&subject=dearoou%E7%9A%84%E8%AE%A2%E5%8D%95&trade_no=2016051321001004790242297728&buyer_email=benbenyu1989111%40163.com&gmt_create=2016-05-13+11%3A58%3A46&notify_type=trade_status_sync&quantity=1&out_trade_no=21897626500822310&seller_id=2088701734809577&notify_time=2016-05-13+11%3A59%3A05&trade_status=TRADE_SUCCESS&is_total_fee_adjust=N&total_fee=396.00&gmt_payment=2016-05-13+11%3A59%3A05&seller_email=ap.ymt%40ymatou.com&price=396.00&buyer_id=2088302134796793&notify_id=c0fe678eb06fdcb795e8f465a21d70bm3i&use_coupon=N&sign_type=MD5&sign=240dd0275cc965c9ef2a3fc9e1121d9e";
         Map<String, String> signMap = parseQueryStringToMap(notifyMessage);
 
-        boolean signResult = signatureService.validateSign(signMap, instConfigManager.getConfig(payType), false);
+        boolean signResult = signatureService.validateSign(signMap, instConfigManager.getConfig(payType), null);
 
         assertEquals("验证MD5签名", true, signResult);
     }
@@ -100,7 +100,7 @@ public class SignatureServiceImplTest extends RestBaseTest {
         notifyMap.put("trade_type", "APP");
         notifyMap.put("transaction_id", "4010032001201605135802475848");
 
-        boolean signResult = signatureService.validateSign(notifyMap, instConfigManager.getConfig(payType), false);
+        boolean signResult = signatureService.validateSign(notifyMap, instConfigManager.getConfig(payType), null);
 
         assertEquals("验证MD5签名", true, signResult);
     }
@@ -131,7 +131,7 @@ public class SignatureServiceImplTest extends RestBaseTest {
         notifyMap.put("trade_type", "JSAPI");
         notifyMap.put("transaction_id", "4008442001201605095674716576");
 
-        boolean signResult = signatureService.validateSign(notifyMap, instConfigManager.getConfig(payType), false);
+        boolean signResult = signatureService.validateSign(notifyMap, instConfigManager.getConfig(payType), null);
 
         assertEquals("验证MD5签名", true, signResult);
     }
@@ -156,9 +156,46 @@ public class SignatureServiceImplTest extends RestBaseTest {
 
         String assertSign =
                 "DtbWbaOFCZO4k5TBOHTtNQpuz8Sejpq/xnYa2eHlOJaQm1Cr90/zNGFBL0SBb80uQ2ilQ+1myFbTG9e6EmIo3B/2a3LBGFMEbVWJn5lb2ibRB7+u55yQWekaGcfGIg8z97PbIZBhD+bQxLYpOWoWg8hh1VFQDDaYeVW5o9tk3xc=";
-        String sign = signatureService.signMessage(notifyMap, instConfigManager.getConfig(payType), false);
+        String sign = signatureService.signMessage(notifyMap, instConfigManager.getConfig(payType), null);
 
         assertEquals("验证RSA签名", assertSign, sign);
+    }
+
+    @Test
+    public void testWeixinJSAPISign() {
+        String payType = "14";
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("appId", "wxa06ebe9f39751792");
+        map.put("signType", "MD5");
+        map.put("sign", "test-no-effect");
+        map.put("serialVersionUID", "test-no-effect");
+        map.put("timeStamp", "1463320049");
+        map.put("nonceStr", "9abaf2f5cfb34b5e87d3a8532977702b");
+        map.put("package", "prepay_id=mock5e702505eb8a4e0ca12fcd8656b606c9");
+
+        String assertSign = "BED2B76C84FB23162E03B4BC3F391663";
+        String sign = signatureService.signMessage(map, instConfigManager.getConfig(payType), null);
+
+        assertEquals("验证MD5签名", assertSign, sign);
+    }
+
+    @Test
+    public void testWeixinAppSign() {
+        String payType = "15";
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("appid", "wxf51a439c0416f182");
+        map.put("partnerid", "1234079001");
+        map.put("prepayid", "wx201605151619502429401d080991478299");
+        map.put("timestamp", "1463300390");
+        map.put("noncestr", "ff64f9646ad443e9958ef170dc9f68cc");
+        map.put("package", "Sign=WXPay");
+        map.put("sign", "test-no-effect");
+        map.put("serialVersionUID", "test-no-effect");
+
+        String assertSign = "FB9FC0359274BCF3464B9D94FD11F235";
+        String sign = signatureService.signMessage(map, instConfigManager.getConfig(payType), null);
+
+        assertEquals("验证MD5签名", assertSign, sign);
     }
 
 

@@ -72,7 +72,7 @@ public class AliPayAppAcquireOrderServiceImpl implements AcquireOrderService {
         Map<String, String> reqMap = buildReqMap(payment, instConfig);
 
         // 签名
-        String sign = signatureService.signMessage(reqMap, instConfig, false);
+        String sign = signatureService.signMessage(reqMap, instConfig, payment.getAcquireOrderReq().getMockHeader());
         reqMap.put("sign_type", "\"RSA\"");
         reqMap.put("sign", String.format("\"%s\"", UrlEncoder.encode(sign)));
 

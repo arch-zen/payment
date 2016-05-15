@@ -155,6 +155,73 @@ public class PaymentResourceImplTest extends RestBaseTest {
         System.out.println(res.getErrorMessage());
     }
 
+    @Test
+    public void testAcquireOrderWeixinApp() {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+
+        req.setPayType("15");
+        req.setPayPrice("1.01");
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        assertEquals("验证返回码", 0, res.getErrorCode());
+        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
+        assertEquals("验证ResultType", "JSON", res.getResultType());
+        assertNotNull("验证Result", res.getResult());
+
+        BussinessOrder bo = payService.GetBussinessOrderByOrderId(req.orderId);
+        assertNotNull("验证商户订单", bo);
+
+        System.out.println(bo.getOrderid());
+        System.out.println(bo.getBussinessorderid());
+
+        assertEquals("验证PayType", req.getPayType(), bo.getPaytype());
+
+        Payment payment = payService.GetPaymentByBussinessOrderId(bo.getBussinessorderid());
+        assertNotNull("验证支付单不为空", payment);
+
+        assertEquals("验证PayType", req.getPayType(), payment.getPaytype());
+        assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(), payment.getPayprice().doubleValue(),
+                0.000001);
+        assertEquals("验证PayStatus", new Integer(0), payment.getPaystatus());
+    }
+
+    @Test
+    public void testAcquireOrderWeixinJSAPI() {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+
+        req.setPayType("14");
+        req.setPayPrice("1.01");
+        req.setUserId(3790800);
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        assertEquals("验证返回码", 0, res.getErrorCode());
+        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
+        assertEquals("验证ResultType", "JSON", res.getResultType());
+        assertNotNull("验证Result", res.getResult());
+
+        BussinessOrder bo = payService.GetBussinessOrderByOrderId(req.orderId);
+        assertNotNull("验证商户订单", bo);
+
+        System.out.println(bo.getOrderid());
+        System.out.println(bo.getBussinessorderid());
+
+        assertEquals("验证PayType", req.getPayType(), bo.getPaytype());
+
+        Payment payment = payService.GetPaymentByBussinessOrderId(bo.getBussinessorderid());
+        assertNotNull("验证支付单不为空", payment);
+
+        assertEquals("验证PayType", req.getPayType(), payment.getPaytype());
+        assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(), payment.getPayprice().doubleValue(),
+                0.000001);
+        assertEquals("验证PayStatus", new Integer(0), payment.getPaystatus());
+    }
+
     /**
      * 构造请求报文
      * 

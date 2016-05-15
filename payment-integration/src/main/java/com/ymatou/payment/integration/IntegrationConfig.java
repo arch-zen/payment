@@ -261,7 +261,7 @@ public class IntegrationConfig {
         this.openMock = openMock;
     }
 
-    private boolean isMock(HashMap<String, String> header) {
+    public boolean isMock(HashMap<String, String> header) {
         return header != null
                 && "1".equals(header.get("Mock"))
                 && "true".equals(getOpenMock());

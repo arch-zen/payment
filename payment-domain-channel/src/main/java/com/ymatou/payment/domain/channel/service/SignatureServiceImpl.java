@@ -7,7 +7,10 @@ package com.ymatou.payment.domain.channel.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+
+import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -17,6 +20,7 @@ import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.infrastructure.security.MD5Util;
 import com.ymatou.payment.infrastructure.security.RSAUtil;
+import com.ymatou.payment.integration.IntegrationConfig;
 
 /**
  * 签名服务实现
@@ -42,6 +46,9 @@ public class SignatureServiceImpl implements SignatureService {
     private final String mockYmtPrivateKey =
             "MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAOY/57sgqIjHEZjNhmXlLapuYJuSACN4zzWaDCnujAEd2dxulxp57ajrnNgUjRJcm7O7mtkF7cE8u5y5l6De3sWM1/YLuPyB8Nhy+IxqY7AjtW5Zn5kS0IdIeQ6FSXBy6XnEsxeXac93VjMvrMwJ7ZUArvlwegEqd34OYRVI5CKlAgMBAAECgYBApPCKuUCYJkvqesmhEhcgIp09EGC5lNGYWwfPPgpQxfDE0sfZxyHSq1P91sdEwHt2mtV+2QtHlaWW+wR3RhuFEuGM1z8fsvongAk9bNDPvaPz07HF1YwXuviakDYk1bWwqCS+9VFJ82fGae4+ftUQOmJYSH+LV89RRqWdCP5GgQJBAP/nwVbgw/bBR04UDfUK2Bdr+Op+6WFdFoyzK7Kvr5sjO0T5ewswHJ34+B26X50kGqkIU2h2AXh8/AX1ZJUB5vsCQQDmVbglUXIrjLG5zraxstNlDnJvDL3WmYtZJxbKWq9QgSWYzf4iCaAVqsjZHfAHAV2iMGf+x55QGuHk7hZ0SGrfAkEAlVRE0xCX6c8BcANt3Zc1X/2GpDfosgMjHHmVP1Eb1RirBmXasj2iBWD6UEaocsdVs1uDaIqr8wZj/ooi5nzUrwJBAM5R2jETU4FO9aPKVju2Q0UyO67dau7fesLREMkRkhg6lsLZQdqbZJoD8QUKnAaqYoT1dzHw/Q4kBlRaMCLY+2ECQQDVAbyCAAte4LH9EndxkisOZXKMLbjhlmORpyKBUwSwW6Hk4If4hlKTIOUCuwXJzb08BK40AGD+pw6P35e+B3Dh";
 
+    @Resource
+    private IntegrationConfig integrationConfig;
+
     /*
      * (non-Javadoc)
      * 
@@ -50,16 +57,16 @@ public class SignatureServiceImpl implements SignatureService {
      */
     @Override
     public String signMessage(Map<String, String> rawMapData, InstitutionConfig instConfig,
-            Boolean isMock) {
+            HashMap<String, String> mockHeader) {
         // 拼装加签报文
         boolean needSort = !"13".equals(instConfig.getPayType()); // 13- AliPay App 的收单加签不需要对参数排序
         String rawMessage = mapToString(rawMapData, instConfig, needSort);
         String sign = null;
 
         if ("MD5".equals(instConfig.getSignType()))
-            sign = md5Sign(rawMessage, instConfig, isMock);
+            sign = md5Sign(rawMessage, instConfig, mockHeader);
         else if ("RSA".equals(instConfig.getSignType()))
-            sign = rsaSign(rawMessage, instConfig, isMock);
+            sign = rsaSign(rawMessage, instConfig, mockHeader);
         else
             throw new BizException(ErrorCode.INVALID_SIGN_TYPE, instConfig.getSignType());
 
@@ -73,18 +80,19 @@ public class SignatureServiceImpl implements SignatureService {
      * com.ymatou.payment.domain.channel.InstitutionConfig, java.lang.Boolean)
      */
     @Override
-    public boolean validateSign(Map<String, String> signMapData, InstitutionConfig instConfig, Boolean isMock) {
+    public boolean validateSign(Map<String, String> signMapData, InstitutionConfig instConfig,
+            HashMap<String, String> mockHeader) {
         // 拼装待延签签报文
         String rawMessage = mapToString(signMapData, instConfig, true);
         String sign = signMapData.get("sign").toString();
 
         if ("MD5".equals(instConfig.getSignType())) {
-            String md5Sign = md5Sign(rawMessage, instConfig, isMock);
+            String md5Sign = md5Sign(rawMessage, instConfig, mockHeader);
             return sign.equals(md5Sign);
         }
 
         if ("RSA".equals(instConfig.getSignType())) {
-            return rsaSignValidate(rawMessage, signMapData.get("sign").toString(), instConfig, isMock);
+            return rsaSignValidate(rawMessage, signMapData.get("sign").toString(), instConfig, mockHeader);
         }
 
         throw new BizException(ErrorCode.INVALID_SIGN_TYPE, instConfig.getSignType());
@@ -100,7 +108,10 @@ public class SignatureServiceImpl implements SignatureService {
     private String mapToString(Map<String, String> map, InstitutionConfig instConfig, boolean needSort) {
         ArrayList<String> list = new ArrayList<String>();
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            if (entry.getValue() != "" && !entry.getKey().equals("sign") && !entry.getKey().equals("sign_type")) {
+            if (entry.getValue() != ""
+                    && !entry.getKey().equals("serialVersionUID")
+                    && !entry.getKey().equals("sign")
+                    && !entry.getKey().equals("sign_type")) {
                 list.add(entry.getKey() + "=" + entry.getValue() + "&");
             }
         }
@@ -129,8 +140,8 @@ public class SignatureServiceImpl implements SignatureService {
      * @param isMock
      * @return
      */
-    private String md5Sign(String rawMessage, InstitutionConfig instConfig, Boolean isMock) {
-        String md5Key = isMock ? mockMd5key : instConfig.getMd5Key();
+    private String md5Sign(String rawMessage, InstitutionConfig instConfig, HashMap<String, String> mockHeader) {
+        String md5Key = integrationConfig.isMock(mockHeader) ? mockMd5key : instConfig.getMd5Key();
         String md5keyConnector =
                 StringUtils.isBlank(instConfig.getMd5KeyConnector()) ? "" : instConfig.getMd5KeyConnector();
         String targetMessage = rawMessage + md5keyConnector + md5Key;
@@ -149,8 +160,9 @@ public class SignatureServiceImpl implements SignatureService {
      * @param isMock
      * @return
      */
-    private String rsaSign(String rawMessage, InstitutionConfig instConfig, Boolean isMock) {
-        String privateKey = isMock ? mockYmtPrivateKey : instConfig.getInstYmtPrivateKey();
+    private String rsaSign(String rawMessage, InstitutionConfig instConfig, HashMap<String, String> mockHeader) {
+        String privateKey =
+                integrationConfig.isMock(mockHeader) ? mockYmtPrivateKey : instConfig.getInstYmtPrivateKey();
 
         return RSAUtil.sign(rawMessage, privateKey);
     }
@@ -164,8 +176,9 @@ public class SignatureServiceImpl implements SignatureService {
      * @param isMock
      * @return
      */
-    private boolean rsaSignValidate(String rawMessage, String sign, InstitutionConfig instConfig, Boolean isMock) {
-        String publicKey = isMock ? mockPublicKey : instConfig.getInstPublicKey();
+    private boolean rsaSignValidate(String rawMessage, String sign, InstitutionConfig instConfig,
+            HashMap<String, String> mockHeader) {
+        String publicKey = integrationConfig.isMock(mockHeader) ? mockPublicKey : instConfig.getInstPublicKey();
 
         return RSAUtil.doCheck(rawMessage, sign, publicKey);
     }

@@ -5,6 +5,7 @@
  */
 package com.ymatou.payment.domain.channel.service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.ymatou.payment.domain.channel.InstitutionConfig;
@@ -25,7 +26,8 @@ public interface SignatureService {
      * @param isMock
      * @return 返回签名
      */
-    String signMessage(Map<String, String> rawMapData, InstitutionConfig instConfig, Boolean isMock);
+    String signMessage(Map<String, String> rawMapData, InstitutionConfig instConfig,
+            HashMap<String, String> mockHeader);
 
     /**
      * 验证签名
@@ -35,5 +37,6 @@ public interface SignatureService {
      * @param isMock
      * @return
      */
-    boolean validateSign(Map<String, String> signMapData, InstitutionConfig instConfig, Boolean isMock);
+    boolean validateSign(Map<String, String> signMapData, InstitutionConfig instConfig,
+            HashMap<String, String> mockHeader);
 }

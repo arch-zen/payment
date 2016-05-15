@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import com.ymatou.payment.facade.PrintFriendliness;
+import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 
 /**
@@ -23,6 +24,11 @@ public class Payment extends PrintFriendliness {
      * 商户订单
      */
     private BussinessOrder bussinessOrder;
+
+    /**
+     * 收单请求
+     */
+    private AcquireOrderReq acquireOrderReq;
 
     /**
      * VARCHAR(32) 必填<br>
@@ -438,6 +444,20 @@ public class Payment extends PrintFriendliness {
      */
     public void setBussinessOrder(BussinessOrder bussinessOrder) {
         this.bussinessOrder = bussinessOrder;
+    }
+
+    /**
+     * @return the acquireOrderReq
+     */
+    public AcquireOrderReq getAcquireOrderReq() {
+        return acquireOrderReq;
+    }
+
+    /**
+     * @param acquireOrderReq the acquireOrderReq to set
+     */
+    public void setAcquireOrderReq(AcquireOrderReq acquireOrderReq) {
+        this.acquireOrderReq = acquireOrderReq;
     }
 
 }
