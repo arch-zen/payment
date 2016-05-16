@@ -18,8 +18,17 @@ public class ApproveRefundRequest extends BaseRequest {
 
     private static final long serialVersionUID = 704177923514574213L;
 
+    /**
+     * 支付订单号列表
+     */
     private List<String> paymentIds;
+    /**
+     * 审核人
+     */
     private String approveUser;
+    /**
+     * http请求header(可不填)
+     */
     private HashMap<String, String> header;
 
     public List<String> getPaymentIds() {

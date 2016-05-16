@@ -7,7 +7,6 @@ import java.util.List;
 
 import com.ymatou.payment.facade.model.AcquireRefundDetail;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
-import com.ymatou.payment.facade.model.TradeDetail;
 import com.ymatou.payment.facade.model.TradeRefundDetail;
 
 /**
@@ -24,7 +23,7 @@ public interface SubmitRefundService {
      * @param traderDetails
      * @return
      */
-    public List<TradeRefundDetail> generateTradeRefundDetailList(List<TradeDetail> traderDetails);
+    public List<TradeRefundDetail> generateTradeRefundDetailList(List<String> tradeNos);
 
     /**
      * 检查RefundRequest是否存在， 若不存在则插入

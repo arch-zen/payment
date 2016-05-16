@@ -6,6 +6,7 @@ package com.ymatou.payment.test.facade.impl.rest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -19,9 +20,15 @@ import com.ymatou.payment.facade.impl.rest.RefundResource;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
 import com.ymatou.payment.facade.model.AcquireRefundResponse;
+import com.ymatou.payment.facade.model.ApproveRefundRequest;
+import com.ymatou.payment.facade.model.ApproveRefundResponse;
 import com.ymatou.payment.facade.model.FastRefundRequest;
 import com.ymatou.payment.facade.model.FastRefundResponse;
+import com.ymatou.payment.facade.model.QueryRefundRequest;
+import com.ymatou.payment.facade.model.QueryRefundResponse;
 import com.ymatou.payment.facade.model.TradeDetail;
+import com.ymatou.payment.facade.model.TradeRefundableRequest;
+import com.ymatou.payment.facade.model.TradeRefundableResponse;
 import com.ymatou.payment.test.RestBaseTest;
 
 /**
@@ -88,6 +95,55 @@ public class RefundResourceImpTest extends RestBaseTest {
         Assert.assertEquals(0, response.getErrorCode());
         Assert.assertEquals(1, response.getDetails().size());
         Assert.assertEquals("PP20151104300104729", response.getDetails().get(0).getTradeNo());
+    }
+
+    @Test
+    public void testCheckRefundable() {
+        TradeRefundableRequest req = new TradeRefundableRequest();
+        req.setTradeNos(Arrays
+                .asList(new String[] {"20150915133207757", "8178254", "19335806615459", "8526937", "114581437722686",
+                        "20160503194109806", "114659944449425", "4070149626832712", "8198025", "4092297615140378"}));
+        TradeRefundableResponse response = refundResource.checkRefundable(req, new MockHttpServletRequest());
+        Assert.assertEquals(5, response.getDetails().size());
+    }
+
+    @Test
+    public void testQueryRefund() {
+        QueryRefundRequest req = new QueryRefundRequest();
+        req.setKey("");
+        req.setPageSize(10);
+        req.setPageIndex(5); // 41之后的，
+        req.setApproveStatus(9);
+
+        QueryRefundResponse resp = refundResource.query(req, new MockHttpServletRequest());
+
+        Assert.assertEquals("21568176200183545", resp.getDetails().get(0).getPaymentId());
+    }
+
+    @Test
+    public void testQueryRefundWithOrderId() {
+        QueryRefundRequest req = new QueryRefundRequest();
+        req.setKey("");
+        req.setPageSize(10);
+        req.setPageIndex(1);
+        req.setApproveStatus(9);
+        req.setKey("127822744");
+
+        QueryRefundResponse resp = refundResource.query(req, new MockHttpServletRequest());
+
+        Assert.assertEquals(1, resp.getDetails().size());
+        Assert.assertEquals("127822744", resp.getDetails().get(0).getOrderId());
+    }
+
+    @Test
+    public void testApproveRefund() {
+        ApproveRefundRequest req = new ApproveRefundRequest();
+        req.setApproveUser("testApproveRefund");
+        req.setPaymentIds(Arrays.asList(new String[] {"20151104150448396000000000027244"}));
+
+        ApproveRefundResponse response = refundResource.approveRefund(req, new MockHttpServletRequest());
+        Assert.assertEquals(true, response.getDetails().isOkFlag());
+
     }
 
     /**

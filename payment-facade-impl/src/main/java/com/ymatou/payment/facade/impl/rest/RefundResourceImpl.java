@@ -20,8 +20,14 @@ import org.springframework.stereotype.Component;
 import com.ymatou.payment.facade.RefundFacade;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
 import com.ymatou.payment.facade.model.AcquireRefundResponse;
+import com.ymatou.payment.facade.model.ApproveRefundRequest;
+import com.ymatou.payment.facade.model.ApproveRefundResponse;
 import com.ymatou.payment.facade.model.FastRefundRequest;
 import com.ymatou.payment.facade.model.FastRefundResponse;
+import com.ymatou.payment.facade.model.QueryRefundRequest;
+import com.ymatou.payment.facade.model.QueryRefundResponse;
+import com.ymatou.payment.facade.model.TradeRefundableRequest;
+import com.ymatou.payment.facade.model.TradeRefundableResponse;
 
 /**
  * 退款REST实现
@@ -73,5 +79,36 @@ public class RefundResourceImpl implements RefundResource {
             header.put(headerName, servletRequest.getHeader(headerName));
         }
         return header;
+    }
+
+    @POST
+    @Path("/Refund/ApproveRefund")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Override
+    public ApproveRefundResponse approveRefund(ApproveRefundRequest req, HttpServletRequest servletRequest) {
+        req.setHeader(generateHttpHeader(servletRequest));
+
+        return refundFacade.approveRefund(req);
+    }
+
+    @POST
+    @Path("/Refund/CheckRefundable")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Override
+    public TradeRefundableResponse checkRefundable(TradeRefundableRequest req, HttpServletRequest servletRequest) {
+
+        return refundFacade.checkRefundable(req);
+    }
+
+    @POST
+    @Path("/Refund/Query")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Override
+    public QueryRefundResponse query(QueryRefundRequest req, HttpServletRequest servletRequest) {
+
+        return refundFacade.query(req);
     }
 }

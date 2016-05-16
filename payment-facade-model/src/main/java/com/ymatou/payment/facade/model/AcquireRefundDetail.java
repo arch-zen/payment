@@ -3,13 +3,18 @@
  */
 package com.ymatou.payment.facade.model;
 
+import com.ymatou.payment.facade.PrintFriendliness;
+
 /**
  * SubmitRefund接口应答的子模型
  * 
  * @author qianmin 2016年5月12日 上午11:27:57
  * 
  */
-public class AcquireRefundDetail {
+public class AcquireRefundDetail extends PrintFriendliness {
+
+    private static final long serialVersionUID = 4745201305711793006L;
+
     /**
      * 交易号
      */

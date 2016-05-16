@@ -3,13 +3,18 @@
  */
 package com.ymatou.payment.facade.model;
 
+import com.ymatou.payment.facade.PrintFriendliness;
+
 /**
  * 交易信息
  * 
  * @author qianmin 2016年5月11日 下午3:00:31
  * 
  */
-public class TradeDetail {
+public class TradeDetail extends PrintFriendliness {
+
+    private static final long serialVersionUID = -1996785311799086155L;
+
     /**
      * 交易号
      */

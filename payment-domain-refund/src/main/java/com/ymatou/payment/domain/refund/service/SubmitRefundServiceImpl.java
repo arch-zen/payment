@@ -52,7 +52,7 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
     private DomainConfig domainConfig;
 
     @Override
-    public List<TradeRefundDetail> generateTradeRefundDetailList(List<TradeDetail> traderDetails) {
+    public List<TradeRefundDetail> generateTradeRefundDetailList(List<String> tradeNos) {
         List<TradeRefundDetail> tradeRefundDetails = new ArrayList<>();
 
         String refundSupportDaysStr = domainConfig.getRefundSupportDays(); // 获取退款允许的天数
@@ -60,8 +60,7 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
         LocalDate validDate = LocalDate.now().minusDays(refundSupportDays); // 获取有效的订单日期
 
         logger.info("generate tradeRefundDetailList begin.");
-        for (TradeDetail tradeDetail : traderDetails) {
-            String tradeNo = tradeDetail.getTradeNo();
+        for (String tradeNo : tradeNos) {
             // 根据tradeNo获取已支付，退款有效期内的BussinessOrder
             BussinessOrder bussinessOrder = bussinessOrderRepository.getBussinessOrderCanRefund(
                     tradeNo, OrderStatus.Paied.getIndex(), Date.valueOf(validDate));
@@ -80,7 +79,7 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
                 tradeRefundDetail.setRefundable(true); // 可退款
                 tradeRefundDetail.setPayAmount(payment.getPayprice());
                 tradeRefundDetail.setTradeNo(tradeNo);
-                tradeRefundDetail.setPayChannel(convertPayTypeToPayChannel(payment.getPaytype()));
+                tradeRefundDetail.setPayChannel(refundPository.convertPayTypeToPayChannel(payment.getPaytype()));
                 tradeRefundDetail.setPaymentId(payment.getPaymentid());
                 tradeRefundDetail.setPayType(payment.getPaytype());
                 tradeRefundDetail.setInstPaymentId(payment.getInstitutionpaymentid());
@@ -97,17 +96,6 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
         logger.info("generate tradeRefundDetailList end.");
 
         return tradeRefundDetails;
-    }
-
-    private String convertPayTypeToPayChannel(String payType) {
-        switch (payType) {
-            case "14":
-            case "15":
-            case "16":
-                return "2";
-            default:
-                return "1";
-        }
     }
 
     @Override

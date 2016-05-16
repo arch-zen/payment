@@ -5,13 +5,17 @@ package com.ymatou.payment.facade.model;
 
 import java.math.BigDecimal;
 
+import com.ymatou.payment.facade.PrintFriendliness;
+
 /**
  * 是否可以退款detailModel
  * 
  * @author qianmin 2016年5月12日 下午2:54:07
  * 
  */
-public class TradeRefundDetail {
+public class TradeRefundDetail extends PrintFriendliness {
+
+    private static final long serialVersionUID = -6599328508785983461L;
 
     private String tradeNo;
     private BigDecimal payAmount;

@@ -5,8 +5,14 @@ package com.ymatou.payment.facade;
 
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
 import com.ymatou.payment.facade.model.AcquireRefundResponse;
+import com.ymatou.payment.facade.model.ApproveRefundRequest;
+import com.ymatou.payment.facade.model.ApproveRefundResponse;
 import com.ymatou.payment.facade.model.FastRefundRequest;
 import com.ymatou.payment.facade.model.FastRefundResponse;
+import com.ymatou.payment.facade.model.QueryRefundRequest;
+import com.ymatou.payment.facade.model.QueryRefundResponse;
+import com.ymatou.payment.facade.model.TradeRefundableRequest;
+import com.ymatou.payment.facade.model.TradeRefundableResponse;
 
 /**
  * 退款接口
@@ -31,4 +37,28 @@ public interface RefundFacade {
      * @return
      */
     AcquireRefundResponse submitRefund(AcquireRefundRequest req);
+
+    /**
+     * 退款审核
+     * 
+     * @param req
+     * @return
+     */
+    ApproveRefundResponse approveRefund(ApproveRefundRequest req);
+
+    /**
+     * 检查是否可以退款
+     * 
+     * @param req
+     * @return
+     */
+    TradeRefundableResponse checkRefundable(TradeRefundableRequest req);
+
+    /**
+     * 查询退款单
+     * 
+     * @param req
+     * @return
+     */
+    QueryRefundResponse query(QueryRefundRequest req);
 }

@@ -4,8 +4,10 @@
 package com.ymatou.payment.domain.refund.repository;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,9 @@ public class RefundPository {
 
     @Autowired
     private RefundrequestMapper refundrequestMapper;
+
+    @Autowired
+    private SqlSession sqlSession;
 
     @Transactional
     public void addRefundrequestAndCompensateprocessinfo(Payment payment, BussinessOrder bussinessorder,
@@ -85,10 +90,55 @@ public class RefundPository {
         return pos.get(0);
     }
 
+    /**
+     * 保存RefundRequest
+     * 
+     * @param refundrequestWithBLOBs
+     */
     @Transactional
     public void batchSaveRefundRequest(List<RefundrequestWithBLOBs> refundrequestWithBLOBs) {
         for (RefundrequestWithBLOBs refundrequest : refundrequestWithBLOBs) {
             refundrequestMapper.insertSelective(refundrequest);
+        }
+    }
+
+    /**
+     * 更新RequestRequest，保存Compensateprocessinfo
+     * 
+     * @param refundrequestPos
+     * @param compensateprocessinfoWithBLOBs
+     */
+    @Transactional
+    public void updateRefundRequestAndSaveCompensateprocessinfo(List<RefundrequestPo> refundrequestPos,
+            List<PpCompensateprocessinfoWithBLOBs> compensateprocessinfoWithBLOBs) {
+        for (RefundrequestPo refundrequestPo : refundrequestPos) {
+            RefundrequestExample example = new RefundrequestExample();
+            example.createCriteria().andPaymentidEqualTo(refundrequestPo.getPaymentid());
+            refundrequestMapper.updateByExample(refundrequestPo, example);
+        }
+        for (PpCompensateprocessinfoWithBLOBs info : compensateprocessinfoWithBLOBs) {
+            compensateprocessinfoMapper.insertSelective(info);
+        }
+    }
+
+    /**
+     * 查询退款单
+     * 
+     * @param query
+     * @return
+     */
+    public List<RefundrequestPo> queryRefundRequest(HashMap<String, Object> query) {
+        return sqlSession.selectList("ext-refundrequest.selectRefundrequestByPage", query);
+    }
+
+    public String convertPayTypeToPayChannel(String payType) {
+        switch (payType) {
+            case "14":
+            case "15":
+            case "16":
+                return "2";
+            default:
+                return "1";
         }
     }
 }
