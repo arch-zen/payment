@@ -63,6 +63,9 @@ public class PayServiceImpl implements PayService {
         Payment payment = Payment.convertFromPo(paymentPo);
         payment.setBussinessOrder(BussinessOrder.convertFromPo(bussinessOrderPo));
 
+        // 将请求带入到模型中
+        payment.setAcquireOrderReq(req);
+
         return payment;
     }
 

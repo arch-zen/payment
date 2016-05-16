@@ -18,6 +18,6 @@
 		md5KeyConnector="&amp;key=" />
 	<!--weixin App -->
 	<config payType="15" merchantId="1234079001" signType="MD5"
-		instName="WeixinApp" md5Key="c5781df6b8f149adca6094cdac4ac684" appId="wxf51a439c0416f182"
+		instName="Weixin" md5Key="c5781df6b8f149adca6094cdac4ac684" appId="wxf51a439c0416f182"
 		md5KeyConnector="&amp;key=" />
 </institutionConfigCollection>

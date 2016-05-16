@@ -52,4 +52,9 @@ public final class AliPayConsts {
      * 统一下单支付接口（杭报订单专用）
      */
     public final static String PAY_SERVICE_HANBO = "alipay.acquire.page.createandpay";
+
+    /**
+     * App订单关闭时间
+     */
+    public final static String ALI_APP_ORDER_CLOSE_TIME = "10d";
 }

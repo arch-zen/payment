@@ -5,6 +5,9 @@
  */
 package com.ymatou.payment.facade.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.ymatou.payment.facade.BaseRequest;
 
 
@@ -25,6 +28,11 @@ public class AcquireOrderReq extends BaseRequest {
      * 接口版本
      */
     private Integer version;
+
+    /**
+     * MockHeader
+     */
+    private HashMap<String, String> mockHeader;
 
     /**
      * 调用方AppId
@@ -486,6 +494,20 @@ public class AcquireOrderReq extends BaseRequest {
      */
     public void setVersion(Integer version) {
         this.version = version;
+    }
+
+    /**
+     * @return the mockHeader
+     */
+    public HashMap<String, String> getMockHeader() {
+        return mockHeader;
+    }
+
+    /**
+     * @param mockHeader the mockHeader to set
+     */
+    public void setMockHeader(HashMap<String, String> mockHeader) {
+        this.mockHeader = mockHeader;
     }
 
 

@@ -48,13 +48,13 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
     @Resource
     private InstitutionConfigManager instConfigManager;
 
-    @Autowired
+    @Resource
     private IntegrationConfig integrationConfig;
 
-    @Autowired
+    @Resource
     private QueryTimestampService queryTimestampService;
 
-    @Autowired
+    @Resource
     private SignatureService signatureService;
 
     /*
@@ -73,11 +73,11 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
         HashMap<String, String> reqMap = buildReqMap(payment, instConfig);
 
         // 签名
-        String sign = signatureService.signMessage(reqMap, instConfig, false);
+        String sign = signatureService.signMessage(reqMap, instConfig, payment.getAcquireOrderReq().getMockHeader());
         reqMap.put("sign", sign);
 
         // 拼装请求报文
-        String reqForm = AliPayFormBuilder.buildForm(reqMap, integrationConfig.getAliPayBaseUrl("1"));
+        String reqForm = AliPayFormBuilder.buildForm(reqMap, integrationConfig.getAliPayBaseUrl(null));
 
         // 返回报文结果
         AcquireOrderPackageResp resp = new AcquireOrderPackageResp();
@@ -111,7 +111,7 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
         reqDict.put("body", payment.getBussinessOrder().getProductdesc());
         reqDict.put("total_fee", String.format("%.2f", payment.getPayprice().doubleValue()));
         reqDict.put("paymethod", acquireOrderExt.getPayMethod());
-        reqDict.put("anti_phishing_key", getAntiFishingKey(instConfig.getMerchantId()));
+        reqDict.put("anti_phishing_key", getAntiFishingKey(instConfig.getMerchantId(), payment));
         reqDict.put("exter_invoke_ip", payment.getBussinessOrder().getClientip());
         reqDict.put("buyer_email", payment.getBussinessOrder().getThirdpartyuserid());
         reqDict.put("sign_type", instConfig.getSignType());
@@ -150,10 +150,11 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
      * @param merchantId
      * @return
      */
-    private String getAntiFishingKey(String merchantId) {
+    private String getAntiFishingKey(String merchantId, Payment payment) {
         String antiFishKey = "";
         try {
-            QueryTimestampResponse response = queryTimestampService.doService("query_timestamp", merchantId, null);
+            QueryTimestampResponse response = queryTimestampService.doService("query_timestamp", merchantId,
+                    payment.getAcquireOrderReq().getMockHeader());
             if (response != null)
                 antiFishKey = response.getTimestampEncryptKey();
         } catch (Exception ex) {

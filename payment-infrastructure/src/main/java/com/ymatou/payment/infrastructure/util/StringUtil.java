@@ -15,6 +15,10 @@ import java.util.Date;
  * @author wangxudong 2016年5月10日 下午7:03:59
  *
  */
+/**
+ * @author Administrator 2016年5月14日 下午10:58:42
+ *
+ */
 public final class StringUtil {
     public static String subString(String oriStr, int beginIndex, int len) {
         int strlen = oriStr.length();
@@ -71,13 +75,33 @@ public final class StringUtil {
     }
 
     /**
-     * 构造日期字符串
+     * 构造当前日期字符串(yyyyMMddHHmmss)
+     * 
+     * @return
+     */
+    public static String getDateFormatString() {
+        return getDateFormatString("yyyyMMddHHmmss");
+    }
+
+    /**
+     * 构造当前日期字符串
      * 
      * @return
      */
     public static String getDateFormatString(String format) {
+        return getDateFormatString(format, new Date());
+    }
+
+    /**
+     * 构造指定日期字符串
+     * 
+     * @param format
+     * @param date
+     * @return
+     */
+    public static String getDateFormatString(String format, Date date) {
         DateFormat dateFormat = new SimpleDateFormat(format);
 
-        return dateFormat.format(new Date());
+        return dateFormat.format(date);
     }
 }

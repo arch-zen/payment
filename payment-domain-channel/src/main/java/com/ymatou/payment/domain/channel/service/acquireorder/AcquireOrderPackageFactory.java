@@ -28,6 +28,12 @@ public class AcquireOrderPackageFactory {
     @Resource
     private AliPayAppAcquireOrderServiceImpl aliPayAppAcquireOrderServiceImpl;
 
+    @Resource
+    private WeiXinAppAcquireOrderServiceImpl weiXinAppAcquireOrderServiceImpl;
+
+    @Resource
+    private WeiXinJSAPIAcquireOrderServiceImpl weiXinJSAPIAcquireOrderServiceImpl;
+
 
     /**
      * 获取到收单
@@ -40,6 +46,10 @@ public class AcquireOrderPackageFactory {
             return aliPayPcAcquireOrderServiceImpl;
         else if (payType == "13")
             return aliPayAppAcquireOrderServiceImpl;
+        else if (payType == "14")
+            return weiXinJSAPIAcquireOrderServiceImpl;
+        else if (payType == "15")
+            return weiXinAppAcquireOrderServiceImpl;
         else
             throw new BizException(ErrorCode.INVALID_PAYTYPE, payType);
     }
