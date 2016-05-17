@@ -53,6 +53,9 @@
 		<thoughtworks.xstream.version>1.4.7</thoughtworks.xstream.version>
 		<dom4j.version>1.6.1</dom4j.version>
 
+		<errorreporter.version>1.0.0</errorreporter.version>
+		<performancemonitorclient.version>1.0.0</performancemonitorclient.version>
+
 		<!-- self version -->
 		<payment.version>1.0.0</payment.version>
 
@@ -294,6 +297,18 @@
 				<groupId>dom4j</groupId>
 				<artifactId>dom4j</artifactId>
 				<version>${dom4j.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.ymatou.errorreporter</groupId>
+				<artifactId>errorreporter-logback</artifactId>
+				<version>${errorreporter.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.ymatou</groupId>
+				<artifactId>performancemonitorclient</artifactId>
+				<version>${performancemonitorclient.version}</version>
 			</dependency>
 
 			<!-- self -->
