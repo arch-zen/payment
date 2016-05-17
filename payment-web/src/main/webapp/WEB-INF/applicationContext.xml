@@ -72,12 +72,15 @@
 	<!-- 用dubbo协议在20880端口暴露服务 -->
 	<dubbo:protocol name="dubbo" port="30880" serialization="kryo" />
 
-	<dubbo:protocol name="rest" server="servlet" port="8899"
+	<dubbo:protocol name="rest" server="servlet" port="8091"
 		extension="com.ymatou.payment.infrastructure.serialize.JacksonConfig" />
 
 
 	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.PaymentResource"
 		ref="paymentResource" protocol="rest" />
+
+	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.RefundResource"
+		ref="refundResource" protocol="rest" />
 
 
 </beans>
