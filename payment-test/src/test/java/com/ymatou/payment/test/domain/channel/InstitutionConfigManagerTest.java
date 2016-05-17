@@ -63,7 +63,7 @@ public class InstitutionConfigManagerTest extends RestBaseTest {
 
         assertEquals("验证商户号", "1234079001", config.getMerchantId());
         assertEquals("验证签名方式", "MD5", config.getSignType());
-        assertEquals("验证机构名称", "WeixinApp", config.getInstName());
+        assertEquals("验证机构名称", "Weixin", config.getInstName());
         assertEquals("验证AppId", "wxf51a439c0416f182", config.getAppId());
         assertEquals("验证Md5Key", "c5781df6b8f149adca6094cdac4ac684", config.getMd5Key());
         assertEquals("验证Md5KeyConnector", "&key=", config.getMd5KeyConnector());
