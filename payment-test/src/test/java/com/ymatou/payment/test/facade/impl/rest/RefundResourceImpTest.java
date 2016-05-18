@@ -32,6 +32,7 @@ import com.ymatou.payment.facade.model.TradeRefundableResponse;
 import com.ymatou.payment.test.RestBaseTest;
 
 /**
+ * test
  * 
  * @author qianmin 2016年5月11日 下午6:05:48
  * 
