@@ -10,8 +10,10 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
@@ -27,10 +29,13 @@ import com.ymatou.payment.infrastructure.db.model.BussinessorderPo;
  */
 @Component
 public class BussinessOrderRepository {
-    private static final Logger logger = LoggerFactory.getLogger(PaymentRepository.class);
+    private static final Logger logger = LoggerFactory.getLogger(BussinessOrderRepository.class);
 
     @Resource
     private BussinessorderMapper mapper;
+
+    @Resource
+    private SqlSession sqlSession;
 
     /**
      * 根据商户订单（交易号）获取到商户订单信息
@@ -41,7 +46,7 @@ public class BussinessOrderRepository {
     public BussinessOrder getByOrderId(String orderId) {
         BussinessorderExample example = new BussinessorderExample();
         example.createCriteria().andOrderidEqualTo(orderId);
-        List<BussinessorderPo> opList = mapper.selectByExample(example);
+        List<BussinessorderPo> opList = sqlSession.selectList("ext-ppBussinessorder.selectByExample", example);
 
         if (opList.size() == 0)
             return null;
@@ -57,7 +62,7 @@ public class BussinessOrderRepository {
      * @return
      */
     public int insert(BussinessorderPo po) {
-        return mapper.insert(po);
+        return sqlSession.insert("ext-ppBussinessorder.insert", po);
     }
 
     /**
@@ -69,7 +74,7 @@ public class BussinessOrderRepository {
     public BussinessOrder getBussinessOrderById(String bussinessorderid) {
         BussinessorderExample example = new BussinessorderExample();
         example.createCriteria().andBussinessorderidEqualTo(bussinessorderid);
-        List<BussinessorderPo> opList = mapper.selectByExample(example);
+        List<BussinessorderPo> opList = sqlSession.selectList("ext-ppBussinessorder.selectByExample", example);
         if (opList == null || opList.size() == 0)
             return null;
         return BussinessOrder.convertFromPo(opList.get(0));
@@ -88,7 +93,7 @@ public class BussinessOrderRepository {
         example.createCriteria().andOrderidEqualTo(tradeNo)
                 .andOrderstatusEqualTo(orderStatus)
                 .andCreatedtimeGreaterThanOrEqualTo(validDate);
-        List<BussinessorderPo> pos = mapper.selectByExample(example);
+        List<BussinessorderPo> pos = sqlSession.selectList("ext-ppBussinessorder.selectByExample", example);
         if (pos == null || pos.size() == 0) {
             return null;
         }

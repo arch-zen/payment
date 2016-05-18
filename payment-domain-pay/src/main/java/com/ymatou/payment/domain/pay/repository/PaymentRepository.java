@@ -5,6 +5,7 @@ import java.util.Random;
 
 import javax.annotation.Resource;
 
+import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,9 @@ public class PaymentRepository {
     @Resource
     private BussinessOrderRepository bussinessOrderRepository;
 
+    @Resource
+    private SqlSession sqlSession;
+
     /**
      * 根据PaymentId获取到支付单信息
      * 
@@ -41,9 +45,15 @@ public class PaymentRepository {
      * @return
      */
     public Payment getByPaymentId(String paymentId) {
-        PaymentPo payment = paymentMapper.selectByPrimaryKey(paymentId);
+        PaymentExample example = new PaymentExample();
+        example.createCriteria().andPaymentidEqualTo(paymentId);
 
-        return Payment.convertFromPo(payment);
+        List<PaymentPo> paymentList = sqlSession.selectList("ext-ppPayment.selectByExample", example);
+
+        if (paymentList == null || paymentList.size() == 0)
+            return null;
+        else
+            return Payment.convertFromPo(paymentList.get(0));
     }
 
     /**
@@ -56,7 +66,7 @@ public class PaymentRepository {
         PaymentExample example = new PaymentExample();
         example.createCriteria().andBussinessorderidEqualTo(bussinessId);
 
-        List<PaymentPo> poList = paymentMapper.selectByExample(example);
+        List<PaymentPo> poList = sqlSession.selectList("ext-ppPayment.selectByExample", example);
         if (poList.size() == 0)
             return null;
         else
@@ -72,12 +82,14 @@ public class PaymentRepository {
      */
     @Transactional(rollbackFor = Throwable.class)
     public int acquireOrder(PaymentPo payment, BussinessorderPo bussinessOrder) {
-
+        // 商户订单落地
         bussinessOrderRepository.insert(bussinessOrder);
 
+        // 支付单落地
         payment.setPaymentid(genPaymentId(bussinessOrder));
+        int rows = sqlSession.insert("ext-ppPayment.insert", payment);
 
-        return paymentMapper.insert(payment);
+        return rows;
     }
 
     /**
@@ -114,7 +126,7 @@ public class PaymentRepository {
         PaymentExample example = new PaymentExample();
         example.createCriteria().andBussinessorderidEqualTo(bussinessOrderId)
                 .andPaystatusEqualTo(payStatus);
-        List<PaymentPo> pos = paymentMapper.selectByExample(example);
+        List<PaymentPo> pos = sqlSession.selectList("ext-ppPayment.selectByExample", example);
         if (pos == null || pos.size() == 0) {
             return null;
         }

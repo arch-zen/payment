@@ -56,7 +56,7 @@
 						<configuration>
 							<!-- 非本地Profile，所有配置文件不打在war包，而是通过disconf或http://cmc.ops.ymatou.cn/管理 -->
 							<packagingExcludes>
-								WEB-INF/classes/*.*
+								WEB-INF/classes/*.properties,WEB-INF/classes/logback-test.xml
 							</packagingExcludes>
 						</configuration>
 					</plugin>
