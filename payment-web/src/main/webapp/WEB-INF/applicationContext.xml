@@ -97,5 +97,11 @@
 	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.PaymentNotifyResource"
 		ref="paymentNotifyResource" protocol="rest" />
 
+	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.RefundResource"
+		ref="refundResource" protocol="rest" />
+
+	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.PaymentNotifyResource"
+		ref="paymentNotifyResource" protocol="rest" />
+
 
 </beans>
