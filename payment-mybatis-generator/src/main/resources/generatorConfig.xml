@@ -48,7 +48,10 @@
 
 		<table tableName="RefundRequest">
 		</table>
-	
+		
+		<table tableName="PP_CompensateProcessInfo">
+		</table>
+		
 		<table tableName="RefundMiscRequestLog">
 		</table>
 	</context>

@@ -15,35 +15,36 @@ import org.apache.catalina.webresources.StandardRoot;
  */
 public class EmbeddedTomcatLauncher {
 
-	/**
-	 * 以内嵌tomcat启动
-	 * @param args
-	 */
-	public static void main(String[] args) throws Exception{
-		String webappDirLocation = "src/main/webapp/";
+    /**
+     * 以内嵌tomcat启动
+     * 
+     * @param args
+     */
+    public static void main(String[] args) throws Exception {
+        String webappDirLocation = "src/main/webapp/";
 
-		Tomcat tomcat = new Tomcat();
+        Tomcat tomcat = new Tomcat();
 
-		try {			
-			tomcat.setPort(8899);
+        try {
+            tomcat.setPort(8091);
 
-			StandardContext ctx = (StandardContext) tomcat.addWebapp("",
-					new File(webappDirLocation).getAbsolutePath());
-			System.out.println("configuring app with basedir: " + new File("./" + webappDirLocation).getAbsolutePath());
+            StandardContext ctx = (StandardContext) tomcat.addWebapp("",
+                    new File(webappDirLocation).getAbsolutePath());
+            System.out.println("configuring app with basedir: " + new File("./" + webappDirLocation).getAbsolutePath());
 
-			File additionWebInfClasses = new File("target/classes");
-			WebResourceRoot resources = new StandardRoot(ctx);
-			resources.addPreResources(
-					new DirResourceSet(resources, "/WEB-INF/classes", additionWebInfClasses.getAbsolutePath(), "/"));
-			ctx.setResources(resources);
+            File additionWebInfClasses = new File("target/classes");
+            WebResourceRoot resources = new StandardRoot(ctx);
+            resources.addPreResources(
+                    new DirResourceSet(resources, "/WEB-INF/classes", additionWebInfClasses.getAbsolutePath(), "/"));
+            ctx.setResources(resources);
 
-			tomcat.start();
-			tomcat.getServer().await();
-		} finally {
-			tomcat.stop();
-			tomcat.destroy();
-		}
+            tomcat.start();
+            tomcat.getServer().await();
+        } finally {
+            tomcat.stop();
+            tomcat.destroy();
+        }
 
-	}
+    }
 
 }
