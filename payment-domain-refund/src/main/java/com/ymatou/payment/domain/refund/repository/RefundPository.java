@@ -18,8 +18,10 @@ import com.ymatou.payment.domain.refund.constants.ApproveStatusEnum;
 import com.ymatou.payment.domain.refund.constants.RefundStatusEnum;
 import com.ymatou.payment.domain.refund.model.Refund;
 import com.ymatou.payment.infrastructure.db.mapper.CompensateprocessinfoMapper;
+import com.ymatou.payment.infrastructure.db.mapper.RefundmiscrequestlogMapper;
 import com.ymatou.payment.infrastructure.db.mapper.RefundrequestMapper;
 import com.ymatou.payment.infrastructure.db.model.PpCompensateprocessinfoWithBLOBs;
+import com.ymatou.payment.infrastructure.db.model.RefundmiscrequestlogWithBLOBs;
 import com.ymatou.payment.infrastructure.db.model.RefundrequestExample;
 import com.ymatou.payment.infrastructure.db.model.RefundrequestPo;
 import com.ymatou.payment.infrastructure.db.model.RefundrequestWithBLOBs;
@@ -37,6 +39,9 @@ public class RefundPository {
 
     @Autowired
     private RefundrequestMapper refundrequestMapper;
+
+    @Autowired
+    private RefundmiscrequestlogMapper refundmiscrequestlogMapper;
 
     @Autowired
     private SqlSession sqlSession;
@@ -139,6 +144,32 @@ public class RefundPository {
                 return "2";
             default:
                 return "1";
+        }
+    }
+
+    /**
+     * 通过RefundBatchNo查询RefundRequest
+     * 
+     * @param batchNo
+     * @return
+     */
+    public List<RefundrequestPo> queryRefundRequestByRefundBatchNo(String batchNo) {
+        RefundrequestExample example = new RefundrequestExample();
+        example.createCriteria().andRefundbatchnoEqualTo(batchNo);
+        List<RefundrequestPo> pos = refundrequestMapper.selectByExample(example);
+
+        return pos;
+    }
+
+    /**
+     * 保存退款回调日志
+     * 
+     * @param list
+     */
+    @Transactional
+    public void batchSaveRefundmiscrequestlog(List<RefundmiscrequestlogWithBLOBs> list) {
+        for (RefundmiscrequestlogWithBLOBs refundmiscrequestlog : list) {
+            refundmiscrequestlogMapper.insertSelective(refundmiscrequestlog);
         }
     }
 }

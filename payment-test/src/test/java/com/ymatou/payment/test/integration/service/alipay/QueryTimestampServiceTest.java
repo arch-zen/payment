@@ -1,7 +1,5 @@
 package com.ymatou.payment.test.integration.service.alipay;
 
-import java.util.HashMap;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,7 @@ public class QueryTimestampServiceTest extends RestBaseTest {
 
     @Test
     public void testDoServiceSuccess() throws Exception {
-        HashMap<String, String> header = new HashMap<>();
+        // HashMap<String, String> header = new HashMap<>();
         // header.put("Mock", "1");
         // header.put("MockId", "888888");
         QueryTimestampResponse response =
@@ -30,7 +28,7 @@ public class QueryTimestampServiceTest extends RestBaseTest {
 
     @Test
     public void testDoServiceFail() throws Exception {
-        HashMap<String, String> header = new HashMap<>();
+        // HashMap<String, String> header = new HashMap<>();
         // header.put("Mock", "1");
         // header.put("MockId", "888888");
         QueryTimestampResponse response =

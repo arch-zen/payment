@@ -12,7 +12,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,6 +36,8 @@ import com.ymatou.payment.facade.model.TradeRefundableResponse;
  */
 @Path("/api")
 @Component("refundResource")
+@Consumes({"application/json; charset=UTF-8"})
+@Produces({"application/json; charset=UTF-8"})
 public class RefundResourceImpl implements RefundResource {
 
     @Autowired
@@ -44,8 +45,6 @@ public class RefundResourceImpl implements RefundResource {
 
     @POST
     @Path("/Refund/FastRefund")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Override
     public FastRefundResponse fastRefund(FastRefundRequest req, @Context HttpServletRequest servletRequest) {
         req.setHeader(generateHttpHeader(servletRequest));
@@ -55,10 +54,8 @@ public class RefundResourceImpl implements RefundResource {
 
     @POST
     @Path("/Refund/SubmitRefund")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Override
-    public AcquireRefundResponse submitRefund(AcquireRefundRequest req, HttpServletRequest servletRequest) {
+    public AcquireRefundResponse submitRefund(AcquireRefundRequest req, @Context HttpServletRequest servletRequest) {
         req.setHeader(generateHttpHeader(servletRequest));
 
         return refundFacade.submitRefund(req);
@@ -83,10 +80,8 @@ public class RefundResourceImpl implements RefundResource {
 
     @POST
     @Path("/Refund/ApproveRefund")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Override
-    public ApproveRefundResponse approveRefund(ApproveRefundRequest req, HttpServletRequest servletRequest) {
+    public ApproveRefundResponse approveRefund(ApproveRefundRequest req, @Context HttpServletRequest servletRequest) {
         req.setHeader(generateHttpHeader(servletRequest));
 
         return refundFacade.approveRefund(req);
@@ -94,20 +89,17 @@ public class RefundResourceImpl implements RefundResource {
 
     @POST
     @Path("/Refund/CheckRefundable")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Override
-    public TradeRefundableResponse checkRefundable(TradeRefundableRequest req, HttpServletRequest servletRequest) {
+    public TradeRefundableResponse checkRefundable(TradeRefundableRequest req,
+            @Context HttpServletRequest servletRequest) {
 
         return refundFacade.checkRefundable(req);
     }
 
     @POST
     @Path("/Refund/Query")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Override
-    public QueryRefundResponse query(QueryRefundRequest req, HttpServletRequest servletRequest) {
+    public QueryRefundResponse query(QueryRefundRequest req, @Context HttpServletRequest servletRequest) {
 
         return refundFacade.query(req);
     }

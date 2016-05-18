@@ -107,7 +107,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         Assert.assertEquals(5, response.getDetails().size());
     }
 
-    @Test
+    // @Test
     public void testQueryRefund() {
         QueryRefundRequest req = new QueryRefundRequest();
         req.setKey("");

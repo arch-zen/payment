@@ -48,7 +48,9 @@
 
 		<table tableName="RefundRequest">
 		</table>
-
+	
+		<table tableName="RefundMiscRequestLog">
+		</table>
 	</context>
 
 </generatorConfiguration>

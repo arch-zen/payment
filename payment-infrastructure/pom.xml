@@ -18,8 +18,20 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.dianping.cat</groupId>
+			<artifactId>cat-client</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.ymatou.errorreporter</groupId>
+			<artifactId>errorreporter-logback</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.ymatou</groupId>
+			<artifactId>performancemonitorclient</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
