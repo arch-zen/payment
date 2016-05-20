@@ -5,7 +5,10 @@
  */
 package com.ymatou.payment.domain.channel.constants;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 第三方机构常量
@@ -57,4 +60,9 @@ public final class AliPayConsts {
      * App订单关闭时间
      */
     public final static String ALI_APP_ORDER_CLOSE_TIME = "10d";
+
+    public final static Set<String> ALI_TRADE_OK_STATUS =
+            new HashSet<String>(Arrays.asList(new String[] {"TRADE_SUCCESS", "TRADE_FINISHED"}));
+
+    public final static String TRADE_REFUND_SUCCESS = "REFUND_SUCCESS";
 }

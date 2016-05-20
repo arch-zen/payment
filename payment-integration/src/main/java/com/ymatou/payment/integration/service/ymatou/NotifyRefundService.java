@@ -3,7 +3,6 @@
  */
 package com.ymatou.payment.integration.service.ymatou;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +43,7 @@ public class NotifyRefundService implements InitializingBean {
      * @param traceId
      * @param header
      * @return
-     * @throws IOException
+     * @throws Exception
      */
     public void doService(String paymentId, String traceId, HashMap<String, String> header) throws Exception {
         try {

@@ -14,7 +14,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSON;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.common.HttpClientUtil;
 import com.ymatou.payment.integration.model.UserServiceResponse;
@@ -51,7 +51,7 @@ public class UserService implements InitializingBean {
 
         try {
             String result = HttpClientUtil.sendGet(url, header, httpClient);
-            UserServiceResponse userServiceResponse = new Gson().fromJson(result, UserServiceResponse.class);
+            UserServiceResponse userServiceResponse = JSON.parseObject(result, UserServiceResponse.class);
             return userServiceResponse;
         } catch (IOException e) {
             logger.error(e.getMessage(), e);

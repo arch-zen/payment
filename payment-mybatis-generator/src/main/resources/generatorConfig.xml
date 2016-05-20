@@ -54,6 +54,9 @@
 		
 		<table tableName="RefundMiscRequestLog">
 		</table>
+		
+		<table tableName="Ymt_AlipayNotifyLog">
+		</table>
 	</context>
 
 </generatorConfiguration>

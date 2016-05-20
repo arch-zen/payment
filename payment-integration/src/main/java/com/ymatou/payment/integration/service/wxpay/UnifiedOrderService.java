@@ -3,7 +3,6 @@
  */
 package com.ymatou.payment.integration.service.wxpay;
 
-import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
@@ -12,7 +11,6 @@ import java.util.Map;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -23,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -55,11 +52,8 @@ public class UnifiedOrderService implements InitializingBean {
      * 
      * @param request
      * @param header
-     * @return UnifiedOrderResponse
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws IntegerationException
+     * @return
+     * @throws Exception
      */
     public UnifiedOrderResponse doService(UnifiedOrderRequest request, HashMap<String, String> header)
             throws Exception {
