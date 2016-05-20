@@ -16,10 +16,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjtools</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.ymatou.payment</groupId>
 			<artifactId>payment-domain-pay</artifactId>
 		</dependency>

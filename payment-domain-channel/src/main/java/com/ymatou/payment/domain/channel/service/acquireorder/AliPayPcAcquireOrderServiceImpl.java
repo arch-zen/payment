@@ -9,13 +9,12 @@ import java.util.HashMap;
 
 import javax.annotation.Resource;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.esotericsoftware.minlog.Log;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.constants.AliPayConsts;
@@ -29,7 +28,6 @@ import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.model.AcquireOrderExt;
 import com.ymatou.payment.integration.IntegrationConfig;
-import com.ymatou.payment.integration.common.HttpClientUtil;
 import com.ymatou.payment.integration.model.QueryTimestampResponse;
 import com.ymatou.payment.integration.service.alipay.QueryTimestampService;
 

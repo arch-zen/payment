@@ -13,12 +13,16 @@ import java.util.HashMap;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
+import org.jboss.resteasy.specimpl.BuiltResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -51,21 +55,31 @@ public class PaymentNotifyResourceImpl implements PaymentNotifyResource {
     @Override
     @GET
     @Path("callback/{payType}")
-    public String callback(@PathParam("payType") String payType, @Context HttpServletRequest servletRequest) {
+    public Response callback(@PathParam("payType") String payType, @Context HttpServletRequest servletRequest) {
         PaymentNotifyRequest notifyReq = new PaymentNotifyRequest();
         notifyReq.setPayType(payType);
-        notifyReq.setNotifyType(PaymentNotifyType.Callback);
+        notifyReq.setNotifyType(PaymentNotifyType.Client);
         notifyReq.setRawString(getHttpBody(servletRequest));
         notifyReq.setMockHeader(getMockHttpHeader(servletRequest));
 
-        return payType;
+        String url = "http://www.baidu.com";
+        // String url = paymentNotifyFacade.notify(notifyReq);
+        Response response = Response.status(Status.FOUND).header("location", url).build();
+
+        return response;
     }
 
     @Override
-    @GET
+    @POST
     @Path("notify/{payType}")
     public String notify(@PathParam("payType") String payType, @Context HttpServletRequest servletRequest) {
-        return payType;
+        PaymentNotifyRequest notifyReq = new PaymentNotifyRequest();
+        notifyReq.setPayType(payType);
+        notifyReq.setNotifyType(PaymentNotifyType.Server);
+        notifyReq.setRawString(getHttpBody(servletRequest));
+        notifyReq.setMockHeader(getMockHttpHeader(servletRequest));
+
+        return paymentNotifyFacade.notify(notifyReq);
     }
 
     /**
@@ -104,7 +118,7 @@ public class PaymentNotifyResourceImpl implements PaymentNotifyResource {
             return res;
         } catch (Exception e) {
             logger.error("parse http body failed", e);
-            throw new BizException(ErrorCode.FAIL, "parse http body failed");
+            throw new BizException(ErrorCode.FAIL, "parse http body failed", e);
         }
     }
 
@@ -132,7 +146,8 @@ public class PaymentNotifyResourceImpl implements PaymentNotifyResource {
                 }
                 return message;
             } catch (IOException e) {
-                logger.error("parse http body failed", e);
+                logger.error("parse http body where read bytes failed", e);
+                throw new BizException(ErrorCode.FAIL, "parse http body where read bytes failed");
             }
         }
         return new byte[] {};

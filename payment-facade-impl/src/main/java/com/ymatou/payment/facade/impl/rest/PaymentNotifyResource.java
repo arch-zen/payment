@@ -6,8 +6,7 @@
 package com.ymatou.payment.facade.impl.rest;
 
 import javax.servlet.http.HttpServletRequest;
-
-import com.ymatou.payment.facade.model.PaymentNotifyRequest;
+import javax.ws.rs.core.Response;
 
 /**
  * 支付回调REST接口
@@ -24,7 +23,7 @@ public interface PaymentNotifyResource {
      * @param servletRequest
      * @return
      */
-    String callback(String payType, HttpServletRequest servletRequest);
+    Response callback(String payType, HttpServletRequest servletRequest);
 
     /**
      * 服务端回调

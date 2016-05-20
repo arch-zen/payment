@@ -1,6 +1,7 @@
 package com.ymatou.payment.domain.pay.service;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.annotation.Resource;
@@ -33,7 +34,7 @@ public class PayServiceImpl implements PayService {
      * @see com.payment.domain.pay.service.PayService#GetByPaymentId(java.lang.String)
      */
     @Override
-    public Payment GetPaymentByPaymentId(String paymentId) {
+    public Payment getPaymentByPaymentId(String paymentId) {
         return paymentRepository.getByPaymentId(paymentId);
     }
 
@@ -44,17 +45,17 @@ public class PayServiceImpl implements PayService {
      * String)
      */
     @Override
-    public Payment GetPaymentByBussinessOrderId(String bussinessOrderId) {
+    public Payment getPaymentByBussinessOrderId(String bussinessOrderId) {
         return paymentRepository.getByBussinessOrderId(bussinessOrderId);
     }
 
     @Override
-    public BussinessOrder GetBussinessOrderByOrderId(String orderId) {
+    public BussinessOrder getBussinessOrderByOrderId(String orderId) {
         return bussinessOrderRepository.getByOrderId(orderId);
     }
 
     @Override
-    public Payment CreatePayment(AcquireOrderReq req) {
+    public Payment createPayment(AcquireOrderReq req) {
         BussinessorderPo bussinessOrderPo = buildBussinessOrder(req);
         PaymentPo paymentPo = buildPayment(req, bussinessOrderPo);
 
@@ -127,9 +128,37 @@ public class PayServiceImpl implements PayService {
     }
 
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.ymatou.payment.domain.pay.service.PayService#getBussinessOrderById(java.lang.String)
+     */
     @Override
     public BussinessOrder getBussinessOrderById(String bussinessOrderId) {
         return bussinessOrderRepository.getBussinessOrderById(bussinessOrderId);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.ymatou.payment.domain.pay.service.PayService#setPaymentOrderPaid(com.ymatou.payment.
+     * infrastructure.db.model.PaymentPo, java.lang.String)
+     */
+    @Override
+    public void setPaymentOrderPaid(Payment payment, String traceId) {
+        PaymentPo paymentPo = new PaymentPo();
+        paymentPo.setPaymentid(payment.getPaymentid());
+        paymentPo.setInstitutionpaymentid(payment.getInstitutionpaymentid());
+        paymentPo.setPaystatus(payment.getPaystatus());
+        paymentPo.setActualpayprice(payment.getActualpayprice());
+        paymentPo.setActualpaycurrencytype(payment.getActualpaycurrencytype());
+        paymentPo.setBankid(payment.getBankid());
+        paymentPo.setCardtype(payment.getCardtype());
+        paymentPo.setPaytime(payment.getPaytime());
+        paymentPo.setLastupdatedtime(new Date());
+        paymentPo.setExchangerate(payment.getExchangerate());
+
+        paymentRepository.setPaymentOrderPaid(paymentPo, traceId);
     }
 
 }
