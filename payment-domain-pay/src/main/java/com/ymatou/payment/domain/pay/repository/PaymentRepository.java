@@ -168,4 +168,18 @@ public class PaymentRepository {
         }
         return Payment.convertFromPo(pos.get(0));
     }
+
+    /**
+     * 更新对账状态
+     * 
+     * @param checkStatus
+     * @param paymentId
+     */
+    @Transactional
+    public void updatePaymentCheckStatus(int checkStatus, String paymentId) {
+        PaymentPo paymentPo = new PaymentPo();
+        paymentPo.setCheckstatus(checkStatus);
+        paymentPo.setPaymentid(paymentId);
+        paymentMapper.updateByPrimaryKeySelective(paymentPo);
+    }
 }

@@ -7,15 +7,20 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.NameValuePair;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -60,14 +65,13 @@ public class SingleTradeQueryService implements InitializingBean {
      */
     public SingleTradeQueryResponse doService(SingleTradeQueryRequest req, HashMap<String, String> header)
             throws Exception {
-        String url = generateRequestUrl(req, header);
-
+        String url = integrationConfig.getAliPayBaseUrl(header);
         try {
-            String respXmlStr = HttpClientUtil.sendGet(url, header, httpClient);
+            String respXmlStr = HttpClientUtil.sendPost(url, getRequestBody(req), header, httpClient);
             SingleTradeQueryResponse response = generateResponseData(respXmlStr);
-            response.setResponseOriginString(respXmlStr);
-            logger.info("singleTradeQueryResponse: " + JSON.toJSONString(response));
 
+            logger.info("singleTradeQueryResponse: " + JSON.toJSONString(response));
+            response.setResponseOriginString(respXmlStr);
             return response;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -76,24 +80,16 @@ public class SingleTradeQueryService implements InitializingBean {
 
     }
 
-    /**
-     * 拼接请求url
-     * 
-     * @param req
-     * @param header
-     * @return
-     */
-    private String generateRequestUrl(SingleTradeQueryRequest req, HashMap<String, String> header) {
-        String url = new StringBuilder(100).append(integrationConfig.getAliPayBaseUrl(header))
-                .append("?service=").append(req.getService())
-                .append("&partner=").append(req.getPartner())
-                .append("&_input_charset=").append(req.get_input_charset())
-                .append("&sign=").append(req.getSign())
-                .append("&sign_type=").append(req.getSign_type())
-                .append("&trade_no=").append(req.getTrade_no())
-                .append("&out_trade_no=").append(req.getOut_trade_no())
-                .toString();
-        return url;
+    private List<NameValuePair> getRequestBody(SingleTradeQueryRequest req) {
+        List<NameValuePair> nvp = new ArrayList<>();
+        nvp.add(new BasicNameValuePair("service", req.getService()));
+        nvp.add(new BasicNameValuePair("partner", req.getPartner()));
+        nvp.add(new BasicNameValuePair("_input_charset", req.get_input_charset()));
+        nvp.add(new BasicNameValuePair("sign", req.getSign()));
+        nvp.add(new BasicNameValuePair("sign_type", req.getSign_type()));
+        nvp.add(new BasicNameValuePair("trade_no", req.getTrade_no()));
+        nvp.add(new BasicNameValuePair("out_trade_no", req.getOut_trade_no()));
+        return nvp;
     }
 
     private SingleTradeQueryResponse generateResponseData(String respXmlStr) throws DocumentException, ParseException {
@@ -115,7 +111,8 @@ public class SingleTradeQueryService implements InitializingBean {
             response.setSubject(trade.elementText("subject"));
             response.setFlag_trade_locked(trade.elementText("flag_trade_locked"));
             response.setBody(trade.elementText("body"));
-            response.setGmt_create(sdf.parse(trade.elementText("gmt_create")));
+            response.setGmt_create(StringUtils.isBlank(trade.elementText("gmt_create"))
+                    ? null : sdf.parse(trade.elementText("gmt_create")));
             response.setSeller_email(trade.elementText("seller_email"));
             response.setSeller_id(trade.elementText("seller_id"));
             response.setTotal_fee(trade.elementText("total_fee"));
@@ -128,13 +125,20 @@ public class SingleTradeQueryService implements InitializingBean {
             response.setRefund_status(trade.elementText("refund_status"));
             response.setLogistics_status(trade.elementText("logistics_status"));
             response.setAdditional_trade_status(trade.elementText("additional_trade_status"));
-            response.setGmt_last_modified_time(sdf.parse(trade.elementText("gmt_last_modified_time")));
-            response.setGmt_payment(sdf.parse(trade.elementText("gmt_payment")));
-            response.setGmt_send_goods(sdf.parse(trade.elementText("gmt_send_goods")));
-            response.setGmt_refund(sdf.parse(trade.elementText("gmt_refund")));
-            response.setTime_out(sdf.parse(trade.elementText("time_out")));
-            response.setGmt_close(sdf.parse(trade.elementText("gmt_close")));
-            response.setGmt_logistics_modify(sdf.parse(trade.elementText("gmt_logistics_modify")));
+            response.setGmt_last_modified_time(StringUtils.isBlank(trade.elementText("gmt_last_modified_time"))
+                    ? null : sdf.parse(trade.elementText("gmt_last_modified_time")));
+            response.setGmt_payment(StringUtils.isBlank(trade.elementText("gmt_payment"))
+                    ? null : sdf.parse(trade.elementText("gmt_payment")));
+            response.setGmt_send_goods(StringUtils.isBlank(trade.elementText("gmt_send_goods"))
+                    ? null : sdf.parse(trade.elementText("gmt_send_goods")));
+            response.setGmt_refund(StringUtils.isBlank(trade.elementText("gmt_refund"))
+                    ? null : sdf.parse(trade.elementText("gmt_refund")));
+            response.setTime_out(StringUtils.isBlank(trade.elementText("time_out"))
+                    ? null : sdf.parse(trade.elementText("time_out")));
+            response.setGmt_close(StringUtils.isBlank(trade.elementText("gmt_close"))
+                    ? null : sdf.parse(trade.elementText("gmt_close")));
+            response.setGmt_logistics_modify(StringUtils.isBlank(trade.elementText("gmt_logistics_modify"))
+                    ? null : sdf.parse(trade.elementText("gmt_logistics_modify")));
             response.setTime_out_type(trade.elementText("time_out_type"));
             response.setRefund_fee(trade.elementText("refund_fee"));
             response.setRefund_flow_type(trade.elementText("refund_flow_type"));

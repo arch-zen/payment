@@ -116,6 +116,46 @@ public class HttpClientUtil {
      * @return 请求应答
      * @throws ParseException
      * @throws IOException
+     */
+    public static String sendPost(String url, List<NameValuePair> body, HashMap<String, String> header,
+            HttpClient httpClient)
+            throws IOException {
+        String result = null;
+
+        HttpPost httpPost = new HttpPost(url);
+        UrlEncodedFormEntity postEntity = new UrlEncodedFormEntity(body, "UTF-8");
+        httpPost.setEntity(postEntity); // set request body
+        if (header != null) {
+            for (Entry<String, String> entry : header.entrySet()) {
+                httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
+            }
+        }
+        logger.info("executing request" + httpPost.getRequestLine());
+        logger.info("request header: " + Arrays.toString(httpPost.getAllHeaders()));
+        logger.info("request body: " + body);
+
+        try {
+            HttpResponse response = httpClient.execute(httpPost);
+            HttpEntity entity = response.getEntity();
+            result = EntityUtils.toString(entity, "UTF-8");
+            logger.info("response message:" + result);
+        } finally {
+            httpPost.abort();
+        }
+
+        return result;
+    }
+
+
+    /**
+     * 
+     * @param url 请求路径
+     * @param body 请求body
+     * @param header 请求header
+     * @param httpClient 执行请求的HttpClient
+     * @return 请求应答
+     * @throws ParseException
+     * @throws IOException
      * @throws ExecutionException
      * @throws InterruptedException
      */
