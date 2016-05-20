@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +23,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.jboss.resteasy.specimpl.BuiltResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -59,11 +59,11 @@ public class PaymentNotifyResourceImpl implements PaymentNotifyResource {
         PaymentNotifyRequest notifyReq = new PaymentNotifyRequest();
         notifyReq.setPayType(payType);
         notifyReq.setNotifyType(PaymentNotifyType.Client);
-        notifyReq.setRawString(getHttpBody(servletRequest));
+        notifyReq.setRawString(servletRequest.getQueryString());
         notifyReq.setMockHeader(getMockHttpHeader(servletRequest));
 
-        String url = "http://www.baidu.com";
-        // String url = paymentNotifyFacade.notify(notifyReq);
+        // String url = "http://www.baidu.com";
+        String url = paymentNotifyFacade.notify(notifyReq);
         Response response = Response.status(Status.FOUND).header("location", url).build();
 
         return response;
