@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.SSLContext;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -31,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -67,16 +65,8 @@ public class RefundQueryService {
      * 
      * @param request
      * @param header
-     * @return RefundQueryResponse
-     * @throws ParserConfigurationException
-     * @throws KeyManagementException
-     * @throws UnrecoverableKeyException
-     * @throws KeyStoreException
-     * @throws CertificateException
-     * @throws NoSuchAlgorithmException
-     * @throws IOException
-     * @throws SAXException
-     * @throws IntegerationException
+     * @return
+     * @throws Exception
      */
     public RefundQueryResponse doService(RefundQueryRequest request, HashMap<String, String> header)
             throws Exception {
@@ -108,48 +98,54 @@ public class RefundQueryService {
         response.setReturn_code((String) responseMap.get("return_code"));
         response.setReturn_msg((String) responseMap.get("return_msg"));
 
-        response.setResult_code((String) responseMap.get("result_code"));
-        response.setErr_code((String) responseMap.get("err_code"));
-        response.setErr_code_des((String) responseMap.get("err_code_des"));
-        response.setAppid((String) responseMap.get("appid"));
-        response.setMch_id((String) responseMap.get("mch_id"));
-        response.setDevice_info((String) responseMap.get("device_info"));
-        response.setNonce_str((String) responseMap.get("nonce_str"));
-        response.setSign((String) responseMap.get("sign"));
-        response.setTransaction_id((String) responseMap.get("transaction_id"));
-        response.setOut_trade_no((String) responseMap.get("out_trade_no"));
-        response.setTotal_fee(NumberUtils.toInt((String) responseMap.get("total_fee")));
-        response.setFee_type((String) responseMap.get("fee_type"));
-        response.setCash_fee(NumberUtils.toInt((String) responseMap.get("cash_fee")));
-        response.setRefund_count(NumberUtils.toInt((String) responseMap.get("refund_count")));
+        if ("SUCCESS".equals(response.getReturn_code())) {
+            // 以下字段在return_code为SUCCESS的时候有返回
+            response.setResult_code((String) responseMap.get("result_code"));
+            response.setErr_code((String) responseMap.get("err_code"));
+            response.setErr_code_des((String) responseMap.get("err_code_des"));
+            response.setAppid((String) responseMap.get("appid"));
+            response.setMch_id((String) responseMap.get("mch_id"));
+            response.setDevice_info((String) responseMap.get("device_info"));
+            response.setNonce_str((String) responseMap.get("nonce_str"));
+            response.setSign((String) responseMap.get("sign"));
+            response.setTransaction_id((String) responseMap.get("transaction_id"));
+            response.setOut_trade_no((String) responseMap.get("out_trade_no"));
+            response.setTotal_fee(NumberUtils.toInt((String) responseMap.get("total_fee")));
+            response.setFee_type((String) responseMap.get("fee_type"));
+            response.setCash_fee(NumberUtils.toInt((String) responseMap.get("cash_fee")));
+            response.setRefund_count(NumberUtils.toInt((String) responseMap.get("refund_count")));
 
-        List<RefundOrderData> refundOrderDataList = new ArrayList<RefundOrderData>();
-        for (int index = 0; index < response.getRefund_count(); ++index) {
-            RefundOrderData refundOrderData = new RefundOrderData();
-            refundOrderData.setOutRefundNo((String) responseMap.get("out_refund_no_" + index));
-            refundOrderData.setRefundID((String) responseMap.get("refund_id_" + index));
-            refundOrderData.setRefundChannel((String) responseMap.get("refund_channel_" + index));
-            refundOrderData.setRefundFee(Integer.valueOf((String) responseMap.get("refund_fee_" + index)));
-            refundOrderData.setCouponRefundFee(Integer.valueOf((String) responseMap.get("coupon_refund_fee_" + index)));
-            refundOrderData.setRefundStatus((String) responseMap.get("refund_status_" + index));
-            refundOrderData
-                    .setCouponRefundCount(NumberUtils.toInt((String) responseMap.get("coupon_refund_count_" + index)));
+            List<RefundOrderData> refundOrderDataList = new ArrayList<RefundOrderData>();
+            for (int index = 0; index < response.getRefund_count(); ++index) {
+                RefundOrderData refundOrderData = new RefundOrderData();
+                refundOrderData.setOutRefundNo((String) responseMap.get("out_refund_no_" + index));
+                refundOrderData.setRefundID((String) responseMap.get("refund_id_" + index));
+                refundOrderData.setRefundChannel((String) responseMap.get("refund_channel_" + index));
+                refundOrderData.setRefundFee(Integer.valueOf((String) responseMap.get("refund_fee_" + index)));
+                refundOrderData
+                        .setCouponRefundFee(Integer.valueOf((String) responseMap.get("coupon_refund_fee_" + index)));
+                refundOrderData.setRefundStatus((String) responseMap.get("refund_status_" + index));
+                refundOrderData
+                        .setCouponRefundCount(
+                                NumberUtils.toInt((String) responseMap.get("coupon_refund_count_" + index)));
 
-            List<CouponRefundData> couponRefundDataList = new ArrayList<>();
-            for (int loop = 0; loop < refundOrderData.getCouponRefundCount(); ++loop) {
-                CouponRefundData couponRefundData = new CouponRefundData();
-                couponRefundData.setCouponRefundBatchId(
-                        (String) responseMap.get("coupon_refund_batch_id_" + index + "_" + loop));
-                couponRefundData.setCouponRefundId((String) responseMap.get("coupon_refund_id_" + index + "_" + loop));
-                couponRefundData.setCouponRefundFee(
-                        NumberUtils.toInt((String) responseMap.get("coupon_refund_fee_" + index + "_" + loop)));
-                couponRefundDataList.add(couponRefundData);
+                List<CouponRefundData> couponRefundDataList = new ArrayList<>();
+                for (int loop = 0; loop < refundOrderData.getCouponRefundCount(); ++loop) {
+                    CouponRefundData couponRefundData = new CouponRefundData();
+                    couponRefundData.setCouponRefundBatchId(
+                            (String) responseMap.get("coupon_refund_batch_id_" + index + "_" + loop));
+                    couponRefundData
+                            .setCouponRefundId((String) responseMap.get("coupon_refund_id_" + index + "_" + loop));
+                    couponRefundData.setCouponRefundFee(
+                            NumberUtils.toInt((String) responseMap.get("coupon_refund_fee_" + index + "_" + loop)));
+                    couponRefundDataList.add(couponRefundData);
+                }
+                refundOrderData.setCouponRefundData(couponRefundDataList);
+
+                refundOrderDataList.add(refundOrderData);
             }
-            refundOrderData.setCouponRefundData(couponRefundDataList);
-
-            refundOrderDataList.add(refundOrderData);
+            response.setRefundOrderDataList(refundOrderDataList);
         }
-        response.setRefundOrderDataList(refundOrderDataList);
 
         return response;
     }

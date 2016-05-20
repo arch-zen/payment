@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSON;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.domain.refund.constants.RefundStatusEnum;
@@ -110,7 +110,7 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
                     rmrl.setLogid(UUID.randomUUID().toString());
                     rmrl.setMethod("RefundNotify");
                     rmrl.setRequestdata("");
-                    rmrl.setResponsedata(new Gson().toJson(signMap)); // TODO
+                    rmrl.setResponsedata(JSON.toJSONString(signMap)); // TODO
                     rmrl.setRequesttime(new Date());
                     rmrl.setResponsetime(req.getNotify_time());
 

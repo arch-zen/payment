@@ -22,6 +22,7 @@ public class IntegrationConfig {
 
     private String wxUnifiedOrderUrl; // 微信统一下单url
     private String wxRefundQueryUrl; // 微信退款查询url
+    private String wxOrderQueryUrl; // 微信查询订单url
     private String wxJsapiCertPath; // 微信Jsapi(1278350701)对应的证书路径
     private String wxJsapiCertPass; // 微信Jsapi(1278350701)对应的证书密码
     private String wxJsapiMchId; // 微信Jsapi的商户号(1234079001)
@@ -39,10 +40,38 @@ public class IntegrationConfig {
     private String aliPayBaseUrlMock; // 支付宝网关url(mock)
     private String wxUnifiedOrderUrlMock; // 微信统一下单url(mock)
     private String wxRefundQueryUrlMock; // 微信退款查询url(mock)
+    private String wxOrderQueryUrlMock; // 微信查询订单url(mock)
     private String ymtUserServiceUrlMock; // 用户服务url(mock)
     private String ymtNotifyRefundUrlMock; // 通知退款url(mock)
     private String ymtNotifyPaymentUrlMock; // 通知支付url(mock)
     private String ymtNotifytradingeventUrlMock; // 通知用户交易信息url(mock)
+
+
+    public String getWxOrderQueryUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getWxOrderQueryUrlMock();
+        } else {
+            return getWxOrderQueryUrl();
+        }
+    }
+
+    @DisconfFileItem(name = "wx.orderquery.url")
+    public String getWxOrderQueryUrl() {
+        return wxOrderQueryUrl;
+    }
+
+    public void setWxOrderQueryUrl(String wxOrderQueryUrl) {
+        this.wxOrderQueryUrl = wxOrderQueryUrl;
+    }
+
+    @DisconfFileItem(name = "wx.orderquery.url.mock")
+    public String getWxOrderQueryUrlMock() {
+        return wxOrderQueryUrlMock;
+    }
+
+    public void setWxOrderQueryUrlMock(String wxOrderQueryUrlMock) {
+        this.wxOrderQueryUrlMock = wxOrderQueryUrlMock;
+    }
 
     public String getYmtNotifyRefundUrl(HashMap<String, String> header) {
         if (isMock(header)) {

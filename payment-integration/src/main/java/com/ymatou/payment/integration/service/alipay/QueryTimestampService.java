@@ -3,7 +3,6 @@
  */
 package com.ymatou.payment.integration.service.alipay;
 
-import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
@@ -26,7 +25,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSON;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.common.HttpClientUtil;
 import com.ymatou.payment.integration.model.QueryTimestampResponse;
@@ -53,9 +52,8 @@ public class QueryTimestampService implements InitializingBean {
      * @param service
      * @param partner
      * @param header
-     * @return QueryTimestampResponse
-     * @throws DocumentException
-     * @throws IOException
+     * @return
+     * @throws Exception
      */
     public QueryTimestampResponse doService(String service, String partner, HashMap<String, String> header)
             throws Exception {
@@ -65,7 +63,7 @@ public class QueryTimestampService implements InitializingBean {
         try {
             String respXmlStr = HttpClientUtil.sendGet(url, header, httpClient);
             QueryTimestampResponse response = generateResponseData(respXmlStr);
-            logger.info("queryTimestampResponse: " + new Gson().toJson(response));
+            logger.info("queryTimestampResponse: " + JSON.toJSONString(response));
 
             return response;
         } catch (Exception e) {
