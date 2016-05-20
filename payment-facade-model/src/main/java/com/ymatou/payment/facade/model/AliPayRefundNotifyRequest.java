@@ -5,8 +5,7 @@ package com.ymatou.payment.facade.model;
 
 import java.util.Date;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ymatou.payment.facade.BaseRequest;
 
 /**

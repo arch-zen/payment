@@ -3,6 +3,7 @@ package com.ymatou.payment.domain.pay.service;
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
+import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 
 /**
  * 支付服务接口
@@ -18,7 +19,7 @@ public interface PayService {
      * @param paymentId
      * @return
      */
-    Payment GetPaymentByPaymentId(String paymentId);
+    Payment getPaymentByPaymentId(String paymentId);
 
     /**
      * 根据BussinessOrderId获取到支付单信息
@@ -26,7 +27,7 @@ public interface PayService {
      * @param bussinessOrderId
      * @return
      */
-    Payment GetPaymentByBussinessOrderId(String bussinessOrderId);
+    Payment getPaymentByBussinessOrderId(String bussinessOrderId);
 
     /**
      * 根据OrderId获取到商户订单信息
@@ -34,7 +35,7 @@ public interface PayService {
      * @param orderId
      * @return
      */
-    BussinessOrder GetBussinessOrderByOrderId(String orderId);
+    BussinessOrder getBussinessOrderByOrderId(String orderId);
 
     /**
      * 根据收单请求创建Payment和BussinessOrder
@@ -42,7 +43,7 @@ public interface PayService {
      * @param req
      * @return
      */
-    Payment CreatePayment(AcquireOrderReq req);
+    Payment createPayment(AcquireOrderReq req);
 
     /**
      * 根据bussinessOrderId获取BussinessOrder
@@ -51,4 +52,12 @@ public interface PayService {
      * @return
      */
     BussinessOrder getBussinessOrderById(String bussinessOrderId);
+
+    /**
+     * 设置支付单为已支付
+     * 
+     * @param paymentPo
+     * @param traceId
+     */
+    void setPaymentOrderPaid(Payment payment, String traceId);
 }

@@ -48,7 +48,7 @@ public class PaymentFacadeImpl implements PaymentFacade {
         validateReqParam(req);
 
         // 创建支付单
-        Payment payment = payService.CreatePayment(req);
+        Payment payment = payService.createPayment(req);
 
         // 拼装支付报文
         AcquireOrderPackageResp packageResp =
@@ -78,7 +78,7 @@ public class PaymentFacadeImpl implements PaymentFacade {
         if (instConfig == null)
             throw new BizException(ErrorCode.INVALID_PAYTYPE, req.getPayType());
 
-        BussinessOrder bussinessOrder = payService.GetBussinessOrderByOrderId(req.getOrderId());
+        BussinessOrder bussinessOrder = payService.getBussinessOrderByOrderId(req.getOrderId());
         if (bussinessOrder != null)
             throw new BizException(ErrorCode.DB_ERROR, "OrderId已经创建过支付单");
     }

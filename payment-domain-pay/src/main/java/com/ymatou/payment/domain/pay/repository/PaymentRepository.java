@@ -12,11 +12,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ymatou.payment.domain.pay.model.Payment;
+import com.ymatou.payment.infrastructure.db.mapper.CompensateprocessinfoMapper;
 import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
 import com.ymatou.payment.infrastructure.db.model.BussinessorderPo;
 import com.ymatou.payment.infrastructure.db.model.PaymentExample;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
+import com.ymatou.payment.infrastructure.db.model.PpCompensateprocessinfoWithBLOBs;
 import com.ymatou.payment.infrastructure.util.StringUtil;
+import com.ymatou.payment.integration.IntegrationConfig;
 
 /**
  * 支付单仓储
@@ -36,7 +39,13 @@ public class PaymentRepository {
     private BussinessOrderRepository bussinessOrderRepository;
 
     @Resource
+    private CompensateprocessinfoMapper compensateprocessinfoMapper;
+
+    @Resource
     private SqlSession sqlSession;
+
+    @Resource
+    private IntegrationConfig integrationConfig;
 
     /**
      * 根据PaymentId获取到支付单信息
@@ -90,6 +99,33 @@ public class PaymentRepository {
         int rows = sqlSession.insert("ext-ppPayment.insert", payment);
 
         return rows;
+    }
+
+    /**
+     * 设置支付单状态为已支付
+     * 
+     * @param paymentPo
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void setPaymentOrderPaid(PaymentPo paymentPo, String traceId) {
+        // 更新支付单
+        PaymentExample paymentExample = new PaymentExample();
+        paymentExample.createCriteria().andPaymentidEqualTo(paymentPo.getPaymentid());
+        paymentMapper.updateByExampleSelective(paymentPo, paymentExample);
+
+        // 更新商户订单
+        bussinessOrderRepository.updateOrderStatus(paymentPo.getBussinessorderid(), paymentPo.getPaystatus());
+
+        // 添加发货信息
+        PpCompensateprocessinfoWithBLOBs compensateprocessinfoPo = new PpCompensateprocessinfoWithBLOBs();
+        compensateprocessinfoPo.setAppid("1");// 固定值代表发货服务
+        compensateprocessinfoPo.setCorrelateid(paymentPo.getPaymentid());
+        compensateprocessinfoPo.setMethodname("DeliveryNotify");
+        compensateprocessinfoPo.setRequesturl(integrationConfig.getYmtNotifyPaymentUrl());
+        compensateprocessinfoPo.setRequestdata(
+                String.format("{\"PaymentId\":\"%s\",\"TraceId\":\"%s\"}", paymentPo.getPaymentid(), traceId));
+
+        compensateprocessinfoMapper.insertSelective(compensateprocessinfoPo);
     }
 
     /**

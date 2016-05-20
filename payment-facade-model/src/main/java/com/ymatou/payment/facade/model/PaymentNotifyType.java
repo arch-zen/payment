@@ -15,10 +15,10 @@ public enum PaymentNotifyType {
     /**
      * 客户端回调
      */
-    Callback,
+    Client,
 
     /**
      * 服务端回调
      */
-    Notify
+    Server
 }

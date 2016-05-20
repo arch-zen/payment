@@ -16,16 +16,7 @@ import com.ymatou.payment.facade.model.PaymentNotifyRequest;
 public interface PaymentNotifyFacade {
 
     /**
-     * 客户端回调
-     * 
-     * @param req
-     * @return
-     */
-    String callback(PaymentNotifyRequest req);
-
-
-    /**
-     * 服务端回调
+     * 支付回调接口
      * 
      * @param req
      * @return

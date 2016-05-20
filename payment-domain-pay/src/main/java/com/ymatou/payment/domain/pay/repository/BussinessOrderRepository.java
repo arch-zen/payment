@@ -6,17 +6,20 @@
 package com.ymatou.payment.domain.pay.repository;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
+import com.ymatou.payment.domain.pay.model.PayStatus;
+import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.infrastructure.db.mapper.BussinessorderMapper;
 import com.ymatou.payment.infrastructure.db.model.BussinessorderExample;
 import com.ymatou.payment.infrastructure.db.model.BussinessorderPo;
@@ -63,6 +66,23 @@ public class BussinessOrderRepository {
      */
     public int insert(BussinessorderPo po) {
         return sqlSession.insert("ext-ppBussinessorder.insert", po);
+    }
+
+    /**
+     * 更新商户订单状态
+     * 
+     * @param bussinessorderid
+     * @param orderStatus
+     */
+    public void updateOrderStatus(String bussinessorderid, int orderStatus) {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("bussinessorderid", bussinessorderid);
+        params.put("orderstatus", orderStatus);
+
+        int updated = sqlSession.update("ext-ppBussinessorder.updateOrderStatus", params);
+        if (updated <= 0) {
+            throw new BizException("Bussinessorder not exist");
+        }
     }
 
     /**

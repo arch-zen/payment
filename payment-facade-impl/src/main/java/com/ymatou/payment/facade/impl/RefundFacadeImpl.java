@@ -72,7 +72,7 @@ public class RefundFacadeImpl implements RefundFacade {
     @Override
     public FastRefundResponse fastRefund(FastRefundRequest req) {
         // query and verify payment
-        Payment payment = payService.GetPaymentByPaymentId(req.getPaymentId());
+        Payment payment = payService.getPaymentByPaymentId(req.getPaymentId());
         if (payment == null) {
             throw new BizException(ErrorCode.NOT_EXIST_PAYMENTID, "Payment not exist");
         }

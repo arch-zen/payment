@@ -31,6 +31,7 @@ public class IntegrationConfig {
     private String aliPayBaseUrl; // 支付宝防钓鱼时间戳url
     private String ymtUserServiceUrl; // 用户服务url
     private String ymtNotifyRefundUrl; // 通知退款url
+    private String ymtNotifyPaymentUrl; // 通知支付url
     private String ymtNotifytradingeventUrl; // 通知用户交易信息url
     private String ymtPaymentBaseUrl; // ymt.payment.baseurl
 
@@ -40,6 +41,7 @@ public class IntegrationConfig {
     private String wxRefundQueryUrlMock; // 微信退款查询url(mock)
     private String ymtUserServiceUrlMock; // 用户服务url(mock)
     private String ymtNotifyRefundUrlMock; // 通知退款url(mock)
+    private String ymtNotifyPaymentUrlMock; // 通知支付url(mock)
     private String ymtNotifytradingeventUrlMock; // 通知用户交易信息url(mock)
 
     public String getYmtNotifyRefundUrl(HashMap<String, String> header) {
@@ -47,6 +49,14 @@ public class IntegrationConfig {
             return getYmtNotifyRefundUrlMock();
         } else {
             return getYmtNotifyRefundUrl();
+        }
+    }
+
+    public String getYmtNotifyPaymentUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getYmtNotifyPaymentUrlMock();
+        } else {
+            return getYmtNotifyPaymentUrl();
         }
     }
 
@@ -67,6 +77,15 @@ public class IntegrationConfig {
         this.ymtNotifyRefundUrl = ymtNotifyRefundUrl;
     }
 
+    @DisconfFileItem(name = "ymt.notifypayment.url")
+    public String getYmtNotifyPaymentUrl() {
+        return ymtNotifyPaymentUrl;
+    }
+
+    public void setYmtNotifyPaymentUrl(String ymtNotifyPaymentUrl) {
+        this.ymtNotifyPaymentUrl = ymtNotifyPaymentUrl;
+    }
+
     @DisconfFileItem(name = "ymt.notifytradingevent.url")
     public String getYmtNotifytradingeventUrl() {
         return ymtNotifytradingeventUrl;
@@ -83,6 +102,15 @@ public class IntegrationConfig {
 
     public void setYmtNotifyRefundUrlMock(String ymtNotifyRefundUrlMock) {
         this.ymtNotifyRefundUrlMock = ymtNotifyRefundUrlMock;
+    }
+
+    @DisconfFileItem(name = "ymt.notifypayment.url.mock")
+    public String getYmtNotifyPaymentUrlMock() {
+        return ymtNotifyPaymentUrlMock;
+    }
+
+    public void setYmtNotifyPaymentUrlMock(String ymtNotifyPaymentUrlMock) {
+        this.ymtNotifyPaymentUrlMock = ymtNotifyPaymentUrlMock;
     }
 
     @DisconfFileItem(name = "ymt.notifytradingevent.url.mock")

@@ -7,8 +7,10 @@ package com.ymatou.payment.domain.channel.service.acquireorder;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import com.ymatou.payment.domain.channel.model.enums.PayTypeEnum;
 import com.ymatou.payment.domain.channel.service.AcquireOrderService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
@@ -36,21 +38,24 @@ public class AcquireOrderPackageFactory {
 
 
     /**
-     * 获取到收单
+     * 获取到收单解析器
      * 
      * @param payType
      * @return
      */
     public AcquireOrderService getInstance(String payType) {
-        if (payType == "10")
-            return aliPayPcAcquireOrderServiceImpl;
-        else if (payType == "13")
-            return aliPayAppAcquireOrderServiceImpl;
-        else if (payType == "14")
-            return weiXinJSAPIAcquireOrderServiceImpl;
-        else if (payType == "15")
-            return weiXinAppAcquireOrderServiceImpl;
-        else
-            throw new BizException(ErrorCode.INVALID_PAYTYPE, payType);
+        switch (PayTypeEnum.parse(payType)) {
+            case AliPayPc:
+                return aliPayPcAcquireOrderServiceImpl;
+            case AliPayApp:
+                return aliPayAppAcquireOrderServiceImpl;
+            case WeiXinJSAPI:
+                return weiXinJSAPIAcquireOrderServiceImpl;
+            case WeiXinApp:
+                return weiXinAppAcquireOrderServiceImpl;
+            default:
+                throw new BizException(ErrorCode.INVALID_PAYTYPE, payType);
+
+        }
     }
 }

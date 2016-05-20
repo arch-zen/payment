@@ -26,8 +26,8 @@ import com.ymatou.payment.facade.model.AcquireOrderResp;
  */
 @Path("/api")
 @Component("paymentResource")
-@Consumes(MediaType.APPLICATION_JSON)
 @Produces({"application/json; charset=UTF-8"})
+@Consumes({MediaType.APPLICATION_JSON})
 public class PaymentResourceImpl implements PaymentResource {
 
     /**
@@ -39,6 +39,7 @@ public class PaymentResourceImpl implements PaymentResource {
     /**
      * 支付收单
      */
+    @Override
     @POST
     @Path("/AcquireOrder")
     public AcquireOrderResp acquireOrder(AcquireOrderReq req, @Context HttpServletRequest servletRequest) {
