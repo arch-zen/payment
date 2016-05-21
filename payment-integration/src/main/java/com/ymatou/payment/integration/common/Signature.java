@@ -5,6 +5,7 @@ package com.ymatou.payment.integration.common;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -31,9 +32,10 @@ public class Signature {
      * @param o 要参与签名的数据对象
      * @param key 盐值
      * @return 签名
+     * @throws NoSuchAlgorithmException
      * @throws IllegalAccessException
      */
-    public static String getSign(Object o, String key) {
+    public static String getSign(Object o, String key) throws NoSuchAlgorithmException {
         ArrayList<String> list = new ArrayList<String>();
         Class<?> cls = o.getClass();
         Field[] fields = cls.getDeclaredFields();
@@ -68,8 +70,9 @@ public class Signature {
      * @param map 要参与签名的map
      * @param key 盐值
      * @return 签名
+     * @throws NoSuchAlgorithmException
      */
-    public static String getSign(Map<String, Object> map, String key) {
+    public static String getSign(Map<String, Object> map, String key) throws NoSuchAlgorithmException {
         ArrayList<String> list = new ArrayList<String>();
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             if (entry.getValue() != "") {
@@ -100,9 +103,10 @@ public class Signature {
      * @throws ParserConfigurationException
      * @throws IOException
      * @throws SAXException
+     * @throws NoSuchAlgorithmException
      */
     public static String getSignFromResponseString(String responseString, String key)
-            throws IOException, SAXException, ParserConfigurationException {
+            throws IOException, SAXException, ParserConfigurationException, NoSuchAlgorithmException {
         Map<String, Object> map = XmlParser.getMapFromXML(responseString);
         // 清掉返回数据对象里面的Sign数据（不能把这个数据也加进去进行签名），然后用签名算法进行签名
         map.put("sign", "");
@@ -119,9 +123,10 @@ public class Signature {
      * @throws ParserConfigurationException
      * @throws IOException
      * @throws SAXException
+     * @throws NoSuchAlgorithmException
      */
     public static boolean checkIsSignValidFromResponseString(String responseString, String key)
-            throws ParserConfigurationException, IOException, SAXException {
+            throws ParserConfigurationException, IOException, SAXException, NoSuchAlgorithmException {
 
         Map<String, Object> map = XmlParser.getMapFromXML(responseString);
 

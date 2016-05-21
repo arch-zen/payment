@@ -9,7 +9,9 @@ import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.channel.model.PaymentNotifyMessage;
 import com.ymatou.payment.domain.channel.service.PaymentNotifyService;
+import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.model.PaymentNotifyRequest;
+import com.ymatou.payment.facade.model.PaymentNotifyType;
 
 /**
  * 微信 APP 回调报文解析器 (13)
@@ -18,7 +20,7 @@ import com.ymatou.payment.facade.model.PaymentNotifyRequest;
  *
  */
 @Component
-public class WeiXinAppPaymentNotifyServiceImpl implements PaymentNotifyService {
+public class WeiXinPaymentNotifyServiceImpl implements PaymentNotifyService {
 
     /*
      * (non-Javadoc)
@@ -33,16 +35,24 @@ public class WeiXinAppPaymentNotifyServiceImpl implements PaymentNotifyService {
         return paymentNotifyMessage;
     }
 
+
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.ymatou.payment.domain.channel.service.PaymentNotifyService#BuildInstNeedResponse(com.
-     * ymatou.payment.domain.channel.model.PaymentNotifyMessage)
+     * @see com.ymatou.payment.domain.channel.service.PaymentNotifyService#buildResponse(com.ymatou.
+     * payment.domain.channel.model.PaymentNotifyMessage,
+     * com.ymatou.payment.domain.pay.model.Payment,
+     * com.ymatou.payment.facade.model.PaymentNotifyType)
      */
     @Override
-    public String buildInstNeedResponse(PaymentNotifyMessage notifyMessage) {
-        return "success";
+    public String buildResponse(PaymentNotifyMessage notifyMessage, Payment payment, PaymentNotifyType notifyType) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<xml>");
+        sb.append("<return_code><![CDATA[SUCCESS]]></return_code>");
+        sb.append("<return_msg><![CDATA[OK]]></return_msg>");
+        sb.append("</xml>");
+
+        return sb.toString();
     }
 
 }

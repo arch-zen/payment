@@ -7,6 +7,7 @@ package com.ymatou.payment.infrastructure.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,5 +41,24 @@ public final class HttpUtil {
         }
 
         return map;
+    }
+
+    /**
+     * 将Map转成QueryString
+     * 
+     * @param map
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    public static String parseMapToQueryString(Map<String, String> map) throws UnsupportedEncodingException {
+        if (map == null || map.size() == 0)
+            return "";
+
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, String> item : map.entrySet()) {
+            sb.append(String.format("&%s=%s", item.getKey(), URLEncoder.encode(item.getValue(), "utf-8")));
+        }
+
+        return sb.toString().replaceFirst("&", "");
     }
 }
