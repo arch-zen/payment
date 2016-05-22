@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
@@ -17,9 +15,9 @@
         http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
 	<context:annotation-config />
-	
-	<tx:annotation-driven transaction-manager="transactionManager"/>
-	
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
 	<aop:aspectj-autoproxy />
 
 	<context:component-scan base-package="com.ymatou.payment" />
@@ -55,17 +53,47 @@
 			</list>
 		</property>
 	</bean>
-	
-	<bean id="performanceMonitorAdvice" class="com.ymatou.performancemonitorclient.PerformanceMonitorAdvice">
+
+	<bean id="taskExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<!-- 核心线程数，默认为1 -->
+		<property name="corePoolSize" value="10" />
+		<!-- 最大线程数，默认为Integer.MAX_VALUE -->
+		<property name="maxPoolSize" value="50" />
+		<!-- 队列最大长度，一般需要设置值>=notifyScheduledMainExecutor.maxNum；默认为Integer.MAX_VALUE -->
+		<property name="queueCapacity" value="1000" />
+		<!-- 线程池维护线程所允许的空闲时间，默认为60s -->
+		<property name="keepAliveSeconds" value="300" />
+
+		<!-- 线程池对拒绝任务（无线程可用）的处理策略 -->
+		<property name="rejectedExecutionHandler">
+			<!-- AbortPolicy:直接抛出java.util.concurrent.RejectedExecutionException异常 -->
+			<!-- CallerRunsPolicy:主线程直接执行该任务，执行完之后尝试添加下一个任务到线程池中，可以有效降低向线程池内添加任务的速度 -->
+			<!-- DiscardOldestPolicy:抛弃旧的任务 ；会导致被丢弃的任务无法再次被执行 -->
+			<!-- DiscardPolicy:抛弃当前任务 ；会导致被丢弃的任务无法再次被执行 -->
+			<bean
+				class="com.ymatou.tradeservice.infrastructure.threadexception.LogRejectedPolicy" />
+		</property>
+	</bean>
+
+	<bean id="performanceMonitorAdvice"
+		class="com.ymatou.performancemonitorclient.PerformanceMonitorAdvice">
 		<property name="appId" value="payment.iapi.ymatou.com"></property>
 		<property name="serverUrl" value="http://172.16.100.13:8089/api/perfmon"></property>
 	</bean>
-	
+
 	<aop:config>
-        <aop:advisor advice-ref="performanceMonitorAdvice"
-            pointcut="execution(* com.ymatou.payment.facade.*Facade.*(*))" />
-    </aop:config>
-	
+		<aop:advisor advice-ref="performanceMonitorAdvice"
+			pointcut="execution(* com.ymatou.payment.facade.*Facade.*(..))
+						|| execution(* com.ymatou.payment.facade.rest.*Resource.*(..))
+						|| execution(* com.ymatou.payment.infrastructure.db.mapper.*Mapper.*(..))
+						|| execution(* com.ymatou.payment.infrastructure.db.query.*Query.*(..))
+						|| execution(* com.ymatou.payment..*Repository.*(..))
+						|| execution(* com.ymatou.payment.integration.util.*.*(..))
+						" />
+	</aop:config>
+
+
 	<import resource="classpath:spring/persistence.xml" />
 
 
@@ -84,23 +112,27 @@
 
 	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.PaymentResource"
 		ref="paymentResource" protocol="rest" />
-	
-	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.RefundNotifyResource"
+
+	<dubbo:service
+		interface="com.ymatou.payment.facade.impl.rest.RefundNotifyResource"
 		ref="refundNotifyResource" protocol="rest" />
-		
+
 	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.RefundResource"
 		ref="refundResource" protocol="rest" />
 
-	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.RefundNotifyResource"
+	<dubbo:service
+		interface="com.ymatou.payment.facade.impl.rest.RefundNotifyResource"
 		ref="refundNotifyResource" protocol="rest" />
 
-	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.PaymentNotifyResource"
+	<dubbo:service
+		interface="com.ymatou.payment.facade.impl.rest.PaymentNotifyResource"
 		ref="paymentNotifyResource" protocol="rest" />
 
 	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.RefundResource"
 		ref="refundResource" protocol="rest" />
 
-	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.PaymentNotifyResource"
+	<dubbo:service
+		interface="com.ymatou.payment.facade.impl.rest.PaymentNotifyResource"
 		ref="paymentNotifyResource" protocol="rest" />
 
 

@@ -57,7 +57,7 @@ public class AliPayPaymentNotifyServiceImpl implements PaymentNotifyService {
      */
     @Override
     public PaymentNotifyMessage resloveNotifyMessage(PaymentNotifyRequest notifyRequest) {
-
+        // 解析报文
         Map<String, String> map = new HashMap<String, String>();
         try {
             map = HttpUtil.parseQueryStringToMap(notifyRequest.getRawString());;
@@ -65,12 +65,14 @@ public class AliPayPaymentNotifyServiceImpl implements PaymentNotifyService {
             throw new BizException(ErrorCode.FAIL, "parse query string when receive alipay payment notify.", e);
         }
 
+        // 验签
         InstitutionConfig instConfig = institutionConfigManager.getConfig(notifyRequest.getPayType());
         boolean isSignValidate = signatureService.validateSign(map, instConfig, notifyRequest.getMockHeader());
         if (isSignValidate == false) {
             throw new BizException(ErrorCode.SIGN_NOT_MATCH, "paymentId:" + map.get("out_trade_no"));
         }
 
+        // 从报文中获取到有效信息
         PaymentNotifyMessage paymentNotifyMessage = new PaymentNotifyMessage();
         paymentNotifyMessage.setTraceId(UUID.randomUUID().toString());
         paymentNotifyMessage.setPayerId(

@@ -36,6 +36,8 @@
 
 	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
 		init-method="init" destroy-method="close">
+		<property name="filters" value="slf4j"></property>
+		
 		<!-- 基本属性 url、user、password -->
 		<property name="url" value="${dbUrl}" />
 		<property name="username" value="${dbUser}" />

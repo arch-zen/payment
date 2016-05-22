@@ -84,7 +84,7 @@ public class SignatureServiceImpl implements SignatureService {
             HashMap<String, String> mockHeader) {
         // 拼装待验签报文
         String rawMessage = mapToString(signMapData, instConfig, true);
-        String sign = signMapData.get("sign").toString();
+        String sign = signMapData.get("sign");
 
         if ("MD5".equals(instConfig.getSignType())) {
             String md5Sign = md5Sign(rawMessage, instConfig, mockHeader);
