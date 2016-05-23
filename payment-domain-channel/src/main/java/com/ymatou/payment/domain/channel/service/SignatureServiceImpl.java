@@ -59,7 +59,8 @@ public class SignatureServiceImpl implements SignatureService {
     public String signMessage(Map<String, String> rawMapData, InstitutionConfig instConfig,
             HashMap<String, String> mockHeader) {
         // 拼装加签报文
-        boolean needSort = !"13".equals(instConfig.getPayType()); // 13- AliPay App 的收单加签不需要对参数排序
+        boolean needSort = !"13".equals(instConfig.getPayType())// 13- AliPay App的收单加签不需要对参数排序
+                || "single_trade_query".equals(rawMapData.get("service")); // 13 的单笔交易查询需要对参数排序
         String rawMessage = mapToString(rawMapData, instConfig, needSort);
         String sign = null;
 

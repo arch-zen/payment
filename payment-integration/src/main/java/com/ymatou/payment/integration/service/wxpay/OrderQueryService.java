@@ -19,6 +19,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -31,6 +32,7 @@ import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.common.HttpClientUtil;
 import com.ymatou.payment.integration.common.XmlParser;
+import com.ymatou.payment.integration.common.constants.Constants;
 import com.ymatou.payment.integration.model.CouponData;
 import com.ymatou.payment.integration.model.OrderQueryRequest;
 import com.ymatou.payment.integration.model.OrderQueryResponse;
@@ -95,7 +97,7 @@ public class OrderQueryService implements InitializingBean {
         response.setReturn_code((String) responseMap.get("return_code"));
         response.setReturn_msg((String) responseMap.get("return_msg"));
 
-        if ("SUCCESS".equals(response.getResult_code())) {
+        if ("SUCCESS".equals(response.getReturn_code())) {
             // 以下字段在return_code为SUCCESS的时候有返回
             response.setAppid((String) responseMap.get("appid"));
             response.setMch_id((String) responseMap.get("mch_id"));
@@ -160,7 +162,13 @@ public class OrderQueryService implements InitializingBean {
         SSLConnectionSocketFactory ssf = new SSLConnectionSocketFactory(ctx,
                 SSLConnectionSocketFactory.getDefaultHostnameVerifier());
 
-        this.httpClient =
-                HttpClientBuilder.create().setSSLSocketFactory(ssf).build();
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+        cm.setDefaultMaxPerRoute(Constants.DEFAULT_MAX_PER_ROUTE);
+        cm.setMaxTotal(Constants.MAX_TOTAL);
+
+        this.httpClient = HttpClientBuilder.create()
+                .setSSLSocketFactory(ssf)
+                .setConnectionManager(cm)
+                .build();
     }
 }

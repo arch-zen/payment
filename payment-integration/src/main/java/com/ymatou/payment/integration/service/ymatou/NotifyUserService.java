@@ -10,7 +10,10 @@ import java.util.List;
 import org.apache.http.NameValuePair;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
+import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
+import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.common.HttpClientUtil;
+import com.ymatou.payment.integration.common.constants.Constants;
 import com.ymatou.payment.integration.model.NotifyUserRequest;
 
 /**
@@ -54,7 +58,12 @@ public class NotifyUserService implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        httpClient = HttpAsyncClients.createDefault();
+        ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
+        PoolingNHttpClientConnectionManager cm = new PoolingNHttpClientConnectionManager(ioReactor);
+        cm.setDefaultMaxPerRoute(Constants.DEFAULT_MAX_PER_ROUTE);
+        cm.setMaxTotal(Constants.MAX_TOTAL);
+
+        httpClient = HttpAsyncClients.custom().setConnectionManager(cm).build();
         httpClient.start();
     }
 }

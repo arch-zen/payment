@@ -5,6 +5,7 @@ package com.ymatou.payment.facade.model;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ymatou.payment.facade.BaseRequest;
 
@@ -19,6 +20,7 @@ public class AliPayRefundNotifyRequest extends BaseRequest {
     private static final long serialVersionUID = 6547133957669831614L;
 
     @JsonProperty("notify_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date notify_time;
 
     @JsonProperty("notify_type")

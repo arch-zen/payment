@@ -16,6 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -28,6 +29,7 @@ import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.common.HttpClientUtil;
 import com.ymatou.payment.integration.common.XmlParser;
+import com.ymatou.payment.integration.common.constants.Constants;
 import com.ymatou.payment.integration.model.UnifiedOrderRequest;
 import com.ymatou.payment.integration.model.UnifiedOrderResponse;
 
@@ -123,7 +125,13 @@ public class UnifiedOrderService implements InitializingBean {
         SSLConnectionSocketFactory ssf = new SSLConnectionSocketFactory(ctx,
                 SSLConnectionSocketFactory.getDefaultHostnameVerifier());
 
-        this.httpClient =
-                HttpClientBuilder.create().setSSLSocketFactory(ssf).build();
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+        cm.setDefaultMaxPerRoute(Constants.DEFAULT_MAX_PER_ROUTE);
+        cm.setMaxTotal(Constants.MAX_TOTAL);
+
+        this.httpClient = HttpClientBuilder.create()
+                .setSSLSocketFactory(ssf)
+                .setConnectionManager(cm)
+                .build();
     }
 }

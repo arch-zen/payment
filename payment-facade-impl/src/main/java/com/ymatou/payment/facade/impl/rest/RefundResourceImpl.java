@@ -44,7 +44,7 @@ public class RefundResourceImpl implements RefundResource {
     private RefundFacade refundFacade;
 
     @POST
-    @Path("/Refund/FastRefund")
+    @Path("/{Refund:(?i:Refund)}/{FastRefund:(?i:FastRefund)}")
     @Override
     public FastRefundResponse fastRefund(FastRefundRequest req, @Context HttpServletRequest servletRequest) {
         req.setHeader(generateHttpHeader(servletRequest));
@@ -53,7 +53,7 @@ public class RefundResourceImpl implements RefundResource {
     }
 
     @POST
-    @Path("/Refund/SubmitRefund")
+    @Path("/{Refund:(?i:Refund)}/{SubmitRefund:(?i:SubmitRefund)}")
     @Override
     public AcquireRefundResponse submitRefund(AcquireRefundRequest req, @Context HttpServletRequest servletRequest) {
         req.setHeader(generateHttpHeader(servletRequest));
@@ -79,7 +79,7 @@ public class RefundResourceImpl implements RefundResource {
     }
 
     @POST
-    @Path("/Refund/ApproveRefund")
+    @Path("/{Refund:(?i:Refund)}/{ApproveRefund:(?i:ApproveRefund)}")
     @Override
     public ApproveRefundResponse approveRefund(ApproveRefundRequest req, @Context HttpServletRequest servletRequest) {
         req.setHeader(generateHttpHeader(servletRequest));
@@ -88,7 +88,7 @@ public class RefundResourceImpl implements RefundResource {
     }
 
     @POST
-    @Path("/Refund/CheckRefundable")
+    @Path("/{Refund:(?i:Refund)}/{CheckRefundable:(?i:CheckRefundable)}")
     @Override
     public TradeRefundableResponse checkRefundable(TradeRefundableRequest req,
             @Context HttpServletRequest servletRequest) {
@@ -97,7 +97,7 @@ public class RefundResourceImpl implements RefundResource {
     }
 
     @POST
-    @Path("/Refund/Query")
+    @Path("/{Refund:(?i:Refund)}/{Query:(?i:Query)}")
     @Override
     public QueryRefundResponse query(QueryRefundRequest req, @Context HttpServletRequest servletRequest) {
 

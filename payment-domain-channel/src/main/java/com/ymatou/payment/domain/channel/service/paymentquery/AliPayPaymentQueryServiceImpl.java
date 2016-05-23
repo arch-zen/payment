@@ -66,7 +66,7 @@ public class AliPayPaymentQueryServiceImpl implements PaymentQueryService {
                     resp.setPayStatus(PayStatus.Failed);
                 }
                 logger.error(
-                        "error response from aplipay when check payment status on paymentId {0}, error message {1}",
+                        "error response from aplipay when check payment status on paymentId {}, error message {}",
                         requset.getPaymentId(), response.getError());
                 throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
                         "Paymentid:" + requset.getPaymentId());
@@ -87,7 +87,9 @@ public class AliPayPaymentQueryServiceImpl implements PaymentQueryService {
         request.setPartner(institutionConfig.getMerchantId());
         request.setSign_type(institutionConfig.getSignType());
         request.setOut_trade_no(req.getPaymentId());
-        String sign = signatureService.signMessage(new ObjectMapper().convertValue(req, HashMap.class),
+        request.setTrade_no("");
+        logger.info(institutionConfig.getInstPublicKey());
+        String sign = signatureService.signMessage(new ObjectMapper().convertValue(request, HashMap.class),
                 institutionConfig, req.getHeader());
         request.setSign(sign);
 
@@ -100,7 +102,7 @@ public class AliPayPaymentQueryServiceImpl implements PaymentQueryService {
         response.setActualPayPrice(new BigDecimal(resp.getTotal_fee()));
         response.setInstitutionPaymentId(resp.getTrade_no());
         response.setOriginMessage(resp.getResponseOriginString());
-        response.setPayerId(resp.getBuyer_email()); // TODO
+        response.setPayerId(resp.getBuyer_email());
         response.setPaymentId(resp.getOut_trade_no());
         PayStatus payStatus = (AliPayConsts.ALI_TRADE_OK_STATUS.contains(resp.getTrade_status()) ||
                 AliPayConsts.TRADE_REFUND_SUCCESS.equalsIgnoreCase(resp.getRefund_status()))

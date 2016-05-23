@@ -3,6 +3,8 @@
  */
 package com.ymatou.payment.domain.pay.service;
 
+import java.util.HashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import com.ymatou.payment.domain.pay.repository.BussinessOrderRepository;
 import com.ymatou.payment.domain.pay.repository.PaymentRepository;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
+import com.ymatou.payment.integration.service.ymatou.NotifyPaymentService;
 
 /**
  * 
@@ -41,31 +44,35 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
     @Autowired
     private PayService payService;
 
+    @Autowired
+    private NotifyPaymentService notifyPaymentService;
+
     @Override
-    public void doCheck(ThirdPartyPayment thirdPartyPayment, String paymentId, boolean finalCheck) {
+    public void doCheck(ThirdPartyPayment thirdPartyPayment, String paymentId, boolean finalCheck,
+            HashMap<String, String> header) {
         // 记录第三方应答
         alipayNotifyLogRespository.saveAlipaynoitfylog(paymentId, thirdPartyPayment.getOriginMessage());
 
         // 根据paymentId查询Payment,BussinessOrder
         Payment payment = paymentRepository.getByPaymentId(paymentId);
         if (payment == null) {
-            throw new BizException(ErrorCode.DATA_NOT_FOUND, String.format("can not find paymentid {0}", paymentId));
+            throw new BizException(ErrorCode.DATA_NOT_FOUND, "can not find paymentid " + paymentId);
         }
         BussinessOrder bussinessOrder = bussinessOrderRepository.getBussinessOrderById(payment.getBussinessorderid());
         if (bussinessOrder == null) {
             throw new BizException(ErrorCode.DATA_NOT_FOUND,
-                    String.format("can not find order {0}", payment.getBussinessorderid()));
+                    "can not find order " + payment.getBussinessorderid());
         }
 
-        if (PayStatus.Paied.equals(thirdPartyPayment.getPayStatus())) {
-            if (PayStatus.Paied.getIndex() == payment.getPaystatus().intValue()
-                    || PayStatus.Refunded.getIndex() == payment.getPaystatus().intValue()) {
+        if (PayStatus.Paied.getIndex() == thirdPartyPayment.getPayStatus()) {
+            if (PayStatus.Paied.getIndex() == payment.getPaystatus()
+                    || PayStatus.Refunded.getIndex() == payment.getPaystatus()) {
                 paymentRepository.updatePaymentCheckStatus(CheckStatus.SUCCESS.getCode(), paymentId); // 对账成功
             } else {
                 try {
                     payment.setCheckstatus(CheckStatus.REPAIR_SUCCESS.getCode()); // 补单成功
                     payment.setInstitutionpaymentid(thirdPartyPayment.getInstitutionPaymentId());
-                    payment.setPaystatus(thirdPartyPayment.getPayStatus().getIndex());
+                    payment.setPaystatus(thirdPartyPayment.getPayStatus());
                     payment.setActualpayprice(thirdPartyPayment.getActualPayPrice());
                     payment.setActualpaycurrencytype(thirdPartyPayment.getActualPayCurrency());
                     payment.setBankid(thirdPartyPayment.getBankId());
@@ -75,6 +82,15 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
                     payment.setExchangerate(payment.getExchangerate() == null ? 1 : payment.getExchangerate());
 
                     payService.setPaymentOrderPaid(payment, thirdPartyPayment.getTraceId());
+
+                    // 通知发货服务
+                    try {
+                        notifyPaymentService.doService(payment.getPaymentid(), thirdPartyPayment.getTraceId(),
+                                header);
+                    } catch (Exception e) {
+                        logger.error("notify deliver service failed with paymentid :" + payment.getPaymentid(), e);
+                    }
+
                 } catch (Exception e) {
                     paymentRepository.updatePaymentCheckStatus(CheckStatus.AMOUNT_NOT_MATCH.getCode(), paymentId); // 金额不一致
                     throw e;
@@ -83,7 +99,7 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
         } else {
             if (PayStatus.Paied.equals(payment.getPaystatus())) {
                 paymentRepository.updatePaymentCheckStatus(CheckStatus.THIRD_PART_NOT_PAID.getCode(), paymentId); // 第三方未付，YMT已付
-                logger.error("{0} pay check failed, but paystatus is successful!", paymentId);
+                logger.error("{} pay check failed, but paystatus is successful!", paymentId);
             } else {
                 int checkStatus = checkFailed(finalCheck, payment.getCheckstatus());
                 paymentRepository.updatePaymentCheckStatus(checkStatus, paymentId);

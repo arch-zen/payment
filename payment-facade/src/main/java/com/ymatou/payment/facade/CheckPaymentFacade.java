@@ -19,5 +19,5 @@ public interface CheckPaymentFacade {
      * @param req
      * @return
      */
-    public String checkPayment(CheckPaymentRequset req);
+    public BaseResponse checkPayment(CheckPaymentRequset req);
 }

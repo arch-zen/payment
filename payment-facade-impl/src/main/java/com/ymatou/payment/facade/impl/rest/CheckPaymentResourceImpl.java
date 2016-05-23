@@ -16,6 +16,7 @@ import javax.ws.rs.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.ymatou.payment.facade.BaseResponse;
 import com.ymatou.payment.facade.CheckPaymentFacade;
 import com.ymatou.payment.facade.model.CheckPaymentRequset;
 
@@ -27,19 +28,24 @@ import com.ymatou.payment.facade.model.CheckPaymentRequset;
 @Path("/api")
 @Component("checkPaymentResource")
 @Consumes({"application/json; charset=UTF-8"})
-@Produces({"application/json; charset=UTF-8"})
+@Produces({"text/html; charset=UTF-8"})
 public class CheckPaymentResourceImpl implements CheckPaymentResource {
 
     @Autowired
     private CheckPaymentFacade checkPaymentFacade;
 
     @POST
-    @Path("/CheckPayment")
+    @Path("/{CheckPayment:(?i:CheckPayment)}")
     @Override
     public String checkPayment(CheckPaymentRequset req, @Context HttpServletRequest servletRequest) {
         req.setHeader(generateHttpHeader(servletRequest));
 
-        return checkPaymentFacade.checkPayment(req);
+        BaseResponse response = checkPaymentFacade.checkPayment(req);
+        if (response.getIsSuccess()) {
+            return "OK";
+        } else {
+            return "FAIL";
+        }
     }
 
     /**
