@@ -4,7 +4,6 @@
 package com.ymatou.payment.domain.refund.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -14,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.ymatou.payment.domain.refund.constants.RefundConstants;
 import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.model.QueryRefundDetail;
 import com.ymatou.payment.facade.model.QueryRefundRequest;
@@ -55,7 +55,7 @@ public class QueryRefundServiceImpl implements QueryRefundService {
 
     private String generateRefundStatusQuery(List<Integer> refundStatusList) {
         if (refundStatusList == null || refundStatusList.size() == 0) {
-            refundStatusList = Arrays.asList(new Integer[] {-2, -1, 0, 1, 2, 3, 4});
+            refundStatusList = RefundConstants.REFUND_QUERY_DEFULT_STATUS; // 默认条件
         }
         StringBuilder sb = new StringBuilder().append("(");
         for (Integer rs : refundStatusList) {

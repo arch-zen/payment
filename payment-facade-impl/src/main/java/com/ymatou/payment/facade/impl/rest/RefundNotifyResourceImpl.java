@@ -12,13 +12,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ymatou.payment.domain.refund.service.RefundNotifyService;
+import com.ymatou.payment.facade.BaseResponse;
+import com.ymatou.payment.facade.RefundNotifyFacade;
 import com.ymatou.payment.facade.model.AliPayRefundNotifyRequest;
 
 /**
@@ -27,14 +27,14 @@ import com.ymatou.payment.facade.model.AliPayRefundNotifyRequest;
  * 
  */
 
-@Path("/RefundNotify")
+@Path("/{RefundNotify:(?i:RefundNotify)}")
 @Component("refundNotifyResource")
 public class RefundNotifyResourceImpl implements RefundNotifyResource {
 
     private static final Logger logger = LoggerFactory.getLogger(RefundNotifyResourceImpl.class);
 
     @Autowired
-    private RefundNotifyService refundNotifyService;
+    private RefundNotifyFacade refundNotifyFacade;
 
     @POST
     @Path("/{payType}")
@@ -43,21 +43,15 @@ public class RefundNotifyResourceImpl implements RefundNotifyResource {
     public String refundNotify(AliPayRefundNotifyRequest req, @PathParam("payType") String payType,
             @Context HttpServletRequest servletRequest) {
 
-        if (req.getNotify_time() == null || StringUtils.isBlank(req.getNotify_type())
-                || StringUtils.isBlank(req.getNotify_id()) || StringUtils.isBlank(req.getSign_type())
-                || StringUtils.isBlank(req.getSign()) || StringUtils.isBlank(req.getBatch_no())
-                || StringUtils.isBlank(req.getSuccess_num())) {
-            logger.info("request data invalid.");
-            return "fail";
-        }
-
         try {
-            refundNotifyService.processRefundCallback(req, payType);
+            BaseResponse response = refundNotifyFacade.refundNotify(req, payType);
+            if (response.getIsSuccess()) {
+                return "success";
+            } else {
+                return "fail";
+            }
         } catch (Exception e) {
-            logger.error("process refund callback error.", e);
             return "fail";
         }
-
-        return "success";
     }
 }

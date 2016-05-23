@@ -14,15 +14,15 @@ import java.util.Date;
 public class ThirdPartyPayment {
     private String paymentId;
     private String institutionPaymentId;
-    private BigDecimal ActualPayPrice;
-    private String ActualPayCurrency;
-    private String PayerId;
-    private Integer CardType;
-    private String BankId;
-    private String OriginMessage;
-    private Date PayTime;
-    private PayStatus PayStatus;
-    private String TraceId;
+    private BigDecimal actualPayPrice;
+    private String actualPayCurrency;
+    private String payerId;
+    private Integer cardType;
+    private String bankId;
+    private String originMessage;
+    private Date payTime;
+    private int payStatus;
+    private String traceId;
 
     public String getPaymentId() {
         return paymentId;
@@ -41,74 +41,74 @@ public class ThirdPartyPayment {
     }
 
     public BigDecimal getActualPayPrice() {
-        return ActualPayPrice;
+        return actualPayPrice;
     }
 
     public void setActualPayPrice(BigDecimal actualPayPrice) {
-        ActualPayPrice = actualPayPrice;
+        this.actualPayPrice = actualPayPrice;
     }
 
     public String getActualPayCurrency() {
-        return ActualPayCurrency;
+        return actualPayCurrency;
     }
 
     public void setActualPayCurrency(String actualPayCurrency) {
-        ActualPayCurrency = actualPayCurrency;
+        this.actualPayCurrency = actualPayCurrency;
     }
 
     public String getPayerId() {
-        return PayerId;
+        return payerId;
     }
 
     public void setPayerId(String payerId) {
-        PayerId = payerId;
+        this.payerId = payerId;
     }
 
     public Integer getCardType() {
-        return CardType;
+        return cardType;
     }
 
     public void setCardType(Integer cardType) {
-        CardType = cardType;
+        this.cardType = cardType;
     }
 
     public String getBankId() {
-        return BankId;
+        return bankId;
     }
 
     public void setBankId(String bankId) {
-        BankId = bankId;
+        this.bankId = bankId;
     }
 
     public String getOriginMessage() {
-        return OriginMessage;
+        return originMessage;
     }
 
     public void setOriginMessage(String originMessage) {
-        OriginMessage = originMessage;
+        this.originMessage = originMessage;
     }
 
     public Date getPayTime() {
-        return PayTime;
+        return payTime;
     }
 
     public void setPayTime(Date payTime) {
-        PayTime = payTime;
+        this.payTime = payTime;
     }
 
-    public PayStatus getPayStatus() {
-        return PayStatus;
+    public int getPayStatus() {
+        return payStatus;
     }
 
-    public void setPayStatus(PayStatus payStatus) {
-        PayStatus = payStatus;
+    public void setPayStatus(int payStatus) {
+        this.payStatus = payStatus;
     }
 
     public String getTraceId() {
-        return TraceId;
+        return traceId;
     }
 
     public void setTraceId(String traceId) {
-        TraceId = traceId;
+        this.traceId = traceId;
     }
 }

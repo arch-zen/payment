@@ -32,6 +32,6 @@ public class AlipayNotifyLogRespository {
         alipaynotifylogPo.setBizno(paymentId);
         alipaynotifylogPo.setSparameters(respMsg);
 
-        alipaynotifylogMapper.insert(alipaynotifylogPo);
+        alipaynotifylogMapper.insertSelective(alipaynotifylogPo);
     }
 }

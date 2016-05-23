@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSON;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.common.HttpClientUtil;
+import com.ymatou.payment.integration.common.constants.Constants;
 import com.ymatou.payment.integration.model.UserServiceResponse;
 
 /**
@@ -61,6 +63,10 @@ public class UserService implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        this.httpClient = HttpClientBuilder.create().build();
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+        cm.setDefaultMaxPerRoute(Constants.DEFAULT_MAX_PER_ROUTE);
+        cm.setMaxTotal(Constants.MAX_TOTAL);
+
+        httpClient = HttpClients.custom().setConnectionManager(cm).build();
     }
 }

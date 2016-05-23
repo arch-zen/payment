@@ -25,6 +25,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.common.HttpClientUtil;
 import com.ymatou.payment.integration.common.XmlParser;
+import com.ymatou.payment.integration.common.constants.Constants;
 import com.ymatou.payment.integration.model.CouponRefundData;
 import com.ymatou.payment.integration.model.RefundOrderData;
 import com.ymatou.payment.integration.model.RefundQueryRequest;
@@ -194,6 +196,13 @@ public class RefundQueryService {
                 null,
                 SSLConnectionSocketFactory.getDefaultHostnameVerifier());
 
-        return HttpClientBuilder.create().setSSLSocketFactory(sslsf).build();
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+        cm.setDefaultMaxPerRoute(Constants.DEFAULT_MAX_PER_ROUTE);
+        cm.setMaxTotal(Constants.MAX_TOTAL);
+
+        return HttpClientBuilder.create()
+                .setSSLSocketFactory(sslsf)
+                .setConnectionManager(cm)
+                .build();
     }
 }

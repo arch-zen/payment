@@ -49,7 +49,7 @@ public class HttpClientUtil {
         String result = null;
 
         HttpGet httpGet = new HttpGet(url);
-        if (header != null) {
+        if (header != null && "1".equals(header.get("Mock"))) { // mock
             for (Entry<String, String> entry : header.entrySet()) {
                 httpGet.addHeader(entry.getKey(), entry.getValue()); // add request header
             }
@@ -86,7 +86,7 @@ public class HttpClientUtil {
         HttpPost httpPost = new HttpPost(url);
         StringEntity postEntity = new StringEntity(body, "UTF-8");
         httpPost.setEntity(postEntity); // set request body
-        if (header != null) {
+        if (header != null && "1".equals(header.get("Mock"))) {
             for (Entry<String, String> entry : header.entrySet()) {
                 httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
             }
@@ -125,7 +125,7 @@ public class HttpClientUtil {
         HttpPost httpPost = new HttpPost(url);
         UrlEncodedFormEntity postEntity = new UrlEncodedFormEntity(body, "UTF-8");
         httpPost.setEntity(postEntity); // set request body
-        if (header != null) {
+        if (header != null && "1".equals(header.get("Mock"))) {
             for (Entry<String, String> entry : header.entrySet()) {
                 httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
             }
@@ -167,7 +167,7 @@ public class HttpClientUtil {
         HttpPost httpPost = new HttpPost(url);
         UrlEncodedFormEntity postEntity = new UrlEncodedFormEntity(body, "UTF-8");
         httpPost.setEntity(postEntity); // set request body
-        if (header != null) {
+        if (header != null && "1".equals(header.get("Mock"))) {
             for (Entry<String, String> entry : header.entrySet()) {
                 httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
             }

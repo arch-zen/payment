@@ -3,6 +3,8 @@
  */
 package com.ymatou.payment.domain.pay.service;
 
+import java.util.HashMap;
+
 import com.ymatou.payment.domain.pay.model.ThirdPartyPayment;
 
 /**
@@ -16,5 +18,6 @@ public interface PaymentCheckService {
     /**
      * 对账
      */
-    public void doCheck(ThirdPartyPayment thirdPartyPayment, String paymentId, boolean finlCheck);
+    public void doCheck(ThirdPartyPayment thirdPartyPayment, String paymentId, boolean finlCheck,
+            HashMap<String, String> header);
 }

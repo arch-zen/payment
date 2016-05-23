@@ -7,8 +7,8 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.UUID;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,7 +103,7 @@ public class WeiXinPaymentQueryServiceImpl implements PaymentQueryService {
         OrderQueryRequest orderQueryRequest = new OrderQueryRequest();
         orderQueryRequest.setAppid(appId);
         orderQueryRequest.setMch_id(mchId);
-        orderQueryRequest.setNonce_str(UUID.randomUUID().toString());
+        orderQueryRequest.setNonce_str(RandomStringUtils.randomAlphabetic(32));
         orderQueryRequest.setOut_trade_no(req.getPaymentId());
         orderQueryRequest.setTransaction_id("");
         @SuppressWarnings("unchecked")
