@@ -30,7 +30,7 @@ import com.ymatou.payment.domain.pay.model.PayStatus;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
-import com.ymatou.payment.facade.model.PaymentNotifyRequest;
+import com.ymatou.payment.facade.model.PaymentNotifyReq;
 import com.ymatou.payment.facade.model.PaymentNotifyType;
 import com.ymatou.payment.infrastructure.util.HttpUtil;
 
@@ -56,7 +56,7 @@ public class AliPayPaymentNotifyServiceImpl implements PaymentNotifyService {
      * ymatou.payment.facade.model.PaymentNotifyRequest)
      */
     @Override
-    public PaymentNotifyMessage resloveNotifyMessage(PaymentNotifyRequest notifyRequest) {
+    public PaymentNotifyMessage resloveNotifyMessage(PaymentNotifyReq notifyRequest) {
         // 解析报文
         Map<String, String> map = new HashMap<String, String>();
         try {

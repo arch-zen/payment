@@ -35,7 +35,7 @@
 		class="com.baidu.disconf.client.addons.properties.ReloadablePropertiesFactoryBean">
 		<property name="locations">
 			<list>
-				<value>dubbo.properties</value>
+				<value>institutionConfig.xml</value>
 			</list>
 		</property>
 	</bean>
@@ -50,6 +50,7 @@
 		<property name="locations">
 			<list>
 				<value>classpath:db.properties</value>
+				<value>classpath:dubbo.properties</value>
 			</list>
 		</property>
 	</bean>

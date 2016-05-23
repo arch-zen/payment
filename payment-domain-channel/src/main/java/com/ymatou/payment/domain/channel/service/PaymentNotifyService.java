@@ -7,7 +7,7 @@ package com.ymatou.payment.domain.channel.service;
 
 import com.ymatou.payment.domain.channel.model.PaymentNotifyMessage;
 import com.ymatou.payment.domain.pay.model.Payment;
-import com.ymatou.payment.facade.model.PaymentNotifyRequest;
+import com.ymatou.payment.facade.model.PaymentNotifyReq;
 import com.ymatou.payment.facade.model.PaymentNotifyType;
 
 /**
@@ -23,7 +23,7 @@ public interface PaymentNotifyService {
      * @param notifyRequest
      * @return
      */
-    PaymentNotifyMessage resloveNotifyMessage(PaymentNotifyRequest notifyRequest);
+    PaymentNotifyMessage resloveNotifyMessage(PaymentNotifyReq notifyRequest);
 
 
     /**

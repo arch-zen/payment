@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component("systemResource")
-@Path("/system")
+@Path("/")
 @Produces(MediaType.TEXT_HTML)
 public class SystemResourceImpl implements SystemResource {
 
@@ -33,7 +33,7 @@ public class SystemResourceImpl implements SystemResource {
 
     @Override
     @GET
-    @Path("/status")
+    @Path("/warmup")
     public String status() {
 
         return "ok";

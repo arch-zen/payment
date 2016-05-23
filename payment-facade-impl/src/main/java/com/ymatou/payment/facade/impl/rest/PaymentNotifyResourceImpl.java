@@ -31,7 +31,8 @@ import com.esotericsoftware.minlog.Log;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.PaymentNotifyFacade;
-import com.ymatou.payment.facade.model.PaymentNotifyRequest;
+import com.ymatou.payment.facade.model.PaymentNotifyReq;
+import com.ymatou.payment.facade.model.PaymentNotifyResp;
 import com.ymatou.payment.facade.model.PaymentNotifyType;
 
 /**
@@ -55,37 +56,49 @@ public class PaymentNotifyResourceImpl implements PaymentNotifyResource {
 
     @Override
     @GET
-    @Path("callback/{payType}")
+    @Path("{callback:(?i:callback)}/{payType}")
     public Response callback(@PathParam("payType") String payType, @Context HttpServletRequest servletRequest) {
+        Response response;
         try {
-            PaymentNotifyRequest notifyReq = new PaymentNotifyRequest();
+            PaymentNotifyReq notifyReq = new PaymentNotifyReq();
             notifyReq.setPayType(payType);
             notifyReq.setNotifyType(PaymentNotifyType.Client);
             notifyReq.setRawString(servletRequest.getQueryString());
             notifyReq.setMockHeader(getMockHttpHeader(servletRequest));
 
-            // String url = "http://www.baidu.com";
-            String url = paymentNotifyFacade.notify(notifyReq);
-            Response response = Response.status(Status.FOUND).header("location", url).build();
-            return response;
+            PaymentNotifyResp notifyResp = paymentNotifyFacade.notify(notifyReq);
+            if (notifyResp.getIsSuccess()) {
+                String url = notifyResp.getResult();
+                response = Response.status(Status.FOUND).header("location", url).build();
+            } else {
+                logger.error("process callback failed with paytype: " + payType);
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+            }
         } catch (Exception e) {
             logger.error("process callback failed with paytype: " + payType, e);
-            return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
+
+        return response;
     }
 
     @Override
     @POST
-    @Path("notify/{payType}")
+    @Path("{notify:(?i:notify)}/{payType}")
     public String notify(@PathParam("payType") String payType, @Context HttpServletRequest servletRequest) {
         try {
-            PaymentNotifyRequest notifyReq = new PaymentNotifyRequest();
+            PaymentNotifyReq notifyReq = new PaymentNotifyReq();
             notifyReq.setPayType(payType);
             notifyReq.setNotifyType(PaymentNotifyType.Server);
             notifyReq.setRawString(getHttpBody(servletRequest));
             notifyReq.setMockHeader(getMockHttpHeader(servletRequest));
 
-            return paymentNotifyFacade.notify(notifyReq);
+            PaymentNotifyResp notifyResp = paymentNotifyFacade.notify(notifyReq);
+            if (notifyResp.getIsSuccess()) {
+                return notifyResp.getResult();
+            } else {
+                return "failed";
+            }
         } catch (Exception e) {
             logger.error("process notify failed with paytype: " + payType, e);
             return "failed";

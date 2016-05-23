@@ -5,8 +5,6 @@
  */
 package com.ymatou.payment.facade.impl;
 
-import java.sql.Date;
-
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -25,7 +23,8 @@ import com.ymatou.payment.domain.pay.service.PayService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.PaymentNotifyFacade;
-import com.ymatou.payment.facade.model.PaymentNotifyRequest;
+import com.ymatou.payment.facade.model.PaymentNotifyReq;
+import com.ymatou.payment.facade.model.PaymentNotifyResp;
 import com.ymatou.payment.facade.model.PaymentNotifyType;
 import com.ymatou.payment.infrastructure.db.mapper.AlipaynotifylogMapper;
 import com.ymatou.payment.infrastructure.db.model.AlipaynotifylogPo;
@@ -64,7 +63,7 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
      * PaymentNotifyRequest)
      */
     @Override
-    public String notify(PaymentNotifyRequest req) {
+    public PaymentNotifyResp notify(PaymentNotifyReq req) {
         // STEP.1 获取到第三方机构配置
         InstitutionConfig instConfig = institutionConfigManager.getConfig(req.getPayType());
 
@@ -74,6 +73,7 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
 
         // STEP.3 如果支付成功
         Payment payment = null;
+        PaymentNotifyResp response = new PaymentNotifyResp();
         if (notifyMessage.getPayStatus() == PayStatus.Paied) {
             // 添加日志
             AlipaynotifylogPo notifyLog = new AlipaynotifylogPo();
@@ -96,8 +96,10 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
 
 
             // 如果支付单的状态 已经成功则直接返回成功
-            if (payment.getPaystatus() == PayStatus.Paied.getIndex())
-                return notifyService.buildResponse(notifyMessage, payment, req.getNotifyType());
+            if (payment.getPaystatus() == PayStatus.Paied.getIndex()) {
+                response.setResult(notifyService.buildResponse(notifyMessage, payment, req.getNotifyType()));
+                return response;
+            }
 
 
             // 更改订单状态
@@ -113,7 +115,8 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
             }
         }
 
-        return notifyService.buildResponse(notifyMessage, payment, req.getNotifyType());
+        response.setResult(notifyService.buildResponse(notifyMessage, payment, req.getNotifyType()));
+        return response;
     }
 
     /**

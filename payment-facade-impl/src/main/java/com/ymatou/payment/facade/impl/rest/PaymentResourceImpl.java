@@ -24,7 +24,7 @@ import com.ymatou.payment.facade.model.AcquireOrderResp;
  * @author wangxudong
  *
  */
-@Path("/api")
+@Path("/api}")
 @Component("paymentResource")
 @Produces({"application/json; charset=UTF-8"})
 @Consumes({MediaType.APPLICATION_JSON})

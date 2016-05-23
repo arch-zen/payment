@@ -5,7 +5,8 @@
  */
 package com.ymatou.payment.facade;
 
-import com.ymatou.payment.facade.model.PaymentNotifyRequest;
+import com.ymatou.payment.facade.model.PaymentNotifyReq;
+import com.ymatou.payment.facade.model.PaymentNotifyResp;
 
 /**
  * 支付回调接口
@@ -21,5 +22,5 @@ public interface PaymentNotifyFacade {
      * @param req
      * @return
      */
-    String notify(PaymentNotifyRequest req);
+    PaymentNotifyResp notify(PaymentNotifyReq req);
 }

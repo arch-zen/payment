@@ -15,7 +15,7 @@ import com.ymatou.payment.facade.BaseRequest;
  * @author wangxudong 2016年5月17日 下午8:11:21
  *
  */
-public class PaymentNotifyRequest extends BaseRequest {
+public class PaymentNotifyReq extends BaseRequest {
 
     /**
      * 序列化版本
