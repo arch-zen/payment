@@ -24,7 +24,7 @@ import com.ymatou.payment.facade.model.AcquireOrderResp;
  * @author wangxudong
  *
  */
-@Path("/api}")
+@Path("/{api:(?i:api)}")
 @Component("paymentResource")
 @Produces({"application/json; charset=UTF-8"})
 @Consumes({MediaType.APPLICATION_JSON})
@@ -41,7 +41,7 @@ public class PaymentResourceImpl implements PaymentResource {
      */
     @Override
     @POST
-    @Path("/{acquireOrder:(?i:acquireOrder)}")
+    @Path("/{AcquireOrder:(?i:AcquireOrder)}")
     public AcquireOrderResp acquireOrder(AcquireOrderReq req, @Context HttpServletRequest servletRequest) {
         req.setMockHeader(getMockHttpHeader(servletRequest));
 

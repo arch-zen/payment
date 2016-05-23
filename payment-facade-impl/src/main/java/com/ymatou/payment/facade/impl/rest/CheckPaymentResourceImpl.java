@@ -25,7 +25,7 @@ import com.ymatou.payment.facade.model.CheckPaymentRequset;
  * @author qianmin 2016年5月19日 下午4:16:36
  *
  */
-@Path("/api")
+@Path("/{api:(?i:api)}")
 @Component("checkPaymentResource")
 @Consumes({"application/json; charset=UTF-8"})
 @Produces({"text/html; charset=UTF-8"})

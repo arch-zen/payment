@@ -34,7 +34,7 @@ import com.ymatou.payment.facade.model.TradeRefundableResponse;
  * @author qianmin 2016年5月11日 上午10:52:35
  * 
  */
-@Path("/api")
+@Path("/{api:(?i:api)}")
 @Component("refundResource")
 @Consumes({"application/json; charset=UTF-8"})
 @Produces({"application/json; charset=UTF-8"})
