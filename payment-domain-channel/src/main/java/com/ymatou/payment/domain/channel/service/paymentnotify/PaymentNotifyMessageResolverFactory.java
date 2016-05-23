@@ -24,16 +24,10 @@ import com.ymatou.payment.facade.ErrorCode;
 public class PaymentNotifyMessageResolverFactory {
 
     @Resource
-    private AliPayPcPaymentNotifyServiceImpl aliPayPcPaymentNotifyServiceImpl;
+    private AliPayPaymentNotifyServiceImpl aliPayPaymentNotifyServiceImpl;
 
     @Resource
-    private AliPayAppPaymentNotifyServiceImpl aliPayAppPaymentNotifyServiceImpl;
-
-    @Resource
-    private WeiXinJSAPIPaymentNotifyServiceImpl weiXinJSAPIPaymentNotifyServiceImpl;
-
-    @Resource
-    private WeiXinAppPaymentNotifyServiceImpl weiXinAppPaymentNotifyServiceImpl;
+    private WeiXinPaymentNotifyServiceImpl weiXinPaymentNotifyServiceImpl;
 
     /**
      * 获取到支付回调解析器
@@ -44,13 +38,13 @@ public class PaymentNotifyMessageResolverFactory {
     public PaymentNotifyService getInstance(String payType) {
         switch (PayTypeEnum.parse(payType)) {
             case AliPayPc:
-                return aliPayPcPaymentNotifyServiceImpl;
+                return aliPayPaymentNotifyServiceImpl;
             case AliPayApp:
-                return aliPayAppPaymentNotifyServiceImpl;
+                return aliPayPaymentNotifyServiceImpl;
             case WeiXinJSAPI:
-                return weiXinJSAPIPaymentNotifyServiceImpl;
+                return weiXinPaymentNotifyServiceImpl;
             case WeiXinApp:
-                return weiXinAppPaymentNotifyServiceImpl;
+                return weiXinPaymentNotifyServiceImpl;
             default:
                 throw new BizException(ErrorCode.INVALID_PAYTYPE, payType);
         }

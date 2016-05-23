@@ -23,6 +23,10 @@
 	<logger name="java.util.sql">
 		<level value="${level}" />
 	</logger>
+	
+	<logger name="com.alibaba.druid">
+		<level value="${level}"></level>
+	</logger>
 
 	<logger name="com.ymatou.payment">
 		<level value="${level}" />

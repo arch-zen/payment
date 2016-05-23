@@ -4,6 +4,7 @@
 package com.ymatou.payment.integration.common;
 
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * MD5加密工具类
@@ -50,16 +51,13 @@ public class MD5 {
      * 
      * @param origin 原始字符串
      * @return 经过MD5加密之后的结果
+     * @throws NoSuchAlgorithmException
      */
-    public static String MD5Encode(String origin) {
+    public static String MD5Encode(String origin) throws NoSuchAlgorithmException {
         String resultString = null;
-        try {
-            resultString = origin;
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            resultString = byteArrayToHexString(md.digest(resultString.getBytes()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        resultString = origin;
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        resultString = byteArrayToHexString(md.digest(resultString.getBytes()));
         return resultString;
     }
 

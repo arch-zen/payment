@@ -82,9 +82,9 @@ public class SignatureServiceImpl implements SignatureService {
     @Override
     public boolean validateSign(Map<String, String> signMapData, InstitutionConfig instConfig,
             HashMap<String, String> mockHeader) {
-        // 拼装待延签签报文
+        // 拼装待验签报文
         String rawMessage = mapToString(signMapData, instConfig, true);
-        String sign = signMapData.get("sign").toString();
+        String sign = signMapData.get("sign");
 
         if ("MD5".equals(instConfig.getSignType())) {
             String md5Sign = md5Sign(rawMessage, instConfig, mockHeader);
@@ -141,15 +141,19 @@ public class SignatureServiceImpl implements SignatureService {
      * @return
      */
     private String md5Sign(String rawMessage, InstitutionConfig instConfig, HashMap<String, String> mockHeader) {
-        String md5Key = integrationConfig.isMock(mockHeader) ? mockMd5key : instConfig.getMd5Key();
-        String md5keyConnector =
-                StringUtils.isBlank(instConfig.getMd5KeyConnector()) ? "" : instConfig.getMd5KeyConnector();
-        String targetMessage = rawMessage + md5keyConnector + md5Key;
+        try {
+            String md5Key = integrationConfig.isMock(mockHeader) ? mockMd5key : instConfig.getMd5Key();
+            String md5keyConnector =
+                    StringUtils.isBlank(instConfig.getMd5KeyConnector()) ? "" : instConfig.getMd5KeyConnector();
+            String targetMessage = rawMessage + md5keyConnector + md5Key;
 
-        if (StringUtils.isBlank(instConfig.getMd5KeyConnector()))
-            return MD5Util.encode(targetMessage);
-        else
-            return MD5Util.encode(targetMessage).toUpperCase();
+            if (StringUtils.isBlank(instConfig.getMd5KeyConnector()))
+                return MD5Util.encode(targetMessage);
+            else
+                return MD5Util.encode(targetMessage).toUpperCase();
+        } catch (Exception e) {
+            throw new BizException(ErrorCode.FAIL, "md5 sign failed with paytype: " + instConfig.getPayType());
+        }
     }
 
     /**
@@ -161,10 +165,14 @@ public class SignatureServiceImpl implements SignatureService {
      * @return
      */
     private String rsaSign(String rawMessage, InstitutionConfig instConfig, HashMap<String, String> mockHeader) {
-        String privateKey =
-                integrationConfig.isMock(mockHeader) ? mockYmtPrivateKey : instConfig.getInstYmtPrivateKey();
+        try {
+            String privateKey =
+                    integrationConfig.isMock(mockHeader) ? mockYmtPrivateKey : instConfig.getInstYmtPrivateKey();
 
-        return RSAUtil.sign(rawMessage, privateKey);
+            return RSAUtil.sign(rawMessage, privateKey);
+        } catch (Exception e) {
+            throw new BizException(ErrorCode.FAIL, "rsa sign failed with paytype: " + instConfig.getPayType());
+        }
     }
 
     /**
@@ -178,9 +186,13 @@ public class SignatureServiceImpl implements SignatureService {
      */
     private boolean rsaSignValidate(String rawMessage, String sign, InstitutionConfig instConfig,
             HashMap<String, String> mockHeader) {
-        String publicKey = integrationConfig.isMock(mockHeader) ? mockPublicKey : instConfig.getInstPublicKey();
+        try {
+            String publicKey = integrationConfig.isMock(mockHeader) ? mockPublicKey : instConfig.getInstPublicKey();
 
-        return RSAUtil.doCheck(rawMessage, sign, publicKey);
+            return RSAUtil.doCheck(rawMessage, sign, publicKey);
+        } catch (Exception e) {
+            throw new BizException(ErrorCode.FAIL, "rsa sign validae failed with paytype: " + instConfig.getPayType());
+        }
     }
 
 }

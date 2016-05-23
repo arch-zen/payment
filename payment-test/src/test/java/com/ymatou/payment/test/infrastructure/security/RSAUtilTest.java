@@ -7,6 +7,12 @@ package com.ymatou.payment.test.infrastructure.security;
 
 import static org.junit.Assert.*;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
+
 import org.junit.Test;
 
 import com.ymatou.payment.infrastructure.security.RSAUtil;
@@ -27,7 +33,8 @@ public class RSAUtilTest {
 
 
     @Test
-    public void testSign() {
+    public void testSign() throws InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException,
+            SignatureException, UnsupportedEncodingException {
         String target = "123456";
         String rsaSign =
                 "Tr0A6L06m93pOh5cEUhYv6jWDtfxirOUQk2oXszKrIv0xwp71GgvL69csT7j2y+x+hnteoCUbHw6lyqP/hcprlEMJ1GTXiEnu2eECYSf5bhbw1xOdF/db7HMM2JxwPhY/lsEoC4d/TmDNzeK5nDT2PZGkcp53nM7hfS+zK2hMf8=";
@@ -37,7 +44,8 @@ public class RSAUtilTest {
     }
 
     @Test
-    public void testSignAndCheck() {
+    public void testSignAndCheck() throws InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException,
+            SignatureException, UnsupportedEncodingException {
         String target = "123456中国";
         String rsaSign = RSAUtil.sign(target, PRIVATE_KEY);
         boolean signCheck = RSAUtil.doCheck(target, rsaSign, PUBLIC_KEY);
@@ -47,9 +55,16 @@ public class RSAUtilTest {
 
     /**
      * 测试验签
+     * 
+     * @throws UnsupportedEncodingException
+     * @throws SignatureException
+     * @throws InvalidKeySpecException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
      */
     @Test
-    public void testDoCheck() {
+    public void testDoCheck() throws InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException,
+            SignatureException, UnsupportedEncodingException {
         String target = "123456";
         String sign =
                 "Tr0A6L06m93pOh5cEUhYv6jWDtfxirOUQk2oXszKrIv0xwp71GgvL69csT7j2y+x+hnteoCUbHw6lyqP/hcprlEMJ1GTXiEnu2eECYSf5bhbw1xOdF/db7HMM2JxwPhY/lsEoC4d/TmDNzeK5nDT2PZGkcp53nM7hfS+zK2hMf8=";
@@ -61,9 +76,16 @@ public class RSAUtilTest {
 
     /**
      * 测试验签失败
+     * 
+     * @throws UnsupportedEncodingException
+     * @throws SignatureException
+     * @throws InvalidKeySpecException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
      */
     @Test
-    public void testDoCheckFailed() {
+    public void testDoCheckFailed() throws InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException,
+            SignatureException, UnsupportedEncodingException {
         String target = "1234561";
         String sign =
                 "Tr0A6L06m93pOh5cEUhYv6jWDtfxirOUQk2oXszKrIv0xwp71GgvL69csT7j2y+x+hnteoCUbHw6lyqP/hcprlEMJ1GTXiEnu2eECYSf5bhbw1xOdF/db7HMM2JxwPhY/lsEoC4d/TmDNzeK5nDT2PZGkcp53nM7hfS+zK2hMf8=";

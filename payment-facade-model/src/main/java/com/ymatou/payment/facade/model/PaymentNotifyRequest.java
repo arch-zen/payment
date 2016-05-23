@@ -7,13 +7,20 @@ package com.ymatou.payment.facade.model;
 
 import java.util.HashMap;
 
+import com.ymatou.payment.facade.BaseRequest;
+
 /**
  * 支付回调请求
  * 
  * @author wangxudong 2016年5月17日 下午8:11:21
  *
  */
-public class PaymentNotifyRequest {
+public class PaymentNotifyRequest extends BaseRequest {
+
+    /**
+     * 序列化版本
+     */
+    private static final long serialVersionUID = -3699489461058687559L;
 
     /**
      * 支付渠道

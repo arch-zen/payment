@@ -9,6 +9,8 @@ import java.sql.Date;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.channel.InstitutionConfig;
@@ -27,6 +29,7 @@ import com.ymatou.payment.facade.model.PaymentNotifyRequest;
 import com.ymatou.payment.facade.model.PaymentNotifyType;
 import com.ymatou.payment.infrastructure.db.mapper.AlipaynotifylogMapper;
 import com.ymatou.payment.infrastructure.db.model.AlipaynotifylogPo;
+import com.ymatou.payment.integration.service.ymatou.NotifyPaymentService;
 
 /**
  * 支付回调接口
@@ -36,6 +39,8 @@ import com.ymatou.payment.infrastructure.db.model.AlipaynotifylogPo;
  */
 @Component("paymentNotifyFacade")
 public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
+
+    private static Logger logger = LoggerFactory.getLogger(PaymentNotifyFacadeImpl.class);
 
     @Resource
     PaymentNotifyMessageResolverFactory notityMessageResolverFactory;
@@ -48,6 +53,9 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
 
     @Resource
     PayService payService;
+
+    @Resource
+    NotifyPaymentService notifyPaymentService;
 
     /*
      * (non-Javadoc)
@@ -65,6 +73,7 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
         PaymentNotifyMessage notifyMessage = notifyService.resloveNotifyMessage(req);
 
         // STEP.3 如果支付成功
+        Payment payment = null;
         if (notifyMessage.getPayStatus() == PayStatus.Paied) {
             // 添加日志
             AlipaynotifylogPo notifyLog = new AlipaynotifylogPo();
@@ -73,24 +82,38 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
             alipaynotifylogMapper.insertSelective(notifyLog);
 
             // 校验支付单Id
-            Payment payment = payService.getPaymentByPaymentId(notifyMessage.getPaymentId());
+            payment = payService.getPaymentByPaymentId(notifyMessage.getPaymentId());
             if (payment == null)
                 throw new BizException(ErrorCode.DATA_NOT_FOUND,
-                        String.format("can not find paymentid %s", notifyMessage.getPayerId()));
+                        String.format("can not find paymentid %s", notifyMessage.getPaymentId()));
 
             // 校验商户订单
             BussinessOrder bussinessOrder = payService.getBussinessOrderById(payment.getBussinessorderid());
             if (bussinessOrder == null)
                 throw new BizException(ErrorCode.DATA_NOT_FOUND,
                         String.format("can not find order %s", payment.getBussinessorderid()));
+            payment.setBussinessOrder(bussinessOrder);
+
+
+            // 如果支付单的状态 已经成功则直接返回成功
+            if (payment.getPaystatus() == PayStatus.Paied.getIndex())
+                return notifyService.buildResponse(notifyMessage, payment, req.getNotifyType());
+
 
             // 更改订单状态
             if (req.getNotifyType() == PaymentNotifyType.Server) {
                 setPaymentOrderPaid(payment, notifyMessage);
             }
+
+            // 通知发货服务
+            try {
+                notifyPaymentService.doService(payment.getPaymentid(), notifyMessage.getTraceId(), req.getMockHeader());
+            } catch (Exception e) {
+                logger.error("notify deliver service failed with paymentid :" + payment.getPaymentid(), e);
+            }
         }
 
-        return notifyService.buildInstNeedResponse(notifyMessage);
+        return notifyService.buildResponse(notifyMessage, payment, req.getNotifyType());
     }
 
     /**

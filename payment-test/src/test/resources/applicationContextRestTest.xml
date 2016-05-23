@@ -44,5 +44,4 @@
 	</bean>
 
 	<import resource="classpath:spring/persistence.xml" />
-
 </beans>

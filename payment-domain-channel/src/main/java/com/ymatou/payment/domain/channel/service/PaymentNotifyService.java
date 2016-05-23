@@ -6,7 +6,9 @@
 package com.ymatou.payment.domain.channel.service;
 
 import com.ymatou.payment.domain.channel.model.PaymentNotifyMessage;
+import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.model.PaymentNotifyRequest;
+import com.ymatou.payment.facade.model.PaymentNotifyType;
 
 /**
  * 支付回调通知服务
@@ -23,11 +25,14 @@ public interface PaymentNotifyService {
      */
     PaymentNotifyMessage resloveNotifyMessage(PaymentNotifyRequest notifyRequest);
 
+
     /**
      * 构建第三方需要的请求报文
      * 
      * @param notifyMessage
+     * @param payment
+     * @param notifyType
      * @return
      */
-    String buildInstNeedResponse(PaymentNotifyMessage notifyMessage);
+    String buildResponse(PaymentNotifyMessage notifyMessage, Payment payment, PaymentNotifyType notifyType);
 }

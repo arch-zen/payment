@@ -41,7 +41,7 @@ public class PaymentResourceImpl implements PaymentResource {
      */
     @Override
     @POST
-    @Path("/AcquireOrder")
+    @Path("/{acquireOrder:(?i:acquireOrder)}")
     public AcquireOrderResp acquireOrder(AcquireOrderReq req, @Context HttpServletRequest servletRequest) {
         req.setMockHeader(getMockHttpHeader(servletRequest));
 

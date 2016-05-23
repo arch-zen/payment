@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -22,11 +23,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.jboss.resteasy.specimpl.BuiltResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.esotericsoftware.minlog.Log;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.PaymentNotifyFacade;
@@ -56,30 +57,39 @@ public class PaymentNotifyResourceImpl implements PaymentNotifyResource {
     @GET
     @Path("callback/{payType}")
     public Response callback(@PathParam("payType") String payType, @Context HttpServletRequest servletRequest) {
-        PaymentNotifyRequest notifyReq = new PaymentNotifyRequest();
-        notifyReq.setPayType(payType);
-        notifyReq.setNotifyType(PaymentNotifyType.Client);
-        notifyReq.setRawString(getHttpBody(servletRequest));
-        notifyReq.setMockHeader(getMockHttpHeader(servletRequest));
+        try {
+            PaymentNotifyRequest notifyReq = new PaymentNotifyRequest();
+            notifyReq.setPayType(payType);
+            notifyReq.setNotifyType(PaymentNotifyType.Client);
+            notifyReq.setRawString(servletRequest.getQueryString());
+            notifyReq.setMockHeader(getMockHttpHeader(servletRequest));
 
-        String url = "http://www.baidu.com";
-        // String url = paymentNotifyFacade.notify(notifyReq);
-        Response response = Response.status(Status.FOUND).header("location", url).build();
-
-        return response;
+            // String url = "http://www.baidu.com";
+            String url = paymentNotifyFacade.notify(notifyReq);
+            Response response = Response.status(Status.FOUND).header("location", url).build();
+            return response;
+        } catch (Exception e) {
+            logger.error("process callback failed with paytype: " + payType, e);
+            return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @Override
     @POST
     @Path("notify/{payType}")
     public String notify(@PathParam("payType") String payType, @Context HttpServletRequest servletRequest) {
-        PaymentNotifyRequest notifyReq = new PaymentNotifyRequest();
-        notifyReq.setPayType(payType);
-        notifyReq.setNotifyType(PaymentNotifyType.Server);
-        notifyReq.setRawString(getHttpBody(servletRequest));
-        notifyReq.setMockHeader(getMockHttpHeader(servletRequest));
+        try {
+            PaymentNotifyRequest notifyReq = new PaymentNotifyRequest();
+            notifyReq.setPayType(payType);
+            notifyReq.setNotifyType(PaymentNotifyType.Server);
+            notifyReq.setRawString(getHttpBody(servletRequest));
+            notifyReq.setMockHeader(getMockHttpHeader(servletRequest));
 
-        return paymentNotifyFacade.notify(notifyReq);
+            return paymentNotifyFacade.notify(notifyReq);
+        } catch (Exception e) {
+            logger.error("process notify failed with paytype: " + payType, e);
+            return "failed";
+        }
     }
 
     /**
@@ -117,7 +127,7 @@ public class PaymentNotifyResourceImpl implements PaymentNotifyResource {
 
             return res;
         } catch (Exception e) {
-            logger.error("parse http body failed", e);
+            logger.error("parse http body failed when process alipay notify", e);
             throw new BizException(ErrorCode.FAIL, "parse http body failed", e);
         }
     }
@@ -146,8 +156,8 @@ public class PaymentNotifyResourceImpl implements PaymentNotifyResource {
                 }
                 return message;
             } catch (IOException e) {
-                logger.error("parse http body where read bytes failed", e);
-                throw new BizException(ErrorCode.FAIL, "parse http body where read bytes failed");
+                logger.error("parse http body when read bytes failed", e);
+                throw new BizException(ErrorCode.FAIL, "parse http body where read bytes failed", e);
             }
         }
         return new byte[] {};

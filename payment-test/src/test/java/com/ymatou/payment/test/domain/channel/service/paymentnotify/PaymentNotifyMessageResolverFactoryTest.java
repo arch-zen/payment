@@ -12,11 +12,9 @@ import javax.annotation.Resource;
 import org.junit.Test;
 
 import com.ymatou.payment.domain.channel.service.PaymentNotifyService;
-import com.ymatou.payment.domain.channel.service.paymentnotify.AliPayAppPaymentNotifyServiceImpl;
-import com.ymatou.payment.domain.channel.service.paymentnotify.AliPayPcPaymentNotifyServiceImpl;
+import com.ymatou.payment.domain.channel.service.paymentnotify.AliPayPaymentNotifyServiceImpl;
 import com.ymatou.payment.domain.channel.service.paymentnotify.PaymentNotifyMessageResolverFactory;
-import com.ymatou.payment.domain.channel.service.paymentnotify.WeiXinAppPaymentNotifyServiceImpl;
-import com.ymatou.payment.domain.channel.service.paymentnotify.WeiXinJSAPIPaymentNotifyServiceImpl;
+import com.ymatou.payment.domain.channel.service.paymentnotify.WeiXinPaymentNotifyServiceImpl;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.test.RestBaseTest;
 
@@ -34,16 +32,16 @@ public class PaymentNotifyMessageResolverFactoryTest extends RestBaseTest {
     @Test
     public void testGetInstance() {
         PaymentNotifyService paymentNotifyService1 = paymentNotifyMessageResolverFactory.getInstance("10");
-        assertEquals("10", AliPayPcPaymentNotifyServiceImpl.class, paymentNotifyService1.getClass());
+        assertEquals("10", AliPayPaymentNotifyServiceImpl.class, paymentNotifyService1.getClass());
 
         PaymentNotifyService paymentNotifyService2 = paymentNotifyMessageResolverFactory.getInstance("13");
-        assertEquals("13", AliPayAppPaymentNotifyServiceImpl.class, paymentNotifyService2.getClass());
+        assertEquals("13", AliPayPaymentNotifyServiceImpl.class, paymentNotifyService2.getClass());
 
         PaymentNotifyService paymentNotifyService3 = paymentNotifyMessageResolverFactory.getInstance("14");
-        assertEquals("14", WeiXinJSAPIPaymentNotifyServiceImpl.class, paymentNotifyService3.getClass());
+        assertEquals("14", WeiXinPaymentNotifyServiceImpl.class, paymentNotifyService3.getClass());
 
         PaymentNotifyService paymentNotifyService4 = paymentNotifyMessageResolverFactory.getInstance("15");
-        assertEquals("15", WeiXinAppPaymentNotifyServiceImpl.class, paymentNotifyService4.getClass());
+        assertEquals("15", WeiXinPaymentNotifyServiceImpl.class, paymentNotifyService4.getClass());
     }
 
     @Test(expected = BizException.class)
