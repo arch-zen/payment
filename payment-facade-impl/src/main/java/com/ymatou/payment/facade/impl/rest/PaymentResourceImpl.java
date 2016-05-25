@@ -45,7 +45,12 @@ public class PaymentResourceImpl implements PaymentResource {
     public AcquireOrderResp acquireOrder(AcquireOrderReq req, @Context HttpServletRequest servletRequest) {
         req.setMockHeader(getMockHttpHeader(servletRequest));
 
-        return paymentFacade.acquireOrder(req);
+        AcquireOrderResp resp = paymentFacade.acquireOrder(req);
+        resp.setAppId(req.getAppId());
+        // resp.setVersion(req.getVersion());
+        resp.setTraceId(req.getTraceId());
+
+        return resp;
     }
 
     /**
@@ -59,7 +64,7 @@ public class PaymentResourceImpl implements PaymentResource {
         HashMap<String, String> header = new HashMap<>();
         while (headerNames.hasMoreElements()) {
             String headerName = (String) headerNames.nextElement();
-            if (headerName != null && headerName.startsWith("Mock"))
+            if (headerName != null && headerName.toLowerCase().startsWith("mock"))
                 header.put(headerName, servletRequest.getHeader(headerName));
         }
         return header;

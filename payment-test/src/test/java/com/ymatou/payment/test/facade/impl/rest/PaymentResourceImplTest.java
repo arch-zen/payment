@@ -145,7 +145,7 @@ public class PaymentResourceImplTest extends RestBaseTest {
 
         req.setVersion(2);
         AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
-        assertEquals("验证无效版本返回码", -2003, res.getErrorCode());
+        assertEquals("验证无效版本返回码", 1000, res.getErrorCode());
         System.out.println(res.getErrorMessage());
 
         req.setVersion(1);

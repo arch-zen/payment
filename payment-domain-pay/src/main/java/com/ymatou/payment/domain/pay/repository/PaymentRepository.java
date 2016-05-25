@@ -1,5 +1,6 @@
 package com.ymatou.payment.domain.pay.repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -135,16 +136,20 @@ public class PaymentRepository {
      * @return
      */
     private String genPaymentId(BussinessorderPo bo) {
-        String paymentId = null;
+        // String paymentId = null;
 
-        // "PP"开头的交易单号代表补款
-        if (bo.getOrderid().startsWith("PP")) {
-            paymentId = String.format("%s%015d", StringUtil.getDateFormatString("yyyyMMddhhmmssSSS"),
-                    new Random().nextInt(100000));
-        } else {
-            // 由于报关对商户订单号的长度有要求，所以生成逻辑与补款不同
-            paymentId = String.format("%s%08d", bo.getOrderid(), new Random().nextInt(1000000));
-        }
+        // // "PP"开头的交易单号代表补款
+        // if (bo.getOrderid().startsWith("PP")) {
+        // paymentId = String.format("%s%015d", StringUtil.getDateFormatString("yyyyMMddhhmmssSSS"),
+        // new Random().nextInt(100000));
+        // } else {
+        // // 由于报关对商户订单号的长度有要求，所以生成逻辑与补款不同
+        // paymentId = String.format("%s%08d", bo.getOrderid(), new Random().nextInt(1000000));
+        // }
+
+        // 为符合
+        long timestamp = new Date().getTime();
+        String paymentId = String.format("%d%04d", timestamp, new Random().nextInt(10000));
 
         logger.debug("genPaymentId:" + paymentId);
 

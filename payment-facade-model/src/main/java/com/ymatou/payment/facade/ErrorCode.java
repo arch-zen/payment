@@ -6,6 +6,8 @@ package com.ymatou.payment.facade;
  *
  */
 public enum ErrorCode {
+    SING_SERVER_ERROR(-5000, "服务端验签异常"),
+
     SIGN_NOT_MATCH(-2001, "验签失败"),
 
     NOT_SUPPORT_VERSION_OBJECT(-2002, "余额不足"),
@@ -58,7 +60,7 @@ public enum ErrorCode {
 
     FAIL(5000, "请求处理失败"),
 
-    UNKNOWN(9999, "未知错误，系统异常");
+    UNKNOWN(-9999, "未知错误，系统异常");
 
     private int code;
 

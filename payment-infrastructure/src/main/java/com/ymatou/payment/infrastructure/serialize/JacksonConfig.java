@@ -21,6 +21,8 @@ public class JacksonConfig implements ContextResolver<ObjectMapper> {
     public JacksonConfig() {
         objectMapper = new ObjectMapper();
 
+        objectMapper.setPropertyNamingStrategy(new BigCamelPropertyNamingStrategy());
+
         objectMapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 

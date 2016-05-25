@@ -109,7 +109,7 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
 
         MockHttpServletRequest servletRequest = new MockHttpServletRequest();
         servletRequest.setRequestURI("/notify/" + payType);
-        servletRequest.addHeader("Mock", "1");
+        servletRequest.addHeader("mock", "1");
         servletRequest.setContent(reqBody.getBytes("utf-8"));
 
         String response = paymentNotifyResource.notify(payType, servletRequest);
@@ -203,7 +203,7 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
         InstitutionConfig instConfig = institutionConfigManager.getConfig(payType);
         Map<String, String> map = HttpUtil.parseQueryStringToMap(originString);
         HashMap<String, String> mockHeader = new HashMap<String, String>();
-        mockHeader.put("Mock", "1");
+        mockHeader.put("mock", "1");
         String sign = signatureService.signMessage(map, instConfig, mockHeader);
         map.put("sign", sign);
 

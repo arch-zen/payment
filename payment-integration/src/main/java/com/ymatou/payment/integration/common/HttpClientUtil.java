@@ -49,7 +49,7 @@ public class HttpClientUtil {
         String result = null;
 
         HttpGet httpGet = new HttpGet(url);
-        if (header != null && "1".equals(header.get("Mock"))) { // mock
+        if (header != null && "1".equals(header.get("mock"))) { // mock
             for (Entry<String, String> entry : header.entrySet()) {
                 httpGet.addHeader(entry.getKey(), entry.getValue()); // add request header
             }
@@ -86,7 +86,7 @@ public class HttpClientUtil {
         HttpPost httpPost = new HttpPost(url);
         StringEntity postEntity = new StringEntity(body, "UTF-8");
         httpPost.setEntity(postEntity); // set request body
-        if (header != null && "1".equals(header.get("Mock"))) {
+        if (header != null && "1".equals(header.get("mock"))) {
             for (Entry<String, String> entry : header.entrySet()) {
                 httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
             }
@@ -119,13 +119,13 @@ public class HttpClientUtil {
      */
     public static String sendPost(String url, List<NameValuePair> body, HashMap<String, String> header,
             HttpClient httpClient)
-            throws IOException {
+                    throws IOException {
         String result = null;
 
         HttpPost httpPost = new HttpPost(url);
         UrlEncodedFormEntity postEntity = new UrlEncodedFormEntity(body, "UTF-8");
         httpPost.setEntity(postEntity); // set request body
-        if (header != null && "1".equals(header.get("Mock"))) {
+        if (header != null && "1".equals(header.get("mock"))) {
             for (Entry<String, String> entry : header.entrySet()) {
                 httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
             }
@@ -161,13 +161,13 @@ public class HttpClientUtil {
      */
     public static String sendPost(String url, List<NameValuePair> body, HashMap<String, String> header,
             CloseableHttpAsyncClient httpClient)
-            throws IOException, InterruptedException, ExecutionException {
+                    throws IOException, InterruptedException, ExecutionException {
         String result = null;
 
         HttpPost httpPost = new HttpPost(url);
         UrlEncodedFormEntity postEntity = new UrlEncodedFormEntity(body, "UTF-8");
         httpPost.setEntity(postEntity); // set request body
-        if (header != null && "1".equals(header.get("Mock"))) {
+        if (header != null && "1".equals(header.get("mock"))) {
             for (Entry<String, String> entry : header.entrySet()) {
                 httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
             }

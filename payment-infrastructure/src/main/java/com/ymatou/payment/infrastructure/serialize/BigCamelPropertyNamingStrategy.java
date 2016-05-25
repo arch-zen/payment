@@ -12,6 +12,11 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
  */
 public class BigCamelPropertyNamingStrategy extends PropertyNamingStrategy {
 
+    /**
+     * 序列化版本
+     */
+    private static final long serialVersionUID = 5481923680145129858L;
+
     @Override
     public String nameForGetterMethod(MapperConfig<?> config, AnnotatedMethod method, String defaultName) {
         return method.getName().substring(3);

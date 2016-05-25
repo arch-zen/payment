@@ -16,7 +16,7 @@ public class QueryTimestampServiceTest extends RestBaseTest {
     @Test
     public void testDoServiceSuccess() throws Exception {
         // HashMap<String, String> header = new HashMap<>();
-        // header.put("Mock", "1");
+        // header.put("mock", "1");
         // header.put("MockId", "888888");
         QueryTimestampResponse response =
                 queryTimestampService.doService("query_timestamp", "2088701734809577", null);

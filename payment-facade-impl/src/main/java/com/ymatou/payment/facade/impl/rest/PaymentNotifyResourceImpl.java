@@ -116,7 +116,7 @@ public class PaymentNotifyResourceImpl implements PaymentNotifyResource {
         HashMap<String, String> header = new HashMap<>();
         while (headerNames.hasMoreElements()) {
             String headerName = (String) headerNames.nextElement();
-            if (headerName != null && headerName.startsWith("Mock"))
+            if (headerName != null && headerName.startsWith("mock"))
                 header.put(headerName, servletRequest.getHeader(headerName));
         }
         return header;

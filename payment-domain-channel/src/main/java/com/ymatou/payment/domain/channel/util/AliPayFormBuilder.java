@@ -9,9 +9,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.HtmlUtils;
 
 import com.ymatou.payment.domain.channel.service.acquireorder.AliPayPcAcquireOrderServiceImpl;
 import com.ymatou.payment.facade.BizException;
@@ -57,9 +59,10 @@ public final class AliPayFormBuilder {
         try {
             StringBuilder sbInput = new StringBuilder();
             for (Map.Entry<String, String> entry : reqMap.entrySet()) {
-                if (!StringUtils.isBlank(entry.getValue()))
+                if (!StringUtils.isBlank(entry.getValue())) {
                     sbInput.append(
-                            String.format(inputFormat, entry.getKey(), URLEncoder.encode(entry.getValue(), "utf-8")));
+                            String.format(inputFormat, entry.getKey(), HtmlUtils.htmlEscape(entry.getValue())));
+                }
             }
             String form = String.format(formFormat, metaFormat, url, sbInput.toString());
 

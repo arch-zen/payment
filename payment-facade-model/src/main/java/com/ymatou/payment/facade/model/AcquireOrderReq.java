@@ -6,7 +6,11 @@
 package com.ymatou.payment.facade.model;
 
 import java.util.HashMap;
-import java.util.Map;
+
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.Range;
 
 import com.ymatou.payment.facade.BaseRequest;
 
@@ -27,7 +31,8 @@ public class AcquireOrderReq extends BaseRequest {
     /**
      * 接口版本
      */
-    private Integer version;
+    @Range(min = 1, max = 1, message = "invalidate version")
+    private int version;
 
     /**
      * MockHeader
@@ -37,6 +42,7 @@ public class AcquireOrderReq extends BaseRequest {
     /**
      * 调用方AppId
      */
+    @NotEmpty(message = "appId should not be empty ")
     private String appId;
 
     /**
@@ -57,11 +63,13 @@ public class AcquireOrderReq extends BaseRequest {
     /**
      * 编码方式
      */
+    @NotNull(message = "encoding should not be empty")
     private Integer encoding;
 
     /**
      * 支付金额
      */
+    @NotNull(message = "payPrice should not be empty")
     private String payPrice;
 
     /**
@@ -72,6 +80,7 @@ public class AcquireOrderReq extends BaseRequest {
     /**
      * 调用方的业务ID，需要保证唯一性
      */
+    @NotNull(message = "orderId should not be empty")
     public String orderId;
 
     /**
@@ -82,6 +91,7 @@ public class AcquireOrderReq extends BaseRequest {
     /**
      * 支付渠道：10:支付宝PC. 11.支付宝WAP 13.支付宝APP 14.微信 JSAP 15.微信APP 20.Paypal
      */
+    @NotNull(message = "payType should not be empty")
     private String payType;
 
     /**

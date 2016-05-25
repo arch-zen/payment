@@ -33,8 +33,8 @@ public class RefundQueryServiceTest extends RestBaseTest {
         request.setSign(sign);
 
         HashMap<String, String> header = new HashMap<>();
-        header.put("Mock", "1");
-        header.put("MockId", "888888");
+        header.put("mock", "1");
+        header.put("mockId", "888888");
         RefundQueryResponse response = refundQueryService.doService(request, header);
         Assert.assertNotNull(response);
         Assert.assertEquals(400, response.getTotal_fee());

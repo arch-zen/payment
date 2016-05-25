@@ -320,7 +320,7 @@ public class IntegrationConfig {
 
     public boolean isMock(HashMap<String, String> header) {
         return header != null
-                && "1".equals(header.get("Mock"))
+                && "1".equals(header.get("mock"))
                 && "true".equals(getOpenMock());
     }
 

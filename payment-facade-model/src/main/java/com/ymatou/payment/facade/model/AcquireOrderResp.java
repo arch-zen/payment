@@ -17,7 +17,7 @@ public class AcquireOrderResp extends BaseResponse {
     /**
      * 接口版本
      */
-    private Integer version;
+    private int version;
 
     /**
      * 应用Id

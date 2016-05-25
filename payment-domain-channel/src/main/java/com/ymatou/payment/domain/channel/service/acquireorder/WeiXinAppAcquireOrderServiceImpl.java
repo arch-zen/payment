@@ -117,17 +117,17 @@ public class WeiXinAppAcquireOrderServiceImpl implements AcquireOrderService {
             // 调用微信接口
             UnifiedOrderResponse response =
                     unifiedOrderService.doService(request, payment.getAcquireOrderReq().getMockHeader());
-            if (response.getAppid().equals(instConfig.getAppId())
-                    && response.getMch_id().equals(instConfig.getMerchantId())
+            if (response.getMch_id().equals(instConfig.getMerchantId())
                     && "SUCCESS".equals(response.getResult_code())
                     && "SUCCESS".equals(response.getReturn_code()))
                 return response.getPrepay_id();
             else
-                throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
-                        "paymentid:" + payment.getPaymentid());
+                throw new Exception(response.getReturn_msg());
         } catch (Exception ex) {
             Log.error("call weixin unifed order failed", ex);
-            throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED, "paymentid:" + payment.getPaymentid());
+            throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
+                    "paymentid:" + payment.getPaymentid() + "|" + ex.getMessage(),
+                    ex);
         }
 
     }

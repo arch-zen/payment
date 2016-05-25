@@ -43,7 +43,7 @@
 		<zookeeper.version>3.4.8</zookeeper.version>
 		<zkclient.version>0.1</zkclient.version>
 		<commons-lang3.version>3.4</commons-lang3.version>
-		<disconf.version>2.6.32</disconf.version>
+		<disconf.version>2.6.34</disconf.version>
 		<commons-io.version>2.4</commons-io.version>
 
 		<mongo-driver.verson>3.2.2</mongo-driver.verson>
