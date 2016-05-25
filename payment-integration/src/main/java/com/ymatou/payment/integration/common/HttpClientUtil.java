@@ -14,6 +14,7 @@ import java.util.concurrent.Future;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -121,7 +122,7 @@ public class HttpClientUtil {
      */
     public static String sendPost(String url, List<NameValuePair> body, HashMap<String, String> header,
             HttpClient httpClient)
-                    throws IOException {
+            throws IOException {
         String result = null;
 
         HttpPost httpPost = new HttpPost(url);
@@ -163,7 +164,7 @@ public class HttpClientUtil {
      */
     public static String sendPost(String url, List<NameValuePair> body, HashMap<String, String> header,
             CloseableHttpAsyncClient httpClient)
-                    throws IOException, InterruptedException, ExecutionException {
+            throws IOException, InterruptedException, ExecutionException {
         String result = null;
 
         HttpPost httpPost = new HttpPost(url);

@@ -30,6 +30,7 @@ public class IntegrationConfig {
     private String wxAppCertPass; // 微信APP(1234079001)对应的证书密码
     private String wxAppMchId; // 微信App的商户号(1234079001)
     private String aliPayBaseUrl; // 支付宝防钓鱼时间戳url
+    private String aliPayWapUrl; // 支付宝wap支付url
     private String ymtUserServiceUrl; // 用户服务url
     private String ymtNotifyRefundUrl; // 通知退款url
     private String ymtNotifyPaymentUrl; // 通知支付url
@@ -38,6 +39,7 @@ public class IntegrationConfig {
 
     private String openMock;
     private String aliPayBaseUrlMock; // 支付宝网关url(mock)
+    private String aliPayWapUrlMock; // 支付宝wap支付url(mock)
     private String wxUnifiedOrderUrlMock; // 微信统一下单url(mock)
     private String wxRefundQueryUrlMock; // 微信退款查询url(mock)
     private String wxOrderQueryUrlMock; // 微信查询订单url(mock)
@@ -46,6 +48,31 @@ public class IntegrationConfig {
     private String ymtNotifyPaymentUrlMock; // 通知支付url(mock)
     private String ymtNotifytradingeventUrlMock; // 通知用户交易信息url(mock)
 
+    public String getAliPayWapUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getAliPayWapUrlMock();
+        } else {
+            return getAliPayWapUrl();
+        }
+    }
+
+    @DisconfFileItem(name = "ali.wap.url")
+    public String getAliPayWapUrl() {
+        return aliPayWapUrl;
+    }
+
+    public void setAliPayWapUrl(String aliPayWapUrl) {
+        this.aliPayWapUrl = aliPayWapUrl;
+    }
+
+    @DisconfFileItem(name = "ali.wap.url.mock")
+    public String getAliPayWapUrlMock() {
+        return aliPayWapUrlMock;
+    }
+
+    public void setAliPayWapUrlMock(String aliPayWapUrlMock) {
+        this.aliPayWapUrlMock = aliPayWapUrlMock;
+    }
 
     public String getWxOrderQueryUrl(HashMap<String, String> header) {
         if (isMock(header)) {

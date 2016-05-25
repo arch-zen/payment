@@ -79,7 +79,6 @@ public class SingleTradeQueryService implements InitializingBean {
             logger.error(e.getMessage(), e);
             throw e;
         }
-
     }
 
     private List<NameValuePair> getRequestBody(SingleTradeQueryRequest req) {
