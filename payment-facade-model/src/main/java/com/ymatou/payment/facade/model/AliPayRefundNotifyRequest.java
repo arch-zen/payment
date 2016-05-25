@@ -54,6 +54,8 @@ public class AliPayRefundNotifyRequest extends BaseRequest {
     @NotNull
     private String result_details;
 
+    private String payType;
+
     public Date getNotify_time() {
         return notify_time;
     }
@@ -84,5 +86,13 @@ public class AliPayRefundNotifyRequest extends BaseRequest {
 
     public String getResult_details() {
         return result_details;
+    }
+
+    public String getPayType() {
+        return payType;
+    }
+
+    public void setPayType(String payType) {
+        this.payType = payType;
     }
 }

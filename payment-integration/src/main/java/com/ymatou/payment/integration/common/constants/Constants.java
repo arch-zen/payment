@@ -16,4 +16,5 @@ public class Constants {
     public static final Long CONN_MANAGER_TIMEOUT = 500L;
 
     public static final String MOCK = "1"; // http header (mock=1)
+    public static final String WEIXIN_RESPONSE_BODY_START = "<xml>";
 }

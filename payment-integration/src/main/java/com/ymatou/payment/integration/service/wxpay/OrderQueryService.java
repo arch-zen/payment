@@ -70,7 +70,7 @@ public class OrderQueryService implements InitializingBean {
 
             String respXmlStr = HttpClientUtil.sendPost(integrationConfig.getWxOrderQueryUrl(header),
                     getPostDataXml(request), new HashMap<String, String>(), httpClient);
-            if (!StringUtils.isEmpty(respXmlStr)) {
+            if (!StringUtils.isEmpty(respXmlStr) && respXmlStr.startsWith(Constants.WEIXIN_RESPONSE_BODY_START)) {
                 Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);
                 OrderQueryResponse response = generateResponseData(respMap);
                 response.setResponseOriginString(respXmlStr); // 返回原始应答

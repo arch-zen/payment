@@ -36,7 +36,8 @@ public class RefundNotifyFacadeImpl implements RefundNotifyFacade {
         // throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "request data invalid.");
         // }
 
-        refundNotifyService.processRefundCallback(req, payType);
+        req.setPayType(payType);
+        refundNotifyService.processRefundCallback(req);
 
         return new BaseResponse();
     }

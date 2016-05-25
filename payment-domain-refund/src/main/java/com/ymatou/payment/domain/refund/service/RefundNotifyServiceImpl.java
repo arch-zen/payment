@@ -51,10 +51,11 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
     private NotifyRefundService notifyRefundService;
 
     @Override
-    public void processRefundCallback(AliPayRefundNotifyRequest req, String payType) {
+    public void processRefundCallback(AliPayRefundNotifyRequest req) {
         // 验签
         Map<String, String> signMap = getRequestMap(req);
-        boolean signResult = signatureService.validateSign(signMap, instConfigManager.getConfig(payType), null);
+        boolean signResult =
+                signatureService.validateSign(signMap, instConfigManager.getConfig(req.getPayType()), null);
         if (!signResult) {
             throw new BizException("signdata is invalid");
         }

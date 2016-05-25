@@ -83,7 +83,7 @@ public class RefundQueryService {
 
             String respXmlStr = HttpClientUtil.sendPost(integrationConfig.getWxRefundQueryUrl(header),
                     getPostDataXml(request), header, getHttpClient(mchId));
-            if (!StringUtils.isEmpty(respXmlStr)) {
+            if (!StringUtils.isEmpty(respXmlStr) && respXmlStr.startsWith(Constants.WEIXIN_RESPONSE_BODY_START)) {
                 Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);
                 RefundQueryResponse response = generateResponseData(respMap);
                 return response;
