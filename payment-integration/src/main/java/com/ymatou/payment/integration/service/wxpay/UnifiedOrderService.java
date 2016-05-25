@@ -67,7 +67,7 @@ public class UnifiedOrderService implements InitializingBean {
 
             String respXmlStr = HttpClientUtil.sendPost(integrationConfig.getWxUnifiedOrderUrl(header),
                     getPostDataXml(request), header, httpClient);
-            if (!StringUtils.isEmpty(respXmlStr)) {
+            if (!StringUtils.isEmpty(respXmlStr) && respXmlStr.startsWith(Constants.WEIXIN_RESPONSE_BODY_START)) {
                 Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);
                 UnifiedOrderResponse response = generateResponseData(respMap);
                 return response;

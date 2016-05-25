@@ -18,5 +18,5 @@ public interface RefundNotifyService {
      * @param req
      * @return
      */
-    public void processRefundCallback(AliPayRefundNotifyRequest req, String payType);
+    public void processRefundCallback(AliPayRefundNotifyRequest req);
 }
