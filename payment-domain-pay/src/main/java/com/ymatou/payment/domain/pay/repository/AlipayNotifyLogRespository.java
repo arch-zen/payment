@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ymatou.payment.infrastructure.db.mapper.AlipaynotifylogMapper;
-import com.ymatou.payment.infrastructure.db.model.AlipaynotifylogPo;
+import com.ymatou.payment.infrastructure.db.mapper.AlipayNotifyLogMapper;
+import com.ymatou.payment.infrastructure.db.model.AlipayNotifyLogPo;
 
 /**
  * 第三方报文
@@ -24,14 +24,14 @@ public class AlipayNotifyLogRespository {
     private static final Logger logger = LoggerFactory.getLogger(AlipayNotifyLogRespository.class);
 
     @Autowired
-    private AlipaynotifylogMapper alipaynotifylogMapper;
+    private AlipayNotifyLogMapper alipayNotifyLogMapper;
 
     @Transactional
     public void saveAlipaynoitfylog(String paymentId, String respMsg) {
-        AlipaynotifylogPo alipaynotifylogPo = new AlipaynotifylogPo();
-        alipaynotifylogPo.setBizno(paymentId);
-        alipaynotifylogPo.setSparameters(respMsg);
+        AlipayNotifyLogPo alipaynotifylogPo = new AlipayNotifyLogPo();
+        alipaynotifylogPo.setBizNo(paymentId);
+        alipaynotifylogPo.setsParameters(respMsg);
 
-        alipaynotifylogMapper.insertSelective(alipaynotifylogPo);
+        alipayNotifyLogMapper.insertSelective(alipaynotifylogPo);
     }
 }

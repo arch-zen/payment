@@ -35,7 +35,9 @@ public class CheckPaymentFacadeImpl implements CheckPaymentFacade {
         PaymentQueryService paymentQueryService =
                 paymentQueryServiceFactory.getInstanceByPayType(req.getPayType(), req.getPaymentId());
 
-        PaymentQueryResp paymentQueryResp = paymentQueryService.paymentQuery(req);
+        PaymentQueryResp paymentQueryResp =
+                paymentQueryService.paymentQuery(req.getPaymentId(), req.getPayType(), req.getHeader());
+
         paymentCheckService.doCheck(generateModel(paymentQueryResp), req.getPaymentId(), req.isFinalCheck(),
                 req.getHeader());
 

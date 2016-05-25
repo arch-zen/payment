@@ -6,23 +6,19 @@
 package com.ymatou.payment.domain.pay.repository;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
-import com.ymatou.payment.domain.pay.model.PayStatus;
 import com.ymatou.payment.facade.BizException;
-import com.ymatou.payment.infrastructure.db.mapper.BussinessorderMapper;
-import com.ymatou.payment.infrastructure.db.model.BussinessorderExample;
-import com.ymatou.payment.infrastructure.db.model.BussinessorderPo;
+import com.ymatou.payment.infrastructure.db.mapper.BussinessOrderMapper;
+import com.ymatou.payment.infrastructure.db.model.BussinessOrderExample;
+import com.ymatou.payment.infrastructure.db.model.BussinessOrderPo;
 
 /**
  * 商户订单仓储类
@@ -35,10 +31,7 @@ public class BussinessOrderRepository {
     private static final Logger logger = LoggerFactory.getLogger(BussinessOrderRepository.class);
 
     @Resource
-    private BussinessorderMapper mapper;
-
-    @Resource
-    private SqlSession sqlSession;
+    private BussinessOrderMapper mapper;
 
     /**
      * 根据商户订单（交易号）获取到商户订单信息
@@ -47,9 +40,9 @@ public class BussinessOrderRepository {
      * @return
      */
     public BussinessOrder getByOrderId(String orderId) {
-        BussinessorderExample example = new BussinessorderExample();
-        example.createCriteria().andOrderidEqualTo(orderId);
-        List<BussinessorderPo> opList = sqlSession.selectList("ext-ppBussinessorder.selectByExample", example);
+        BussinessOrderExample example = new BussinessOrderExample();
+        example.createCriteria().andOrderIdEqualTo(orderId);
+        List<BussinessOrderPo> opList = mapper.selectByExample(example);
 
         if (opList.size() == 0)
             return null;
@@ -64,8 +57,8 @@ public class BussinessOrderRepository {
      * @param po
      * @return
      */
-    public int insert(BussinessorderPo po) {
-        return sqlSession.insert("ext-ppBussinessorder.insert", po);
+    public int insert(BussinessOrderPo po) {
+        return mapper.insertSelective(po);
     }
 
     /**
@@ -75,11 +68,10 @@ public class BussinessOrderRepository {
      * @param orderStatus
      */
     public void updateOrderStatus(String bussinessorderid, int orderStatus) {
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("bussinessorderid", bussinessorderid);
-        params.put("orderstatus", orderStatus);
-
-        int updated = sqlSession.update("ext-ppBussinessorder.updateOrderStatus", params);
+        BussinessOrderPo bussinessOrderPo = new BussinessOrderPo();
+        bussinessOrderPo.setOrderStatus(orderStatus);
+        bussinessOrderPo.setBussinessOrderId(bussinessorderid);
+        int updated = mapper.updateByPrimaryKeySelective(bussinessOrderPo);
         if (updated <= 0) {
             throw new BizException("Bussinessorder not exist");
         }
@@ -92,12 +84,8 @@ public class BussinessOrderRepository {
      * @return
      */
     public BussinessOrder getBussinessOrderById(String bussinessorderid) {
-        BussinessorderExample example = new BussinessorderExample();
-        example.createCriteria().andBussinessorderidEqualTo(bussinessorderid);
-        List<BussinessorderPo> opList = sqlSession.selectList("ext-ppBussinessorder.selectByExample", example);
-        if (opList == null || opList.size() == 0)
-            return null;
-        return BussinessOrder.convertFromPo(opList.get(0));
+        BussinessOrderPo po = mapper.selectByPrimaryKey(bussinessorderid);
+        return BussinessOrder.convertFromPo(po);
     }
 
     /**
@@ -109,11 +97,11 @@ public class BussinessOrderRepository {
      * @return
      */
     public BussinessOrder getBussinessOrderCanRefund(String tradeNo, Integer orderStatus, Date validDate) {
-        BussinessorderExample example = new BussinessorderExample();
-        example.createCriteria().andOrderidEqualTo(tradeNo)
-                .andOrderstatusEqualTo(orderStatus)
-                .andCreatedtimeGreaterThanOrEqualTo(validDate);
-        List<BussinessorderPo> pos = sqlSession.selectList("ext-ppBussinessorder.selectByExample", example);
+        BussinessOrderExample example = new BussinessOrderExample();
+        example.createCriteria().andOrderIdEqualTo(tradeNo)
+                .andOrderStatusEqualTo(orderStatus)
+                .andCreatedTimeGreaterThanOrEqualTo(validDate);
+        List<BussinessOrderPo> pos = mapper.selectByExample(example);
         if (pos == null || pos.size() == 0) {
             return null;
         }

@@ -77,6 +77,7 @@ public class FacadeAspect {
                 resp = builErrorResponse(joinPoint, ErrorCode.ILLEGAL_ARGUMENT, e.getLocalizedMessage());
             }
 
+            resp = builErrorResponse(joinPoint, ErrorCode.ILLEGAL_ARGUMENT, e.getLocalizedMessage());
             logger.error("Invalid request: {}", req, e);
         } catch (BizException e) {
 
@@ -102,6 +103,7 @@ public class FacadeAspect {
         logger.info("Finished {}, Consumed:{}ms", getRequestFlag(req), consumedTime);
         return resp;
     }
+
 
     private BaseResponse builErrorResponse(ProceedingJoinPoint joinPoint, ErrorCode errorCode, String errorMsg)
             throws InstantiationException, IllegalAccessException {

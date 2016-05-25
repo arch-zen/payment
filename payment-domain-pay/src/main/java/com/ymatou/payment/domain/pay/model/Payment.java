@@ -411,23 +411,23 @@ public class Payment extends PrintFriendliness {
      */
     public static Payment convertFromPo(PaymentPo po) {
         Payment model = new Payment();
-        model.setPaymentid(po.getPaymentid());
-        model.setBussinessorderid(po.getBussinessorderid());
-        model.setInstitutionpaymentid(po.getInstitutionpaymentid());
-        model.setPaytype(po.getPaytype());
-        model.setPayprice(po.getPayprice());
-        model.setPaycurrencytype(po.getPaycurrencytype());
-        model.setActualpayprice(po.getActualpayprice());
-        model.setActualpaycurrencytype(po.getActualpaycurrencytype());
-        model.setExchangerate(po.getExchangerate());
-        model.setBankid(po.getBankid());
-        model.setCardtype(po.getCardtype());
-        model.setPayerid(po.getPayerid());
-        model.setCreatedtime(po.getCreatedtime());
-        model.setPaystatus(po.getPaystatus());
-        model.setPaytime(po.getPaytime());
-        model.setLastupdatedtime(po.getLastupdatedtime());
-        model.setCheckstatus(po.getCheckstatus());
+        model.setPaymentid(po.getPaymentId());
+        model.setBussinessorderid(po.getBussinessOrderId());
+        model.setInstitutionpaymentid(po.getInstitutionPaymentId());
+        model.setPaytype(po.getPayType());
+        model.setPayprice(po.getPayPrice());
+        model.setPaycurrencytype(po.getPayCurrencyType());
+        model.setActualpayprice(po.getActualPayPrice());
+        model.setActualpaycurrencytype(po.getActualPayCurrencyType());
+        model.setExchangerate(po.getExchangeRate());
+        model.setBankid(po.getBankId());
+        model.setCardtype(po.getCardType());
+        model.setPayerid(po.getPayerId());
+        model.setCreatedtime(po.getCreatedTime());
+        model.setPaystatus(po.getPayStatus());
+        model.setPaytime(po.getPayTime());
+        model.setLastupdatedtime(po.getLastUpdatedTime());
+        model.setCheckstatus(po.getCheckStatus());
 
         return model;
     }

@@ -39,23 +39,29 @@
 			targetProject="..\payment-infrastructure\src\main\java">
 		</javaClientGenerator>
 
-		<table tableName="PP_Payment">
+		<table tableName="PP_Payment" domainObjectName="Payment">
+			<property name="useActualColumnNames" value="true"/>
 		</table>
 
-		<table tableName="PP_BussinessOrder">
+		<table tableName="PP_BussinessOrder" domainObjectName="BussinessOrder">
+			<property name="useActualColumnNames" value="true"/>
 		</table>
-
-
-		<table tableName="RefundRequest">
-		</table>
-		
-		<table tableName="PP_CompensateProcessInfo">
+		<table tableName="RefundRequest" domainObjectName="RefundRequest">
+			<property name="useActualColumnNames" value="true"/>
+			<ignoreColumn column="DataVersion"/>
 		</table>
 		
-		<table tableName="RefundMiscRequestLog">
+		<table tableName="PP_CompensateProcessInfo" domainObjectName="CompensateProcessInfo">
+			<property name="useActualColumnNames" value="true"/>
+			<ignoreColumn column="DataVersion"/>
 		</table>
 		
-		<table tableName="Ymt_AlipayNotifyLog">
+		<table tableName="RefundMiscRequestLog" domainObjectName="RefundMiscRequestLog">
+			<property name="useActualColumnNames" value="true"/>
+		</table>
+		
+		<table tableName="Ymt_AlipayNotifyLog" domainObjectName="AlipayNotifyLog">
+			<property name="useActualColumnNames" value="true"/>
 		</table>
 	</context>
 

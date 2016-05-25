@@ -87,7 +87,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         request.setTraceId("12321321321");
         List<TradeDetail> tradeDetails = new ArrayList<>();
         TradeDetail tradeDetail = new TradeDetail();
-        tradeDetail.setTradeNo("PP20151104300104729");
+        tradeDetail.setTradeNo("114659944449425");
         tradeDetail.setTradeType(1);
         tradeDetails.add(tradeDetail);
         request.setTradeDetails(tradeDetails);
@@ -95,7 +95,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         AcquireRefundResponse response = refundResource.submitRefund(request, new MockHttpServletRequest());
         Assert.assertEquals(0, response.getErrorCode());
         Assert.assertEquals(1, response.getDetails().size());
-        Assert.assertEquals("PP20151104300104729", response.getDetails().get(0).getTradeNo());
+        Assert.assertEquals("114659944449425", response.getDetails().get(0).getTradeNo());
     }
 
     @Test
@@ -105,7 +105,7 @@ public class RefundResourceImpTest extends RestBaseTest {
                 .asList(new String[] {"20150915133207757", "8178254", "19335806615459", "8526937", "114581437722686",
                         "20160503194109806", "114659944449425", "4070149626832712", "8198025", "4092297615140378"}));
         TradeRefundableResponse response = refundResource.checkRefundable(req, new MockHttpServletRequest());
-        Assert.assertEquals(5, response.getDetails().size());
+        Assert.assertEquals(3, response.getDetails().size());
     }
 
     // @Test

@@ -19,14 +19,13 @@ import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
-import com.ymatou.payment.domain.channel.constants.PayStatus;
+import com.ymatou.payment.domain.channel.constants.PayStatusEnum;
 import com.ymatou.payment.domain.channel.constants.WeixinPayConstants;
 import com.ymatou.payment.domain.channel.model.PaymentQueryResp;
 import com.ymatou.payment.domain.channel.service.PaymentQueryService;
 import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
-import com.ymatou.payment.facade.model.CheckPaymentRequset;
 import com.ymatou.payment.integration.model.OrderQueryRequest;
 import com.ymatou.payment.integration.model.OrderQueryResponse;
 import com.ymatou.payment.integration.service.wxpay.OrderQueryService;
@@ -53,12 +52,12 @@ public class WeiXinPaymentQueryServiceImpl implements PaymentQueryService {
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 
     @Override
-    public PaymentQueryResp paymentQuery(CheckPaymentRequset request) {
-        OrderQueryRequest orderQueryRequest = generateRequest(request);
+    public PaymentQueryResp paymentQuery(String paymentId, String payType, HashMap<String, String> header) {
+        OrderQueryRequest orderQueryRequest = generateRequest(paymentId, payType, header);
 
         try {
             // 调用微信支付查询订单接口
-            OrderQueryResponse response = orderQueryService.doService(orderQueryRequest, request.getHeader());
+            OrderQueryResponse response = orderQueryService.doService(orderQueryRequest, header);
 
             if (OrderQueryResponse.SUCCESS.equals(response.getResult_code())
                     && OrderQueryResponse.SUCCESS.equals(response.getReturn_code())) {
@@ -66,13 +65,13 @@ public class WeiXinPaymentQueryServiceImpl implements PaymentQueryService {
                 return resp;
             } else {
                 throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
-                        "Paymentid:" + request.getPaymentId());
+                        "Paymentid:" + paymentId);
             }
 
         } catch (Exception e) {
             logger.error("call weixin order query failed", e);
             throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
-                    "Paymentid: " + request.getPaymentId());
+                    "Paymentid: " + paymentId);
         }
     }
 
@@ -86,16 +85,16 @@ public class WeiXinPaymentQueryServiceImpl implements PaymentQueryService {
         resp.setOriginMessage(response.getResponseOriginString());
         resp.setPayerId(response.getOpenid());
         resp.setPaymentId(response.getOut_trade_no());
-        resp.setPayStatus(response.isValid() ? PayStatus.Paied : PayStatus.Failed);
+        resp.setPayStatus(response.isValid() ? PayStatusEnum.Paied : PayStatusEnum.Failed);
         resp.setPayTime(sdf.parse(response.getTime_end()));
         resp.setTraceId(response.getNonce_str());
 
         return resp;
     }
 
-    private OrderQueryRequest generateRequest(CheckPaymentRequset req) {
+    private OrderQueryRequest generateRequest(String paymentId, String payType, HashMap<String, String> header) {
         // 根据payType获取appId,mchId信息
-        InstitutionConfig institutionConfig = institutionConfigManager.getConfig(req.getPayType());
+        InstitutionConfig institutionConfig = institutionConfigManager.getConfig(payType);
         String appId = institutionConfig.getAppId();
         String mchId = institutionConfig.getMerchantId();
 
@@ -104,11 +103,11 @@ public class WeiXinPaymentQueryServiceImpl implements PaymentQueryService {
         orderQueryRequest.setAppid(appId);
         orderQueryRequest.setMch_id(mchId);
         orderQueryRequest.setNonce_str(RandomStringUtils.randomAlphabetic(32));
-        orderQueryRequest.setOut_trade_no(req.getPaymentId());
+        orderQueryRequest.setOut_trade_no(paymentId);
         orderQueryRequest.setTransaction_id("");
         @SuppressWarnings("unchecked")
         String sign = signatureService.signMessage(new ObjectMapper().convertValue(orderQueryRequest, HashMap.class),
-                institutionConfig, req.getHeader()); // 加签
+                institutionConfig, header); // 加签
         orderQueryRequest.setSign(sign);
 
         logger.info("order query request: {}", JSON.toJSONString(orderQueryRequest));

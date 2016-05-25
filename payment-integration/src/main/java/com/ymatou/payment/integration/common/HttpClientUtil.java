@@ -14,7 +14,6 @@ import java.util.concurrent.Future;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -24,6 +23,9 @@ import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.alibaba.dubbo.common.json.ParseException;
+import com.ymatou.payment.integration.common.constants.Constants;
 
 /**
  * 用于提交get,post请求
@@ -49,7 +51,7 @@ public class HttpClientUtil {
         String result = null;
 
         HttpGet httpGet = new HttpGet(url);
-        if (header != null && "1".equals(header.get("mock"))) { // mock
+        if (header != null && Constants.MOCK.equals(header.get("mock"))) { // mock
             for (Entry<String, String> entry : header.entrySet()) {
                 httpGet.addHeader(entry.getKey(), entry.getValue()); // add request header
             }
@@ -63,7 +65,7 @@ public class HttpClientUtil {
             result = EntityUtils.toString(entity, "UTF-8");
             logger.info("response message:" + result);
         } finally {
-            httpGet.abort();
+            httpGet.releaseConnection();
         }
 
         return result;
@@ -86,7 +88,7 @@ public class HttpClientUtil {
         HttpPost httpPost = new HttpPost(url);
         StringEntity postEntity = new StringEntity(body, "UTF-8");
         httpPost.setEntity(postEntity); // set request body
-        if (header != null && "1".equals(header.get("mock"))) {
+        if (header != null && Constants.MOCK.equals(header.get("mock"))) {
             for (Entry<String, String> entry : header.entrySet()) {
                 httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
             }
@@ -101,7 +103,7 @@ public class HttpClientUtil {
             result = EntityUtils.toString(entity, "UTF-8");
             logger.info("response message:" + result);
         } finally {
-            httpPost.abort();
+            httpPost.releaseConnection();
         }
 
         return result;
@@ -125,7 +127,7 @@ public class HttpClientUtil {
         HttpPost httpPost = new HttpPost(url);
         UrlEncodedFormEntity postEntity = new UrlEncodedFormEntity(body, "UTF-8");
         httpPost.setEntity(postEntity); // set request body
-        if (header != null && "1".equals(header.get("mock"))) {
+        if (header != null && Constants.MOCK.equals(header.get("mock"))) {
             for (Entry<String, String> entry : header.entrySet()) {
                 httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
             }
@@ -140,7 +142,7 @@ public class HttpClientUtil {
             result = EntityUtils.toString(entity, "UTF-8");
             logger.info("response message:" + result);
         } finally {
-            httpPost.abort();
+            httpPost.releaseConnection();
         }
 
         return result;
@@ -167,7 +169,7 @@ public class HttpClientUtil {
         HttpPost httpPost = new HttpPost(url);
         UrlEncodedFormEntity postEntity = new UrlEncodedFormEntity(body, "UTF-8");
         httpPost.setEntity(postEntity); // set request body
-        if (header != null && "1".equals(header.get("mock"))) {
+        if (header != null && Constants.MOCK.equals(header.get("mock"))) {
             for (Entry<String, String> entry : header.entrySet()) {
                 httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
             }
@@ -182,7 +184,7 @@ public class HttpClientUtil {
             result = EntityUtils.toString(entity, "UTF-8");
             logger.info("response message:" + result);
         } finally {
-            httpPost.abort();
+            httpPost.releaseConnection();
         }
 
         return result;

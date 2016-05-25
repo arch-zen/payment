@@ -15,9 +15,8 @@ import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.repository.BussinessOrderRepository;
 import com.ymatou.payment.domain.pay.repository.PaymentRepository;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
-import com.ymatou.payment.infrastructure.db.model.BussinessorderPo;
+import com.ymatou.payment.infrastructure.db.model.BussinessOrderPo;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
-import com.ymatou.payment.integration.service.ymatou.NotifyPaymentService;
 
 @Component
 public class PayServiceImpl implements PayService {
@@ -58,7 +57,7 @@ public class PayServiceImpl implements PayService {
 
     @Override
     public Payment createPayment(AcquireOrderReq req) {
-        BussinessorderPo bussinessOrderPo = buildBussinessOrder(req);
+        BussinessOrderPo bussinessOrderPo = buildBussinessOrder(req);
         PaymentPo paymentPo = buildPayment(req, bussinessOrderPo);
 
         paymentRepository.acquireOrder(paymentPo, bussinessOrderPo);
@@ -79,14 +78,14 @@ public class PayServiceImpl implements PayService {
      * @param bussinessOrder
      * @return
      */
-    private PaymentPo buildPayment(AcquireOrderReq req, BussinessorderPo bussinessOrder) {
+    private PaymentPo buildPayment(AcquireOrderReq req, BussinessOrderPo bussinessOrder) {
         PaymentPo payment = new PaymentPo();
-        payment.setBankid(req.getBankId());
-        payment.setBussinessorderid(bussinessOrder.getBussinessorderid());
-        payment.setPaystatus(PayStatus.Init.getIndex());
-        payment.setPaycurrencytype(req.getCurrency());
-        payment.setPayprice(bussinessOrder.getOrderprice());
-        payment.setPaytype(req.getPayType());
+        payment.setBankId(req.getBankId());
+        payment.setBussinessOrderId(bussinessOrder.getBussinessOrderId());
+        payment.setPayStatus(PayStatus.Init.getIndex());
+        payment.setPayCurrencyType(req.getCurrency());
+        payment.setPayPrice(bussinessOrder.getOrderPrice());
+        payment.setPayType(req.getPayType());
 
         return payment;
     }
@@ -98,32 +97,32 @@ public class PayServiceImpl implements PayService {
      * @param req
      * @return
      */
-    private BussinessorderPo buildBussinessOrder(AcquireOrderReq req) {
-        BussinessorderPo bo = new BussinessorderPo();
-        bo.setBussinessorderid(UUID.randomUUID().toString());
-        bo.setAppid(req.getAppId());
-        bo.setTraceid(req.getTraceId());
-        bo.setBizcode(req.getBizCode());
-        bo.setCallbackurl(req.getCallbackUrl());
-        bo.setClientip(req.getUserIp());
-        bo.setCodepage(req.getEncoding());
-        bo.setCurrencytype(req.getCurrency());
+    private BussinessOrderPo buildBussinessOrder(AcquireOrderReq req) {
+        BussinessOrderPo bo = new BussinessOrderPo();
+        bo.setBussinessOrderId(UUID.randomUUID().toString());
+        bo.setAppId(req.getAppId());
+        bo.setTraceId(req.getTraceId());
+        bo.setBizCode(req.getBizCode());
+        bo.setCallbackUrl(req.getCallbackUrl());
+        bo.setClientIp(req.getUserIp());
+        bo.setCodePage(req.getEncoding());
+        bo.setCurrencyType(req.getCurrency());
         bo.setExt(req.getExt());
         bo.setMemo(req.getMemo());
-        bo.setNotifyurl(req.getNotifyUrl());
-        bo.setOrderid(req.getOrderId());
-        bo.setOrderprice(new BigDecimal(req.getPayPrice()));
-        bo.setOrderstatus(OrderStatus.Init.getIndex());
-        bo.setOrdertime(req.getOrderTime());
-        bo.setOriginappid(req.getOriginAppId());
-        bo.setPaytype(req.getPayType());
-        bo.setProductdesc(req.getProductDesc());
-        bo.setProducturl(req.getProductUrl());
-        bo.setProductname(req.getProductName());
-        bo.setSignmethod(req.getSignMethod());
-        bo.setThirdpartyuserid(req.getThirdPartyUserId());
-        bo.setThirdpartyusertype(0); // 0-代表JAVA版，null-代表.NET版本
-        bo.setUserid(req.getUserId());
+        bo.setNotifyUrl(req.getNotifyUrl());
+        bo.setOrderId(req.getOrderId());
+        bo.setOrderPrice(new BigDecimal(req.getPayPrice()));
+        bo.setOrderStatus(OrderStatus.Init.getIndex());
+        bo.setOrderTime(req.getOrderTime());
+        bo.setOriginAppId(req.getOriginAppId());
+        bo.setPayType(req.getPayType());
+        bo.setProductDesc(req.getProductDesc());
+        bo.setProductUrl(req.getProductUrl());
+        bo.setProductName(req.getProductName());
+        bo.setSignMethod(req.getSignMethod());
+        bo.setThirdPartyUserId(req.getThirdPartyUserId());
+        bo.setThirdPartyUserType(0); // 0-代表JAVA版，null-代表.NET版本
+        bo.setUserId(req.getUserId());
         bo.setVersion(req.getVersion());
 
         return bo;
@@ -149,17 +148,17 @@ public class PayServiceImpl implements PayService {
     @Override
     public void setPaymentOrderPaid(Payment payment, String traceId) {
         PaymentPo paymentPo = new PaymentPo();
-        paymentPo.setPaymentid(payment.getPaymentid());
-        paymentPo.setInstitutionpaymentid(payment.getInstitutionpaymentid());
-        paymentPo.setPaystatus(payment.getPaystatus());
-        paymentPo.setActualpayprice(payment.getActualpayprice());
-        paymentPo.setActualpaycurrencytype(payment.getActualpaycurrencytype());
-        paymentPo.setBankid(payment.getBankid());
-        paymentPo.setCardtype(payment.getCardtype());
-        paymentPo.setPaytime(payment.getPaytime());
-        paymentPo.setLastupdatedtime(new Date());
-        paymentPo.setExchangerate(payment.getExchangerate());
-        paymentPo.setCheckstatus(payment.getCheckstatus());
+        paymentPo.setPaymentId(payment.getPaymentid());
+        paymentPo.setInstitutionPaymentId(payment.getInstitutionpaymentid());
+        paymentPo.setPayStatus(payment.getPaystatus());
+        paymentPo.setActualPayPrice(payment.getActualpayprice());
+        paymentPo.setActualPayCurrencyType(payment.getActualpaycurrencytype());
+        paymentPo.setBankId(payment.getBankid());
+        paymentPo.setCardType(payment.getCardtype());
+        paymentPo.setPayTime(payment.getPaytime());
+        paymentPo.setLastUpdatedTime(new Date());
+        paymentPo.setExchangeRate(payment.getExchangerate());
+        paymentPo.setCheckStatus(payment.getCheckstatus());
 
         paymentRepository.setPaymentOrderPaid(paymentPo, traceId);
     }
