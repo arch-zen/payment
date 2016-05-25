@@ -16,13 +16,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.constants.AliPayConsts;
-import com.ymatou.payment.domain.channel.constants.PayStatus;
+import com.ymatou.payment.domain.channel.constants.PayStatusEnum;
 import com.ymatou.payment.domain.channel.model.PaymentQueryResp;
 import com.ymatou.payment.domain.channel.service.PaymentQueryService;
 import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
-import com.ymatou.payment.facade.model.CheckPaymentRequset;
 import com.ymatou.payment.integration.model.SingleTradeQueryRequest;
 import com.ymatou.payment.integration.model.SingleTradeQueryResponse;
 import com.ymatou.payment.integration.service.alipay.SingleTradeQueryService;
@@ -49,13 +48,14 @@ public class AliPayPaymentQueryServiceImpl implements PaymentQueryService {
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Override
-    public PaymentQueryResp paymentQuery(CheckPaymentRequset requset) {
-        SingleTradeQueryRequest checkPaymentRequset = generateRequest(requset);
+    public PaymentQueryResp paymentQuery(String paymentId, String payType,
+            HashMap<String, String> header) {
+        SingleTradeQueryRequest checkPaymentRequset = generateRequest(paymentId, payType, header);
 
         try {
             // 调用支付宝单笔交易查询接口
             SingleTradeQueryResponse response =
-                    singleTradeQueryService.doService(checkPaymentRequset, requset.getHeader());
+                    singleTradeQueryService.doService(checkPaymentRequset, header);
 
             if (SingleTradeQueryResponse.SUCCESS.equals(response.getIs_success())) {
                 PaymentQueryResp resp = generateResponse(response);
@@ -63,34 +63,35 @@ public class AliPayPaymentQueryServiceImpl implements PaymentQueryService {
             } else {
                 if ("TRADE_IS_NOT_EXIST".equalsIgnoreCase(response.getError())) {
                     PaymentQueryResp resp = new PaymentQueryResp();
-                    resp.setPayStatus(PayStatus.Failed);
+                    resp.setPayStatus(PayStatusEnum.Failed);
                 }
                 logger.error(
                         "error response from aplipay when check payment status on paymentId {}, error message {}",
-                        requset.getPaymentId(), response.getError());
+                        paymentId, response.getError());
                 throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
-                        "Paymentid:" + requset.getPaymentId());
+                        "Paymentid:" + paymentId);
             }
 
         } catch (Exception e) {
             logger.error("call alipay single trade query failed", e);
             throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
-                    "Paymentid: " + requset.getPaymentId());
+                    "Paymentid: " + paymentId);
         }
     }
 
-    private SingleTradeQueryRequest generateRequest(CheckPaymentRequset req) {
-        InstitutionConfig institutionConfig = institutionConfigManager.getConfig(req.getPayType());
+    private SingleTradeQueryRequest generateRequest(String paymentId, String payType,
+            HashMap<String, String> header) {
+        InstitutionConfig institutionConfig = institutionConfigManager.getConfig(payType);
 
         SingleTradeQueryRequest request = new SingleTradeQueryRequest();
         request.setService("single_trade_query");
         request.setPartner(institutionConfig.getMerchantId());
         request.setSign_type(institutionConfig.getSignType());
-        request.setOut_trade_no(req.getPaymentId());
+        request.setOut_trade_no(paymentId);
         request.setTrade_no("");
         logger.info(institutionConfig.getInstPublicKey());
         String sign = signatureService.signMessage(new ObjectMapper().convertValue(request, HashMap.class),
-                institutionConfig, req.getHeader());
+                institutionConfig, header);
         request.setSign(sign);
 
         return request;
@@ -104,9 +105,9 @@ public class AliPayPaymentQueryServiceImpl implements PaymentQueryService {
         response.setOriginMessage(resp.getResponseOriginString());
         response.setPayerId(resp.getBuyer_email());
         response.setPaymentId(resp.getOut_trade_no());
-        PayStatus payStatus = (AliPayConsts.ALI_TRADE_OK_STATUS.contains(resp.getTrade_status()) ||
+        PayStatusEnum payStatus = (AliPayConsts.ALI_TRADE_OK_STATUS.contains(resp.getTrade_status()) ||
                 AliPayConsts.TRADE_REFUND_SUCCESS.equalsIgnoreCase(resp.getRefund_status()))
-                        ? PayStatus.Paied : PayStatus.Failed;
+                        ? PayStatusEnum.Paied : PayStatusEnum.Failed;
         response.setPayStatus(payStatus);
         response.setPayTime(resp.getGmt_payment());
 

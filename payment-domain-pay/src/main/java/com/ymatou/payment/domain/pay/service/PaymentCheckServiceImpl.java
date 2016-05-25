@@ -110,13 +110,13 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
     private int checkFailed(boolean isFinalCheck, Integer originalCheckStatus) {
         int checkStaus = 0;
         if (isFinalCheck) {
-            checkStaus = -10; // 负数为对账次数
+            checkStaus = CheckStatus.FINAL_CHECK_FAIL_INDEX.getCode(); // 直接设为最大的对账失败次数
             return checkStaus;
         }
 
         if (originalCheckStatus == null) {
-            checkStaus = -1; // 对账次数
-        } else if (originalCheckStatus > -10) { // --最多对10次，避免和-20产生冲突
+            checkStaus = CheckStatus.INIT_CHECK_FAIL_INDEX.getCode(); // 第一次对账失败
+        } else if (originalCheckStatus > CheckStatus.FINAL_CHECK_FAIL_INDEX.getCode()) { // 需要大于最大的对账失败次数
             checkStaus = originalCheckStatus - 1; // 对账次数+1
         }
         return checkStaus;

@@ -19,10 +19,11 @@ import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 
 /**
- * Facade实现方法的AOP. 
+ * Facade实现方法的AOP.
  * 实现与业务无关的通用操作。
  * 1，日志
  * 2，异常处理等
+ * 
  * @author tuwenjie
  *
  */
@@ -30,81 +31,80 @@ import com.ymatou.payment.facade.ErrorCode;
 @Component
 public class FacadeAspect {
 
-	private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(FacadeAspect.class);
+    private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(FacadeAspect.class);
 
-	@Pointcut("execution(* com.ymatou.payment.facade.*Facade.*(*)) && args(req)")
-	public void executAccountFacade(BaseRequest req) {
-	};
+    @Pointcut("execution(* com.ymatou.payment.facade.*Facade.*(*)) && args(req)")
+    public void executAccountFacade(BaseRequest req) {};
 
-	@Around("executAccountFacade(req)")
-	public Object aroundFacadeExecution(ProceedingJoinPoint joinPoint, BaseRequest req)
-			throws InstantiationException, IllegalAccessException {
+    @Around("executAccountFacade(req)")
+    public Object aroundFacadeExecution(ProceedingJoinPoint joinPoint, BaseRequest req)
+            throws InstantiationException, IllegalAccessException {
 
-		Logger logger = DEFAULT_LOGGER;
+        Logger logger = DEFAULT_LOGGER;
 
-		if (req == null) {
-			logger.error("Recv: null");
-			return builErrorResponse(joinPoint, ErrorCode.ILLEGAL_ARGUMENT, "request is null");
-		}
+        if (req == null) {
+            logger.error("Recv: null");
+            return builErrorResponse(joinPoint, ErrorCode.ILLEGAL_ARGUMENT, "request is null");
+        }
 
-		long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
 
-		if (StringUtils.isEmpty(req.getRequestId())) {
-			req.setRequestId(UUID.randomUUID().toString().replaceAll("-", ""));
-		}
+        if (StringUtils.isEmpty(req.getRequestId())) {
+            req.setRequestId(UUID.randomUUID().toString().replaceAll("-", ""));
+        }
 
-		// log日志配有"logPrefix"占位符
-		MDC.put("logPrefix", getRequestFlag(req));
+        // log日志配有"logPrefix"占位符
+        MDC.put("logPrefix", getRequestFlag(req));
 
-		logger.info("Recv:" + req);
+        logger.info("Recv:" + req);
 
-		Object resp = null;
+        Object resp = null;
 
-		try {
+        try {
 
-			req.validate();
+            req.validate();
 
-			resp = joinPoint.proceed(new Object[] { req });
+            resp = joinPoint.proceed(new Object[] {req});
 
-			logger.info("Resp: {}", resp);
+            logger.info("Resp: {}", resp);
 
-		} catch (IllegalArgumentException e) {
-			
-			resp = builErrorResponse(joinPoint, ErrorCode.ILLEGAL_ARGUMENT, e.getLocalizedMessage());
-			logger.error("Invalid request: {}", req, e);
-		} catch (BizException e) {
-			
-			resp = builErrorResponse(joinPoint, e.getErrorCode(),
-					e.getErrorCode().getMessage() + "|" + e.getLocalizedMessage());
-			logger.warn("Failed to execute request: {}, Error:{}", req.getRequestId(),
-					e.getErrorCode() + "|" + e.getErrorCode().getMessage() + "|" + e.getLocalizedMessage());
-		} catch (Throwable e) {
-			
-			resp = builErrorResponse(joinPoint, ErrorCode.UNKNOWN, e.getLocalizedMessage());
-			logger.error("Unknown error in executing request:{}", req, e);
-		} finally {
+        } catch (IllegalArgumentException e) {
 
-			MDC.clear();
-		}
+            resp = builErrorResponse(joinPoint, ErrorCode.ILLEGAL_ARGUMENT, e.getLocalizedMessage());
+            logger.error("Invalid request: {}", req, e);
+        } catch (BizException e) {
 
-		long consumedTime = System.currentTimeMillis() - startTime;
+            resp = builErrorResponse(joinPoint, e.getErrorCode(),
+                    e.getErrorCode().getMessage() + "|" + e.getLocalizedMessage());
+            logger.warn("Failed to execute request: {}, Error:{}", req.getRequestId(),
+                    e.getErrorCode() + "|" + e.getErrorCode().getMessage() + "|" + e.getLocalizedMessage());
+        } catch (Throwable e) {
 
-		logger.info("Finished {}, Consumed:{}ms", getRequestFlag(req), consumedTime);
-		return resp;
-	}
+            resp = builErrorResponse(joinPoint, ErrorCode.UNKNOWN, e.getLocalizedMessage());
+            logger.error("Unknown error in executing request:{}", req, e);
+        } finally {
 
-	private BaseResponse builErrorResponse(ProceedingJoinPoint joinPoint, ErrorCode errorCode, String errorMsg)
-			throws InstantiationException, IllegalAccessException {
+            MDC.clear();
+        }
 
-		MethodSignature ms = (MethodSignature) joinPoint.getSignature();
-		BaseResponse resp = (BaseResponse) ms.getReturnType().newInstance();
-		resp.setErrorCode(errorCode);
-		resp.setErrorMessage(errorMsg);
-		return resp;
+        long consumedTime = System.currentTimeMillis() - startTime;
 
-	}
+        logger.info("Finished {}, Consumed:{}ms", getRequestFlag(req), consumedTime);
+        return resp;
+    }
 
-	private String getRequestFlag(BaseRequest req) {
-		return req.getClass().getSimpleName() + "|" + req.getRequestId();
-	}
+    private BaseResponse builErrorResponse(ProceedingJoinPoint joinPoint, ErrorCode errorCode, String errorMsg)
+            throws InstantiationException, IllegalAccessException {
+
+        MethodSignature ms = (MethodSignature) joinPoint.getSignature();
+        BaseResponse resp = (BaseResponse) ms.getReturnType().newInstance();
+        resp.setErrorCode(errorCode);
+        resp.setErrorMessage(errorMsg);
+        return resp;
+
+    }
+
+    private String getRequestFlag(BaseRequest req) {
+        return req.getClass().getSimpleName() + "|" + req.getRequestId();
+    }
 }

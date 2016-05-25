@@ -3,7 +3,6 @@
  */
 package com.ymatou.payment.facade.impl;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +10,6 @@ import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.refund.service.RefundNotifyService;
 import com.ymatou.payment.facade.BaseResponse;
-import com.ymatou.payment.facade.BizException;
-import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.RefundNotifyFacade;
 import com.ymatou.payment.facade.model.AliPayRefundNotifyRequest;
 
@@ -31,13 +28,13 @@ public class RefundNotifyFacadeImpl implements RefundNotifyFacade {
 
     @Override
     public BaseResponse refundNotify(AliPayRefundNotifyRequest req, String payType) {
-        if (req.getNotify_time() == null || StringUtils.isBlank(req.getNotify_type())
-                || StringUtils.isBlank(req.getNotify_id()) || StringUtils.isBlank(req.getSign_type())
-                || StringUtils.isBlank(req.getSign()) || StringUtils.isBlank(req.getBatch_no())
-                || StringUtils.isBlank(req.getSuccess_num())) {
-            logger.info("request data invalid.");
-            throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "request data invalid.");
-        }
+        // if (req.getNotify_time() == null || StringUtils.isBlank(req.getNotify_type())
+        // || StringUtils.isBlank(req.getNotify_id()) || StringUtils.isBlank(req.getSign_type())
+        // || StringUtils.isBlank(req.getSign()) || StringUtils.isBlank(req.getBatch_no())
+        // || StringUtils.isBlank(req.getSuccess_num())) {
+        // logger.info("request data invalid.");
+        // throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "request data invalid.");
+        // }
 
         refundNotifyService.processRefundCallback(req, payType);
 

@@ -18,8 +18,8 @@ import com.ymatou.payment.domain.refund.constants.ApproveStatusEnum;
 import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
-import com.ymatou.payment.infrastructure.db.model.PpCompensateprocessinfoWithBLOBs;
-import com.ymatou.payment.infrastructure.db.model.RefundrequestPo;
+import com.ymatou.payment.infrastructure.db.model.CompensateProcessInfoPo;
+import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 import com.ymatou.payment.integration.service.ymatou.NotifyRefundService;
 
 /**
@@ -40,36 +40,36 @@ public class ApproveRefundServiceImpl implements ApproveRefundService {
 
     @Override
     public List<String> approveRefund(List<String> paymentIds, String approveUser) {
-        List<RefundrequestPo> refundrequestPos = new ArrayList<>();
-        List<PpCompensateprocessinfoWithBLOBs> compensateprocessinfos = new ArrayList<>();
+        List<RefundRequestPo> refundrequestPos = new ArrayList<>();
+        List<CompensateProcessInfoPo> compensateprocessinfos = new ArrayList<>();
         List<String> requriedNotifyRefundPaymentIds = new ArrayList<>();
         for (String paymentId : paymentIds) {
-            RefundrequestPo refundrequestPo = refundPository.getRefundRequestByPaymentId(paymentId);
+            RefundRequestPo refundrequestPo = refundPository.getRefundRequestByPaymentId(paymentId);
             if (refundrequestPo == null) {
                 throw new BizException(ErrorCode.REFUND_REQUEST_NOT_EXIST, "refund request not exist.");
             }
-            if (refundrequestPo.getApprovestatus() != ApproveStatusEnum.NOT_APPROVED.getCode()) {
+            if (refundrequestPo.getApproveStatus() != ApproveStatusEnum.NOT_APPROVED.getCode()) {
                 logger.info("RefundRequest ApproveStaus expected 0, but {}. PaymentId: {}",
-                        refundrequestPo.getApprovestatus(), paymentId);
+                        refundrequestPo.getApproveStatus(), paymentId);
                 continue;
             }
 
             requriedNotifyRefundPaymentIds.add(paymentId); // 需要通知退款的
 
             // 组装更新RefundRequest
-            refundrequestPo.setApprovestatus(ApproveStatusEnum.APPROVED.getCode());
-            refundrequestPo.setApprovedtime(new Date());
-            refundrequestPo.setApproveduser(approveUser);
+            refundrequestPo.setApproveStatus(ApproveStatusEnum.APPROVED.getCode());
+            refundrequestPo.setApprovedTime(new Date());
+            refundrequestPo.setApprovedUser(approveUser);
             refundrequestPos.add(refundrequestPo);
 
             // 组装新增PpCompensateprocessinfo
-            PpCompensateprocessinfoWithBLOBs compensateprocessinfo = new PpCompensateprocessinfoWithBLOBs();
-            compensateprocessinfo.setAppid("1");
-            compensateprocessinfo.setCorrelateid(paymentId);
-            compensateprocessinfo.setMethodname("Refund");
-            compensateprocessinfo.setRequesturl("");
-            compensateprocessinfo.setRequestdata(paymentId);
-            compensateprocessinfo.setCompensatetype(1); // 退款
+            CompensateProcessInfoPo compensateprocessinfo = new CompensateProcessInfoPo();
+            compensateprocessinfo.setAppId("1");
+            compensateprocessinfo.setCorrelateId(paymentId);
+            compensateprocessinfo.setMethodName("Refund");
+            compensateprocessinfo.setRequestUrl("");
+            compensateprocessinfo.setRequestData(paymentId);
+            compensateprocessinfo.setCompensateType(1); // 退款
             compensateprocessinfos.add(compensateprocessinfo);
         }
 

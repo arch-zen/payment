@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import com.ymatou.payment.facade.PrintFriendliness;
-import com.ymatou.payment.infrastructure.db.model.BussinessorderPo;
+import com.ymatou.payment.infrastructure.db.model.BussinessOrderPo;
 
 /**
  * 商户订单模型
@@ -650,37 +650,37 @@ public class BussinessOrder extends PrintFriendliness {
         return sb.toString();
     }
 
-    public static BussinessOrder convertFromPo(BussinessorderPo po) {
+    public static BussinessOrder convertFromPo(BussinessOrderPo po) {
         BussinessOrder model = new BussinessOrder();
-        model.setBussinessorderid(po.getBussinessorderid());
-        model.setAppid(po.getAppid());
-        model.setOriginappid(po.getOriginappid());
-        model.setOrderid(po.getOrderid());
-        model.setPaytype(po.getPaytype());
-        model.setOrderprice(po.getOrderprice());
-        model.setCurrencytype(po.getCurrencytype());
-        model.setUserid(po.getUserid());
+        model.setBussinessorderid(po.getBussinessOrderId());
+        model.setAppid(po.getAppId());
+        model.setOriginappid(po.getOriginAppId());
+        model.setOrderid(po.getOrderId());
+        model.setPaytype(po.getPayType());
+        model.setOrderprice(po.getOrderPrice());
+        model.setCurrencytype(po.getCurrencyType());
+        model.setUserid(po.getUserId());
         model.setVersion(po.getVersion());
-        model.setTraceid(po.getTraceid());
-        model.setOrdertime(po.getOrdertime());
-        model.setThirdpartyuserid(po.getThirdpartyuserid());
-        model.setThirdpartyusertype(po.getThirdpartyusertype());
-        model.setClientip(po.getClientip());
-        model.setCallbackurl(po.getCallbackurl());
-        model.setNotifyurl(po.getNotifyurl());
-        model.setProductname(po.getProductname());
-        model.setProductdesc(po.getProductdesc());
-        model.setProducturl(po.getProducturl());
-        model.setCodepage(po.getCodepage());
+        model.setTraceid(po.getTraceId());
+        model.setOrdertime(po.getOrderTime());
+        model.setThirdpartyuserid(po.getThirdPartyUserId());
+        model.setThirdpartyusertype(po.getThirdPartyUserType());
+        model.setClientip(po.getClientIp());
+        model.setCallbackurl(po.getCallbackUrl());
+        model.setNotifyurl(po.getNotifyUrl());
+        model.setProductname(po.getProductName());
+        model.setProductdesc(po.getProductDesc());
+        model.setProducturl(po.getProductUrl());
+        model.setCodepage(po.getCodePage());
         model.setExt(po.getExt());
         model.setMemo(po.getMemo());
-        model.setSignmethod(po.getSignmethod());
-        model.setBizcode(po.getBizcode());
-        model.setCreatedtime(po.getCreatedtime());
-        model.setLastupdatedtime(po.getLastupdatedtime());
-        model.setOrderstatus(po.getOrderstatus());
-        model.setNotifystatus(po.getNotifystatus());
-        model.setNotifytime(po.getNotifytime());
+        model.setSignmethod(po.getSignMethod());
+        model.setBizcode(po.getBizCode());
+        model.setCreatedtime(po.getCreatedTime());
+        model.setLastupdatedtime(po.getLastUpdatedTime());
+        model.setOrderstatus(po.getOrderStatus());
+        model.setNotifystatus(po.getNotifyStatus());
+        model.setNotifytime(po.getNotifyTime());
 
         return model;
     }

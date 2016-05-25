@@ -42,9 +42,9 @@ public class CheckPaymentResourceImpl implements CheckPaymentResource {
 
         BaseResponse response = checkPaymentFacade.checkPayment(req);
         if (response.getIsSuccess()) {
-            return "OK";
+            return "ok";
         } else {
-            return "FAIL";
+            return "failed";
         }
     }
 
