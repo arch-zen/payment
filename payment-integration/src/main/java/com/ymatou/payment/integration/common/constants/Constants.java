@@ -14,4 +14,6 @@ public class Constants {
     public static final Integer DEFAULT_MAX_PER_ROUTE = 10;
     public static final Integer MAX_TOTAL = 30;
     public static final Long CONN_MANAGER_TIMEOUT = 500L;
+
+    public static final String MOCK = "1"; // http header (mock=1)
 }

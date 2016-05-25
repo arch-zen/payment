@@ -6,7 +6,7 @@ package com.ymatou.payment.domain.channel.model;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import com.ymatou.payment.domain.channel.constants.PayStatus;
+import com.ymatou.payment.domain.channel.constants.PayStatusEnum;
 
 /**
  * 第三方交易查询结果
@@ -24,7 +24,7 @@ public class PaymentQueryResp {
     private String BankId;
     private String OriginMessage;
     private Date PayTime;
-    private PayStatus PayStatus;
+    private PayStatusEnum PayStatus;
     private String TraceId;
 
     public String getPaymentId() {
@@ -99,11 +99,11 @@ public class PaymentQueryResp {
         PayTime = payTime;
     }
 
-    public PayStatus getPayStatus() {
+    public PayStatusEnum getPayStatus() {
         return PayStatus;
     }
 
-    public void setPayStatus(PayStatus payStatus) {
+    public void setPayStatus(PayStatusEnum payStatus) {
         PayStatus = payStatus;
     }
 

@@ -17,7 +17,7 @@ import com.ymatou.payment.domain.refund.constants.RefundConstants;
 import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.model.QueryRefundDetail;
 import com.ymatou.payment.facade.model.QueryRefundRequest;
-import com.ymatou.payment.infrastructure.db.model.RefundrequestPo;
+import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 
 /**
  * 
@@ -47,7 +47,7 @@ public class QueryRefundServiceImpl implements QueryRefundService {
         query.put("refundStatus", refundStatusQuery);
         logger.info("query refundRequest options: {}", query.toString());
 
-        List<RefundrequestPo> refundrequestPos = refundPository.queryRefundRequest(query);
+        List<RefundRequestPo> refundrequestPos = refundPository.queryRefundRequest(query);
         logger.info("query refundRequest result count: {}", String.valueOf(refundrequestPos.size()));
 
         return generateRefundDetail(refundrequestPos);
@@ -73,30 +73,30 @@ public class QueryRefundServiceImpl implements QueryRefundService {
      * @param refundrequestPos
      * @return
      */
-    private List<QueryRefundDetail> generateRefundDetail(List<RefundrequestPo> refundrequestPos) {
+    private List<QueryRefundDetail> generateRefundDetail(List<RefundRequestPo> refundrequestPos) {
         List<QueryRefundDetail> queryRefundDetails = new ArrayList<>(refundrequestPos.size());
 
         int index = 0;
-        for (RefundrequestPo rq : refundrequestPos) {
+        for (RefundRequestPo rq : refundrequestPos) {
             logger.info("RefundRequestPos[{}]: {}", index++, rq);
             QueryRefundDetail detail = new QueryRefundDetail();
-            detail.setTradeNo(rq.getTradeno());
-            detail.setOrderId(rq.getOrderid());
-            detail.setAppId(rq.getAppid());
-            detail.setPayType(rq.getPaytype());
-            detail.setRefundAmount(rq.getRefundamount());
-            detail.setCurrencyType(rq.getCurrencytype());
-            detail.setApproveStatus(rq.getApprovestatus());
-            detail.setApprovedTime(rq.getApprovedtime());
-            detail.setCreatedTime(rq.getCreatedtime());
-            detail.setApprovedUser(rq.getApproveduser());
-            detail.setRefundStatus(rq.getRefundstatus());
-            detail.setRefundTime(rq.getRefundtime());
-            detail.setRefundBatchNo(rq.getRefundbatchno());
-            detail.setPaymentId(rq.getPaymentid());
+            detail.setTradeNo(rq.getTradeNo());
+            detail.setOrderId(rq.getOrderId());
+            detail.setAppId(rq.getAppId());
+            detail.setPayType(rq.getPayType());
+            detail.setRefundAmount(rq.getRefundAmount());
+            detail.setCurrencyType(rq.getCurrencyType());
+            detail.setApproveStatus(rq.getApproveStatus());
+            detail.setApprovedTime(rq.getApprovedTime());
+            detail.setCreatedTime(rq.getCreatedTime());
+            detail.setApprovedUser(rq.getApprovedUser());
+            detail.setRefundStatus(rq.getRefundStatus());
+            detail.setRefundTime(rq.getRefundTime());
+            detail.setRefundBatchNo(rq.getRefundBatchNo());
+            detail.setPaymentId(rq.getPaymentId());
             detail.setPayChannel(Integer.valueOf(
-                    refundPository.convertPayTypeToPayChannel(rq.getPaytype())));
-            detail.setTradeType(rq.getTradetype());
+                    refundPository.convertPayTypeToPayChannel(rq.getPayType())));
+            detail.setTradeType(rq.getTradeType());
 
             queryRefundDetails.add(detail);
         }

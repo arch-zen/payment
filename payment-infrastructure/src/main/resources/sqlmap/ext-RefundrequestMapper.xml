@@ -3,35 +3,31 @@
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ext-refundrequest">
 
-	<resultMap id="BaseResultMap" type="com.ymatou.payment.infrastructure.db.model.RefundrequestPo">
-		<id column="PaymentId" property="paymentid" jdbcType="VARCHAR" />
-		<result column="TradeNo" property="tradeno" jdbcType="VARCHAR" />
-		<result column="OrderId" property="orderid" jdbcType="VARCHAR" />
-		<result column="TraceId" property="traceid" jdbcType="VARCHAR" />
-		<result column="AppId" property="appid" jdbcType="VARCHAR" />
-		<result column="PayType" property="paytype" jdbcType="VARCHAR" />
-		<result column="RefundAmount" property="refundamount" jdbcType="DECIMAL" />
-		<result column="CurrencyType" property="currencytype" jdbcType="VARCHAR" />
-		<result column="ApproveStatus" property="approvestatus" jdbcType="INTEGER" />
-		<result column="ApprovedTime" property="approvedtime" jdbcType="TIMESTAMP" />
-		<result column="SoftDeleteFlag" property="softdeleteflag" jdbcType="BIT" />
-		<result column="CreatedTime" property="createdtime" jdbcType="TIMESTAMP" />
-		<result column="ApprovedUser" property="approveduser" jdbcType="VARCHAR" />
-		<result column="RefundStatus" property="refundstatus" jdbcType="INTEGER" />
-		<result column="RefundTime" property="refundtime" jdbcType="TIMESTAMP" />
-		<result column="RefundBatchNo" property="refundbatchno" jdbcType="VARCHAR" />
-		<result column="InstPaymentId" property="instpaymentid" jdbcType="VARCHAR" />
-		<result column="TradeType" property="tradetype" jdbcType="INTEGER" />
+	<resultMap id="BaseResultMap" type="com.ymatou.payment.infrastructure.db.model.RefundRequestPo" >
+	    <id column="PaymentId" property="paymentId" jdbcType="VARCHAR" />
+	    <result column="TradeNo" property="tradeNo" jdbcType="VARCHAR" />
+	    <result column="OrderId" property="orderId" jdbcType="VARCHAR" />
+	    <result column="TraceId" property="traceId" jdbcType="VARCHAR" />
+	    <result column="AppId" property="appId" jdbcType="VARCHAR" />
+	    <result column="PayType" property="payType" jdbcType="VARCHAR" />
+	    <result column="RefundAmount" property="refundAmount" jdbcType="DECIMAL" />
+	    <result column="CurrencyType" property="currencyType" jdbcType="VARCHAR" />
+	    <result column="ApproveStatus" property="approveStatus" jdbcType="INTEGER" />
+	    <result column="ApprovedTime" property="approvedTime" jdbcType="TIMESTAMP" />
+	    <result column="SoftDeleteFlag" property="softDeleteFlag" jdbcType="BIT" />
+	    <result column="CreatedTime" property="createdTime" jdbcType="TIMESTAMP" />
+	    <result column="ApprovedUser" property="approvedUser" jdbcType="VARCHAR" />
+	    <result column="RefundStatus" property="refundStatus" jdbcType="INTEGER" />
+	    <result column="RefundTime" property="refundTime" jdbcType="TIMESTAMP" />
+	    <result column="RefundBatchNo" property="refundBatchNo" jdbcType="VARCHAR" />
+	    <result column="InstPaymentId" property="instPaymentId" jdbcType="VARCHAR" />
+	    <result column="TradeType" property="tradeType" jdbcType="INTEGER" />
 	</resultMap>
 	
-	<sql id="Base_Column_List">
-		PaymentId, TradeNo, OrderId, TraceId, AppId, PayType, RefundAmount,
-		CurrencyType,
-		ApproveStatus, ApprovedTime, SoftDeleteFlag, CreatedTime,
-		ApprovedUser,
-		RefundStatus,
-		RefundTime, RefundBatchNo, InstPaymentId,
-		TradeType
+	<sql id="Base_Column_List" >
+	    PaymentId, TradeNo, OrderId, TraceId, AppId, PayType, RefundAmount, CurrencyType, 
+	    ApproveStatus, ApprovedTime, SoftDeleteFlag, CreatedTime, ApprovedUser, RefundStatus, 
+	    RefundTime, RefundBatchNo, InstPaymentId, TradeType
 	</sql>
 	
 	<select id="selectRefundrequestByPage" resultMap="BaseResultMap"

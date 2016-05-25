@@ -5,8 +5,6 @@
  */
 package com.ymatou.payment.facade.impl;
 
-import java.sql.Date;
-
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -27,8 +25,8 @@ import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.PaymentNotifyFacade;
 import com.ymatou.payment.facade.model.PaymentNotifyRequest;
 import com.ymatou.payment.facade.model.PaymentNotifyType;
-import com.ymatou.payment.infrastructure.db.mapper.AlipaynotifylogMapper;
-import com.ymatou.payment.infrastructure.db.model.AlipaynotifylogPo;
+import com.ymatou.payment.infrastructure.db.mapper.AlipayNotifyLogMapper;
+import com.ymatou.payment.infrastructure.db.model.AlipayNotifyLogPo;
 import com.ymatou.payment.integration.service.ymatou.NotifyPaymentService;
 
 /**
@@ -49,7 +47,7 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
     InstitutionConfigManager institutionConfigManager;
 
     @Resource
-    AlipaynotifylogMapper alipaynotifylogMapper;
+    AlipayNotifyLogMapper alipayNotifyLogMapper;
 
     @Resource
     PayService payService;
@@ -76,10 +74,10 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
         Payment payment = null;
         if (notifyMessage.getPayStatus() == PayStatus.Paied) {
             // 添加日志
-            AlipaynotifylogPo notifyLog = new AlipaynotifylogPo();
-            notifyLog.setBizno(notifyMessage.getPaymentId());
-            notifyLog.setSparameters(req.getRawString());
-            alipaynotifylogMapper.insertSelective(notifyLog);
+            AlipayNotifyLogPo notifyLog = new AlipayNotifyLogPo();
+            notifyLog.setBizNo(notifyMessage.getPaymentId());
+            notifyLog.setsParameters(req.getRawString());
+            alipayNotifyLogMapper.insertSelective(notifyLog);
 
             // 校验支付单Id
             payment = payService.getPaymentByPaymentId(notifyMessage.getPaymentId());

@@ -26,8 +26,7 @@ import com.ymatou.payment.facade.model.AcquireRefundDetail;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
 import com.ymatou.payment.facade.model.TradeDetail;
 import com.ymatou.payment.facade.model.TradeRefundDetail;
-import com.ymatou.payment.infrastructure.db.model.RefundrequestPo;
-import com.ymatou.payment.infrastructure.db.model.RefundrequestWithBLOBs;
+import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 
 /**
  * 
@@ -102,12 +101,12 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
     public List<AcquireRefundDetail> checkAndSaveRefundRequest(List<TradeRefundDetail> tradeRefundDetails,
             AcquireRefundRequest req) {
         List<AcquireRefundDetail> acquireRefundDetails = new ArrayList<>();
-        List<RefundrequestWithBLOBs> refundrequestWithBLOBs = new ArrayList<>();
+        List<RefundRequestPo> refundrequestWithBLOBs = new ArrayList<>();
 
         logger.info("generate RefundRequest list");
         for (TradeRefundDetail tradeRefundDetail : tradeRefundDetails) {
             // 根据paymentId查找RefundRequest
-            RefundrequestPo refundrequestPo =
+            RefundRequestPo refundrequestPo =
                     refundPository.getRefundRequestByPaymentId(tradeRefundDetail.getPaymentId());
 
             // 组装AcquireRefundDetail，可被退款的交易(接口的返回参数)
@@ -117,19 +116,19 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
             acquireRefundDetails.add(acquireRefundDetail);
 
             if (refundrequestPo == null) { // 若不存在RefundRequest，则插入
-                RefundrequestWithBLOBs refundrequest = new RefundrequestWithBLOBs();
-                refundrequest.setPaymentid(tradeRefundDetail.getPaymentId());
-                refundrequest.setTradeno(tradeRefundDetail.getTradeNo());
-                refundrequest.setOrderid(req.getOrderId());
-                refundrequest.setTraceid(req.getTraceId());
-                refundrequest.setAppid(req.getAppId());
-                refundrequest.setPaytype(tradeRefundDetail.getPayType());
-                refundrequest.setRefundamount(tradeRefundDetail.getPayAmount());
-                refundrequest.setCurrencytype(tradeRefundDetail.getCurrencyType());
-                refundrequest.setRefundstatus(RefundStatusEnum.INIT.getCode());
+                RefundRequestPo refundrequest = new RefundRequestPo();
+                refundrequest.setPaymentId(tradeRefundDetail.getPaymentId());
+                refundrequest.setTradeNo(tradeRefundDetail.getTradeNo());
+                refundrequest.setOrderId(req.getOrderId());
+                refundrequest.setTraceId(req.getTraceId());
+                refundrequest.setAppId(req.getAppId());
+                refundrequest.setPayType(tradeRefundDetail.getPayType());
+                refundrequest.setRefundAmount(tradeRefundDetail.getPayAmount());
+                refundrequest.setCurrencyType(tradeRefundDetail.getCurrencyType());
+                refundrequest.setRefundStatus(RefundStatusEnum.INIT.getCode());
                 for (TradeDetail tradeDetail : req.getTradeDetails()) {
                     if (tradeDetail.getTradeNo().equals(tradeRefundDetail.getTradeNo())) {
-                        refundrequest.setTradetype(tradeDetail.getTradeType());
+                        refundrequest.setTradeType(tradeDetail.getTradeType());
                         break;
                     }
                 }

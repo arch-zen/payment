@@ -10,8 +10,9 @@ package com.ymatou.payment.domain.pay.model;
  *
  */
 public enum CheckStatus {
-    SUCCESS(1), REPAIR_SUCCESS(2), THIRD_PART_NOT_PAID(15), AMOUNT_NOT_MATCH(-15);
-
+    SUCCESS(1), REPAIR_SUCCESS(2), THIRD_PART_NOT_PAID(-20), AMOUNT_NOT_MATCH(-15), FINAL_CHECK_FAIL_INDEX(
+            -10), INIT_CHECK_FAIL_INDEX(-1);
+    // -1到-10表示对账失败的次数
     private int code;
 
     private CheckStatus(int code) {

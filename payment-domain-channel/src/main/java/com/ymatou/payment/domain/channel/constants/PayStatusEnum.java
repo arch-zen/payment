@@ -11,7 +11,7 @@ package com.ymatou.payment.domain.channel.constants;
  * @author wangxudong 2016年5月10日 下午6:36:21
  *
  */
-public enum PayStatus {
+public enum PayStatusEnum {
     Init(0, "初始化"),
 
     Paied(1, "已支付"),
@@ -23,7 +23,7 @@ public enum PayStatus {
     private int index;
     private String name;
 
-    private PayStatus(int index, String name) {
+    private PayStatusEnum(int index, String name) {
         this.index = index;
         this.name = name;
     }

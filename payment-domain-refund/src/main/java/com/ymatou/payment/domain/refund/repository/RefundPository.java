@@ -12,19 +12,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ymatou.payment.domain.channel.constants.ChannelTypeEnum;
+import com.ymatou.payment.domain.channel.model.enums.PayTypeEnum;
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.refund.constants.ApproveStatusEnum;
 import com.ymatou.payment.domain.refund.constants.RefundStatusEnum;
 import com.ymatou.payment.domain.refund.model.Refund;
-import com.ymatou.payment.infrastructure.db.mapper.CompensateprocessinfoMapper;
-import com.ymatou.payment.infrastructure.db.mapper.RefundmiscrequestlogMapper;
-import com.ymatou.payment.infrastructure.db.mapper.RefundrequestMapper;
-import com.ymatou.payment.infrastructure.db.model.PpCompensateprocessinfoWithBLOBs;
-import com.ymatou.payment.infrastructure.db.model.RefundmiscrequestlogWithBLOBs;
-import com.ymatou.payment.infrastructure.db.model.RefundrequestExample;
-import com.ymatou.payment.infrastructure.db.model.RefundrequestPo;
-import com.ymatou.payment.infrastructure.db.model.RefundrequestWithBLOBs;
+import com.ymatou.payment.infrastructure.db.mapper.CompensateProcessInfoMapper;
+import com.ymatou.payment.infrastructure.db.mapper.RefundMiscRequestLogMapper;
+import com.ymatou.payment.infrastructure.db.mapper.RefundRequestMapper;
+import com.ymatou.payment.infrastructure.db.model.CompensateProcessInfoPo;
+import com.ymatou.payment.infrastructure.db.model.RefundMiscRequestLogWithBLOBs;
+import com.ymatou.payment.infrastructure.db.model.RefundRequestExample;
+import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 
 /**
  * 
@@ -35,13 +36,13 @@ import com.ymatou.payment.infrastructure.db.model.RefundrequestWithBLOBs;
 public class RefundPository {
 
     @Autowired
-    private CompensateprocessinfoMapper compensateprocessinfoMapper;
+    private CompensateProcessInfoMapper compensateProcessInfoMapper;
 
     @Autowired
-    private RefundrequestMapper refundrequestMapper;
+    private RefundRequestMapper refundRequestMapper;
 
     @Autowired
-    private RefundmiscrequestlogMapper refundmiscrequestlogMapper;
+    private RefundMiscRequestLogMapper refundMiscRequestLogMapper;
 
     @Autowired
     private SqlSession sqlSession;
@@ -49,34 +50,34 @@ public class RefundPository {
     @Transactional
     public void addRefundrequestAndCompensateprocessinfo(Payment payment, BussinessOrder bussinessorder,
             Refund refundInfo) {
-        RefundrequestWithBLOBs refundrequest = new RefundrequestWithBLOBs();
-        refundrequest.setPaymentid(payment.getPaymentid());
-        refundrequest.setTradeno(bussinessorder.getOrderid());
-        refundrequest.setOrderid(refundInfo.getOrderIdList().get(0));
-        refundrequest.setTraceid(refundInfo.getTraceId());
-        refundrequest.setAppid(refundInfo.getAppId());
-        refundrequest.setPaytype(payment.getPaytype());
-        refundrequest.setRefundamount(payment.getPayprice());
-        refundrequest.setCurrencytype(payment.getPaycurrencytype());
-        refundrequest.setApprovestatus(ApproveStatusEnum.FAST_REFUND.getCode());
-        refundrequest.setApprovedtime(new Date());
-        refundrequest.setApproveduser("system");
-        refundrequest.setRefundstatus(RefundStatusEnum.INIT.getCode());
-        refundrequest.setTradetype(refundInfo.getTradeType());
+        RefundRequestPo refundrequest = new RefundRequestPo();
+        refundrequest.setPaymentId(payment.getPaymentid());
+        refundrequest.setTradeNo(bussinessorder.getOrderid());
+        refundrequest.setOrderId(refundInfo.getOrderIdList().get(0));
+        refundrequest.setTraceId(refundInfo.getTraceId());
+        refundrequest.setAppId(refundInfo.getAppId());
+        refundrequest.setPayType(payment.getPaytype());
+        refundrequest.setRefundAmount(payment.getPayprice());
+        refundrequest.setCurrencyType(payment.getPaycurrencytype());
+        refundrequest.setApproveStatus(ApproveStatusEnum.FAST_REFUND.getCode());
+        refundrequest.setApprovedTime(new Date());
+        refundrequest.setApprovedUser("system");
+        refundrequest.setRefundStatus(RefundStatusEnum.INIT.getCode());
+        refundrequest.setTradeType(refundInfo.getTradeType());
 
-        PpCompensateprocessinfoWithBLOBs compensateprocessinfo = new PpCompensateprocessinfoWithBLOBs();
-        compensateprocessinfo.setCorrelateid(payment.getPaymentid());
-        compensateprocessinfo.setAppid(refundInfo.getAppId());
-        compensateprocessinfo.setPaytype(null);
-        compensateprocessinfo.setMethodname("Refund");
-        compensateprocessinfo.setRequesturl("");
-        compensateprocessinfo.setRequestdata(payment.getPaymentid());
-        compensateprocessinfo.setProcessmachinename(null);
-        compensateprocessinfo.setLastprocessedtime(null);
-        compensateprocessinfo.setCompensatetype(1); // 退款
+        CompensateProcessInfoPo compensateprocessinfo = new CompensateProcessInfoPo();
+        compensateprocessinfo.setCorrelateId(payment.getPaymentid());
+        compensateprocessinfo.setAppId(refundInfo.getAppId());
+        compensateprocessinfo.setPayType(null);
+        compensateprocessinfo.setMethodName("Refund");
+        compensateprocessinfo.setRequestUrl("");
+        compensateprocessinfo.setRequestData(payment.getPaymentid());
+        compensateprocessinfo.setProcessMachineName(null);
+        compensateprocessinfo.setLastProcessedTime(null);
+        compensateprocessinfo.setCompensateType(1); // 退款
 
-        compensateprocessinfoMapper.insertSelective(compensateprocessinfo);
-        refundrequestMapper.insertSelective(refundrequest);
+        compensateProcessInfoMapper.insertSelective(compensateprocessinfo);
+        refundRequestMapper.insertSelective(refundrequest);
     }
 
     /**
@@ -85,14 +86,8 @@ public class RefundPository {
      * @param paymentId
      * @return
      */
-    public RefundrequestPo getRefundRequestByPaymentId(String paymentId) {
-        RefundrequestExample example = new RefundrequestExample();
-        example.createCriteria().andPaymentidEqualTo(paymentId);
-        List<RefundrequestPo> pos = refundrequestMapper.selectByExample(example);
-        if (pos == null || pos.size() == 0) {
-            return null;
-        }
-        return pos.get(0);
+    public RefundRequestPo getRefundRequestByPaymentId(String paymentId) {
+        return refundRequestMapper.selectByPrimaryKey(paymentId);
     }
 
     /**
@@ -101,9 +96,9 @@ public class RefundPository {
      * @param refundrequestWithBLOBs
      */
     @Transactional
-    public void batchSaveRefundRequest(List<RefundrequestWithBLOBs> refundrequestWithBLOBs) {
-        for (RefundrequestWithBLOBs refundrequest : refundrequestWithBLOBs) {
-            refundrequestMapper.insertSelective(refundrequest);
+    public void batchSaveRefundRequest(List<RefundRequestPo> refundrequestWithBLOBs) {
+        for (RefundRequestPo refundrequest : refundrequestWithBLOBs) {
+            refundRequestMapper.insertSelective(refundrequest);
         }
     }
 
@@ -114,15 +109,15 @@ public class RefundPository {
      * @param compensateprocessinfoWithBLOBs
      */
     @Transactional
-    public void updateRefundRequestAndSaveCompensateprocessinfo(List<RefundrequestPo> refundrequestPos,
-            List<PpCompensateprocessinfoWithBLOBs> compensateprocessinfoWithBLOBs) {
-        for (RefundrequestPo refundrequestPo : refundrequestPos) {
-            RefundrequestExample example = new RefundrequestExample();
-            example.createCriteria().andPaymentidEqualTo(refundrequestPo.getPaymentid());
-            refundrequestMapper.updateByExample(refundrequestPo, example);
+    public void updateRefundRequestAndSaveCompensateprocessinfo(List<RefundRequestPo> refundrequestPos,
+            List<CompensateProcessInfoPo> compensateprocessinfoWithBLOBs) {
+        for (RefundRequestPo refundrequestPo : refundrequestPos) {
+            RefundRequestExample example = new RefundRequestExample();
+            example.createCriteria().andPaymentIdEqualTo(refundrequestPo.getPaymentId());
+            refundRequestMapper.updateByExample(refundrequestPo, example);
         }
-        for (PpCompensateprocessinfoWithBLOBs info : compensateprocessinfoWithBLOBs) {
-            compensateprocessinfoMapper.insertSelective(info);
+        for (CompensateProcessInfoPo info : compensateprocessinfoWithBLOBs) {
+            compensateProcessInfoMapper.insertSelective(info);
         }
     }
 
@@ -132,18 +127,16 @@ public class RefundPository {
      * @param query
      * @return
      */
-    public List<RefundrequestPo> queryRefundRequest(HashMap<String, Object> query) {
+    public List<RefundRequestPo> queryRefundRequest(HashMap<String, Object> query) {
         return sqlSession.selectList("ext-refundrequest.selectRefundrequestByPage", query);
     }
 
     public String convertPayTypeToPayChannel(String payType) {
-        switch (payType) {
-            case "14":
-            case "15":
-            case "16":
-                return "2";
-            default:
-                return "1";
+
+        if (payType.equals(PayTypeEnum.AliPayApp.getCode()) || payType.equals(PayTypeEnum.AliPayPc.getCode())) {
+            return ChannelTypeEnum.AliPay.getCode();
+        } else {
+            return ChannelTypeEnum.WeiXinPay.getCode();
         }
     }
 
@@ -153,10 +146,10 @@ public class RefundPository {
      * @param batchNo
      * @return
      */
-    public List<RefundrequestPo> queryRefundRequestByRefundBatchNo(String batchNo) {
-        RefundrequestExample example = new RefundrequestExample();
-        example.createCriteria().andRefundbatchnoEqualTo(batchNo);
-        List<RefundrequestPo> pos = refundrequestMapper.selectByExample(example);
+    public List<RefundRequestPo> queryRefundRequestByRefundBatchNo(String batchNo) {
+        RefundRequestExample example = new RefundRequestExample();
+        example.createCriteria().andRefundBatchNoEqualTo(batchNo);
+        List<RefundRequestPo> pos = refundRequestMapper.selectByExample(example);
 
         return pos;
     }
@@ -167,9 +160,9 @@ public class RefundPository {
      * @param list
      */
     @Transactional
-    public void batchSaveRefundmiscrequestlog(List<RefundmiscrequestlogWithBLOBs> list) {
-        for (RefundmiscrequestlogWithBLOBs refundmiscrequestlog : list) {
-            refundmiscrequestlogMapper.insertSelective(refundmiscrequestlog);
+    public void batchSaveRefundmiscrequestlog(List<RefundMiscRequestLogWithBLOBs> list) {
+        for (RefundMiscRequestLogWithBLOBs refundmiscrequestlog : list) {
+            refundMiscRequestLogMapper.insertSelective(refundmiscrequestlog);
         }
     }
 }

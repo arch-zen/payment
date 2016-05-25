@@ -22,9 +22,9 @@ import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.facade.impl.rest.PaymentNotifyResource;
-import com.ymatou.payment.infrastructure.db.mapper.AlipaynotifylogMapper;
-import com.ymatou.payment.infrastructure.db.model.AlipaynotifylogExample;
-import com.ymatou.payment.infrastructure.db.model.AlipaynotifylogPo;
+import com.ymatou.payment.infrastructure.db.mapper.AlipayNotifyLogMapper;
+import com.ymatou.payment.infrastructure.db.model.AlipayNotifyLogExample;
+import com.ymatou.payment.infrastructure.db.model.AlipayNotifyLogPo;
 import com.ymatou.payment.infrastructure.util.HttpUtil;
 import com.ymatou.payment.test.RestBaseTest;
 
@@ -46,7 +46,7 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
     private InstitutionConfigManager institutionConfigManager;
 
     @Resource
-    private AlipaynotifylogMapper alipaynotifylogMapper;
+    private AlipayNotifyLogMapper alipaynotifylogMapper;
 
     @Test
     public void testAliPayPCNotify() throws UnsupportedEncodingException {
@@ -60,8 +60,8 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
                 "discount=0.00&payment_type=1&subject=yeyingcao%E7%9A%84%E8%AE%A2%E5%8D%95&trade_no=2016051921001004250269230618&buyer_email=yeyingcao88%40163.com&gmt_create=2016-05-19+12%3A56%3A41&notify_type=trade_status_sync&quantity=1&out_trade_no=21916168000593994&seller_id=2088701734809577&notify_time=2016-05-19+12%3A56%3A47&trade_status=TRADE_SUCCESS&is_total_fee_adjust=N&total_fee=387.00&gmt_payment=2016-05-19+12%3A56%3A47&seller_email=ap.ymt%40ymatou.com&price=387.00&buyer_id=2088002495313254&notify_id=39a92c986d7097b332939697525f793hxi&use_coupon=N&sign_type=MD5&sign=c40ed3acbe82c45cfabf70b0157e6ccf";
 
         // 删除旧数据
-        AlipaynotifylogExample example = new AlipaynotifylogExample();
-        example.createCriteria().andBiznoEqualTo(paymentId);
+        AlipayNotifyLogExample example = new AlipayNotifyLogExample();
+        example.createCriteria().andBizNoEqualTo(paymentId);
         alipaynotifylogMapper.deleteByExample(example);
 
         servletRequest.setContent(reqBody.getBytes("utf-8"));
@@ -69,7 +69,7 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
 
         assertEquals("验证返回值", "failed", response);
 
-        List<AlipaynotifylogPo> poList = alipaynotifylogMapper.selectByExample(example);
+        List<AlipayNotifyLogPo> poList = alipaynotifylogMapper.selectByExample(example);
 
         assertEquals("验证报文插入表中", 1, poList.size());
     }
@@ -80,8 +80,8 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
         String paymentId = "21923050800942763";
 
         // 删除旧数据
-        AlipaynotifylogExample example = new AlipaynotifylogExample();
-        example.createCriteria().andBiznoEqualTo(paymentId);
+        AlipayNotifyLogExample example = new AlipayNotifyLogExample();
+        example.createCriteria().andBizNoEqualTo(paymentId);
         alipaynotifylogMapper.deleteByExample(example);
 
         MockHttpServletRequest servletRequest = new MockHttpServletRequest();
@@ -95,7 +95,7 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
 
         assertEquals("验证返回值", 500, response.getStatus());
 
-        List<AlipaynotifylogPo> poList = alipaynotifylogMapper.selectByExample(example);
+        List<AlipayNotifyLogPo> poList = alipaynotifylogMapper.selectByExample(example);
 
         assertEquals("验证报文插入表中", 1, poList.size());
     }
@@ -125,8 +125,8 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
                 "discount=0.00&payment_type=1&subject=dayday_jie%E7%9A%84%E8%AE%A2%E5%8D%95&trade_no=2016052221001004600254283947&buyer_email=429023038%40qq.com&gmt_create=2016-05-22+16%3A27%3A55&notify_type=trade_status_sync&quantity=1&out_trade_no=20160522162738564000000000075707&seller_id=2088701734809577&notify_time=2016-05-22+16%3A27%3A57&body=dayday_jie%E7%9A%84%E8%AE%A2%E5%8D%95&trade_status=TRADE_SUCCESS&is_total_fee_adjust=N&total_fee=17.00&gmt_payment=2016-05-22+16%3A27%3A57&seller_email=ap.ymt%40ymatou.com&price=17.00&buyer_id=2088202423378603&notify_id=c081bd3a5cf90802e50faef0bfb6d97kmq&use_coupon=N&sign_type=RSA&sign=fw2VqtCqKXytIIZHz69xviiL3%2FT1sMLaf5o6eu1HZzu3KFLCi2FZ86%2FSiaTXd%2BqNN%2BMDgJ6cqzTzsOek%2FIBdSqcFcVU4A13XqVpZVHq4v6LE04auxeWcEBUDuh1QQoA1tOzThyWa6zxp1NBEX78yn1k4378JtGx1F%2BVUsbLp2aY%3D";
 
         // 删除旧数据
-        AlipaynotifylogExample example = new AlipaynotifylogExample();
-        example.createCriteria().andBiznoEqualTo(paymentId);
+        AlipayNotifyLogExample example = new AlipayNotifyLogExample();
+        example.createCriteria().andBizNoEqualTo(paymentId);
         alipaynotifylogMapper.deleteByExample(example);
 
         MockHttpServletRequest servletRequest = new MockHttpServletRequest();
@@ -137,7 +137,7 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
 
         assertEquals("验证返回值", "failed", response);
 
-        List<AlipaynotifylogPo> poList = alipaynotifylogMapper.selectByExample(example);
+        List<AlipayNotifyLogPo> poList = alipaynotifylogMapper.selectByExample(example);
 
         assertEquals("验证报文插入表中", 1, poList.size());
     }
@@ -150,8 +150,8 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
                 "<xml><appid><![CDATA[wxa06ebe9f39751792]]></appid><bank_type><![CDATA[CFT]]></bank_type><cash_fee><![CDATA[6900]]></cash_fee><fee_type><![CDATA[CNY]]></fee_type><is_subscribe><![CDATA[N]]></is_subscribe><mch_id><![CDATA[1278350701]]></mch_id><nonce_str><![CDATA[be7a9693aa7b41e28ad7b570dbd594c3]]></nonce_str><openid><![CDATA[oR5W7jgOj4XWY2B7rkmJ9hr1VPGQ]]></openid><out_trade_no><![CDATA[21913767900550876]]></out_trade_no><result_code><![CDATA[SUCCESS]]></result_code><return_code><![CDATA[SUCCESS]]></return_code><sign><![CDATA[C99435843DA91205171B2AA6DAC203E0]]></sign><time_end><![CDATA[20160518195545]]></time_end><total_fee>6900</total_fee><trade_type><![CDATA[JSAPI]]></trade_type><transaction_id><![CDATA[4009052001201605186002211905]]></transaction_id></xml>";
 
         // 删除旧数据
-        AlipaynotifylogExample example = new AlipaynotifylogExample();
-        example.createCriteria().andBiznoEqualTo(paymentId);
+        AlipayNotifyLogExample example = new AlipayNotifyLogExample();
+        example.createCriteria().andBizNoEqualTo(paymentId);
         alipaynotifylogMapper.deleteByExample(example);
 
 
@@ -162,7 +162,7 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
 
         assertEquals("验证返回值", "failed", response);
 
-        List<AlipaynotifylogPo> poList = alipaynotifylogMapper.selectByExample(example);
+        List<AlipayNotifyLogPo> poList = alipaynotifylogMapper.selectByExample(example);
 
         assertEquals("验证报文插入表中", 1, poList.size());
     }
@@ -175,8 +175,8 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
                 "<xml><appid><![CDATA[wxf51a439c0416f182]]></appid><bank_type><![CDATA[CFT]]></bank_type><cash_fee><![CDATA[6900]]></cash_fee><fee_type><![CDATA[CNY]]></fee_type><is_subscribe><![CDATA[N]]></is_subscribe><mch_id><![CDATA[1234079001]]></mch_id><nonce_str><![CDATA[c798daa9864046d7a109a2fba0a2b668]]></nonce_str><openid><![CDATA[oASzYjl-imWblI9UAcnNn3f6Yp_8]]></openid><out_trade_no><![CDATA[20160522151452525000000000077470]]></out_trade_no><result_code><![CDATA[SUCCESS]]></result_code><return_code><![CDATA[SUCCESS]]></return_code><sign><![CDATA[239E3C920714FBAE9B353E56CDC180BA]]></sign><time_end><![CDATA[20160522151457]]></time_end><total_fee>6900</total_fee><trade_type><![CDATA[APP]]></trade_type><transaction_id><![CDATA[4010052001201605226158055804]]></transaction_id></xml>";
 
         // 删除旧数据
-        AlipaynotifylogExample example = new AlipaynotifylogExample();
-        example.createCriteria().andBiznoEqualTo(paymentId);
+        AlipayNotifyLogExample example = new AlipayNotifyLogExample();
+        example.createCriteria().andBizNoEqualTo(paymentId);
         alipaynotifylogMapper.deleteByExample(example);
 
         MockHttpServletRequest servletRequest = new MockHttpServletRequest();
@@ -187,7 +187,7 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
 
         assertEquals("验证返回值", "failed", response);
 
-        List<AlipaynotifylogPo> poList = alipaynotifylogMapper.selectByExample(example);
+        List<AlipayNotifyLogPo> poList = alipaynotifylogMapper.selectByExample(example);
 
         assertEquals("验证报文插入表中", 1, poList.size());
     }

@@ -24,8 +24,8 @@ import com.ymatou.payment.domain.refund.constants.RefundStatusEnum;
 import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.model.AliPayRefundNotifyRequest;
-import com.ymatou.payment.infrastructure.db.model.RefundmiscrequestlogWithBLOBs;
-import com.ymatou.payment.infrastructure.db.model.RefundrequestPo;
+import com.ymatou.payment.infrastructure.db.model.RefundMiscRequestLogWithBLOBs;
+import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 import com.ymatou.payment.integration.service.ymatou.NotifyRefundService;
 
 /**
@@ -63,17 +63,17 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
         List<RefundNotifyDetail> details = generateRefundNotifyDetail(req.getResult_details());
 
         // 生成退款回调日志
-        List<RefundmiscrequestlogWithBLOBs> list = generateRefundmiscrequestlog(req, details, signMap);
+        List<RefundMiscRequestLogWithBLOBs> list = generateRefundmiscrequestlog(req, details, signMap);
 
         if (list.size() > 0) {
             logger.info("save RefundMiscRequestLog begin.");
             refundPository.batchSaveRefundmiscrequestlog(list); // 保存退款回调日志
 
-            for (RefundmiscrequestlogWithBLOBs rmrl : list) {
+            for (RefundMiscRequestLogWithBLOBs rmrl : list) {
                 try {
                     // 异步通知退款
                     logger.info("notify refund service begin.");
-                    notifyRefundService.doService(rmrl.getCorrelateid(), UUID.randomUUID().toString(), null); // TODO
+                    notifyRefundService.doService(rmrl.getCorrelateId(), UUID.randomUUID().toString(), null); // TODO
                 } catch (Exception e) {
                     // 不做处理
                 }
@@ -82,37 +82,37 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
         }
     }
 
-    public List<RefundmiscrequestlogWithBLOBs> generateRefundmiscrequestlog(AliPayRefundNotifyRequest req,
+    public List<RefundMiscRequestLogWithBLOBs> generateRefundmiscrequestlog(AliPayRefundNotifyRequest req,
             List<RefundNotifyDetail> details, Map<String, String> signMap) {
-        List<RefundmiscrequestlogWithBLOBs> refundmiscrequestlogWithBLOBs = new ArrayList<>();
+        List<RefundMiscRequestLogWithBLOBs> refundmiscrequestlogWithBLOBs = new ArrayList<>();
 
         // 根据refundBatchNo获取RefundRequest
-        List<RefundrequestPo> refundrequestPos = refundPository.queryRefundRequestByRefundBatchNo(req.getBatch_no());
+        List<RefundRequestPo> refundrequestPos = refundPository.queryRefundRequestByRefundBatchNo(req.getBatch_no());
 
-        for (RefundrequestPo po : refundrequestPos) {
-            if (po.getRefundstatus() == RefundStatusEnum.COMPLETE_SUCCESS.getCode()
-                    || po.getRefundstatus() == RefundStatusEnum.RETURN_TRANSACTION.getCode()) { // 已退款成功的，忽略
-                logger.info("The refundRequest is success. PaymentId[{}]", po.getPaymentid());
+        for (RefundRequestPo po : refundrequestPos) {
+            if (po.getRefundStatus() == RefundStatusEnum.COMPLETE_SUCCESS.getCode()
+                    || po.getRefundStatus() == RefundStatusEnum.RETURN_TRANSACTION.getCode()) { // 已退款成功的，忽略
+                logger.info("The refundRequest is success. PaymentId[{}]", po.getPaymentId());
                 continue;
             }
 
             for (RefundNotifyDetail detail : details) {
                 // 第三方退款成功的， 并在RefundRequest找到记录的
-                if (detail.getInstitutionPaymentId().equals(po.getPaymentid()) && detail.isSuccess()) {
+                if (detail.getInstitutionPaymentId().equals(po.getPaymentId()) && detail.isSuccess()) {
 
-                    logger.info("The refundRequest is thirdPart success. PaymentId[{}]", po.getPaymentid());
+                    logger.info("The refundRequest is thirdPart success. PaymentId[{}]", po.getPaymentId());
                     logger.info("generate RefundMiscRequestLog begin.");
-                    RefundmiscrequestlogWithBLOBs rmrl = new RefundmiscrequestlogWithBLOBs();
-                    rmrl.setRefundbatchno(req.getBatch_no());
-                    rmrl.setCorrelateid(po.getPaymentid());
-                    rmrl.setIsexception(false);
-                    rmrl.setExceptiondetail("");
-                    rmrl.setLogid(UUID.randomUUID().toString());
+                    RefundMiscRequestLogWithBLOBs rmrl = new RefundMiscRequestLogWithBLOBs();
+                    rmrl.setRefundBatchNo(req.getBatch_no());
+                    rmrl.setCorrelateId(po.getPaymentId());
+                    rmrl.setIsException(false);
+                    rmrl.setExceptionDetail("");
+                    rmrl.setLogId(UUID.randomUUID().toString());
                     rmrl.setMethod("RefundNotify");
-                    rmrl.setRequestdata("");
-                    rmrl.setResponsedata(JSON.toJSONString(signMap)); // TODO
-                    rmrl.setRequesttime(new Date());
-                    rmrl.setResponsetime(req.getNotify_time());
+                    rmrl.setRequestData("");
+                    rmrl.setResponseData(JSON.toJSONString(signMap)); // TODO
+                    rmrl.setRequestTime(new Date());
+                    rmrl.setResponseTime(req.getNotify_time());
 
                     refundmiscrequestlogWithBLOBs.add(rmrl); // 记录退款回调日志
                 }

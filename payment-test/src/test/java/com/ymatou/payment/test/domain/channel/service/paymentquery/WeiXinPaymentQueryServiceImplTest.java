@@ -32,7 +32,7 @@ public class WeiXinPaymentQueryServiceImplTest extends RestBaseTest {
         request.setPaymentId("21935472000015038");
         request.setPayType("15");
         request.setRequestId("4234823654239504397990");
-        PaymentQueryResp resp = service.paymentQuery(request);
+        PaymentQueryResp resp = service.paymentQuery(request.getPaymentId(), request.getPayType(), null);
 
         Assert.assertEquals(new BigDecimal(29), resp.getActualPayPrice());
     }
