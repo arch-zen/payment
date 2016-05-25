@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
-import com.ymatou.payment.domain.pay.model.PayStatus;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.service.PayService;
 import com.ymatou.payment.domain.refund.model.Refund;
@@ -25,6 +24,7 @@ import com.ymatou.payment.domain.refund.service.SubmitRefundService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.RefundFacade;
+import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.model.AcquireRefundDetail;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
 import com.ymatou.payment.facade.model.AcquireRefundResponse;
@@ -79,17 +79,17 @@ public class RefundFacadeImpl implements RefundFacade {
         logger.info("Payment result: {}", payment);
 
         // query and verify bussinessorder
-        BussinessOrder bussinessorder = payService.getBussinessOrderById(payment.getBussinessorderid());
-        if (bussinessorder == null) {
+        BussinessOrder bussinessOrder = payService.getBussinessOrderById(payment.getBussinessOrderId());
+        if (bussinessOrder == null) {
             throw new BizException(ErrorCode.NOT_EXIST_BUSSINESS_ORDERID, "businessOrderId not exist");
         }
-        logger.info("BussinessOrder result: {}", bussinessorder);
+        logger.info("BussinessOrder result: {}", bussinessOrder);
 
-        if (!req.getTradingId().equals(bussinessorder.getOrderid())) {
+        if (!req.getTradingId().equals(bussinessOrder.getOrderId())) {
             throw new BizException(ErrorCode.INCONSISTENT_PAYMENTID_AND_TRADINGID,
                     "inconsistent paymentId and tradingId");
         }
-        if (!payment.getPaystatus().equals(PayStatus.Paied.getIndex())) {
+        if (!payment.getPayStatus().equals(PayStatusEnum.Paied.getIndex())) {
             throw new BizException(ErrorCode.INVALID_PAYMENT_STATUS, "invalid payment status");
         }
 
@@ -102,14 +102,14 @@ public class RefundFacadeImpl implements RefundFacade {
         refundInfo.setTraceId(req.getTraceId());
 
         // Save RefundRequest And CompensateProcessInfo
-        fastRefundService.saveRefundRequest(payment, bussinessorder, refundInfo);
+        fastRefundService.saveRefundRequest(payment, bussinessOrder, refundInfo);
 
         // notify refund service
         fastRefundService.notifyRefund(refundInfo, req.getHeader());
 
         // send trading message
         for (String orderId : req.getOrderIdList()) {
-            fastRefundService.sendFastRefundTradingMessage(bussinessorder.getUserid().toString(), orderId,
+            fastRefundService.sendFastRefundTradingMessage(bussinessOrder.getUserId().toString(), orderId,
                     req.getHeader());
         }
 

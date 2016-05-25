@@ -3,7 +3,7 @@
  *
  * All rights reserved.
  */
-package com.ymatou.payment.domain.channel.model;
+package com.ymatou.payment.facade.constants;
 
 /**
  * 收单返回类型
@@ -11,6 +11,6 @@ package com.ymatou.payment.domain.channel.model;
  * @author wangxudong 2016年5月11日 下午5:01:57
  *
  */
-public enum AcquireOrderResultType {
+public enum AcquireOrderResultTypeEnum {
     Form, JSON, Query
 }

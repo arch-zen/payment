@@ -52,7 +52,7 @@ public class PaymentFacadeImpl implements PaymentFacade {
 
         // 拼装支付报文
         AcquireOrderPackageResp packageResp =
-                acquireOrderPackageFactory.getInstance(payment.getPaytype()).acquireOrderPackage(payment);
+                acquireOrderPackageFactory.getInstance(payment.getPayType()).acquireOrderPackage(payment);
 
         // 返回收单结果
         AcquireOrderResp resp = new AcquireOrderResp();

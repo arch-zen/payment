@@ -44,7 +44,8 @@ public class RefundNotifyResourceImpl implements RefundNotifyResource {
             @Context HttpServletRequest servletRequest) {
 
         try {
-            BaseResponse response = refundNotifyFacade.refundNotify(req, payType);
+            req.setPayType(payType);
+            BaseResponse response = refundNotifyFacade.refundNotify(req);
             if (response.getIsSuccess()) {
                 return "success";
             } else {

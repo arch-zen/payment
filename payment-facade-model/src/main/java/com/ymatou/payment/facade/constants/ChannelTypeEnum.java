@@ -1,7 +1,7 @@
 /*
  * (C) Copyright 2016 Ymatou (http://www.ymatou.com/). All rights reserved.
  */
-package com.ymatou.payment.domain.channel.constants;
+package com.ymatou.payment.facade.constants;
 
 /**
  * 

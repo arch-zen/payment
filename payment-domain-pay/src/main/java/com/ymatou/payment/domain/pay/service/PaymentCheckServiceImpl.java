@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
-import com.ymatou.payment.domain.pay.model.CheckStatus;
-import com.ymatou.payment.domain.pay.model.PayStatus;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.model.ThirdPartyPayment;
 import com.ymatou.payment.domain.pay.repository.AlipayNotifyLogRespository;
@@ -20,6 +18,8 @@ import com.ymatou.payment.domain.pay.repository.BussinessOrderRepository;
 import com.ymatou.payment.domain.pay.repository.PaymentRepository;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
+import com.ymatou.payment.facade.constants.CheckStatusEnum;
+import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.integration.service.ymatou.NotifyPaymentService;
 
 /**
@@ -58,50 +58,50 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
         if (payment == null) {
             throw new BizException(ErrorCode.DATA_NOT_FOUND, "can not find paymentid " + paymentId);
         }
-        BussinessOrder bussinessOrder = bussinessOrderRepository.getBussinessOrderById(payment.getBussinessorderid());
+        BussinessOrder bussinessOrder = bussinessOrderRepository.getBussinessOrderById(payment.getBussinessOrderId());
         if (bussinessOrder == null) {
             throw new BizException(ErrorCode.DATA_NOT_FOUND,
-                    "can not find order " + payment.getBussinessorderid());
+                    "can not find order " + payment.getBussinessOrderId());
         }
 
-        if (PayStatus.Paied.getIndex() == thirdPartyPayment.getPayStatus()) {
-            if (PayStatus.Paied.getIndex() == payment.getPaystatus()
-                    || PayStatus.Refunded.getIndex() == payment.getPaystatus()) {
-                paymentRepository.updatePaymentCheckStatus(CheckStatus.SUCCESS.getCode(), paymentId); // 对账成功
+        if (PayStatusEnum.Paied.getIndex() == thirdPartyPayment.getPayStatus()) {
+            if (PayStatusEnum.Paied.getIndex() == payment.getPayStatus()
+                    || PayStatusEnum.Refunded.getIndex() == payment.getPayStatus()) {
+                paymentRepository.updatePaymentCheckStatus(CheckStatusEnum.SUCCESS.getCode(), paymentId); // 对账成功
             } else {
                 try {
-                    payment.setCheckstatus(CheckStatus.REPAIR_SUCCESS.getCode()); // 补单成功
-                    payment.setInstitutionpaymentid(thirdPartyPayment.getInstitutionPaymentId());
-                    payment.setPaystatus(thirdPartyPayment.getPayStatus());
-                    payment.setActualpayprice(thirdPartyPayment.getActualPayPrice());
-                    payment.setActualpaycurrencytype(thirdPartyPayment.getActualPayCurrency());
-                    payment.setBankid(thirdPartyPayment.getBankId());
-                    payment.setCardtype(thirdPartyPayment.getCardType());
-                    payment.setPaytime(thirdPartyPayment.getPayTime());
-                    payment.setPayerid(thirdPartyPayment.getPayerId());
-                    payment.setExchangerate(payment.getExchangerate() == null ? 1 : payment.getExchangerate());
+                    payment.setCheckStatus(CheckStatusEnum.REPAIR_SUCCESS.getCode()); // 补单成功
+                    payment.setInstitutionPaymentId(thirdPartyPayment.getInstitutionPaymentId());
+                    payment.setPayStatus(thirdPartyPayment.getPayStatus());
+                    payment.setActualPayPrice(thirdPartyPayment.getActualPayPrice());
+                    payment.setActualPayCurrencyType(thirdPartyPayment.getActualPayCurrency());
+                    payment.setBankId(thirdPartyPayment.getBankId());
+                    payment.setCardType(thirdPartyPayment.getCardType());
+                    payment.setPayTime(thirdPartyPayment.getPayTime());
+                    payment.setPayerId(thirdPartyPayment.getPayerId());
+                    payment.setExchangeRate(payment.getExchangeRate() == null ? 1 : payment.getExchangeRate());
 
                     payService.setPaymentOrderPaid(payment, thirdPartyPayment.getTraceId());
 
                     // 通知发货服务
                     try {
-                        notifyPaymentService.doService(payment.getPaymentid(), thirdPartyPayment.getTraceId(),
+                        notifyPaymentService.doService(payment.getPaymentId(), thirdPartyPayment.getTraceId(),
                                 header);
                     } catch (Exception e) {
-                        logger.error("notify deliver service failed with paymentid :" + payment.getPaymentid(), e);
+                        logger.error("notify deliver service failed with paymentid :" + payment.getPaymentId(), e);
                     }
 
                 } catch (Exception e) {
-                    paymentRepository.updatePaymentCheckStatus(CheckStatus.AMOUNT_NOT_MATCH.getCode(), paymentId); // 金额不一致
+                    paymentRepository.updatePaymentCheckStatus(CheckStatusEnum.AMOUNT_NOT_MATCH.getCode(), paymentId); // 金额不一致
                     throw e;
                 }
             }
         } else {
-            if (PayStatus.Paied.equals(payment.getPaystatus())) {
-                paymentRepository.updatePaymentCheckStatus(CheckStatus.THIRD_PART_NOT_PAID.getCode(), paymentId); // 第三方未付，YMT已付
+            if (PayStatusEnum.Paied.equals(payment.getPayStatus())) {
+                paymentRepository.updatePaymentCheckStatus(CheckStatusEnum.THIRD_PART_NOT_PAID.getCode(), paymentId); // 第三方未付，YMT已付
                 logger.error("{} pay check failed, but paystatus is successful!", paymentId);
             } else {
-                int checkStatus = checkFailed(finalCheck, payment.getCheckstatus());
+                int checkStatus = checkFailed(finalCheck, payment.getCheckStatus());
                 paymentRepository.updatePaymentCheckStatus(checkStatus, paymentId);
             }
         }
@@ -110,13 +110,13 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
     private int checkFailed(boolean isFinalCheck, Integer originalCheckStatus) {
         int checkStaus = 0;
         if (isFinalCheck) {
-            checkStaus = CheckStatus.FINAL_CHECK_FAIL_INDEX.getCode(); // 直接设为最大的对账失败次数
+            checkStaus = CheckStatusEnum.FINAL_CHECK_FAIL_INDEX.getCode(); // 直接设为最大的对账失败次数
             return checkStaus;
         }
 
         if (originalCheckStatus == null) {
-            checkStaus = CheckStatus.INIT_CHECK_FAIL_INDEX.getCode(); // 第一次对账失败
-        } else if (originalCheckStatus > CheckStatus.FINAL_CHECK_FAIL_INDEX.getCode()) { // 需要大于最大的对账失败次数
+            checkStaus = CheckStatusEnum.INIT_CHECK_FAIL_INDEX.getCode(); // 第一次对账失败
+        } else if (originalCheckStatus > CheckStatusEnum.FINAL_CHECK_FAIL_INDEX.getCode()) { // 需要大于最大的对账失败次数
             checkStaus = originalCheckStatus - 1; // 对账次数+1
         }
         return checkStaus;

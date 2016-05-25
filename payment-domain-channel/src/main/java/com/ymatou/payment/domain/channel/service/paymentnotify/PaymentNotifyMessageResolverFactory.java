@@ -9,10 +9,10 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Component;
 
-import com.ymatou.payment.domain.channel.model.enums.PayTypeEnum;
 import com.ymatou.payment.domain.channel.service.PaymentNotifyService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 
 /**
  * 支付回调解析器工厂

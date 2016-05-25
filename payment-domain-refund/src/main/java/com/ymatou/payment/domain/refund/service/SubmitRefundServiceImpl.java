@@ -15,13 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
-import com.ymatou.payment.domain.pay.model.OrderStatus;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.repository.BussinessOrderRepository;
 import com.ymatou.payment.domain.pay.repository.PaymentRepository;
 import com.ymatou.payment.domain.refund.DomainConfig;
-import com.ymatou.payment.domain.refund.constants.RefundStatusEnum;
 import com.ymatou.payment.domain.refund.repository.RefundPository;
+import com.ymatou.payment.facade.constants.OrderStatusEnum;
+import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.facade.model.AcquireRefundDetail;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
 import com.ymatou.payment.facade.model.TradeDetail;
@@ -62,26 +62,26 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
         for (String tradeNo : tradeNos) {
             // 根据tradeNo获取已支付，退款有效期内的BussinessOrder
             BussinessOrder bussinessOrder = bussinessOrderRepository.getBussinessOrderCanRefund(
-                    tradeNo, OrderStatus.Paied.getIndex(), Date.valueOf(validDate));
+                    tradeNo, OrderStatusEnum.Paied.getIndex(), Date.valueOf(validDate));
 
             if (bussinessOrder != null) {
                 logger.info(bussinessOrder.toString());
 
                 // 根据bussinessorderid找到支付单Payment
-                Payment payment = paymentRepository.getPaymentCanRefund(bussinessOrder.getBussinessorderid(),
-                        OrderStatus.Paied.getIndex());
+                Payment payment = paymentRepository.getPaymentCanRefund(bussinessOrder.getBussinessOrderId(),
+                        OrderStatusEnum.Paied.getIndex());
                 logger.info(payment.toString());
 
                 // 组装可退款交易信息
                 TradeRefundDetail tradeRefundDetail = new TradeRefundDetail();
-                tradeRefundDetail.setCurrencyType(payment.getPaycurrencytype());
+                tradeRefundDetail.setCurrencyType(payment.getPayCurrencyType());
                 tradeRefundDetail.setRefundable(true); // 可退款
-                tradeRefundDetail.setPayAmount(payment.getPayprice());
+                tradeRefundDetail.setPayAmount(payment.getPayPrice());
                 tradeRefundDetail.setTradeNo(tradeNo);
-                tradeRefundDetail.setPayChannel(refundPository.convertPayTypeToPayChannel(payment.getPaytype()));
-                tradeRefundDetail.setPaymentId(payment.getPaymentid());
-                tradeRefundDetail.setPayType(payment.getPaytype());
-                tradeRefundDetail.setInstPaymentId(payment.getInstitutionpaymentid());
+                tradeRefundDetail.setPayChannel(refundPository.convertPayTypeToPayChannel(payment.getPayType()));
+                tradeRefundDetail.setPaymentId(payment.getPaymentId());
+                tradeRefundDetail.setPayType(payment.getPayType());
+                tradeRefundDetail.setInstPaymentId(payment.getInstitutionPaymentId());
 
                 tradeRefundDetails.add(tradeRefundDetail);
             } else {

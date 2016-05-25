@@ -19,13 +19,13 @@ import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.constants.AliPayConsts;
 import com.ymatou.payment.domain.channel.model.AcquireOrderPackageResp;
-import com.ymatou.payment.domain.channel.model.AcquireOrderResultType;
 import com.ymatou.payment.domain.channel.service.AcquireOrderService;
 import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.domain.channel.util.AliPayFormBuilder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
+import com.ymatou.payment.facade.constants.AcquireOrderResultTypeEnum;
 import com.ymatou.payment.facade.model.AcquireOrderExt;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.model.QueryTimestampResponse;
@@ -65,7 +65,7 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
     @Override
     public AcquireOrderPackageResp acquireOrderPackage(Payment payment) {
         // 获取第三方机构配置
-        InstitutionConfig instConfig = instConfigManager.getConfig(payment.getPaytype());
+        InstitutionConfig instConfig = instConfigManager.getConfig(payment.getPayType());
 
         // 拼装请求Map
         HashMap<String, String> reqMap = buildReqMap(payment, instConfig);
@@ -79,7 +79,7 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
 
         // 返回报文结果
         AcquireOrderPackageResp resp = new AcquireOrderPackageResp();
-        resp.setResultType(AcquireOrderResultType.Form);
+        resp.setResultType(AcquireOrderResultTypeEnum.Form);
         resp.setResult(reqForm);
 
         return resp;
@@ -99,19 +99,19 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
         reqDict.put("partner", instConfig.getMerchantId());
         reqDict.put("seller_email", instConfig.getSellerEmail());
         reqDict.put("return_url",
-                String.format("%s/callback/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPaytype()));
+                String.format("%s/callback/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPayType()));
         reqDict.put("notify_url",
-                String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPaytype()));
+                String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPayType()));
         reqDict.put("_input_charset", AliPayConsts.INPUT_CHARSET);
-        reqDict.put("show_url", payment.getBussinessOrder().getProducturl());
-        reqDict.put("out_trade_no", payment.getPaymentid());
+        reqDict.put("show_url", payment.getBussinessOrder().getProductUrl());
+        reqDict.put("out_trade_no", payment.getPaymentId());
         reqDict.put("subject", payment.getBussinessOrder().getSubject());
-        reqDict.put("body", payment.getBussinessOrder().getProductdesc());
-        reqDict.put("total_fee", String.format("%.2f", payment.getPayprice().doubleValue()));
+        reqDict.put("body", payment.getBussinessOrder().getProductDesc());
+        reqDict.put("total_fee", String.format("%.2f", payment.getPayPrice().doubleValue()));
         reqDict.put("paymethod", acquireOrderExt.getPayMethod());
         reqDict.put("anti_phishing_key", getAntiFishingKey(instConfig.getMerchantId(), payment));
-        reqDict.put("exter_invoke_ip", payment.getBussinessOrder().getClientip());
-        reqDict.put("buyer_email", payment.getBussinessOrder().getThirdpartyuserid());
+        reqDict.put("exter_invoke_ip", payment.getBussinessOrder().getClientIp());
+        reqDict.put("buyer_email", payment.getBussinessOrder().getThirdPartyUserId());
         reqDict.put("sign_type", instConfig.getSignType());
 
         if (acquireOrderExt.getIsHangZhou() == 1) {
@@ -125,9 +125,9 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
             }
         } else {
             reqDict.put("service", "create_direct_pay_by_user");
-            reqDict.put("defaultbank", payment.getBankid());
+            reqDict.put("defaultbank", payment.getBankId());
 
-            String thirdPartyUserId = payment.getBussinessOrder().getThirdpartyuserid();
+            String thirdPartyUserId = payment.getBussinessOrder().getThirdPartyUserId();
             if (thirdPartyUserId != null && !thirdPartyUserId.isEmpty())
                 reqDict.put("default_login", "Y");
             else

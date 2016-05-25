@@ -14,10 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ymatou.payment.domain.refund.constants.ApproveStatusEnum;
 import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
+import com.ymatou.payment.facade.constants.ApproveStatusEnum;
 import com.ymatou.payment.infrastructure.db.model.CompensateProcessInfoPo;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 import com.ymatou.payment.integration.service.ymatou.NotifyRefundService;

@@ -17,15 +17,15 @@ import com.ymatou.payment.domain.channel.model.PaymentNotifyMessage;
 import com.ymatou.payment.domain.channel.service.PaymentNotifyService;
 import com.ymatou.payment.domain.channel.service.paymentnotify.PaymentNotifyMessageResolverFactory;
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
-import com.ymatou.payment.domain.pay.model.PayStatus;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.service.PayService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.PaymentNotifyFacade;
+import com.ymatou.payment.facade.constants.PayStatusEnum;
+import com.ymatou.payment.facade.constants.PaymentNotifyType;
 import com.ymatou.payment.facade.model.PaymentNotifyReq;
 import com.ymatou.payment.facade.model.PaymentNotifyResp;
-import com.ymatou.payment.facade.model.PaymentNotifyType;
 import com.ymatou.payment.infrastructure.db.mapper.AlipayNotifyLogMapper;
 import com.ymatou.payment.infrastructure.db.model.AlipayNotifyLogPo;
 import com.ymatou.payment.integration.service.ymatou.NotifyPaymentService;
@@ -74,7 +74,7 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
         // STEP.3 如果支付成功
         Payment payment = null;
         PaymentNotifyResp response = new PaymentNotifyResp();
-        if (notifyMessage.getPayStatus() == PayStatus.Paied) {
+        if (notifyMessage.getPayStatus() == PayStatusEnum.Paied) {
             // 添加日志
             AlipayNotifyLogPo notifyLog = new AlipayNotifyLogPo();
             notifyLog.setBizNo(notifyMessage.getPaymentId());
@@ -88,15 +88,15 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
                         String.format("can not find paymentid %s", notifyMessage.getPaymentId()));
 
             // 校验商户订单
-            BussinessOrder bussinessOrder = payService.getBussinessOrderById(payment.getBussinessorderid());
+            BussinessOrder bussinessOrder = payService.getBussinessOrderById(payment.getBussinessOrderId());
             if (bussinessOrder == null)
                 throw new BizException(ErrorCode.DATA_NOT_FOUND,
-                        String.format("can not find order %s", payment.getBussinessorderid()));
+                        String.format("can not find order %s", payment.getBussinessOrderId()));
             payment.setBussinessOrder(bussinessOrder);
 
 
             // 如果支付单的状态 已经成功则直接返回成功
-            if (payment.getPaystatus() == PayStatus.Paied.getIndex()) {
+            if (payment.getPayStatus() == PayStatusEnum.Paied.getIndex()) {
                 response.setResult(notifyService.buildResponse(notifyMessage, payment, req.getNotifyType()));
                 return response;
             }
@@ -109,9 +109,9 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
 
             // 通知发货服务
             try {
-                notifyPaymentService.doService(payment.getPaymentid(), notifyMessage.getTraceId(), req.getMockHeader());
+                notifyPaymentService.doService(payment.getPaymentId(), notifyMessage.getTraceId(), req.getMockHeader());
             } catch (Exception e) {
-                logger.error("notify deliver service failed with paymentid :" + payment.getPaymentid(), e);
+                logger.error("notify deliver service failed with paymentid :" + payment.getPaymentId(), e);
             }
         }
 
@@ -126,14 +126,14 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
      * @param notifyMessage
      */
     private void setPaymentOrderPaid(Payment payment, PaymentNotifyMessage notifyMessage) {
-        payment.setInstitutionpaymentid(notifyMessage.getInstitutionPaymentId());
-        payment.setPaystatus(PayStatus.Paied.getIndex());
-        payment.setActualpayprice(notifyMessage.getActualPayPrice());
-        payment.setActualpaycurrencytype(notifyMessage.getActualPayCurrency());
-        payment.setBankid(notifyMessage.getBankId());
-        payment.setCardtype(notifyMessage.getCardType());
-        payment.setPaytime(notifyMessage.getPayTime());
-        payment.setPayerid(notifyMessage.getPayerId());
+        payment.setInstitutionPaymentId(notifyMessage.getInstitutionPaymentId());
+        payment.setPayStatus(PayStatusEnum.Paied.getIndex());
+        payment.setActualPayPrice(notifyMessage.getActualPayPrice());
+        payment.setActualPayCurrencyType(notifyMessage.getActualPayCurrency());
+        payment.setBankId(notifyMessage.getBankId());
+        payment.setCardType(notifyMessage.getCardType());
+        payment.setPayTime(notifyMessage.getPayTime());
+        payment.setPayerId(notifyMessage.getPayerId());
         payService.setPaymentOrderPaid(payment, notifyMessage.getTraceId());
     }
 }

@@ -5,6 +5,8 @@
  */
 package com.ymatou.payment.domain.channel.model;
 
+import com.ymatou.payment.facade.constants.AcquireOrderResultTypeEnum;
+
 /**
  * 收单报文请求
  * 
@@ -20,7 +22,7 @@ public class AcquireOrderPackageResp {
     /**
      * 返回报文类型
      */
-    private AcquireOrderResultType resultType;
+    private AcquireOrderResultTypeEnum resultType;
 
     /**
      * @return the result
@@ -39,14 +41,14 @@ public class AcquireOrderPackageResp {
     /**
      * @return the resultType
      */
-    public AcquireOrderResultType getResultType() {
+    public AcquireOrderResultTypeEnum getResultType() {
         return resultType;
     }
 
     /**
      * @param resultType the resultType to set
      */
-    public void setResultType(AcquireOrderResultType resultType) {
+    public void setResultType(AcquireOrderResultTypeEnum resultType) {
         this.resultType = resultType;
     }
 }

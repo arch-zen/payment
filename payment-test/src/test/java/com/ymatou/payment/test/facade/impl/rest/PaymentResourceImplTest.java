@@ -65,30 +65,30 @@ public class PaymentResourceImplTest extends RestBaseTest {
         BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
         assertNotNull("验证商户订单", bo);
 
-        System.out.println(bo.getOrderid());
-        System.out.println(bo.getBussinessorderid());
+        System.out.println(bo.getOrderId());
+        System.out.println(bo.getBussinessOrderId());
 
-        assertEquals("验证PayType", req.getPayType(), bo.getPaytype());
-        assertEquals("验证OrderPrice", new BigDecimal(req.getPayPrice()).doubleValue(), bo.getOrderprice().doubleValue(),
+        assertEquals("验证PayType", req.getPayType(), bo.getPayType());
+        assertEquals("验证OrderPrice", new BigDecimal(req.getPayPrice()).doubleValue(), bo.getOrderPrice().doubleValue(),
                 0.00001);
-        assertEquals("验证CurrencyType", req.getCurrency(), bo.getCurrencytype());
+        assertEquals("验证CurrencyType", req.getCurrency(), bo.getCurrencyType());
         assertEquals("验证Version", req.getVersion(), bo.getVersion());
-        assertEquals("验证AppId", req.getAppId(), bo.getAppid());
-        assertEquals("验证TraceId", req.getTraceId(), bo.getTraceid());
-        assertEquals("验证OrderTime", req.getOrderTime(), bo.getOrdertime());
-        assertEquals("验证ClientIP", req.getUserIp(), bo.getClientip());
-        assertEquals("验证CallbackUrl", req.getCallbackUrl(), bo.getCallbackurl());
-        assertEquals("验证NotifyUrl", req.getNotifyUrl(), bo.getNotifyurl());
-        assertEquals("验证ProductName", req.getProductName(), bo.getProductname());
-        assertEquals("验证ProductDesc", req.getProductDesc(), bo.getProductdesc());
-        assertEquals("验证ProductUrl", req.getProductUrl(), bo.getProducturl());
-        assertEquals("验证CodePage", req.getEncoding(), bo.getCodepage());
+        assertEquals("验证AppId", req.getAppId(), bo.getAppId());
+        assertEquals("验证TraceId", req.getTraceId(), bo.getTraceId());
+        assertEquals("验证OrderTime", req.getOrderTime(), bo.getOrderTime());
+        assertEquals("验证ClientIP", req.getUserIp(), bo.getClientIp());
+        assertEquals("验证CallbackUrl", req.getCallbackUrl(), bo.getCallbackUrl());
+        assertEquals("验证NotifyUrl", req.getNotifyUrl(), bo.getNotifyUrl());
+        assertEquals("验证ProductName", req.getProductName(), bo.getProductName());
+        assertEquals("验证ProductDesc", req.getProductDesc(), bo.getProductDesc());
+        assertEquals("验证ProductUrl", req.getProductUrl(), bo.getProductUrl());
+        assertEquals("验证CodePage", req.getEncoding(), bo.getCodePage());
         assertEquals("验证Ext", req.getExt(), bo.getExt());
         assertEquals("验证Memo", req.getMemo(), bo.getMemo());
-        assertEquals("验证SignMethod", req.getSignMethod(), bo.getSignmethod());
-        assertEquals("验证BizCode", req.getBizCode(), bo.getBizcode());
-        assertEquals("验证OrderStatus", new Integer(0), bo.getOrderstatus());
-        assertEquals("验证NotifyStatus", new Integer(0), bo.getNotifystatus());
+        assertEquals("验证SignMethod", req.getSignMethod(), bo.getSignMethod());
+        assertEquals("验证BizCode", req.getBizCode(), bo.getBizCode());
+        assertEquals("验证OrderStatus", new Integer(0), bo.getOrderStatus());
+        assertEquals("验证NotifyStatus", new Integer(0), bo.getNotifyStatus());
     }
 
     @Test
@@ -110,18 +110,18 @@ public class PaymentResourceImplTest extends RestBaseTest {
         BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
         assertNotNull("验证商户订单", bo);
 
-        System.out.println(bo.getOrderid());
-        System.out.println(bo.getBussinessorderid());
+        System.out.println(bo.getOrderId());
+        System.out.println(bo.getBussinessOrderId());
 
-        assertEquals("验证PayType", req.getPayType(), bo.getPaytype());
+        assertEquals("验证PayType", req.getPayType(), bo.getPayType());
 
-        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessorderid());
+        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
         assertNotNull("验证支付单不为空", payment);
 
-        assertEquals("验证PayType", req.getPayType(), payment.getPaytype());
-        assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(), payment.getPayprice().doubleValue(),
+        assertEquals("验证PayType", req.getPayType(), payment.getPayType());
+        assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(), payment.getPayPrice().doubleValue(),
                 0.000001);
-        assertEquals("验证PayStatus", new Integer(0), payment.getPaystatus());
+        assertEquals("验证PayStatus", new Integer(0), payment.getPayStatus());
     }
 
     @Test
@@ -174,18 +174,18 @@ public class PaymentResourceImplTest extends RestBaseTest {
         BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
         assertNotNull("验证商户订单", bo);
 
-        System.out.println(bo.getOrderid());
-        System.out.println(bo.getBussinessorderid());
+        System.out.println(bo.getOrderId());
+        System.out.println(bo.getBussinessOrderId());
 
-        assertEquals("验证PayType", req.getPayType(), bo.getPaytype());
+        assertEquals("验证PayType", req.getPayType(), bo.getPayType());
 
-        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessorderid());
+        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
         assertNotNull("验证支付单不为空", payment);
 
-        assertEquals("验证PayType", req.getPayType(), payment.getPaytype());
-        assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(), payment.getPayprice().doubleValue(),
+        assertEquals("验证PayType", req.getPayType(), payment.getPayType());
+        assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(), payment.getPayPrice().doubleValue(),
                 0.000001);
-        assertEquals("验证PayStatus", new Integer(0), payment.getPaystatus());
+        assertEquals("验证PayStatus", new Integer(0), payment.getPayStatus());
     }
 
     @Test
@@ -208,18 +208,18 @@ public class PaymentResourceImplTest extends RestBaseTest {
         BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
         assertNotNull("验证商户订单", bo);
 
-        System.out.println(bo.getOrderid());
-        System.out.println(bo.getBussinessorderid());
+        System.out.println(bo.getOrderId());
+        System.out.println(bo.getBussinessOrderId());
 
-        assertEquals("验证PayType", req.getPayType(), bo.getPaytype());
+        assertEquals("验证PayType", req.getPayType(), bo.getPayType());
 
-        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessorderid());
+        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
         assertNotNull("验证支付单不为空", payment);
 
-        assertEquals("验证PayType", req.getPayType(), payment.getPaytype());
-        assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(), payment.getPayprice().doubleValue(),
+        assertEquals("验证PayType", req.getPayType(), payment.getPayType());
+        assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(), payment.getPayPrice().doubleValue(),
                 0.000001);
-        assertEquals("验证PayStatus", new Integer(0), payment.getPaystatus());
+        assertEquals("验证PayStatus", new Integer(0), payment.getPayStatus());
     }
 
     /**

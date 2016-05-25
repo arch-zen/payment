@@ -3,7 +3,7 @@
  *
  * All rights reserved.
  */
-package com.ymatou.payment.domain.pay.model;
+package com.ymatou.payment.facade.constants;
 
 /**
  * 商户订单状态
@@ -11,7 +11,7 @@ package com.ymatou.payment.domain.pay.model;
  * @author wangxudong 2016年5月11日 上午10:58:36
  *
  */
-public enum OrderStatus {
+public enum OrderStatusEnum {
     Init(0, "初始化"),
 
     Paied(1, "已支付"),
@@ -21,7 +21,7 @@ public enum OrderStatus {
     private int index;
     private String name;
 
-    private OrderStatus(int index, String name) {
+    private OrderStatusEnum(int index, String name) {
         this.index = index;
         this.name = name;
     }

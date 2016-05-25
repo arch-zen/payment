@@ -3,7 +3,7 @@
  *
  * All rights reserved.
  */
-package com.ymatou.payment.domain.channel.model.enums;
+package com.ymatou.payment.facade.constants;
 
 import org.apache.commons.lang3.StringUtils;
 

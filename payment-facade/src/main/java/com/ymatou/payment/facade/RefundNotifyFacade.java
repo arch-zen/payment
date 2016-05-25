@@ -17,9 +17,7 @@ public interface RefundNotifyFacade {
      * 处理支付宝退款回调
      * 
      * @param req
-     * @param payType
-     * @param servletRequest
      * @return
      */
-    public BaseResponse refundNotify(AliPayRefundNotifyRequest req, String payType);
+    public BaseResponse refundNotify(AliPayRefundNotifyRequest req);
 }

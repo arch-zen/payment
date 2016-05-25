@@ -21,13 +21,13 @@ import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.constants.AliPayConsts;
 import com.ymatou.payment.domain.channel.model.AcquireOrderPackageResp;
-import com.ymatou.payment.domain.channel.model.AcquireOrderResultType;
 import com.ymatou.payment.domain.channel.service.AcquireOrderService;
 import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.domain.channel.util.UrlEncoder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
+import com.ymatou.payment.facade.constants.AcquireOrderResultTypeEnum;
 import com.ymatou.payment.facade.model.AcquireOrderExt;
 import com.ymatou.payment.facade.model.QueryEncryptResult;
 import com.ymatou.payment.integration.IntegrationConfig;
@@ -65,7 +65,7 @@ public class AliPayAppAcquireOrderServiceImpl implements AcquireOrderService {
     @Override
     public AcquireOrderPackageResp acquireOrderPackage(Payment payment) {
         // 获取第三方机构配置
-        InstitutionConfig instConfig = instConfigManager.getConfig(payment.getPaytype());
+        InstitutionConfig instConfig = instConfigManager.getConfig(payment.getPayType());
 
         // 拼装请求Map
         Map<String, String> reqMap = buildReqMap(payment, instConfig);
@@ -80,7 +80,7 @@ public class AliPayAppAcquireOrderServiceImpl implements AcquireOrderService {
 
         // 返回报文结果
         AcquireOrderPackageResp resp = new AcquireOrderPackageResp();
-        resp.setResultType(AcquireOrderResultType.JSON);
+        resp.setResultType(AcquireOrderResultTypeEnum.JSON);
         resp.setResult(reqForm);
 
         return resp;
@@ -100,13 +100,13 @@ public class AliPayAppAcquireOrderServiceImpl implements AcquireOrderService {
         reqDict.put("service", "mobile.securitypay.pay");
         reqDict.put("partner", instConfig.getMerchantId());
         reqDict.put("seller_id", instConfig.getSellerEmail());
-        reqDict.put("out_trade_no", payment.getPaymentid());
+        reqDict.put("out_trade_no", payment.getPaymentId());
         reqDict.put("subject", payment.getBussinessOrder().getSubject());
-        reqDict.put("body", payment.getBussinessOrder().getProductdesc());
+        reqDict.put("body", payment.getBussinessOrder().getProductDesc());
         reqDict.put("rn_check", acquireOrderExt.getIsHangZhou() == 1 ? "T" : null);
-        reqDict.put("total_fee", String.format("%.2f", payment.getPayprice().doubleValue()));
+        reqDict.put("total_fee", String.format("%.2f", payment.getPayPrice().doubleValue()));
         reqDict.put("notify_url",
-                String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPaytype()));
+                String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPayType()));
         reqDict.put("payment_type", AliPayConsts.PAYMENT_TYPE_PURCHARE);
         reqDict.put("_input_charset", AliPayConsts.INPUT_CHARSET);
         reqDict.put("it_b_pay", AliPayConsts.ALI_APP_ORDER_CLOSE_TIME);
@@ -171,17 +171,17 @@ public class AliPayAppAcquireOrderServiceImpl implements AcquireOrderService {
             QueryEncryptResult result = new QueryEncryptResult();
             result.Partner = instConfig.getMerchantId();
             result.SellerId = instConfig.getSellerEmail();
-            result.OutTradeNo = payment.getPaymentid();
-            result.Subject = payment.getBussinessOrder().getProductname();
-            result.Body = payment.getBussinessOrder().getProductdesc();
-            result.TotalFee = String.format("%.2f", payment.getPayprice().doubleValue());
+            result.OutTradeNo = payment.getPaymentId();
+            result.Subject = payment.getBussinessOrder().getProductName();
+            result.Body = payment.getBussinessOrder().getProductDesc();
+            result.TotalFee = String.format("%.2f", payment.getPayPrice().doubleValue());
             result.NotifyUrl =
-                    String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPaytype());
+                    String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPayType());
             result.Service = "mobile.securitypay.pay";
             result.PaymentType = AliPayConsts.PAYMENT_TYPE_PURCHARE;
             result.InputCharset = "utf-8";
             result.ItBPay = AliPayConsts.ALI_APP_ORDER_CLOSE_TIME;
-            result.ShowUrl = payment.getBussinessOrder().getProducturl();
+            result.ShowUrl = payment.getBussinessOrder().getProductUrl();
             result.Sign = originSign;
             result.SignType = "RSA";
             result.EncryptStr = mapToString(reqMap);

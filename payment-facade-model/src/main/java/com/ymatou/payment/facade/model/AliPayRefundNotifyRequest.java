@@ -7,6 +7,8 @@ import java.util.Date;
 
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ymatou.payment.facade.BaseRequest;
@@ -27,31 +29,31 @@ public class AliPayRefundNotifyRequest extends BaseRequest {
     private Date notify_time;
 
     @JsonProperty("notify_type")
-    @NotNull
+    @NotEmpty
     private String notify_type;
 
     @JsonProperty("notify_id")
-    @NotNull
+    @NotEmpty
     private String notify_id;
 
     @JsonProperty("sign_type")
-    @NotNull
+    @NotEmpty
     private String sign_type;
 
     @JsonProperty("sign")
-    @NotNull
+    @NotEmpty
     private String sign;
 
     @JsonProperty("batch_no")
-    @NotNull
+    @NotEmpty
     private String batch_no;
 
     @JsonProperty("success_num")
-    @NotNull
+    @NotEmpty
     private String success_num;
 
     @JsonProperty("result_details")
-    @NotNull
+    @NotEmpty
     private String result_details;
 
     private String payType;

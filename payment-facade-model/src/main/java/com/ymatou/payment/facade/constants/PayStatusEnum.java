@@ -3,7 +3,7 @@
  *
  * All rights reserved.
  */
-package com.ymatou.payment.domain.channel.constants;
+package com.ymatou.payment.facade.constants;
 
 /**
  * 支付单状态

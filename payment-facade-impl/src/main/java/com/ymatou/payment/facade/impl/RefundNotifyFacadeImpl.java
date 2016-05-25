@@ -27,7 +27,7 @@ public class RefundNotifyFacadeImpl implements RefundNotifyFacade {
     private RefundNotifyService refundNotifyService;
 
     @Override
-    public BaseResponse refundNotify(AliPayRefundNotifyRequest req, String payType) {
+    public BaseResponse refundNotify(AliPayRefundNotifyRequest req) {
         // if (req.getNotify_time() == null || StringUtils.isBlank(req.getNotify_type())
         // || StringUtils.isBlank(req.getNotify_id()) || StringUtils.isBlank(req.getSign_type())
         // || StringUtils.isBlank(req.getSign()) || StringUtils.isBlank(req.getBatch_no())
@@ -36,7 +36,6 @@ public class RefundNotifyFacadeImpl implements RefundNotifyFacade {
         // throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "request data invalid.");
         // }
 
-        req.setPayType(payType);
         refundNotifyService.processRefundCallback(req);
 
         return new BaseResponse();

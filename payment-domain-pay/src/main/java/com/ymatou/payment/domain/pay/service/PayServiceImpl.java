@@ -9,11 +9,11 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
-import com.ymatou.payment.domain.pay.model.OrderStatus;
-import com.ymatou.payment.domain.pay.model.PayStatus;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.repository.BussinessOrderRepository;
 import com.ymatou.payment.domain.pay.repository.PaymentRepository;
+import com.ymatou.payment.facade.constants.OrderStatusEnum;
+import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.infrastructure.db.model.BussinessOrderPo;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
@@ -82,7 +82,7 @@ public class PayServiceImpl implements PayService {
         PaymentPo payment = new PaymentPo();
         payment.setBankId(req.getBankId());
         payment.setBussinessOrderId(bussinessOrder.getBussinessOrderId());
-        payment.setPayStatus(PayStatus.Init.getIndex());
+        payment.setPayStatus(PayStatusEnum.Init.getIndex());
         payment.setPayCurrencyType(req.getCurrency());
         payment.setPayPrice(bussinessOrder.getOrderPrice());
         payment.setPayType(req.getPayType());
@@ -112,7 +112,7 @@ public class PayServiceImpl implements PayService {
         bo.setNotifyUrl(req.getNotifyUrl());
         bo.setOrderId(req.getOrderId());
         bo.setOrderPrice(new BigDecimal(req.getPayPrice()));
-        bo.setOrderStatus(OrderStatus.Init.getIndex());
+        bo.setOrderStatus(OrderStatusEnum.Init.getIndex());
         bo.setOrderTime(req.getOrderTime());
         bo.setOriginAppId(req.getOriginAppId());
         bo.setPayType(req.getPayType());
@@ -148,17 +148,17 @@ public class PayServiceImpl implements PayService {
     @Override
     public void setPaymentOrderPaid(Payment payment, String traceId) {
         PaymentPo paymentPo = new PaymentPo();
-        paymentPo.setPaymentId(payment.getPaymentid());
-        paymentPo.setInstitutionPaymentId(payment.getInstitutionpaymentid());
-        paymentPo.setPayStatus(payment.getPaystatus());
-        paymentPo.setActualPayPrice(payment.getActualpayprice());
-        paymentPo.setActualPayCurrencyType(payment.getActualpaycurrencytype());
-        paymentPo.setBankId(payment.getBankid());
-        paymentPo.setCardType(payment.getCardtype());
-        paymentPo.setPayTime(payment.getPaytime());
+        paymentPo.setPaymentId(payment.getPaymentId());
+        paymentPo.setInstitutionPaymentId(payment.getInstitutionPaymentId());
+        paymentPo.setPayStatus(payment.getPayStatus());
+        paymentPo.setActualPayPrice(payment.getActualPayPrice());
+        paymentPo.setActualPayCurrencyType(payment.getActualPayCurrencyType());
+        paymentPo.setBankId(payment.getBankId());
+        paymentPo.setCardType(payment.getCardType());
+        paymentPo.setPayTime(payment.getPayTime());
         paymentPo.setLastUpdatedTime(new Date());
-        paymentPo.setExchangeRate(payment.getExchangerate());
-        paymentPo.setCheckStatus(payment.getCheckstatus());
+        paymentPo.setExchangeRate(payment.getExchangeRate());
+        paymentPo.setCheckStatus(payment.getCheckStatus());
 
         paymentRepository.setPaymentOrderPaid(paymentPo, traceId);
     }

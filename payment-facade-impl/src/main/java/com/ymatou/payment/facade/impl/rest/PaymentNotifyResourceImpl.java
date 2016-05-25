@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -27,13 +26,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.esotericsoftware.minlog.Log;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.PaymentNotifyFacade;
+import com.ymatou.payment.facade.constants.PaymentNotifyType;
 import com.ymatou.payment.facade.model.PaymentNotifyReq;
 import com.ymatou.payment.facade.model.PaymentNotifyResp;
-import com.ymatou.payment.facade.model.PaymentNotifyType;
 
 /**
  * 支付回调接口实现

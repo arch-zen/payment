@@ -24,12 +24,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.model.AcquireOrderPackageResp;
-import com.ymatou.payment.domain.channel.model.AcquireOrderResultType;
 import com.ymatou.payment.domain.channel.service.AcquireOrderService;
 import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
+import com.ymatou.payment.facade.constants.AcquireOrderResultTypeEnum;
 import com.ymatou.payment.facade.model.WeixinJSAPIOrderRequest;
 import com.ymatou.payment.infrastructure.util.StringUtil;
 import com.ymatou.payment.integration.IntegrationConfig;
@@ -70,7 +70,7 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
     @Override
     public AcquireOrderPackageResp acquireOrderPackage(Payment payment) {
         // 获取第三方机构配置
-        InstitutionConfig instConfig = instConfigManager.getConfig(payment.getPaytype());
+        InstitutionConfig instConfig = instConfigManager.getConfig(payment.getPayType());
 
         // 调用微信统一下单接口
         String prepayId = weiXinPrepayId(instConfig, payment);
@@ -80,7 +80,7 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
 
         // 返回报文结果
         AcquireOrderPackageResp resp = new AcquireOrderPackageResp();
-        resp.setResultType(AcquireOrderResultType.JSON);
+        resp.setResultType(AcquireOrderResultTypeEnum.JSON);
         resp.setResult(reqForm);
 
         return resp;
@@ -101,11 +101,11 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
             request.setMch_id(instConfig.getMerchantId());
             request.setNonce_str(String.valueOf(new Random().nextInt(1000000000)));
             request.setBody(payment.getBussinessOrder().getSubject());
-            request.setOut_trade_no(payment.getPaymentid());
-            request.setTotal_fee((int) (payment.getPayprice().doubleValue() * 100));
-            request.setSpbill_create_ip(payment.getBussinessOrder().getClientip());
+            request.setOut_trade_no(payment.getPaymentId());
+            request.setTotal_fee((int) (payment.getPayPrice().doubleValue() * 100));
+            request.setSpbill_create_ip(payment.getBussinessOrder().getClientIp());
             request.setNotify_url(
-                    String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPaytype()));
+                    String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPayType()));
             request.setTrade_type("JSAPI");
             request.setOpenid(getOpenId(payment));
 
@@ -133,7 +133,7 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
         } catch (Exception ex) {
             Log.error("call weixin unifed order failed", ex);
             throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
-                    "paymentid:" + payment.getPaymentid() + "|" + ex.getLocalizedMessage());
+                    "paymentid:" + payment.getPaymentId() + "|" + ex.getLocalizedMessage());
         }
     }
 
@@ -144,7 +144,7 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
      */
     private String getOpenId(Payment payment) {
         try {
-            Integer userId = payment.getBussinessOrder().getUserid();
+            Integer userId = payment.getBussinessOrder().getUserId();
             UserServiceResponse response = userService.doService(String.valueOf(userId), "Wap",
                     payment.getAcquireOrderReq().getMockHeader());
             if ("true".equals(response.getSuccess()))
@@ -225,7 +225,7 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
 
             return objectMapper.writeValueAsString(request);
         } catch (Exception e) {
-            Log.error("weixin jsapi buildFrom failed with paymentid:" + payment.getPaymentid(), e);
+            Log.error("weixin jsapi buildFrom failed with paymentid:" + payment.getPaymentId(), e);
             throw new BizException(ErrorCode.FAIL, "build jsapi form failed");
         }
     }

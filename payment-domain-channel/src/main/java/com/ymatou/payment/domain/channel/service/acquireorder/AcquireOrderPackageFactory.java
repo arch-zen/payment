@@ -7,13 +7,12 @@ package com.ymatou.payment.domain.channel.service.acquireorder;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import com.ymatou.payment.domain.channel.model.enums.PayTypeEnum;
 import com.ymatou.payment.domain.channel.service.AcquireOrderService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 
 /**
  * 收单报文工厂

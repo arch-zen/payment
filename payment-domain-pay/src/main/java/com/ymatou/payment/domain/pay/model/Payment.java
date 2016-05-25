@@ -15,390 +15,203 @@ import com.ymatou.payment.infrastructure.db.model.PaymentPo;
  */
 public class Payment extends PrintFriendliness {
 
-    /**
-     * 序列化版本号
-     */
     private static final long serialVersionUID = 2524661669277166299L;
 
-    /**
-     * 商户订单
-     */
     private BussinessOrder bussinessOrder;
-
-    /**
-     * 收单请求
-     */
     private AcquireOrderReq acquireOrderReq;
+    private String paymentId;
+    private String bussinessOrderId;
+    private String institutionPaymentId;
+    private String payType;
+    private BigDecimal payPrice;
+    private BigDecimal actualPayPrice;
+    private String payCurrencyType;
+    private String actualPayCurrencyType;
+    private Double exchangeRate;
+    private String bankId;
+    private Integer cardType;
+    private String payerId;
+    private Date createdTime;
+    private Integer payStatus;
+    private Date payTime;
+    private Date lastUpdatedTime;
+    private Integer checkStatus;
 
-    /**
-     * VARCHAR(32) 必填<br>
-     * 
-     */
-    private String paymentid;
-
-    /**
-     * CHAR(36) 必填<br>
-     * 
-     */
-    private String bussinessorderid;
-
-    /**
-     * VARCHAR(64)<br>
-     * 
-     */
-    private String institutionpaymentid;
-
-    /**
-     * VARCHAR(16) 必填<br>
-     * 
-     */
-    private String paytype;
-
-    /**
-     * DECIMAL(18,4) 必填<br>
-     * 
-     */
-    private BigDecimal payprice;
-
-    /**
-     * DECIMAL(18,4)<br>
-     * 
-     */
-    private BigDecimal actualpayprice;
-
-    /**
-     * VARCHAR(3) 必填<br>
-     * 
-     */
-    private String paycurrencytype;
-
-    /**
-     * VARCHAR(3)<br>
-     * 
-     */
-    private String actualpaycurrencytype;
-
-    /**
-     * DOUBLE(53)<br>
-     * 
-     */
-    private Double exchangerate;
-
-    /**
-     * VARCHAR(32)<br>
-     * 
-     */
-    private String bankid;
-
-    /**
-     * INTEGER(10)<br>
-     * 
-     */
-    private Integer cardtype;
-
-    /**
-     * VARCHAR(64)<br>
-     * 
-     */
-    private String payerid;
-
-    /**
-     * TIMESTAMP(23,3) 默认值[(getdate())] 必填<br>
-     * 
-     */
-    private Date createdtime;
-
-    /**
-     * INTEGER(10) 默认值[((0))] 必填<br>
-     * 
-     */
-    private Integer paystatus;
-
-    /**
-     * TIMESTAMP(23,3)<br>
-     * 
-     */
-    private Date paytime;
-
-    /**
-     * TIMESTAMP(23,3)<br>
-     * 
-     */
-    private Date lastupdatedtime;
-
-    /**
-     * INTEGER(10)<br>
-     * 
-     */
-    private Integer checkstatus;
-
-    /**
-     * VARCHAR(32) 必填<br>
-     */
-    public String getPaymentid() {
-        return paymentid;
+    public String getPaymentId() {
+        return paymentId;
     }
 
-    /**
-     * VARCHAR(32) 必填<br>
-     */
-    public void setPaymentid(String paymentid) {
-        this.paymentid = paymentid == null ? null : paymentid.trim();
+    public void setPaymentId(String paymentId) {
+        this.paymentId = paymentId;
     }
 
-    /**
-     * CHAR(36) 必填<br>
-     */
-    public String getBussinessorderid() {
-        return bussinessorderid;
+    public String getBussinessOrderId() {
+        return bussinessOrderId;
     }
 
-    /**
-     * CHAR(36) 必填<br>
-     */
-    public void setBussinessorderid(String bussinessorderid) {
-        this.bussinessorderid = bussinessorderid == null ? null : bussinessorderid.trim();
+    public void setBussinessOrderId(String bussinessOrderId) {
+        this.bussinessOrderId = bussinessOrderId;
     }
 
-    /**
-     * VARCHAR(64)<br>
-     */
-    public String getInstitutionpaymentid() {
-        return institutionpaymentid;
+    public String getInstitutionPaymentId() {
+        return institutionPaymentId;
     }
 
-    /**
-     * VARCHAR(64)<br>
-     */
-    public void setInstitutionpaymentid(String institutionpaymentid) {
-        this.institutionpaymentid = institutionpaymentid == null ? null : institutionpaymentid.trim();
+    public void setInstitutionPaymentId(String institutionPaymentId) {
+        this.institutionPaymentId = institutionPaymentId;
     }
 
-    /**
-     * VARCHAR(16) 必填<br>
-     */
-    public String getPaytype() {
-        return paytype;
+    public String getPayType() {
+        return payType;
     }
 
-    /**
-     * VARCHAR(16) 必填<br>
-     */
-    public void setPaytype(String paytype) {
-        this.paytype = paytype == null ? null : paytype.trim();
+    public void setPayType(String payType) {
+        this.payType = payType;
     }
 
-    /**
-     * DECIMAL(18,4) 必填<br>
-     */
-    public BigDecimal getPayprice() {
-        return payprice;
+    public BigDecimal getPayPrice() {
+        return payPrice;
     }
 
-    /**
-     * DECIMAL(18,4) 必填<br>
-     */
-    public void setPayprice(BigDecimal payprice) {
-        this.payprice = payprice;
+    public void setPayPrice(BigDecimal payPrice) {
+        this.payPrice = payPrice;
     }
 
-    /**
-     * DECIMAL(18,4)<br>
-     */
-    public BigDecimal getActualpayprice() {
-        return actualpayprice;
+    public BigDecimal getActualPayPrice() {
+        return actualPayPrice;
     }
 
-    /**
-     * DECIMAL(18,4)<br>
-     */
-    public void setActualpayprice(BigDecimal actualpayprice) {
-        this.actualpayprice = actualpayprice;
+    public void setActualPayPrice(BigDecimal actualPayPrice) {
+        this.actualPayPrice = actualPayPrice;
     }
 
-    /**
-     * VARCHAR(3) 必填<br>
-     */
-    public String getPaycurrencytype() {
-        return paycurrencytype;
+    public String getPayCurrencyType() {
+        return payCurrencyType;
     }
 
-    /**
-     * VARCHAR(3) 必填<br>
-     */
-    public void setPaycurrencytype(String paycurrencytype) {
-        this.paycurrencytype = paycurrencytype == null ? null : paycurrencytype.trim();
+    public void setPayCurrencyType(String payCurrencyType) {
+        this.payCurrencyType = payCurrencyType;
     }
 
-    /**
-     * VARCHAR(3)<br>
-     */
-    public String getActualpaycurrencytype() {
-        return actualpaycurrencytype;
+    public String getActualPayCurrencyType() {
+        return actualPayCurrencyType;
     }
 
-    /**
-     * VARCHAR(3)<br>
-     */
-    public void setActualpaycurrencytype(String actualpaycurrencytype) {
-        this.actualpaycurrencytype = actualpaycurrencytype == null ? null : actualpaycurrencytype.trim();
+    public void setActualPayCurrencyType(String actualPayCurrencyType) {
+        this.actualPayCurrencyType = actualPayCurrencyType;
     }
 
-    /**
-     * DOUBLE(53)<br>
-     */
-    public Double getExchangerate() {
-        return exchangerate;
+    public Double getExchangeRate() {
+        return exchangeRate;
     }
 
-    /**
-     * DOUBLE(53)<br>
-     */
-    public void setExchangerate(Double exchangerate) {
-        this.exchangerate = exchangerate;
+    public void setExchangeRate(Double exchangeRate) {
+        this.exchangeRate = exchangeRate;
     }
 
-    /**
-     * VARCHAR(32)<br>
-     */
-    public String getBankid() {
-        return bankid;
+    public String getBankId() {
+        return bankId;
     }
 
-    /**
-     * VARCHAR(32)<br>
-     */
-    public void setBankid(String bankid) {
-        this.bankid = bankid == null ? null : bankid.trim();
+    public void setBankId(String bankId) {
+        this.bankId = bankId;
     }
 
-    /**
-     * INTEGER(10)<br>
-     */
-    public Integer getCardtype() {
-        return cardtype;
+    public Integer getCardType() {
+        return cardType;
     }
 
-    /**
-     * INTEGER(10)<br>
-     */
-    public void setCardtype(Integer cardtype) {
-        this.cardtype = cardtype;
+    public void setCardType(Integer cardType) {
+        this.cardType = cardType;
     }
 
-    /**
-     * VARCHAR(64)<br>
-     */
-    public String getPayerid() {
-        return payerid;
+    public String getPayerId() {
+        return payerId;
     }
 
-    /**
-     * VARCHAR(64)<br>
-     */
-    public void setPayerid(String payerid) {
-        this.payerid = payerid == null ? null : payerid.trim();
+    public void setPayerId(String payerId) {
+        this.payerId = payerId;
     }
 
-    /**
-     * TIMESTAMP(23,3) 默认值[(getdate())] 必填<br>
-     */
-    public Date getCreatedtime() {
-        return createdtime;
+    public Date getCreatedTime() {
+        return createdTime;
     }
 
-    /**
-     * TIMESTAMP(23,3) 默认值[(getdate())] 必填<br>
-     */
-    public void setCreatedtime(Date createdtime) {
-        this.createdtime = createdtime;
+    public void setCreatedTime(Date createdTime) {
+        this.createdTime = createdTime;
     }
 
-    /**
-     * INTEGER(10) 默认值[((0))] 必填<br>
-     */
-    public Integer getPaystatus() {
-        return paystatus;
+    public Integer getPayStatus() {
+        return payStatus;
     }
 
-    /**
-     * INTEGER(10) 默认值[((0))] 必填<br>
-     */
-    public void setPaystatus(Integer paystatus) {
-        this.paystatus = paystatus;
+    public void setPayStatus(Integer payStatus) {
+        this.payStatus = payStatus;
     }
 
-    /**
-     * TIMESTAMP(23,3)<br>
-     */
-    public Date getPaytime() {
-        return paytime;
+    public Date getPayTime() {
+        return payTime;
     }
 
-    /**
-     * TIMESTAMP(23,3)<br>
-     */
-    public void setPaytime(Date paytime) {
-        this.paytime = paytime;
+    public void setPayTime(Date payTime) {
+        this.payTime = payTime;
     }
 
-    /**
-     * TIMESTAMP(23,3)<br>
-     */
-    public Date getLastupdatedtime() {
-        return lastupdatedtime;
+    public Date getLastUpdatedTime() {
+        return lastUpdatedTime;
     }
 
-    /**
-     * TIMESTAMP(23,3)<br>
-     */
-    public void setLastupdatedtime(Date lastupdatedtime) {
-        this.lastupdatedtime = lastupdatedtime;
+    public void setLastUpdatedTime(Date lastUpdatedTime) {
+        this.lastUpdatedTime = lastUpdatedTime;
     }
 
-    /**
-     * INTEGER(10)<br>
-     */
-    public Integer getCheckstatus() {
-        return checkstatus;
+    public Integer getCheckStatus() {
+        return checkStatus;
     }
 
-    /**
-     * INTEGER(10)<br>
-     */
-    public void setCheckstatus(Integer checkstatus) {
-        this.checkstatus = checkstatus;
+    public void setCheckStatus(Integer checkStatus) {
+        this.checkStatus = checkStatus;
     }
 
-    /**
-     * This method was generated by MyBatis Generator. This method corresponds to the database table
-     * PP_Payment
-     *
-     * @mbggenerated Wed May 04 11:33:50 CST 2016
-     */
+    public BussinessOrder getBussinessOrder() {
+        return bussinessOrder;
+    }
+
+    public void setBussinessOrder(BussinessOrder bussinessOrder) {
+        this.bussinessOrder = bussinessOrder;
+    }
+
+    public AcquireOrderReq getAcquireOrderReq() {
+        return acquireOrderReq;
+    }
+
+    public void setAcquireOrderReq(AcquireOrderReq acquireOrderReq) {
+        this.acquireOrderReq = acquireOrderReq;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
-        sb.append(", paymentid=").append(paymentid);
-        sb.append(", bussinessorderid=").append(bussinessorderid);
-        sb.append(", institutionpaymentid=").append(institutionpaymentid);
-        sb.append(", paytype=").append(paytype);
-        sb.append(", payprice=").append(payprice);
-        sb.append(", actualpayprice=").append(actualpayprice);
-        sb.append(", paycurrencytype=").append(paycurrencytype);
-        sb.append(", actualpaycurrencytype=").append(actualpaycurrencytype);
-        sb.append(", exchangerate=").append(exchangerate);
-        sb.append(", bankid=").append(bankid);
-        sb.append(", cardtype=").append(cardtype);
-        sb.append(", payerid=").append(payerid);
-        sb.append(", createdtime=").append(createdtime);
-        sb.append(", paystatus=").append(paystatus);
-        sb.append(", paytime=").append(paytime);
-        sb.append(", lastupdatedtime=").append(lastupdatedtime);
-        sb.append(", checkstatus=").append(checkstatus);
+        sb.append(", paymentId=").append(paymentId);
+        sb.append(", bussinessOrderId=").append(bussinessOrderId);
+        sb.append(", institutionPaymentId=").append(institutionPaymentId);
+        sb.append(", payType=").append(payType);
+        sb.append(", payPrice=").append(payPrice);
+        sb.append(", actualPayPrice=").append(actualPayPrice);
+        sb.append(", payCurrencyType=").append(payCurrencyType);
+        sb.append(", actualPayCurrencyType=").append(actualPayCurrencyType);
+        sb.append(", exchangeRate=").append(exchangeRate);
+        sb.append(", bankId=").append(bankId);
+        sb.append(", cardType=").append(cardType);
+        sb.append(", payerId=").append(payerId);
+        sb.append(", createdTime=").append(createdTime);
+        sb.append(", payStatus=").append(payStatus);
+        sb.append(", payTime=").append(payTime);
+        sb.append(", lastUpdatedTime=").append(lastUpdatedTime);
+        sb.append(", checkStatus=").append(checkStatus);
         sb.append("]");
         return sb.toString();
     }
@@ -411,53 +224,24 @@ public class Payment extends PrintFriendliness {
      */
     public static Payment convertFromPo(PaymentPo po) {
         Payment model = new Payment();
-        model.setPaymentid(po.getPaymentId());
-        model.setBussinessorderid(po.getBussinessOrderId());
-        model.setInstitutionpaymentid(po.getInstitutionPaymentId());
-        model.setPaytype(po.getPayType());
-        model.setPayprice(po.getPayPrice());
-        model.setPaycurrencytype(po.getPayCurrencyType());
-        model.setActualpayprice(po.getActualPayPrice());
-        model.setActualpaycurrencytype(po.getActualPayCurrencyType());
-        model.setExchangerate(po.getExchangeRate());
-        model.setBankid(po.getBankId());
-        model.setCardtype(po.getCardType());
-        model.setPayerid(po.getPayerId());
-        model.setCreatedtime(po.getCreatedTime());
-        model.setPaystatus(po.getPayStatus());
-        model.setPaytime(po.getPayTime());
-        model.setLastupdatedtime(po.getLastUpdatedTime());
-        model.setCheckstatus(po.getCheckStatus());
+        model.setPaymentId(po.getPaymentId());
+        model.setBussinessOrderId(po.getBussinessOrderId());
+        model.setInstitutionPaymentId(po.getInstitutionPaymentId());
+        model.setPayType(po.getPayType());
+        model.setPayPrice(po.getPayPrice());
+        model.setPayCurrencyType(po.getPayCurrencyType());
+        model.setActualPayPrice(po.getActualPayPrice());
+        model.setActualPayCurrencyType(po.getActualPayCurrencyType());
+        model.setExchangeRate(po.getExchangeRate());
+        model.setBankId(po.getBankId());
+        model.setCardType(po.getCardType());
+        model.setPayerId(po.getPayerId());
+        model.setCreatedTime(po.getCreatedTime());
+        model.setPayStatus(po.getPayStatus());
+        model.setPayTime(po.getPayTime());
+        model.setLastUpdatedTime(po.getLastUpdatedTime());
+        model.setCheckStatus(po.getCheckStatus());
 
         return model;
     }
-
-    /**
-     * @return the bussinessOrder
-     */
-    public BussinessOrder getBussinessOrder() {
-        return bussinessOrder;
-    }
-
-    /**
-     * @param bussinessOrder the bussinessOrder to set
-     */
-    public void setBussinessOrder(BussinessOrder bussinessOrder) {
-        this.bussinessOrder = bussinessOrder;
-    }
-
-    /**
-     * @return the acquireOrderReq
-     */
-    public AcquireOrderReq getAcquireOrderReq() {
-        return acquireOrderReq;
-    }
-
-    /**
-     * @param acquireOrderReq the acquireOrderReq to set
-     */
-    public void setAcquireOrderReq(AcquireOrderReq acquireOrderReq) {
-        this.acquireOrderReq = acquireOrderReq;
-    }
-
 }

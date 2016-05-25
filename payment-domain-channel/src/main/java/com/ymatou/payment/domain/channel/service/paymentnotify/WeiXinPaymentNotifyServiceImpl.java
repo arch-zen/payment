@@ -6,7 +6,6 @@
 package com.ymatou.payment.domain.channel.service.paymentnotify;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -22,12 +21,12 @@ import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.model.PaymentNotifyMessage;
 import com.ymatou.payment.domain.channel.service.PaymentNotifyService;
 import com.ymatou.payment.domain.channel.service.SignatureService;
-import com.ymatou.payment.domain.pay.model.PayStatus;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
+import com.ymatou.payment.facade.constants.PayStatusEnum;
+import com.ymatou.payment.facade.constants.PaymentNotifyType;
 import com.ymatou.payment.facade.model.PaymentNotifyReq;
-import com.ymatou.payment.facade.model.PaymentNotifyType;
 import com.ymatou.payment.infrastructure.util.MapUtil;
 
 /**
@@ -94,7 +93,7 @@ public class WeiXinPaymentNotifyServiceImpl implements PaymentNotifyService {
         paymentNotifyMessage.setPaymentId(map.get("out_trade_no"));
         paymentNotifyMessage
                 .setPayTime(DateUtils.parseDate(map.get("time_end"), new String[] {"yyyyMMddHHmmss"}));
-        paymentNotifyMessage.setPayStatus(PayStatus.Paied);
+        paymentNotifyMessage.setPayStatus(PayStatusEnum.Paied);
 
 
         return paymentNotifyMessage;

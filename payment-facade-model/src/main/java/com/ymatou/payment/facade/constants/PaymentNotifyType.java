@@ -3,7 +3,7 @@
  *
  * All rights reserved.
  */
-package com.ymatou.payment.facade.model;
+package com.ymatou.payment.facade.constants;
 
 /**
  * 支付通知回调类型

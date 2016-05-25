@@ -26,12 +26,12 @@ import com.ymatou.payment.domain.channel.model.PaymentNotifyMessage;
 import com.ymatou.payment.domain.channel.service.PaymentNotifyService;
 import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
-import com.ymatou.payment.domain.pay.model.PayStatus;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
+import com.ymatou.payment.facade.constants.PayStatusEnum;
+import com.ymatou.payment.facade.constants.PaymentNotifyType;
 import com.ymatou.payment.facade.model.PaymentNotifyReq;
-import com.ymatou.payment.facade.model.PaymentNotifyType;
 import com.ymatou.payment.infrastructure.util.HttpUtil;
 
 /**
@@ -92,7 +92,7 @@ public class AliPayPaymentNotifyServiceImpl implements PaymentNotifyService {
         String payStatus = map.get("trade_status");
         if (!StringUtils.isBlank(payStatus)
                 && (payStatus.equals("TRADE_SUCCESS") || payStatus.equals("TRADE_FINISHED")))
-            paymentNotifyMessage.setPayStatus(PayStatus.Paied);
+            paymentNotifyMessage.setPayStatus(PayStatusEnum.Paied);
 
         return paymentNotifyMessage;
     }
@@ -122,18 +122,18 @@ public class AliPayPaymentNotifyServiceImpl implements PaymentNotifyService {
      */
     private String buildClientResponse(PaymentNotifyMessage notifyMessage, Payment payment) {
         BussinessOrder bussinessOrder = payment.getBussinessOrder();
-        StringBuilder sbUrl = new StringBuilder(bussinessOrder.getCallbackurl() + "?");
-        sbUrl.append(queryStringFormat("AppId", bussinessOrder.getAppid()));
+        StringBuilder sbUrl = new StringBuilder(bussinessOrder.getCallbackUrl() + "?");
+        sbUrl.append(queryStringFormat("AppId", bussinessOrder.getAppId()));
         sbUrl.append(queryStringFormat("Currency", notifyMessage.getActualPayCurrency()));
         sbUrl.append(queryStringFormat("InstPaymentId", notifyMessage.getInstitutionPaymentId()));
         sbUrl.append(queryStringFormat("Memo", bussinessOrder.getMemo()));
-        sbUrl.append(queryStringFormat("TradingId", bussinessOrder.getOrderid()));
+        sbUrl.append(queryStringFormat("TradingId", bussinessOrder.getOrderId()));
         sbUrl.append(queryStringFormat("PaymentId", notifyMessage.getPaymentId()));
         sbUrl.append(queryStringFormat("PayPrice", notifyMessage.getActualPayPrice().setScale(2).toString()));
         sbUrl.append(queryStringFormat("PayTime", DateUtil.formatDate(notifyMessage.getPayTime(), "yyyyMMddHHmmss")));
         sbUrl.append(queryStringFormat("TraceId", notifyMessage.getTraceId()));
         sbUrl.append(queryStringFormat("Version", bussinessOrder.getVersion().toString()));
-        sbUrl.append(queryStringFormat("PayType", bussinessOrder.getPaytype()));
+        sbUrl.append(queryStringFormat("PayType", bussinessOrder.getPayType()));
 
         return sbUrl.toString().substring(1);
     }

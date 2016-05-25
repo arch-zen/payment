@@ -8,7 +8,7 @@ package com.ymatou.payment.domain.channel.model;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import com.ymatou.payment.domain.pay.model.PayStatus;
+import com.ymatou.payment.facade.constants.PayStatusEnum;
 
 public class PaymentNotifyMessage {
     /**
@@ -59,7 +59,7 @@ public class PaymentNotifyMessage {
     /**
      * 支付单状态
      */
-    private PayStatus payStatus;
+    private PayStatusEnum payStatus;
 
     /**
      * 跟踪Id
@@ -195,14 +195,14 @@ public class PaymentNotifyMessage {
     /**
      * @return the payStatus
      */
-    public PayStatus getPayStatus() {
+    public PayStatusEnum getPayStatus() {
         return payStatus;
     }
 
     /**
      * @param payStatus the payStatus to set
      */
-    public void setPayStatus(PayStatus payStatus) {
+    public void setPayStatus(PayStatusEnum payStatus) {
         this.payStatus = payStatus;
     }
 

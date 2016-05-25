@@ -8,6 +8,7 @@ package com.ymatou.payment.facade.model;
 import java.util.HashMap;
 
 import com.ymatou.payment.facade.BaseRequest;
+import com.ymatou.payment.facade.constants.PaymentNotifyType;
 
 /**
  * 支付回调请求
