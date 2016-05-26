@@ -34,19 +34,19 @@ public class Payment extends PrintFriendliness {
      * VARCHAR(32) 必填<br>
      * 
      */
-    private String paymentid;
+    private String paymentId;
 
     /**
      * CHAR(36) 必填<br>
      * 
      */
-    private String bussinessorderid;
+    private String bussinessOrderId;
 
     /**
      * VARCHAR(64)<br>
      * 
      */
-    private String institutionpaymentid;
+    private String institutionPaymentId;
 
     /**
      * VARCHAR(16) 必填<br>
@@ -136,42 +136,42 @@ public class Payment extends PrintFriendliness {
      * VARCHAR(32) 必填<br>
      */
     public String getPaymentid() {
-        return paymentid;
+        return paymentId;
     }
 
     /**
      * VARCHAR(32) 必填<br>
      */
     public void setPaymentid(String paymentid) {
-        this.paymentid = paymentid == null ? null : paymentid.trim();
+        this.paymentId = paymentid == null ? null : paymentid.trim();
     }
 
     /**
      * CHAR(36) 必填<br>
      */
     public String getBussinessorderid() {
-        return bussinessorderid;
+        return bussinessOrderId;
     }
 
     /**
      * CHAR(36) 必填<br>
      */
     public void setBussinessorderid(String bussinessorderid) {
-        this.bussinessorderid = bussinessorderid == null ? null : bussinessorderid.trim();
+        this.bussinessOrderId = bussinessorderid == null ? null : bussinessorderid.trim();
     }
 
     /**
      * VARCHAR(64)<br>
      */
     public String getInstitutionpaymentid() {
-        return institutionpaymentid;
+        return institutionPaymentId;
     }
 
     /**
      * VARCHAR(64)<br>
      */
     public void setInstitutionpaymentid(String institutionpaymentid) {
-        this.institutionpaymentid = institutionpaymentid == null ? null : institutionpaymentid.trim();
+        this.institutionPaymentId = institutionpaymentid == null ? null : institutionpaymentid.trim();
     }
 
     /**
@@ -382,9 +382,9 @@ public class Payment extends PrintFriendliness {
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
-        sb.append(", paymentid=").append(paymentid);
-        sb.append(", bussinessorderid=").append(bussinessorderid);
-        sb.append(", institutionpaymentid=").append(institutionpaymentid);
+        sb.append(", paymentid=").append(paymentId);
+        sb.append(", bussinessorderid=").append(bussinessOrderId);
+        sb.append(", institutionpaymentid=").append(institutionPaymentId);
         sb.append(", paytype=").append(paytype);
         sb.append(", payprice=").append(payprice);
         sb.append(", actualpayprice=").append(actualpayprice);
@@ -410,6 +410,9 @@ public class Payment extends PrintFriendliness {
      * @return
      */
     public static Payment convertFromPo(PaymentPo po) {
+        if (po == null) {
+            return null;
+        }
         Payment model = new Payment();
         model.setPaymentid(po.getPaymentId());
         model.setBussinessorderid(po.getBussinessOrderId());

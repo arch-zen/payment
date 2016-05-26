@@ -118,6 +118,7 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
             if (refundrequestPo == null) { // 若不存在RefundRequest，则插入
                 RefundRequestPo refundrequest = new RefundRequestPo();
                 refundrequest.setPaymentId(tradeRefundDetail.getPaymentId());
+                refundrequest.setInstPaymentId(tradeRefundDetail.getInstPaymentId());
                 refundrequest.setTradeNo(tradeRefundDetail.getTradeNo());
                 refundrequest.setOrderId(req.getOrderId());
                 refundrequest.setTraceId(req.getTraceId());

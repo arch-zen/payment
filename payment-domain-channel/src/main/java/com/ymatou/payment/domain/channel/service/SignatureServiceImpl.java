@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.channel.InstitutionConfig;
+import com.ymatou.payment.domain.channel.model.enums.PayTypeEnum;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.infrastructure.security.MD5Util;
@@ -59,8 +60,12 @@ public class SignatureServiceImpl implements SignatureService {
     public String signMessage(Map<String, String> rawMapData, InstitutionConfig instConfig,
             HashMap<String, String> mockHeader) {
         // 拼装加签报文
-        boolean needSort = !"13".equals(instConfig.getPayType())// 13- AliPay App的收单加签不需要对参数排序
-                || "single_trade_query".equals(rawMapData.get("service")); // 13 的单笔交易查询需要对参数排序
+
+        // 13-AliPay-App
+        // 收单加签不需要对参数排序
+        // 单笔交易查询需要对参数排序
+        boolean needSort = !PayTypeEnum.AliPayApp.getCode().equals(instConfig.getPayType())
+                || "single_trade_query".equals(rawMapData.get("service"));
         String rawMessage = mapToString(rawMapData, instConfig, needSort);
         String sign = null;
 
@@ -89,7 +94,7 @@ public class SignatureServiceImpl implements SignatureService {
 
         if ("MD5".equals(instConfig.getSignType())) {
             String md5Sign = md5Sign(rawMessage, instConfig, mockHeader);
-            return sign.equals(md5Sign);
+            return sign.equalsIgnoreCase(md5Sign);
         }
 
         if ("RSA".equals(instConfig.getSignType())) {

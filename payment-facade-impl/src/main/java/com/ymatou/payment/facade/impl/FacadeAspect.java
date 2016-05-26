@@ -86,7 +86,8 @@ public class FacadeAspect {
             logger.warn("Failed to execute request: {}, Error:{}", req.getRequestId(),
                     e.getErrorCode() + "|" + e.getErrorCode().getMessage() + "|" + e.getLocalizedMessage());
         } catch (SQLException | DataIntegrityViolationException e) {
-            resp = builErrorResponse(joinPoint, ErrorCode.UNKNOWN, "EntityValidationErrors-SqlExecption");
+            resp = builErrorResponse(joinPoint, ErrorCode.UNKNOWN,
+                    "EntityValidationErrors-" + e.getClass().getName());
             logger.error("Unknown error in executing request:{}", req, e);
 
         } catch (Throwable e) {

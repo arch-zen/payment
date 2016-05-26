@@ -52,6 +52,7 @@ public class RefundPository {
             Refund refundInfo) {
         RefundRequestPo refundrequest = new RefundRequestPo();
         refundrequest.setPaymentId(payment.getPaymentid());
+        refundrequest.setInstPaymentId(payment.getInstitutionpaymentid());
         refundrequest.setTradeNo(bussinessorder.getOrderid());
         refundrequest.setOrderId(refundInfo.getOrderIdList().get(0));
         refundrequest.setTraceId(refundInfo.getTraceId());
@@ -67,7 +68,7 @@ public class RefundPository {
 
         CompensateProcessInfoPo compensateprocessinfo = new CompensateProcessInfoPo();
         compensateprocessinfo.setCorrelateId(payment.getPaymentid());
-        compensateprocessinfo.setAppId(refundInfo.getAppId());
+        compensateprocessinfo.setAppId("1");
         compensateprocessinfo.setPayType(null);
         compensateprocessinfo.setMethodName("Refund");
         compensateprocessinfo.setRequestUrl("");

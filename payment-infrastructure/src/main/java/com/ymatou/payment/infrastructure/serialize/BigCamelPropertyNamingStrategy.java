@@ -19,11 +19,23 @@ public class BigCamelPropertyNamingStrategy extends PropertyNamingStrategy {
 
     @Override
     public String nameForGetterMethod(MapperConfig<?> config, AnnotatedMethod method, String defaultName) {
-        return method.getName().substring(3);
+        String methodName = method.getName();
+        if (methodName.startsWith("get"))
+            return methodName.substring(3);
+        else if (methodName.startsWith("is"))
+            return "Is" + methodName.substring(2);
+        else
+            return methodName;
     }
 
     @Override
     public String nameForSetterMethod(MapperConfig<?> config, AnnotatedMethod method, String defaultName) {
-        return method.getName().substring(3);
+        String methodName = method.getName();
+        if (methodName.startsWith("set"))
+            return methodName.substring(3);
+        else if (methodName.startsWith("is"))
+            return methodName.substring(2);
+        else
+            return methodName;
     }
 }

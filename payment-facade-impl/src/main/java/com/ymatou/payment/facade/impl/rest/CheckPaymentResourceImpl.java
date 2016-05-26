@@ -38,29 +38,26 @@ public class CheckPaymentResourceImpl implements CheckPaymentResource {
     @Path("/{CheckPayment:(?i:CheckPayment)}")
     @Override
     public String checkPayment(CheckPaymentRequset req, @Context HttpServletRequest servletRequest) {
-        req.setHeader(generateHttpHeader(servletRequest));
+        req.setHeader(getMockHttpHeader(servletRequest));
 
-        BaseResponse response = checkPaymentFacade.checkPayment(req);
-        if (response.getIsSuccess()) {
-            return "ok";
-        } else {
-            return "failed";
-        }
+        checkPaymentFacade.checkPayment(req);
+
+        return "ok";
     }
 
     /**
-     * 获取请求中的HttpHeader
+     * 获取请求中的HttpMockHeader
      * 
      * @param servletRequest
      * @return
      */
-    private HashMap<String, String> generateHttpHeader(HttpServletRequest servletRequest) {
-        // generate http header
+    private HashMap<String, String> getMockHttpHeader(HttpServletRequest servletRequest) {
         Enumeration<String> headerNames = servletRequest.getHeaderNames();
         HashMap<String, String> header = new HashMap<>();
         while (headerNames.hasMoreElements()) {
             String headerName = (String) headerNames.nextElement();
-            header.put(headerName, servletRequest.getHeader(headerName));
+            if (headerName != null && headerName.toLowerCase().startsWith("mock"))
+                header.put(headerName, servletRequest.getHeader(headerName));
         }
         return header;
     }

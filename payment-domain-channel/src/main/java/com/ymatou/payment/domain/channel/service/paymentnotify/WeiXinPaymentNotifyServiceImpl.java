@@ -113,8 +113,8 @@ public class WeiXinPaymentNotifyServiceImpl implements PaymentNotifyService {
     public String buildResponse(PaymentNotifyMessage notifyMessage, Payment payment, PaymentNotifyType notifyType) {
         StringBuilder sb = new StringBuilder();
         sb.append("<xml>");
-        sb.append("<return_code><![CDATA[SUCCESS]]></return_code>");
-        sb.append("<return_msg><![CDATA[OK]]></return_msg>");
+        sb.append("<return_code>SUCCESS</return_code>");
+        sb.append("<return_msg>OK</return_msg>");
         sb.append("</xml>");
 
         return sb.toString();

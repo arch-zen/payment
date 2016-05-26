@@ -20,7 +20,7 @@ public class ApproveRefundDetail extends PrintFriendliness {
      */
     private boolean okFlag;
 
-    public boolean isOkFlag() {
+    public boolean getOkFlag() {
         return okFlag;
     }
 

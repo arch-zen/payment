@@ -122,7 +122,7 @@ public class AliPayPaymentNotifyServiceImpl implements PaymentNotifyService {
      */
     private String buildClientResponse(PaymentNotifyMessage notifyMessage, Payment payment) {
         BussinessOrder bussinessOrder = payment.getBussinessOrder();
-        StringBuilder sbUrl = new StringBuilder(bussinessOrder.getCallbackurl() + "?");
+        StringBuilder sbUrl = new StringBuilder();
         sbUrl.append(queryStringFormat("AppId", bussinessOrder.getAppid()));
         sbUrl.append(queryStringFormat("Currency", notifyMessage.getActualPayCurrency()));
         sbUrl.append(queryStringFormat("InstPaymentId", notifyMessage.getInstitutionPaymentId()));
@@ -135,7 +135,7 @@ public class AliPayPaymentNotifyServiceImpl implements PaymentNotifyService {
         sbUrl.append(queryStringFormat("Version", bussinessOrder.getVersion().toString()));
         sbUrl.append(queryStringFormat("PayType", bussinessOrder.getPaytype()));
 
-        return sbUrl.toString().substring(1);
+        return bussinessOrder.getCallbackurl() + "?" + sbUrl.toString().substring(1);
     }
 
     /**

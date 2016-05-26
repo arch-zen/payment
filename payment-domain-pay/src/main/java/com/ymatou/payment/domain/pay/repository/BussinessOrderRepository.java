@@ -73,7 +73,7 @@ public class BussinessOrderRepository {
         bussinessOrderPo.setBussinessOrderId(bussinessorderid);
         int updated = mapper.updateByPrimaryKeySelective(bussinessOrderPo);
         if (updated <= 0) {
-            throw new BizException("Bussinessorder not exist");
+            throw new BizException("update bussinessorder failed With not exist bussinessorderid :" + bussinessorderid);
         }
     }
 
