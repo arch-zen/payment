@@ -69,7 +69,7 @@ public class PaymentNotifyResourceImpl implements PaymentNotifyResource {
                 String url = notifyResp.getResult();
                 response = Response.status(Status.FOUND).header("location", url).build();
             } else {
-                logger.error("process callback failed with paytype: " + payType);
+                logger.error("process callback failed with paytype: " + payType + "|" + notifyResp.getErrorMessage());
                 response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
         } catch (Exception e) {

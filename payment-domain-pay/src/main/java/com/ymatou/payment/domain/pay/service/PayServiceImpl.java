@@ -148,6 +148,7 @@ public class PayServiceImpl implements PayService {
     @Override
     public void setPaymentOrderPaid(Payment payment, String traceId) {
         PaymentPo paymentPo = new PaymentPo();
+        paymentPo.setBussinessOrderId(payment.getBussinessOrderId());
         paymentPo.setPaymentId(payment.getPaymentId());
         paymentPo.setInstitutionPaymentId(payment.getInstitutionPaymentId());
         paymentPo.setPayStatus(payment.getPayStatus());
@@ -159,6 +160,7 @@ public class PayServiceImpl implements PayService {
         paymentPo.setLastUpdatedTime(new Date());
         paymentPo.setExchangeRate(payment.getExchangeRate());
         paymentPo.setCheckStatus(payment.getCheckStatus());
+        paymentPo.setPayerId(payment.getPayerId());
 
         paymentRepository.setPaymentOrderPaid(paymentPo, traceId);
     }

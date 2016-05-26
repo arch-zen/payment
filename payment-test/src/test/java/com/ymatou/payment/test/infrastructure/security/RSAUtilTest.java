@@ -12,6 +12,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Base64;
 
 import org.junit.Test;
 
@@ -39,6 +40,11 @@ public class RSAUtilTest {
         String rsaSign =
                 "Tr0A6L06m93pOh5cEUhYv6jWDtfxirOUQk2oXszKrIv0xwp71GgvL69csT7j2y+x+hnteoCUbHw6lyqP/hcprlEMJ1GTXiEnu2eECYSf5bhbw1xOdF/db7HMM2JxwPhY/lsEoC4d/TmDNzeK5nDT2PZGkcp53nM7hfS+zK2hMf8=";
         String result = RSAUtil.sign(target, PRIVATE_KEY);
+
+        String raw =
+                "BM3xEGZ9GKZDPGPNrDAY1xjaJrbL/Av4b2RpWYjZSDYmEs8QB6wPli90pzudoo7BnZM0UPgK2asnzb9Lui41t8XxGeSHw+cmqMDcr+AdQ+Ibi/liPH/eetB4sFeGvJM5xtOYbl225ErOK7RhxXzQ/ZXCP9PUups9jLCoF5zB1CE=";
+
+        Base64.getDecoder().decode(raw);
 
         assertEquals(rsaSign, result);
     }

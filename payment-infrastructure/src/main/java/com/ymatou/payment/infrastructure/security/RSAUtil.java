@@ -140,6 +140,8 @@ public class RSAUtil {
         signature.initVerify(pubKey);
         signature.update(content.getBytes("utf-8"));
 
+        sign = sign.replaceAll("\r|\n", "");
+
         boolean bverify = signature.verify(Base64.getDecoder().decode(sign));
         return bverify;
     }

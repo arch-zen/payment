@@ -97,8 +97,10 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
                 }
             }
         } else {
-            if (PayStatusEnum.Paied.equals(payment.getPayStatus())) {
+
+            if (payment.getPayStatus() != null && payment.getPayStatus().intValue() > 0) {
                 paymentRepository.updatePaymentCheckStatus(CheckStatusEnum.THIRD_PART_NOT_PAID.getCode(), paymentId); // 第三方未付，YMT已付
+
                 logger.error("{} pay check failed, but paystatus is successful!", paymentId);
             } else {
                 int checkStatus = checkFailed(finalCheck, payment.getCheckStatus());

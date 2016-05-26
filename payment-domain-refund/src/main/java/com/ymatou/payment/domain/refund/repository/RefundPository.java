@@ -51,8 +51,12 @@ public class RefundPository {
     public void addRefundrequestAndCompensateprocessinfo(Payment payment, BussinessOrder bussinessorder,
             Refund refundInfo) {
         RefundRequestPo refundrequest = new RefundRequestPo();
+
         refundrequest.setPaymentId(payment.getPaymentId());
+        refundrequest.setInstPaymentId(payment.getInstitutionPaymentId());
         refundrequest.setTradeNo(bussinessorder.getOrderId());
+
+
         refundrequest.setOrderId(refundInfo.getOrderIdList().get(0));
         refundrequest.setTraceId(refundInfo.getTraceId());
         refundrequest.setAppId(refundInfo.getAppId());
@@ -66,8 +70,9 @@ public class RefundPository {
         refundrequest.setTradeType(refundInfo.getTradeType());
 
         CompensateProcessInfoPo compensateprocessinfo = new CompensateProcessInfoPo();
+
         compensateprocessinfo.setCorrelateId(payment.getPaymentId());
-        compensateprocessinfo.setAppId(refundInfo.getAppId());
+        compensateprocessinfo.setAppId("1");
         compensateprocessinfo.setPayType(null);
         compensateprocessinfo.setMethodName("Refund");
         compensateprocessinfo.setRequestUrl("");

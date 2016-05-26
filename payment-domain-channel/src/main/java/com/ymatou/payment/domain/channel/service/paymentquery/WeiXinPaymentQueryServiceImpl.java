@@ -59,13 +59,17 @@ public class WeiXinPaymentQueryServiceImpl implements PaymentQueryService {
             // 调用微信支付查询订单接口
             OrderQueryResponse response = orderQueryService.doService(orderQueryRequest, header);
 
+            PaymentQueryResp resp = new PaymentQueryResp();
             if (OrderQueryResponse.SUCCESS.equals(response.getResult_code())
-                    && OrderQueryResponse.SUCCESS.equals(response.getReturn_code())) {
-                PaymentQueryResp resp = generateResponse(response);
+                    && OrderQueryResponse.SUCCESS.equals(response.getReturn_code())
+                    && (OrderQueryResponse.SUCCESS.equals(response.getTrade_state())
+                            || "REFUND".equals(response.getTrade_state()))) {
+                resp = generateResponse(response);
+                resp.setPayStatus(PayStatusEnum.Paied);
                 return resp;
             } else {
-                throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
-                        "Paymentid:" + paymentId);
+                resp.setPayStatus(PayStatusEnum.Failed);
+                return resp;
             }
 
         } catch (Exception e) {

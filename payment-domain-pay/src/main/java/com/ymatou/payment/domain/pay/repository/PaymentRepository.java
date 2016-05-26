@@ -50,7 +50,9 @@ public class PaymentRepository {
      * @return
      */
     public Payment getByPaymentId(String paymentId) {
-        return Payment.convertFromPo(paymentMapper.selectByPrimaryKey(paymentId));
+        PaymentPo paymentPo = paymentMapper.selectByPrimaryKey(paymentId);
+
+        return Payment.convertFromPo(paymentPo);
     }
 
     /**

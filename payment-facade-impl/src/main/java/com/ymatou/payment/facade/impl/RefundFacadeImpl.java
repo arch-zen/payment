@@ -113,7 +113,10 @@ public class RefundFacadeImpl implements RefundFacade {
                     req.getHeader());
         }
 
-        return new FastRefundResponse();
+        FastRefundResponse response = new FastRefundResponse();
+        response.setErrorMessage("操作成功！");
+
+        return response;
     }
 
     @Override
@@ -126,6 +129,9 @@ public class RefundFacadeImpl implements RefundFacade {
 
         // 获取退款的相关的交易信息
         List<TradeDetail> tradeDetails = req.getTradeDetails();
+        if (tradeDetails == null || tradeDetails.size() == 0)
+            throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "TradeDetail值不能为 null");
+
         List<String> tradeNos = new ArrayList<>();
         for (TradeDetail tradeDetail : tradeDetails) {
             tradeNos.add(tradeDetail.getTradeNo());

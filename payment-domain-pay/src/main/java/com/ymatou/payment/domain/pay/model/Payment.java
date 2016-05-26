@@ -223,6 +223,10 @@ public class Payment extends PrintFriendliness {
      * @return
      */
     public static Payment convertFromPo(PaymentPo po) {
+        if (po == null) {
+            return null;
+        }
+
         Payment model = new Payment();
         model.setPaymentId(po.getPaymentId());
         model.setBussinessOrderId(po.getBussinessOrderId());
