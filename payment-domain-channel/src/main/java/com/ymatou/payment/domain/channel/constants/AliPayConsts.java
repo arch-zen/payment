@@ -65,4 +65,6 @@ public final class AliPayConsts {
             new HashSet<String>(Arrays.asList(new String[] {"TRADE_SUCCESS", "TRADE_FINISHED"}));
 
     public final static String TRADE_REFUND_SUCCESS = "REFUND_SUCCESS";
+
+    public final static String WAP_ACQUIRE_ORDER_SERVICE = "alipay.wap.auth.authAndExecute";
 }

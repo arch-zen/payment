@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
+import com.ymatou.payment.domain.channel.constants.AliPayConsts;
 import com.ymatou.payment.domain.channel.model.AcquireOrderPackageResp;
 import com.ymatou.payment.domain.channel.service.AcquireOrderService;
 import com.ymatou.payment.domain.channel.service.SignatureService;
@@ -91,7 +92,7 @@ public class AliPayWapAcquireOrderServiceImpl implements AcquireOrderService {
         map.put("req_data",
                 String.format("<auth_and_execute_req><request_token>%s</request_token></auth_and_execute_req>",
                         requestToken));
-        map.put("service", "alipay.wap.auth.authAndExecute");
+        map.put("service", AliPayConsts.WAP_ACQUIRE_ORDER_SERVICE);
         map.put("sec_id", TradeCreateRequest.SEC_ID);
         map.put("partner", instConfig.getMerchantId());
         map.put("format", TradeCreateRequest.FORMAT);
