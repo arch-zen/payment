@@ -11,12 +11,17 @@ package com.ymatou.payment.integration.model;
  */
 public class TradeCreateRequest {
 
-    private String service = "alipay.wap.trade.create.direct";
-    private String format = "xml";
-    private String v = "2.0";
+    public static final String SEC_ID = "MD5";
+    public static final String VERSION = "2.0";
+    public static final String SERVICE = "alipay.wap.trade.create.direct";
+    public static final String FORMAT = "xml";
+
+    private String service = SERVICE;
+    private String format = FORMAT;
+    private String v = VERSION;
     private String partner;
     private String req_id;
-    private String sec_id;
+    private String sec_id = SEC_ID;
     private String sign;
     private String req_data;
 

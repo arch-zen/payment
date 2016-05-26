@@ -133,7 +133,8 @@ public class RefundPository {
 
     public String convertPayTypeToPayChannel(String payType) {
 
-        if (payType.equals(PayTypeEnum.AliPayApp.getCode()) || payType.equals(PayTypeEnum.AliPayPc.getCode())) {
+        if (payType.equals(PayTypeEnum.AliPayApp.getCode()) || payType.equals(PayTypeEnum.AliPayPc.getCode())
+                || payType.equals(PayTypeEnum.AliPayWap.getCode())) {
             return ChannelTypeEnum.AliPay.getCode();
         } else {
             return ChannelTypeEnum.WeiXinPay.getCode();

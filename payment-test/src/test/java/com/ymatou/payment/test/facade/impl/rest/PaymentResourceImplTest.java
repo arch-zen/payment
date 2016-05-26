@@ -46,6 +46,43 @@ public class PaymentResourceImplTest extends RestBaseTest {
     private IntegrationConfig config;
 
     @Test
+    public void testAcquireOrderWap() {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+
+        req.setPayType("11");
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+        assertEquals("验证返回码", 0, res.getErrorCode());
+        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
+        assertEquals("验证ResultType", "Query", res.getResultType());
+
+        BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
+        assertNotNull("验证商户订单", bo);
+        assertEquals("验证PayType", req.getPayType(), bo.getPayType());
+        assertEquals("验证OrderPrice", new BigDecimal(req.getPayPrice()).doubleValue(), bo.getOrderPrice().doubleValue(),
+                0.00001);
+        assertEquals("验证CurrencyType", req.getCurrency(), bo.getCurrencyType());
+        assertEquals("验证Version", req.getVersion(), bo.getVersion());
+        assertEquals("验证AppId", req.getAppId(), bo.getAppId());
+        assertEquals("验证TraceId", req.getTraceId(), bo.getTraceId());
+        assertEquals("验证OrderTime", req.getOrderTime(), bo.getOrderTime());
+        assertEquals("验证ClientIP", req.getUserIp(), bo.getClientIp());
+        assertEquals("验证CallbackUrl", req.getCallbackUrl(), bo.getCallbackUrl());
+        assertEquals("验证NotifyUrl", req.getNotifyUrl(), bo.getNotifyUrl());
+        assertEquals("验证ProductName", req.getProductName(), bo.getProductName());
+        assertEquals("验证ProductDesc", req.getProductDesc(), bo.getProductDesc());
+        assertEquals("验证ProductUrl", req.getProductUrl(), bo.getProductUrl());
+        assertEquals("验证CodePage", req.getEncoding(), bo.getCodePage());
+        assertEquals("验证Ext", req.getExt(), bo.getExt());
+        assertEquals("验证Memo", req.getMemo(), bo.getMemo());
+        assertEquals("验证SignMethod", req.getSignMethod(), bo.getSignMethod());
+        assertEquals("验证BizCode", req.getBizCode(), bo.getBizCode());
+        assertEquals("验证OrderStatus", new Integer(0), bo.getOrderStatus());
+        assertEquals("验证NotifyStatus", new Integer(0), bo.getNotifyStatus());
+    }
+
+    @Test
     public void testAcquireOrderPC() {
         System.out.println(config);
         System.out.println(config.getAliPayBaseUrl());

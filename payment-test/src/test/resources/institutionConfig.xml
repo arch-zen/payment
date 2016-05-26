@@ -6,7 +6,8 @@
 		md5Key="l9d4rmadb6viepgot7i1i131yilo09vm" />
 	<!--AliPay Wap -->
 	<config payType="11" merchantId="2088701734809577" signType="MD5" sellerEmail="ap.ymt@ymatou.com"
-		instName="AliPay" />
+		instName="AliPay" 
+		md5Key="l9d4rmadb6viepgot7i1i131yilo09vm" />
 	<!--AliPay App -->
 	<config payType="13" merchantId="2088701734809577" signType="RSA" sellerEmail="ap.ymt@ymatou.com"
 		instName="AliPay" 

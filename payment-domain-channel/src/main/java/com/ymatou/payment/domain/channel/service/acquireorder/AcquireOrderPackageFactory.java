@@ -30,11 +30,13 @@ public class AcquireOrderPackageFactory {
     private AliPayAppAcquireOrderServiceImpl aliPayAppAcquireOrderServiceImpl;
 
     @Resource
+    private AliPayWapAcquireOrderServiceImpl aliPayWapAcquireOrderServiceImpl;
+
+    @Resource
     private WeiXinAppAcquireOrderServiceImpl weiXinAppAcquireOrderServiceImpl;
 
     @Resource
     private WeiXinJSAPIAcquireOrderServiceImpl weiXinJSAPIAcquireOrderServiceImpl;
-
 
     /**
      * 获取到收单解析器
@@ -48,6 +50,8 @@ public class AcquireOrderPackageFactory {
                 return aliPayPcAcquireOrderServiceImpl;
             case AliPayApp:
                 return aliPayAppAcquireOrderServiceImpl;
+            case AliPayWap:
+                return aliPayWapAcquireOrderServiceImpl;
             case WeiXinJSAPI:
                 return weiXinJSAPIAcquireOrderServiceImpl;
             case WeiXinApp:

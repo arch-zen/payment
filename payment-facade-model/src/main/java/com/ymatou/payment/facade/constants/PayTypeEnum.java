@@ -22,6 +22,8 @@ public enum PayTypeEnum {
 
     AliPayApp("13"),
 
+    AliPayWap("11"),
+
     WeiXinJSAPI("14"),
 
     WeiXinApp("15");
@@ -44,6 +46,8 @@ public enum PayTypeEnum {
         switch (code) {
             case "10":
                 return AliPayPc;
+            case "11":
+                return AliPayWap;
             case "13":
                 return AliPayApp;
             case "14":

@@ -58,6 +58,8 @@ public enum ErrorCode {
 
     INVALID_SIGN_TYPE(1007, "无效的签名方式"),
 
+    FAIL_TRADE_CEREAT_DIRECT(1009, "授权接口调用失败"),
+
     FAIL(5000, "请求处理失败"),
 
     UNKNOWN(-9999, "未知错误，系统异常");
