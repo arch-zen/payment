@@ -22,6 +22,8 @@ public class Payment extends PrintFriendliness {
     private String paymentId;
     private String bussinessOrderId;
     private String institutionPaymentId;
+    
+    //FIXME: 领域层，应该已经是枚举了
     private String payType;
     private BigDecimal payPrice;
     private BigDecimal actualPayPrice;
@@ -31,10 +33,18 @@ public class Payment extends PrintFriendliness {
     private String bankId;
     private Integer cardType;
     private String payerId;
+    
+    //FIXME: 领域模型不需要 
     private Date createdTime;
+    
+    //FIXME：领域层，应该已经是枚举了
     private Integer payStatus;
     private Date payTime;
+    
+    //FIXME: 领域模型不需要
     private Date lastUpdatedTime;
+    
+     //FIXME：领域层，应该已经是枚举了
     private Integer checkStatus;
 
     public String getPaymentId() {
