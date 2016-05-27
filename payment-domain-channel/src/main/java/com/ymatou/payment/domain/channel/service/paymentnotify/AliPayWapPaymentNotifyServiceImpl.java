@@ -120,7 +120,7 @@ public class AliPayWapPaymentNotifyServiceImpl implements PaymentNotifyService {
 
             } catch (DocumentException e) {
                 logger.error("parse notify_data error. {}", notifyData);
-                throw new BizException(ErrorCode.UNKNOWN, "paymentId:" + map.get("out_trade_no"));
+                throw new BizException(ErrorCode.UNKNOWN, "paymentId:" + map.get("out_trade_no"), e);
             }
 
 
@@ -197,7 +197,7 @@ public class AliPayWapPaymentNotifyServiceImpl implements PaymentNotifyService {
 
         } catch (UnsupportedEncodingException e) {
             throw new BizException(ErrorCode.UNKNOWN,
-                    "url encode failed when process alipay callback with key: " + paramKey);
+                    "url encode failed when process alipay callback with key: " + paramKey, e);
         }
     }
 }

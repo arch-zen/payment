@@ -191,7 +191,7 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
 
             } catch (Exception ex) {
                 logger.error("unrecognize ext param", ex);
-                throw new BizException(ErrorCode.EXT_MESSAGE_NOT_RECOGNIZE, extJson);
+                throw new BizException(ErrorCode.EXT_MESSAGE_NOT_RECOGNIZE, extJson, ex);
             }
         }
 

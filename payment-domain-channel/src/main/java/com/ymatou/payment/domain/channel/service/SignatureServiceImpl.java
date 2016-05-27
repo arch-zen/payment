@@ -160,7 +160,7 @@ public class SignatureServiceImpl implements SignatureService {
             else
                 return MD5Util.encode(targetMessage).toUpperCase();
         } catch (Exception e) {
-            throw new BizException(ErrorCode.FAIL, "md5 sign failed with paytype: " + instConfig.getPayType());
+            throw new BizException(ErrorCode.FAIL, "md5 sign failed with paytype: " + instConfig.getPayType(), e);
         }
     }
 
@@ -179,7 +179,7 @@ public class SignatureServiceImpl implements SignatureService {
 
             return RSAUtil.sign(rawMessage, privateKey);
         } catch (Exception e) {
-            throw new BizException(ErrorCode.FAIL, "rsa sign failed with paytype: " + instConfig.getPayType());
+            throw new BizException(ErrorCode.FAIL, "rsa sign failed with paytype: " + instConfig.getPayType(), e);
         }
     }
 
@@ -199,7 +199,8 @@ public class SignatureServiceImpl implements SignatureService {
 
             return RSAUtil.doCheck(rawMessage, sign, publicKey);
         } catch (Exception e) {
-            throw new BizException(ErrorCode.FAIL, "rsa sign validae failed with paytype: " + instConfig.getPayType());
+            throw new BizException(ErrorCode.FAIL, "rsa sign validae failed with paytype: " + instConfig.getPayType(),
+                    e);
         }
     }
 

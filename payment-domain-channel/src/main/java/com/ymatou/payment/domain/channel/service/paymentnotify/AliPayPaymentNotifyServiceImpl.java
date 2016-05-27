@@ -157,7 +157,7 @@ public class AliPayPaymentNotifyServiceImpl implements PaymentNotifyService {
 
         } catch (UnsupportedEncodingException e) {
             throw new BizException(ErrorCode.UNKNOWN,
-                    "url encode failed when process alipay callback with key: " + paramKey);
+                    "url encode failed when process alipay callback with key: " + paramKey, e);
         }
     }
 }

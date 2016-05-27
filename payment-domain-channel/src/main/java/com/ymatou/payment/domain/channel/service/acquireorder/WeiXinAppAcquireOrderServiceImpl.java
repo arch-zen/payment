@@ -202,7 +202,7 @@ public class WeiXinAppAcquireOrderServiceImpl implements AcquireOrderService {
             return objectMapper.writeValueAsString(request);
         } catch (Exception e) {
             logger.error("weixin app buildFrom failed with paymentid:" + payment.getPaymentId(), e);
-            throw new BizException(ErrorCode.FAIL, "build app form failed");
+            throw new BizException(ErrorCode.FAIL, "build app form failed", e);
         }
     }
 }

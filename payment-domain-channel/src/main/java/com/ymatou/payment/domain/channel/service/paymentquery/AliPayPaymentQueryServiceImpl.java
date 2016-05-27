@@ -76,7 +76,7 @@ public class AliPayPaymentQueryServiceImpl implements PaymentQueryService {
         } catch (Exception e) {
             logger.error("call alipay single trade query failed", e);
             throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
-                    "Paymentid: " + paymentId);
+                    "Paymentid: " + paymentId, e);
         }
     }
 

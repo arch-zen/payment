@@ -132,7 +132,7 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
         } catch (Exception ex) {
             logger.error("call weixin unifed order failed", ex);
             throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
-                    "paymentid:" + payment.getPaymentId() + "|" + ex.getLocalizedMessage());
+                    "paymentid:" + payment.getPaymentId() + "|" + ex.getLocalizedMessage(), ex);
         }
     }
 
@@ -225,7 +225,7 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
             return objectMapper.writeValueAsString(request);
         } catch (Exception e) {
             logger.error("weixin jsapi buildFrom failed with paymentid:" + payment.getPaymentId(), e);
-            throw new BizException(ErrorCode.FAIL, "build jsapi form failed");
+            throw new BizException(ErrorCode.FAIL, "build jsapi form failed", e);
         }
     }
 }

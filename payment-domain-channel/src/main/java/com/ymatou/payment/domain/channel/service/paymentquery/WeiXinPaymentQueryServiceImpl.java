@@ -75,7 +75,7 @@ public class WeiXinPaymentQueryServiceImpl implements PaymentQueryService {
         } catch (Exception e) {
             logger.error("call weixin order query failed", e);
             throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
-                    "Paymentid: " + paymentId);
+                    "Paymentid: " + paymentId, e);
         }
     }
 

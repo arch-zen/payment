@@ -145,7 +145,7 @@ public class AliPayAppAcquireOrderServiceImpl implements AcquireOrderService {
 
             } catch (Exception ex) {
                 logger.error("unrecognize ext param", ex);
-                throw new BizException(ErrorCode.EXT_MESSAGE_NOT_RECOGNIZE, extJson);
+                throw new BizException(ErrorCode.EXT_MESSAGE_NOT_RECOGNIZE, extJson, ex);
             }
         }
 
@@ -187,7 +187,7 @@ public class AliPayAppAcquireOrderServiceImpl implements AcquireOrderService {
             return objectMapper.writeValueAsString(result);
         } catch (Exception e) {
             logger.error("build alipay app form failed.", e);
-            throw new BizException(ErrorCode.FAIL, "build alipay app form failed.");
+            throw new BizException(ErrorCode.FAIL, "build alipay app form failed.", e);
         }
     }
 
