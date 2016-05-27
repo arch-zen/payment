@@ -64,7 +64,8 @@ public class PayServiceImpl implements PayService {
 
         Payment payment = Payment.convertFromPo(paymentPo);
         payment.setBussinessOrder(BussinessOrder.convertFromPo(bussinessOrderPo));
-
+        
+        //FIXME: req不要放在Payment
         // 将请求带入到模型中
         payment.setAcquireOrderReq(req);
 
@@ -108,6 +109,7 @@ public class PayServiceImpl implements PayService {
         bo.setCodePage(req.getEncoding());
         bo.setCurrencyType(req.getCurrency());
         bo.setExt(req.getExt());
+        //FIXME:memo可截取，譬如最长512
         bo.setMemo(req.getMemo());
         bo.setNotifyUrl(req.getNotifyUrl());
         bo.setOrderId(req.getOrderId());

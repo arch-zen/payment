@@ -11,7 +11,7 @@ import com.ymatou.payment.domain.pay.model.Payment;
 public interface AcquireOrderService {
     /**
      * 收单报文组织
-     * 
+     * FIXME: 增加参数, mockHeader
      * @param payment
      * @return
      */

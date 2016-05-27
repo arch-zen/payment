@@ -74,6 +74,7 @@ public class PaymentRepository {
 
 
     /**
+     * FIXME:示例工程误导，此处Throwable.class可去掉
      * 生成商户订单和支付单
      * 
      * @param po
@@ -126,6 +127,11 @@ public class PaymentRepository {
      */
     private String genPaymentId(BussinessOrderPo bo) {
         // 为符合
+        /**
+         * FIXME: 并发/多机 不能绝对保证paymentId不重复，另外long型的timestamp不直观反映日期
+         * 建议 YYmmDDhhMMss + 一个数据库自增长ID的后5位（不足5位，前面补0）
+         */
+        
         long timestamp = new Date().getTime();
         String paymentId = String.format("%d%04d", timestamp, new Random().nextInt(10000));
 

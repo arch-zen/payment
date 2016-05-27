@@ -189,6 +189,7 @@ public class Payment extends PrintFriendliness {
         this.acquireOrderReq = acquireOrderReq;
     }
 
+    //FIXME: needless, PrintFriendliness已实现
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
