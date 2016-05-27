@@ -20,12 +20,14 @@ import com.baidu.disconf.client.common.update.IDisconfUpdate;
 /**
  * 第三方机构配置文件管理器
  * 
+ * FIXME, reload参数不要, 实现InitializingBean， reload方法注意线程安全
+ * 
  * @author wangxudong
  *
  */
 @DisconfUpdateService(confFileKeys = {InstitutionConfigManager.CONFIG_FILE})
 @Component
-public class InstitutionConfigManager implements IDisconfUpdate {
+public class InstitutionConfigManager implements IDisconfUpdate{
 
     /**
      * 第三方机构配置文件
