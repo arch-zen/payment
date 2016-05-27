@@ -89,7 +89,9 @@ public class SignatureServiceImpl implements SignatureService {
     public boolean validateSign(Map<String, String> signMapData, InstitutionConfig instConfig,
             HashMap<String, String> mockHeader) {
         // 拼装待验签报文
-        String rawMessage = mapToString(signMapData, instConfig, true);
+        boolean needSort = !(PayTypeEnum.AliPayWap.getCode().equals(instConfig.getPayType())
+                && !StringUtils.isBlank(signMapData.get("notify_data"))); // AliPay 异步回调不需排序
+        String rawMessage = mapToString(signMapData, instConfig, needSort);
         String sign = signMapData.get("sign");
 
         if ("MD5".equals(instConfig.getSignType())) {

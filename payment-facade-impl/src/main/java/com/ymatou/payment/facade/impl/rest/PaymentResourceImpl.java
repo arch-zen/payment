@@ -47,7 +47,6 @@ public class PaymentResourceImpl implements PaymentResource {
 
         AcquireOrderResp resp = paymentFacade.acquireOrder(req);
         resp.setAppId(req.getAppId());
-        // resp.setVersion(req.getVersion());
         resp.setTraceId(req.getTraceId());
 
         return resp;

@@ -75,14 +75,9 @@ public class RefundQueryService {
         try {
             // 根据mchId获取不同的加签盐值和httpClient(不同商户证书及密码不同)
             String mchId = request.getMch_id();
-
-            if (header == null) {
-                header = new HashMap<String, String>();
-            }
-            header.put("Content-Type", "text/xml");
-
             String respXmlStr = HttpClientUtil.sendPost(integrationConfig.getWxRefundQueryUrl(header),
-                    getPostDataXml(request), header, getHttpClient(mchId));
+                    getPostDataXml(request), Constants.CONTENT_TTPE_XML, header, getHttpClient(mchId));
+
             if (!StringUtils.isEmpty(respXmlStr) && respXmlStr.startsWith(Constants.WEIXIN_RESPONSE_BODY_START)) {
                 Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);
                 RefundQueryResponse response = generateResponseData(respMap);

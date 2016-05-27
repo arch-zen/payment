@@ -29,6 +29,9 @@ public class PaymentNotifyMessageResolverFactory {
     @Resource
     private WeiXinPaymentNotifyServiceImpl weiXinPaymentNotifyServiceImpl;
 
+    @Resource
+    private AliPayWapPaymentNotifyServiceImpl aliPayWapPaymentNotifyServiceImpl;
+
     /**
      * 获取到支付回调解析器
      * 
@@ -41,6 +44,8 @@ public class PaymentNotifyMessageResolverFactory {
                 return aliPayPaymentNotifyServiceImpl;
             case AliPayApp:
                 return aliPayPaymentNotifyServiceImpl;
+            case AliPayWap:
+                return aliPayWapPaymentNotifyServiceImpl;
             case WeiXinJSAPI:
                 return weiXinPaymentNotifyServiceImpl;
             case WeiXinApp:

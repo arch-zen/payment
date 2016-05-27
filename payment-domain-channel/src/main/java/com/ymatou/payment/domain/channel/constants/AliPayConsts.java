@@ -40,6 +40,7 @@ public final class AliPayConsts {
         private static final long serialVersionUID = -5559567189017277137L;
 
         {
+            put(null, "bankPay");
             put("1", "creditCard");
             put("2", "bankPay");
             put("3", "directPay");

@@ -4,6 +4,7 @@
 package com.ymatou.payment.facade.constants;
 
 /**
+ * 审核状态
  * 
  * @author qianmin 2016年5月10日 下午7:13:20
  * 

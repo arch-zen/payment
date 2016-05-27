@@ -36,6 +36,8 @@ public class IntegrationConfig {
     private String ymtNotifyPaymentUrl; // 通知支付url
     private String ymtNotifytradingeventUrl; // 通知用户交易信息url
     private String ymtPaymentBaseUrl; // ymt.payment.baseurl
+    private String ymtAccountingUrl; // 资金账户出入账服务url
+    private String ymtRiskControlUrl; // 风控urk
 
     private String openMock;
     private String aliPayBaseUrlMock; // 支付宝网关url(mock)
@@ -47,6 +49,62 @@ public class IntegrationConfig {
     private String ymtNotifyRefundUrlMock; // 通知退款url(mock)
     private String ymtNotifyPaymentUrlMock; // 通知支付url(mock)
     private String ymtNotifytradingeventUrlMock; // 通知用户交易信息url(mock)
+    private String ymtAccountingUrlMock; // 资金账户出入账服务url(mock)
+    private String ymtRiskControlUrlMock; // 风控urk
+
+    public String getYmtRiskControlUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getYmtRiskControlUrlMock();
+        } else {
+            return getYmtRiskControlUrl();
+        }
+    }
+
+    @DisconfFileItem(name = "ymt.riskcontrol.url")
+    public String getYmtRiskControlUrl() {
+        return ymtRiskControlUrl;
+    }
+
+    public void setYmtRiskControlUrl(String ymtRiskControlUrl) {
+        this.ymtRiskControlUrl = ymtRiskControlUrl;
+    }
+
+    @DisconfFileItem(name = "ymt.riskcontrol.url.mock")
+    public String getYmtRiskControlUrlMock() {
+        return ymtRiskControlUrlMock;
+    }
+
+    public void setYmtRiskControlUrlMock(String ymtRiskControlUrlMock) {
+        this.ymtRiskControlUrlMock = ymtRiskControlUrlMock;
+    }
+
+    public String getYmtAccountingUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getYmtAccountingUrlMock();
+        } else {
+            return getYmtAccountingUrl();
+        }
+    }
+
+    @DisconfFileItem(name = "ymt.accounting.url")
+    public String getYmtAccountingUrl() {
+        return ymtAccountingUrl;
+    }
+
+
+    public void setYmtAccountingUrl(String ymtAccountingUrl) {
+        this.ymtAccountingUrl = ymtAccountingUrl;
+    }
+
+    @DisconfFileItem(name = "ymt.accounting.url.mock")
+    public String getYmtAccountingUrlMock() {
+        return ymtAccountingUrlMock;
+    }
+
+
+    public void setYmtAccountingUrlMock(String ymtAccountingUrlMock) {
+        this.ymtAccountingUrlMock = ymtAccountingUrlMock;
+    }
 
     public String getAliPayWapUrl(HashMap<String, String> header) {
         if (isMock(header)) {

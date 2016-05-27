@@ -76,13 +76,15 @@ public class HttpClientUtil {
      * 
      * @param url 请求路径
      * @param body 请求body
+     * @param contentType 实体类型
      * @param header 请求header
      * @param httpClient 执行请求的HttpClient
      * @return 请求应答
      * @throws ParseException
      * @throws IOException
      */
-    public static String sendPost(String url, String body, HashMap<String, String> header, HttpClient httpClient)
+    public static String sendPost(String url, String body, String contentType, HashMap<String, String> header,
+            HttpClient httpClient)
             throws IOException {
         String result = null;
 
@@ -94,6 +96,8 @@ public class HttpClientUtil {
                 httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
             }
         }
+        httpPost.addHeader("Content-Type", contentType); // 设置body类型
+
         logger.info("executing request" + httpPost.getRequestLine());
         logger.info("request header: " + Arrays.toString(httpPost.getAllHeaders()));
         logger.info("request body: " + body);
