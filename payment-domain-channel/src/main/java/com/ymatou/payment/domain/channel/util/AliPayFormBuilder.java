@@ -65,7 +65,7 @@ public final class AliPayFormBuilder {
             return form;
         } catch (Exception ex) {
             logger.error("build alipay form failed", ex);
-            throw new BizException(ErrorCode.FAIL, "BuildAliPayForm", e);
+            throw new BizException(ErrorCode.FAIL, "BuildAliPayForm", ex);
         }
     }
 }
