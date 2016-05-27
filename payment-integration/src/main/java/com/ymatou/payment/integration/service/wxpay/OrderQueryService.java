@@ -63,13 +63,8 @@ public class OrderQueryService implements InitializingBean {
     public OrderQueryResponse doService(OrderQueryRequest request, HashMap<String, String> header)
             throws Exception {
         try {
-            if (header == null) {
-                header = new HashMap<String, String>();
-            }
-            header.put("Content-Type", "text/xml");
-
             String respXmlStr = HttpClientUtil.sendPost(integrationConfig.getWxOrderQueryUrl(header),
-                    getPostDataXml(request), header, httpClient);
+                    getPostDataXml(request), Constants.CONTENT_TTPE_XML, header, httpClient);
             if (!StringUtils.isEmpty(respXmlStr) && respXmlStr.startsWith(Constants.WEIXIN_RESPONSE_BODY_START)) {
                 Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);
                 OrderQueryResponse response = generateResponseData(respMap);

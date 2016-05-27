@@ -4,6 +4,7 @@
 package com.ymatou.payment.facade.constants;
 
 /**
+ * 退款状态
  * 
  * @author qianmin 2016年5月10日 下午7:17:14
  * 

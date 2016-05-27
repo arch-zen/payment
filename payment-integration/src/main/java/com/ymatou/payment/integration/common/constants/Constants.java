@@ -17,4 +17,6 @@ public class Constants {
 
     public static final String MOCK = "1"; // http header (mock=1)
     public static final String WEIXIN_RESPONSE_BODY_START = "<xml>";
+    public static final String CONTENT_TTPE_XML = "text/xml";
+    public static final String CONTENT_TTPE_JSON = "application/json";
 }

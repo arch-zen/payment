@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.esotericsoftware.minlog.Log;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
@@ -191,8 +190,8 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
                 acquireOrderExt.setPayMethod(payMethod);
 
             } catch (Exception ex) {
-                Log.error("unrecognize ext param", ex);
-                throw new BizException(ErrorCode.EXT_MESSAGE_NOT_RECOGNIZE, extJson);
+                logger.error("unrecognize ext param", ex);
+                throw new BizException(ErrorCode.EXT_MESSAGE_NOT_RECOGNIZE, extJson, ex);
             }
         }
 

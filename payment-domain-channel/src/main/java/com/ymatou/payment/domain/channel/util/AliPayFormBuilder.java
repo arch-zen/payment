@@ -5,17 +5,13 @@
  */
 package com.ymatou.payment.domain.channel.util;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Map;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.util.HtmlUtils;
 
-import com.ymatou.payment.domain.channel.service.acquireorder.AliPayPcAcquireOrderServiceImpl;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 
@@ -69,7 +65,7 @@ public final class AliPayFormBuilder {
             return form;
         } catch (Exception ex) {
             logger.error("build alipay form failed", ex);
-            throw new BizException(ErrorCode.FAIL, "BuildAliPayForm");
+            throw new BizException(ErrorCode.FAIL, "BuildAliPayForm", ex);
         }
     }
 }

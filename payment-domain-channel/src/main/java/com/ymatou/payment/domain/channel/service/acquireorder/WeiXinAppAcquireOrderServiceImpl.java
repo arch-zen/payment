@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.esotericsoftware.minlog.Log;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
@@ -124,7 +123,7 @@ public class WeiXinAppAcquireOrderServiceImpl implements AcquireOrderService {
             else
                 throw new Exception(response.getReturn_msg());
         } catch (Exception ex) {
-            Log.error("call weixin unifed order failed", ex);
+            logger.error("call weixin unifed order failed", ex);
             throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
                     "paymentid:" + payment.getPaymentId() + "|" + ex.getMessage(),
                     ex);
@@ -175,7 +174,7 @@ public class WeiXinAppAcquireOrderServiceImpl implements AcquireOrderService {
                 }
             }
         } catch (IllegalAccessException e) {
-            // 不会出现非法访问异常
+            throw new BizException(e.getMessage(), e);
         }
         return map;
     }
@@ -202,8 +201,8 @@ public class WeiXinAppAcquireOrderServiceImpl implements AcquireOrderService {
 
             return objectMapper.writeValueAsString(request);
         } catch (Exception e) {
-            Log.error("weixin app buildFrom failed with paymentid:" + payment.getPaymentId(), e);
-            throw new BizException(ErrorCode.FAIL, "build app form failed");
+            logger.error("weixin app buildFrom failed with paymentid:" + payment.getPaymentId(), e);
+            throw new BizException(ErrorCode.FAIL, "build app form failed", e);
         }
     }
 }

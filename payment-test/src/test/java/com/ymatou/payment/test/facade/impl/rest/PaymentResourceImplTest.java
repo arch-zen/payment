@@ -49,6 +49,7 @@ public class PaymentResourceImplTest extends RestBaseTest {
     public void testAcquireOrderWap() {
         AcquireOrderReq req = new AcquireOrderReq();
         buildBaseRequest(req);
+        req.setPayPrice("0.01");
 
         req.setPayType("11");
         MockHttpServletRequest servletRequest = new MockHttpServletRequest();

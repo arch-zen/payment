@@ -62,7 +62,7 @@ public class UserService implements InitializingBean {
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         cm.setDefaultMaxPerRoute(Constants.DEFAULT_MAX_PER_ROUTE);
         cm.setMaxTotal(Constants.MAX_TOTAL);

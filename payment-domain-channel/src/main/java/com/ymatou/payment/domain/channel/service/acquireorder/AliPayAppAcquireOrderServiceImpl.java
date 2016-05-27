@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.esotericsoftware.minlog.Log;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
@@ -141,15 +140,12 @@ public class AliPayAppAcquireOrderServiceImpl implements AcquireOrderService {
                 acquireOrderExt = objectMapper.readValue(extJson.toUpperCase(), AcquireOrderExt.class);
 
                 String payMethod = acquireOrderExt.getPayMethod();
-                if (payMethod == null)
-                    payMethod = "2";
-
                 payMethod = AliPayConsts.PAY_METHOD_MAP.getOrDefault(payMethod, "bankPay");
                 acquireOrderExt.setPayMethod(payMethod);
 
             } catch (Exception ex) {
-                Log.error("unrecognize ext param", ex);
-                throw new BizException(ErrorCode.EXT_MESSAGE_NOT_RECOGNIZE, extJson);
+                logger.error("unrecognize ext param", ex);
+                throw new BizException(ErrorCode.EXT_MESSAGE_NOT_RECOGNIZE, extJson, ex);
             }
         }
 
@@ -191,7 +187,7 @@ public class AliPayAppAcquireOrderServiceImpl implements AcquireOrderService {
             return objectMapper.writeValueAsString(result);
         } catch (Exception e) {
             logger.error("build alipay app form failed.", e);
-            throw new BizException(ErrorCode.FAIL, "build alipay app form failed.");
+            throw new BizException(ErrorCode.FAIL, "build alipay app form failed.", e);
         }
     }
 

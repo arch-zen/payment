@@ -198,7 +198,7 @@ public class AliPayWapAcquireOrderServiceImpl implements AcquireOrderService {
                 separator = "&";
             }
         } catch (UnsupportedEncodingException e) {
-            throw new BizException(ErrorCode.UNKNOWN, "URLEncode error.");
+            throw new BizException(ErrorCode.UNKNOWN, "URLEncode error.", e);
         }
         return sb.toString();
     }

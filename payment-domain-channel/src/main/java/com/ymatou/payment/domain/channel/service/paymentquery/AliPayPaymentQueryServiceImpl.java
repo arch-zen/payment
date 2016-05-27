@@ -4,7 +4,6 @@
 package com.ymatou.payment.domain.channel.service.paymentquery;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 import org.slf4j.Logger;
@@ -45,8 +44,6 @@ public class AliPayPaymentQueryServiceImpl implements PaymentQueryService {
     @Autowired
     private SignatureService signatureService;
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
     @Override
     public PaymentQueryResp paymentQuery(String paymentId, String payType,
             HashMap<String, String> header) {
@@ -79,7 +76,7 @@ public class AliPayPaymentQueryServiceImpl implements PaymentQueryService {
         } catch (Exception e) {
             logger.error("call alipay single trade query failed", e);
             throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
-                    "Paymentid: " + paymentId);
+                    "Paymentid: " + paymentId, e);
         }
     }
 
@@ -94,6 +91,7 @@ public class AliPayPaymentQueryServiceImpl implements PaymentQueryService {
         request.setOut_trade_no(paymentId);
         request.setTrade_no("");
         logger.info(institutionConfig.getInstPublicKey());
+        @SuppressWarnings("unchecked")
         String sign = signatureService.signMessage(new ObjectMapper().convertValue(request, HashMap.class),
                 institutionConfig, header);
         request.setSign(sign);

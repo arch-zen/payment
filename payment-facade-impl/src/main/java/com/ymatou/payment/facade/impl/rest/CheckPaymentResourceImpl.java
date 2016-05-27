@@ -16,7 +16,6 @@ import javax.ws.rs.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ymatou.payment.facade.BaseResponse;
 import com.ymatou.payment.facade.CheckPaymentFacade;
 import com.ymatou.payment.facade.model.CheckPaymentRequset;
 

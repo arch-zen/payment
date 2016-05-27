@@ -4,6 +4,7 @@
 package com.ymatou.payment.facade.constants;
 
 /**
+ * 渠道类型
  * 
  * @author qianmin 2016年5月24日 下午4:52:11
  *

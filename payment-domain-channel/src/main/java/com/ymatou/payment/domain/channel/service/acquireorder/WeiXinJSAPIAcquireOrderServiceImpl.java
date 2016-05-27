@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.esotericsoftware.minlog.Log;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
@@ -131,9 +130,9 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
             else
                 throw new Exception(response.getReturn_msg());
         } catch (Exception ex) {
-            Log.error("call weixin unifed order failed", ex);
+            logger.error("call weixin unifed order failed", ex);
             throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
-                    "paymentid:" + payment.getPaymentId() + "|" + ex.getLocalizedMessage());
+                    "paymentid:" + payment.getPaymentId() + "|" + ex.getLocalizedMessage(), ex);
         }
     }
 
@@ -153,7 +152,7 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
                 return null;
 
         } catch (IOException e) {
-            Log.error("call user service for open id failed.", e);
+            logger.error("call user service for open id failed.", e);
             return null;
         }
     }
@@ -225,8 +224,8 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
 
             return objectMapper.writeValueAsString(request);
         } catch (Exception e) {
-            Log.error("weixin jsapi buildFrom failed with paymentid:" + payment.getPaymentId(), e);
-            throw new BizException(ErrorCode.FAIL, "build jsapi form failed");
+            logger.error("weixin jsapi buildFrom failed with paymentid:" + payment.getPaymentId(), e);
+            throw new BizException(ErrorCode.FAIL, "build jsapi form failed", e);
         }
     }
 }

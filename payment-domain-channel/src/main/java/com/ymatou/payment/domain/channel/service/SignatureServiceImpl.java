@@ -89,7 +89,9 @@ public class SignatureServiceImpl implements SignatureService {
     public boolean validateSign(Map<String, String> signMapData, InstitutionConfig instConfig,
             HashMap<String, String> mockHeader) {
         // 拼装待验签报文
-        String rawMessage = mapToString(signMapData, instConfig, true);
+        boolean needSort = !(PayTypeEnum.AliPayWap.getCode().equals(instConfig.getPayType())
+                && !StringUtils.isBlank(signMapData.get("notify_data"))); // AliPay 异步回调不需排序
+        String rawMessage = mapToString(signMapData, instConfig, needSort);
         String sign = signMapData.get("sign");
 
         if ("MD5".equals(instConfig.getSignType())) {
@@ -158,7 +160,7 @@ public class SignatureServiceImpl implements SignatureService {
             else
                 return MD5Util.encode(targetMessage).toUpperCase();
         } catch (Exception e) {
-            throw new BizException(ErrorCode.FAIL, "md5 sign failed with paytype: " + instConfig.getPayType());
+            throw new BizException(ErrorCode.FAIL, "md5 sign failed with paytype: " + instConfig.getPayType(), e);
         }
     }
 
@@ -177,7 +179,7 @@ public class SignatureServiceImpl implements SignatureService {
 
             return RSAUtil.sign(rawMessage, privateKey);
         } catch (Exception e) {
-            throw new BizException(ErrorCode.FAIL, "rsa sign failed with paytype: " + instConfig.getPayType());
+            throw new BizException(ErrorCode.FAIL, "rsa sign failed with paytype: " + instConfig.getPayType(), e);
         }
     }
 
@@ -197,7 +199,8 @@ public class SignatureServiceImpl implements SignatureService {
 
             return RSAUtil.doCheck(rawMessage, sign, publicKey);
         } catch (Exception e) {
-            throw new BizException(ErrorCode.FAIL, "rsa sign validae failed with paytype: " + instConfig.getPayType());
+            throw new BizException(ErrorCode.FAIL, "rsa sign validae failed with paytype: " + instConfig.getPayType(),
+                    e);
         }
     }
 
