@@ -62,6 +62,7 @@ public class PaymentFacadeImpl implements PaymentFacade {
         resp.setResult(packageResp.getResult());
         resp.setResultType(packageResp.getResultType().name());
 
+        //FIXME: add resp.setSuccess(true);
         return resp;
     }
 
