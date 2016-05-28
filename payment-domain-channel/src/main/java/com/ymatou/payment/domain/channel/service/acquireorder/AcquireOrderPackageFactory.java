@@ -44,8 +44,8 @@ public class AcquireOrderPackageFactory {
      * @param payType
      * @return
      */
-    public AcquireOrderService getInstance(String payType) {
-        switch (PayTypeEnum.parse(payType)) {
+    public AcquireOrderService getInstance(PayTypeEnum payType) {
+        switch (payType) {
             case AliPayPc:
                 return aliPayPcAcquireOrderServiceImpl;
             case AliPayApp:
@@ -57,7 +57,7 @@ public class AcquireOrderPackageFactory {
             case WeiXinApp:
                 return weiXinAppAcquireOrderServiceImpl;
             default:
-                throw new BizException(ErrorCode.INVALID_PAYTYPE, payType);
+                throw new BizException(ErrorCode.INVALID_PAYTYPE, payType.getCode());
 
         }
     }

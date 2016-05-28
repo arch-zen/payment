@@ -14,8 +14,14 @@ public class BaseResponse extends PrintFriendliness {
 
     private String errorMessage;
 
+    private boolean isSuccess;
+
     public boolean getIsSuccess() {
-        return errorCode == null;
+        return isSuccess;
+    }
+
+    public void setSuccess(boolean isSuccess) {
+        this.isSuccess = isSuccess;
     }
 
     public String getErrorMessage() {

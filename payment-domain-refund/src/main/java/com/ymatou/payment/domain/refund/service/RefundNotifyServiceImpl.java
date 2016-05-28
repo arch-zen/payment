@@ -22,6 +22,7 @@ import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.BizException;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.facade.model.AliPayRefundNotifyRequest;
 import com.ymatou.payment.infrastructure.db.model.RefundMiscRequestLogWithBLOBs;
@@ -55,7 +56,8 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
         // 验签
         Map<String, String> signMap = getRequestMap(req);
         boolean signResult =
-                signatureService.validateSign(signMap, instConfigManager.getConfig(req.getPayType()), null);
+                signatureService.validateSign(signMap, instConfigManager.getConfig(PayTypeEnum.parse(req.getPayType())),
+                        null);
         if (!signResult) {
             throw new BizException("signdata is invalid");
         }

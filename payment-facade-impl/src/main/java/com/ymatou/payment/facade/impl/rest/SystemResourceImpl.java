@@ -5,18 +5,25 @@
  */
 package com.ymatou.payment.facade.impl.rest;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import com.ymatou.payment.facade.model.AcquireOrderReq;
+import com.ymatou.payment.facade.model.AcquireOrderResp;
 
 /**
  * 系统消息实现
@@ -31,6 +38,9 @@ public class SystemResourceImpl implements SystemResource {
 
     private static final Logger logger = LoggerFactory.getLogger(SystemResourceImpl.class);
 
+    @Resource
+    private PaymentResource paymentResource;
+
     @Override
     @GET
     @Path("/warmup")
@@ -41,41 +51,58 @@ public class SystemResourceImpl implements SystemResource {
 
     @Override
     @GET
-    @Path("/appid")
-    public String appid() {
-        try {
-            String appid = getProperty("app.name");
-            return appid;
-        } catch (Exception e) {
-            logger.error("failed when query appid", e);
-            return "unkonw";
-        }
+    @Path("/alipc")
+    public String alipc(@Context HttpServletRequest servletRequest) {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+
+        req.setPayType("10");
+        req.setPayPrice("0.01");
+
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        return res.getResult();
     }
 
     /**
-     * 获取到properties文件属性
+     * 构造请求报文
      * 
-     * @param name
-     * @return
-     * @throws IOException
+     * @param req
      */
-    private String getProperty(String name) throws IOException {
-        // String file = "/META-INF/app.properties";
-        // Properties props = new Properties();
-        // props.load(this.getClass().getResourceAsStream(file));
-        //
-        // return props.getProperty(name);
+    private void buildBaseRequest(AcquireOrderReq req) {
+        req.setVersion(1);
+        req.setBizCode(3);
+        req.setOriginAppId("JavaTest");
+        req.setAppId("AutoTest");
+        req.setCallbackUrl("http://www.ymatou.com/pay/result");
+        req.setTraceId(UUID.randomUUID().toString());
+        req.setCurrency("CNY");
+        req.setEncoding(65001);
+        req.setNotifyUrl("http://api.trading.operate.ymatou.com/api/Trading/TradingCompletedNotify");
+        req.setOrderId(getDateFormatString("yyyyMMddHHmmssSSS"));
+        req.setOrderTime(getDateFormatString("yyyyMMddHHmmss"));
+        req.setPayPrice("0.01");
+        req.setPayType("10");
+        req.setProductName("测试商品");
+        req.setProductDesc("商品描述");
+        req.setProductUrl("www.ymatou.com");
+        req.setMemo("备注");
+        req.setSignMethod("MD5");
+        req.setExt("{\"SHOWMODE\":\"2\",\"PAYMETHOD\":\"2\", \"IsHangZhou\":0}");
+        req.setUserId(12345L);
+        req.setUserIp("127.0.0.1");
+        // req.setBankId("CMB");
+    }
 
+    /**
+     * 构造日期字符串
+     * 
+     * @return
+     */
+    private String getDateFormatString(String format) {
+        DateFormat dateFormat = new SimpleDateFormat(format);
 
-        String path = System.getProperty("user.dir");// 这个即可获取当前项目所在磁盘路径，那么程序里面就可以根据这个path拼接了
-
-        Properties props = new Properties();
-        // 这里可以利用上面path找到jar包同目录的properties文件，如果properties文件在jar里面，那么是无法修改的，因为IO流写不到jar包里面去
-        FileInputStream fis = new FileInputStream(path + "/META-INF/app.properties");
-        props.load(fis);
-        fis.close();
-
-        return props.getProperty(name);
+        return dateFormat.format(new Date());
     }
 
 }

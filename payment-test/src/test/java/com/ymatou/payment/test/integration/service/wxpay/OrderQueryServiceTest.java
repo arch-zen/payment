@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.service.SignatureService;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.integration.model.OrderQueryRequest;
 import com.ymatou.payment.integration.model.OrderQueryResponse;
 import com.ymatou.payment.integration.service.wxpay.OrderQueryService;
@@ -44,7 +45,7 @@ public class OrderQueryServiceTest extends RestBaseTest {
         orderQueryRequest.setTransaction_id("");
         @SuppressWarnings("unchecked")
 
-        InstitutionConfig institutionConfig = institutionConfigManager.getConfig("15");
+        InstitutionConfig institutionConfig = institutionConfigManager.getConfig(PayTypeEnum.parse("15"));
         String sign = signatureService.signMessage(new ObjectMapper().convertValue(orderQueryRequest, HashMap.class),
                 institutionConfig, null); // 加签
         orderQueryRequest.setSign(sign);

@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
@@ -17,6 +18,7 @@ import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.infrastructure.db.model.BussinessOrderPo;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
+import com.ymatou.payment.infrastructure.util.StringUtil;
 
 @Component
 public class PayServiceImpl implements PayService {
@@ -64,8 +66,8 @@ public class PayServiceImpl implements PayService {
 
         Payment payment = Payment.convertFromPo(paymentPo);
         payment.setBussinessOrder(BussinessOrder.convertFromPo(bussinessOrderPo));
-        
-        //FIXME: req不要放在Payment
+
+        // FIXME: req不要放在Payment
         // 将请求带入到模型中
         payment.setAcquireOrderReq(req);
 
@@ -109,8 +111,7 @@ public class PayServiceImpl implements PayService {
         bo.setCodePage(req.getEncoding());
         bo.setCurrencyType(req.getCurrency());
         bo.setExt(req.getExt());
-        //FIXME:memo可截取，譬如最长512
-        bo.setMemo(req.getMemo());
+        bo.setMemo(StringUtil.TrimMax(req.getMemo(), 512));
         bo.setNotifyUrl(req.getNotifyUrl());
         bo.setOrderId(req.getOrderId());
         bo.setOrderPrice(new BigDecimal(req.getPayPrice()));
@@ -124,8 +125,9 @@ public class PayServiceImpl implements PayService {
         bo.setSignMethod(req.getSignMethod());
         bo.setThirdPartyUserId(req.getThirdPartyUserId());
         bo.setThirdPartyUserType(0); // 0-代表JAVA版，null-代表.NET版本
-        bo.setUserId(req.getUserId());
+        bo.setUserId(req.getUserId().intValue());
         bo.setVersion(req.getVersion());
+
 
         return bo;
     }
@@ -153,7 +155,7 @@ public class PayServiceImpl implements PayService {
         paymentPo.setBussinessOrderId(payment.getBussinessOrderId());
         paymentPo.setPaymentId(payment.getPaymentId());
         paymentPo.setInstitutionPaymentId(payment.getInstitutionPaymentId());
-        paymentPo.setPayStatus(payment.getPayStatus());
+        paymentPo.setPayStatus(payment.getPayStatus().getIndex());
         paymentPo.setActualPayPrice(payment.getActualPayPrice());
         paymentPo.setActualPayCurrencyType(payment.getActualPayCurrencyType());
         paymentPo.setBankId(payment.getBankId());
@@ -163,6 +165,7 @@ public class PayServiceImpl implements PayService {
         paymentPo.setExchangeRate(payment.getExchangeRate());
         paymentPo.setCheckStatus(payment.getCheckStatus());
         paymentPo.setPayerId(payment.getPayerId());
+        paymentPo.setLastUpdatedTime(new Date());
 
         paymentRepository.setPaymentOrderPaid(paymentPo, traceId);
     }

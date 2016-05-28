@@ -65,14 +65,14 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
         }
 
         if (PayStatusEnum.Paied.getIndex() == thirdPartyPayment.getPayStatus()) {
-            if (PayStatusEnum.Paied.getIndex() == payment.getPayStatus()
-                    || PayStatusEnum.Refunded.getIndex() == payment.getPayStatus()) {
+            if (PayStatusEnum.Paied == payment.getPayStatus()
+                    || PayStatusEnum.Refunded == payment.getPayStatus()) {
                 paymentRepository.updatePaymentCheckStatus(CheckStatusEnum.SUCCESS.getCode(), paymentId); // 对账成功
             } else {
                 try {
                     payment.setCheckStatus(CheckStatusEnum.REPAIR_SUCCESS.getCode()); // 补单成功
                     payment.setInstitutionPaymentId(thirdPartyPayment.getInstitutionPaymentId());
-                    payment.setPayStatus(thirdPartyPayment.getPayStatus());
+                    payment.setPayStatus(PayStatusEnum.parse(thirdPartyPayment.getPayStatus()));
                     payment.setActualPayPrice(thirdPartyPayment.getActualPayPrice());
                     payment.setActualPayCurrencyType(thirdPartyPayment.getActualPayCurrency());
                     payment.setBankId(thirdPartyPayment.getBankId());
@@ -98,7 +98,8 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
             }
         } else {
 
-            if (payment.getPayStatus() != null && payment.getPayStatus().intValue() > 0) {
+            if (payment.getPayStatus() == PayStatusEnum.Paied
+                    || payment.getPayStatus() == PayStatusEnum.Refunded) {
                 paymentRepository.updatePaymentCheckStatus(CheckStatusEnum.THIRD_PART_NOT_PAID.getCode(), paymentId); // 第三方未付，YMT已付
 
                 logger.error("{} pay check failed, but paystatus is successful!", paymentId);

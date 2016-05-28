@@ -21,6 +21,7 @@ import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.integration.model.SingleTradeQueryRequest;
 import com.ymatou.payment.integration.model.SingleTradeQueryResponse;
 import com.ymatou.payment.integration.service.alipay.SingleTradeQueryService;
@@ -82,7 +83,7 @@ public class AliPayPaymentQueryServiceImpl implements PaymentQueryService {
 
     private SingleTradeQueryRequest generateRequest(String paymentId, String payType,
             HashMap<String, String> header) {
-        InstitutionConfig institutionConfig = institutionConfigManager.getConfig(payType);
+        InstitutionConfig institutionConfig = institutionConfigManager.getConfig(PayTypeEnum.parse(payType));
 
         SingleTradeQueryRequest request = new SingleTradeQueryRequest();
         request.setService("single_trade_query");

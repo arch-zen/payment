@@ -18,6 +18,7 @@ import org.junit.Test;
 
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.service.SignatureService;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.test.RestBaseTest;
 
@@ -51,7 +52,8 @@ public class SignatureServiceImplTest extends RestBaseTest {
                 "discount=0.00&payment_type=1&subject=3252820.weixin%E7%9A%84%E8%AE%A2%E5%8D%95&trade_no=2016051321001004220248687425&buyer_email=ki.doshi%40hotmail.com&gmt_create=2016-05-13+11%3A33%3A21&notify_type=trade_status_sync&quantity=1&out_trade_no=21897556000062808&seller_id=2088701734809577&notify_time=2016-05-13+11%3A33%3A23&body=3252820.weixin%E7%9A%84%E8%AE%A2%E5%8D%95&trade_status=TRADE_SUCCESS&is_total_fee_adjust=N&total_fee=33.00&gmt_payment=2016-05-13+11%3A33%3A23&seller_email=ap.ymt%40ymatou.com&price=33.00&buyer_id=2088002653527220&notify_id=fb493a38a9b5e24bc53ba1d8ce158c7hp6&use_coupon=N&sign_type=RSA&sign=itrjn%2FrbQFi4oC1RQoaXxjtvA2AvNk2H%2Bc7Kou%2FC%2BNZql04G7wI2bdY5QSyPVu1xZ28A%2FAIW1qkcUQltDDY%2BmR9G%2BbWTePHxI5C0Zjfsur%2FKyMikG21NvwjmsViKp2irVtUtnDPoWr8BwRt7rbD74cXsaVfHbKPj%2B0GjJCRB1xk%3D";
         Map<String, String> signMap = parseQueryStringToMap(notifyMessage);
 
-        boolean signResult = signatureService.validateSign(signMap, instConfigManager.getConfig(payType), null);
+        boolean signResult =
+                signatureService.validateSign(signMap, instConfigManager.getConfig(PayTypeEnum.parse(payType)), null);
 
         assertEquals("验证RSA签名", true, signResult);
     }
@@ -69,7 +71,8 @@ public class SignatureServiceImplTest extends RestBaseTest {
                 "discount=0.00&payment_type=1&subject=dearoou%E7%9A%84%E8%AE%A2%E5%8D%95&trade_no=2016051321001004790242297728&buyer_email=benbenyu1989111%40163.com&gmt_create=2016-05-13+11%3A58%3A46&notify_type=trade_status_sync&quantity=1&out_trade_no=21897626500822310&seller_id=2088701734809577&notify_time=2016-05-13+11%3A59%3A05&trade_status=TRADE_SUCCESS&is_total_fee_adjust=N&total_fee=396.00&gmt_payment=2016-05-13+11%3A59%3A05&seller_email=ap.ymt%40ymatou.com&price=396.00&buyer_id=2088302134796793&notify_id=c0fe678eb06fdcb795e8f465a21d70bm3i&use_coupon=N&sign_type=MD5&sign=240dd0275cc965c9ef2a3fc9e1121d9e";
         Map<String, String> signMap = parseQueryStringToMap(notifyMessage);
 
-        boolean signResult = signatureService.validateSign(signMap, instConfigManager.getConfig(payType), null);
+        boolean signResult =
+                signatureService.validateSign(signMap, instConfigManager.getConfig(PayTypeEnum.parse(payType)), null);
 
         assertEquals("验证MD5签名", true, signResult);
     }
@@ -100,7 +103,8 @@ public class SignatureServiceImplTest extends RestBaseTest {
         notifyMap.put("trade_type", "APP");
         notifyMap.put("transaction_id", "4010032001201605135802475848");
 
-        boolean signResult = signatureService.validateSign(notifyMap, instConfigManager.getConfig(payType), null);
+        boolean signResult =
+                signatureService.validateSign(notifyMap, instConfigManager.getConfig(PayTypeEnum.parse(payType)), null);
 
         assertEquals("验证MD5签名", true, signResult);
     }
@@ -131,9 +135,39 @@ public class SignatureServiceImplTest extends RestBaseTest {
         notifyMap.put("trade_type", "JSAPI");
         notifyMap.put("transaction_id", "4008442001201605095674716576");
 
-        boolean signResult = signatureService.validateSign(notifyMap, instConfigManager.getConfig(payType), null);
+        boolean signResult =
+                signatureService.validateSign(notifyMap, instConfigManager.getConfig(PayTypeEnum.parse(payType)), null);
 
         assertEquals("验证MD5签名", true, signResult);
+    }
+
+    @Test
+    public void testAliPayPcSign() {
+        String payType = "10";
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("_input_charset", "utf-8");
+        map.put("anti_phishing_key", "KP3DpwH1MhuYi5J5GQ==");
+        map.put("body", "商品描述");
+        map.put("buyer_email", "null");
+        map.put("defaultbank", "CMB");
+        map.put("exter_invoke_ip", "127.0.0.1");
+        map.put("notify_url", "http://sit1.paymentproxy.ymatou.com/notify/10");
+        map.put("out_trade_no", "14643461528973075");
+        map.put("partner", "2088701734809577");
+        map.put("payment_type", "1");
+        map.put("paymethod", "bankPay");
+        map.put("qr_pay_mode", "2");
+        map.put("return_url", "http://sit1.paymentproxy.ymatou.com/callback/10");
+        map.put("seller_email", "ap.ymt@ymatou.com");
+        map.put("service", "create_direct_pay_by_user");
+        map.put("show_url", "www.ymatou.com");
+        map.put("subject", "测试商品");
+        map.put("total_fee", "0.01");
+
+        String assertSign = "05ae89f8fe0cd92cb95946abeb220743";
+        String sign = signatureService.signMessage(map, instConfigManager.getConfig(PayTypeEnum.parse(payType)), null);
+
+        assertEquals("验证MD5签名", assertSign, sign);
     }
 
     @Test
@@ -156,7 +190,8 @@ public class SignatureServiceImplTest extends RestBaseTest {
 
         String assertSign =
                 "DtbWbaOFCZO4k5TBOHTtNQpuz8Sejpq/xnYa2eHlOJaQm1Cr90/zNGFBL0SBb80uQ2ilQ+1myFbTG9e6EmIo3B/2a3LBGFMEbVWJn5lb2ibRB7+u55yQWekaGcfGIg8z97PbIZBhD+bQxLYpOWoWg8hh1VFQDDaYeVW5o9tk3xc=";
-        String sign = signatureService.signMessage(notifyMap, instConfigManager.getConfig(payType), null);
+        String sign =
+                signatureService.signMessage(notifyMap, instConfigManager.getConfig(PayTypeEnum.parse(payType)), null);
 
         assertEquals("验证RSA签名", assertSign, sign);
     }
@@ -174,7 +209,7 @@ public class SignatureServiceImplTest extends RestBaseTest {
         map.put("package", "prepay_id=mock5e702505eb8a4e0ca12fcd8656b606c9");
 
         String assertSign = "BED2B76C84FB23162E03B4BC3F391663";
-        String sign = signatureService.signMessage(map, instConfigManager.getConfig(payType), null);
+        String sign = signatureService.signMessage(map, instConfigManager.getConfig(PayTypeEnum.parse(payType)), null);
 
         assertEquals("验证MD5签名", assertSign, sign);
     }
@@ -193,7 +228,7 @@ public class SignatureServiceImplTest extends RestBaseTest {
         map.put("serialVersionUID", "test-no-effect");
 
         String assertSign = "FB9FC0359274BCF3464B9D94FD11F235";
-        String sign = signatureService.signMessage(map, instConfigManager.getConfig(payType), null);
+        String sign = signatureService.signMessage(map, instConfigManager.getConfig(PayTypeEnum.parse(payType)), null);
 
         assertEquals("验证MD5签名", assertSign, sign);
     }

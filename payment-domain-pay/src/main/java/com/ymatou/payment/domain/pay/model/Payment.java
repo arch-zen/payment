@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import com.ymatou.payment.facade.PrintFriendliness;
+import com.ymatou.payment.facade.constants.CheckStatusEnum;
+import com.ymatou.payment.facade.constants.PayStatusEnum;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 
@@ -22,9 +25,8 @@ public class Payment extends PrintFriendliness {
     private String paymentId;
     private String bussinessOrderId;
     private String institutionPaymentId;
-    
-    //FIXME: 领域层，应该已经是枚举了
-    private String payType;
+
+    private PayTypeEnum payType;
     private BigDecimal payPrice;
     private BigDecimal actualPayPrice;
     private String payCurrencyType;
@@ -33,18 +35,9 @@ public class Payment extends PrintFriendliness {
     private String bankId;
     private Integer cardType;
     private String payerId;
-    
-    //FIXME: 领域模型不需要 
-    private Date createdTime;
-    
-    //FIXME：领域层，应该已经是枚举了
-    private Integer payStatus;
+    private PayStatusEnum payStatus;
     private Date payTime;
-    
-    //FIXME: 领域模型不需要
-    private Date lastUpdatedTime;
-    
-     //FIXME：领域层，应该已经是枚举了
+
     private Integer checkStatus;
 
     public String getPaymentId() {
@@ -71,11 +64,11 @@ public class Payment extends PrintFriendliness {
         this.institutionPaymentId = institutionPaymentId;
     }
 
-    public String getPayType() {
+    public PayTypeEnum getPayType() {
         return payType;
     }
 
-    public void setPayType(String payType) {
+    public void setPayType(PayTypeEnum payType) {
         this.payType = payType;
     }
 
@@ -143,19 +136,11 @@ public class Payment extends PrintFriendliness {
         this.payerId = payerId;
     }
 
-    public Date getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(Date createdTime) {
-        this.createdTime = createdTime;
-    }
-
-    public Integer getPayStatus() {
+    public PayStatusEnum getPayStatus() {
         return payStatus;
     }
 
-    public void setPayStatus(Integer payStatus) {
+    public void setPayStatus(PayStatusEnum payStatus) {
         this.payStatus = payStatus;
     }
 
@@ -165,14 +150,6 @@ public class Payment extends PrintFriendliness {
 
     public void setPayTime(Date payTime) {
         this.payTime = payTime;
-    }
-
-    public Date getLastUpdatedTime() {
-        return lastUpdatedTime;
-    }
-
-    public void setLastUpdatedTime(Date lastUpdatedTime) {
-        this.lastUpdatedTime = lastUpdatedTime;
     }
 
     public Integer getCheckStatus() {
@@ -199,34 +176,6 @@ public class Payment extends PrintFriendliness {
         this.acquireOrderReq = acquireOrderReq;
     }
 
-    //FIXME: needless, PrintFriendliness已实现
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", paymentId=").append(paymentId);
-        sb.append(", bussinessOrderId=").append(bussinessOrderId);
-        sb.append(", institutionPaymentId=").append(institutionPaymentId);
-        sb.append(", payType=").append(payType);
-        sb.append(", payPrice=").append(payPrice);
-        sb.append(", actualPayPrice=").append(actualPayPrice);
-        sb.append(", payCurrencyType=").append(payCurrencyType);
-        sb.append(", actualPayCurrencyType=").append(actualPayCurrencyType);
-        sb.append(", exchangeRate=").append(exchangeRate);
-        sb.append(", bankId=").append(bankId);
-        sb.append(", cardType=").append(cardType);
-        sb.append(", payerId=").append(payerId);
-        sb.append(", createdTime=").append(createdTime);
-        sb.append(", payStatus=").append(payStatus);
-        sb.append(", payTime=").append(payTime);
-        sb.append(", lastUpdatedTime=").append(lastUpdatedTime);
-        sb.append(", checkStatus=").append(checkStatus);
-        sb.append("]");
-        return sb.toString();
-    }
-
     /**
      * 从PO转换成model
      * 
@@ -242,7 +191,7 @@ public class Payment extends PrintFriendliness {
         model.setPaymentId(po.getPaymentId());
         model.setBussinessOrderId(po.getBussinessOrderId());
         model.setInstitutionPaymentId(po.getInstitutionPaymentId());
-        model.setPayType(po.getPayType());
+        model.setPayType(PayTypeEnum.parse(po.getPayType()));
         model.setPayPrice(po.getPayPrice());
         model.setPayCurrencyType(po.getPayCurrencyType());
         model.setActualPayPrice(po.getActualPayPrice());
@@ -251,10 +200,8 @@ public class Payment extends PrintFriendliness {
         model.setBankId(po.getBankId());
         model.setCardType(po.getCardType());
         model.setPayerId(po.getPayerId());
-        model.setCreatedTime(po.getCreatedTime());
-        model.setPayStatus(po.getPayStatus());
+        model.setPayStatus(PayStatusEnum.parse(po.getPayStatus()));
         model.setPayTime(po.getPayTime());
-        model.setLastUpdatedTime(po.getLastUpdatedTime());
         model.setCheckStatus(po.getCheckStatus());
 
         return model;

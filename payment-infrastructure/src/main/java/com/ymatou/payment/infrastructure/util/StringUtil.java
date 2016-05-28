@@ -9,6 +9,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * 字符串工具类
  * 
@@ -72,6 +74,21 @@ public final class StringUtil {
         }
         str = str + oriStr;
         return str;
+    }
+
+    /**
+     * 截取最大长度的字符串
+     * 
+     * @param rawStr
+     * @param maxLen
+     * @return
+     */
+    public static String TrimMax(String rawStr, int maxLen) {
+        if (!StringUtils.isBlank(rawStr) && rawStr.length() > maxLen) {
+            return rawStr.substring(0, maxLen);
+        } else {
+            return rawStr;
+        }
     }
 
     /**
