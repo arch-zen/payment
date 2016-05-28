@@ -101,6 +101,7 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
             // 如果支付单的状态 已经成功则直接返回成功
             if (payment.getPayStatus() == PayStatusEnum.Paied) {
                 response.setResult(notifyService.buildResponse(notifyMessage, payment, req.getNotifyType()));
+                response.setSuccess(true);
                 return response;
             }
 
@@ -120,6 +121,12 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
             } catch (Exception e) {
                 logger.error("notify deliver service failed with paymentid :" + payment.getPaymentId(), e);
             }
+        }
+
+        if (response.getErrorCode() == 0) {
+            response.setSuccess(true);
+        } else {
+            response.setSuccess(false);
         }
 
         response.setResult(notifyService.buildResponse(notifyMessage, payment, req.getNotifyType()));

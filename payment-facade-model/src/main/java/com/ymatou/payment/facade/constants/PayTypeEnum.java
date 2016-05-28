@@ -38,6 +38,11 @@ public enum PayTypeEnum {
         return this.code;
     }
 
+    @Override
+    public String toString() {
+        return this.getCode();
+    }
+
     public static PayTypeEnum parse(String code) {
         if (StringUtils.isBlank(code)) {
             throw new BizException(ErrorCode.INVALID_PAYTYPE, "payType is null or empty");

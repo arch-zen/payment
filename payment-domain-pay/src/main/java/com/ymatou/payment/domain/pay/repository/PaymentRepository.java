@@ -79,7 +79,7 @@ public class PaymentRepository {
      * @param po
      * @return
      */
-    @Transactional()
+    @Transactional
     public int acquireOrder(PaymentPo payment, BussinessOrderPo bussinessOrder) {
         // 商户订单落地
         bussinessOrderRepository.insert(bussinessOrder);
