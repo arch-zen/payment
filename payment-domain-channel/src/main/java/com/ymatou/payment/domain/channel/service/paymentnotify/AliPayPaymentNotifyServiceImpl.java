@@ -8,16 +8,20 @@ package com.ymatou.payment.domain.channel.service.paymentnotify;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.jboss.resteasy.util.DateUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.channel.InstitutionConfig;
@@ -33,6 +37,7 @@ import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PaymentNotifyType;
 import com.ymatou.payment.facade.model.PaymentNotifyReq;
 import com.ymatou.payment.infrastructure.util.HttpUtil;
+import com.ymatou.payment.infrastructure.util.StringUtil;
 
 /**
  * 支付宝 APP 回调报文解析器 (10)
@@ -48,6 +53,8 @@ public class AliPayPaymentNotifyServiceImpl implements PaymentNotifyService {
 
     @Resource
     private InstitutionConfigManager institutionConfigManager;
+
+    private static final Logger logger = LoggerFactory.getLogger(AliPayPaymentNotifyServiceImpl.class);
 
     /*
      * (non-Javadoc)
@@ -73,6 +80,7 @@ public class AliPayPaymentNotifyServiceImpl implements PaymentNotifyService {
         }
 
         // 从报文中获取到有效信息
+
         PaymentNotifyMessage paymentNotifyMessage = new PaymentNotifyMessage();
         paymentNotifyMessage.setTraceId(UUID.randomUUID().toString());
         paymentNotifyMessage.setPayerId(
@@ -85,7 +93,7 @@ public class AliPayPaymentNotifyServiceImpl implements PaymentNotifyService {
         paymentNotifyMessage
                 .setPayTime(
                         map.get("gmt_payment") != null
-                                ? DateUtils.parseDate(map.get("gmt_payment"), new String[] {"yyyy-MM-dd HH:mm:ss"})
+                                ? parseDate(map.get("gmt_payment"))
                                 : new Date());
 
         // 根据返回报文判断支付是否成功
@@ -131,7 +139,8 @@ public class AliPayPaymentNotifyServiceImpl implements PaymentNotifyService {
         sbUrl.append(queryStringFormat("TradingId", bussinessOrder.getOrderId()));
         sbUrl.append(queryStringFormat("PaymentId", notifyMessage.getPaymentId()));
         sbUrl.append(queryStringFormat("PayPrice", notifyMessage.getActualPayPrice().setScale(2).toString()));
-        sbUrl.append(queryStringFormat("PayTime", DateUtil.formatDate(notifyMessage.getPayTime(), "yyyyMMddHHmmss")));
+        sbUrl.append(queryStringFormat("PayTime",
+                StringUtil.getDateFormatString("yyyyMMddHHmmss", notifyMessage.getPayTime())));
         sbUrl.append(queryStringFormat("TraceId", notifyMessage.getTraceId()));
         sbUrl.append(queryStringFormat("Version", bussinessOrder.getVersion().toString()));
         sbUrl.append(queryStringFormat("PayType", bussinessOrder.getPayType()));
@@ -157,6 +166,22 @@ public class AliPayPaymentNotifyServiceImpl implements PaymentNotifyService {
         } catch (UnsupportedEncodingException e) {
             throw new BizException(ErrorCode.UNKNOWN,
                     "url encode failed when process alipay callback with key: " + paramKey);
+        }
+    }
+
+    /**
+     * 将日期字符串转成日期格式
+     * 
+     * @param dateString
+     * @return
+     */
+    private Date parseDate(String dateString) {
+        try {
+
+            return DateUtils.parseDate(dateString, new String[] {"yyyy-MM-dd HH:mm:ss"});
+        } catch (ParseException e) {
+            logger.error("pare date when process alipay notify with date string:" + dateString, e);
+            return new Date();
         }
     }
 }

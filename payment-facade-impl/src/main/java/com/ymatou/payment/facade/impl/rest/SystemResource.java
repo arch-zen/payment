@@ -5,6 +5,8 @@
  */
 package com.ymatou.payment.facade.impl.rest;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * 系统消息接口
  * 
@@ -24,5 +26,5 @@ public interface SystemResource {
      * 
      * @return
      */
-    String appid();
+    String alipc(HttpServletRequest servletRequest);
 }

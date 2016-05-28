@@ -32,6 +32,9 @@ public class JacksonConfig implements ContextResolver<ObjectMapper> {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
         objectMapper.setDateFormat(dateFormat);
+
+        // 设置默认的时区
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
     }
 
     @Override

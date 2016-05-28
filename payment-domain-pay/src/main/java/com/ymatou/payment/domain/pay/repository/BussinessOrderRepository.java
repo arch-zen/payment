@@ -69,8 +69,10 @@ public class BussinessOrderRepository {
      */
     public void updateOrderStatus(String bussinessorderid, int orderStatus) {
         BussinessOrderPo bussinessOrderPo = new BussinessOrderPo();
-        bussinessOrderPo.setOrderStatus(orderStatus);
         bussinessOrderPo.setBussinessOrderId(bussinessorderid);
+        bussinessOrderPo.setOrderStatus(orderStatus);
+        bussinessOrderPo.setLastUpdatedTime(new Date());
+
         int updated = mapper.updateByPrimaryKeySelective(bussinessOrderPo);
         if (updated <= 0) {
             throw new BizException("update bussinessorder failed With not exist bussinessorderid :" + bussinessorderid);

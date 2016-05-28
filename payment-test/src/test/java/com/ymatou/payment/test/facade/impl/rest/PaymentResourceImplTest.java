@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.apache.http.client.utils.DateUtils;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
@@ -257,6 +258,12 @@ public class PaymentResourceImplTest extends RestBaseTest {
         assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(), payment.getPayPrice().doubleValue(),
                 0.000001);
         assertEquals("验证PayStatus", new Integer(0), payment.getPayStatus());
+    }
+
+    @Test
+    public void gmtTimeTest() {
+        String gmt_payment = "2016-05-27 20:27:08";
+        Date date = DateUtils.parseDate(gmt_payment, new String[] {"yyyy-MM-dd HH:mm:ss"});
     }
 
     /**

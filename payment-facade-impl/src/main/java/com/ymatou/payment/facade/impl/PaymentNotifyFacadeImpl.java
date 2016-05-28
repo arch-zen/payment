@@ -5,6 +5,8 @@
  */
 package com.ymatou.payment.facade.impl;
 
+import java.util.Date;
+
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -101,13 +103,13 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
                 return response;
             }
 
-            // 验证实际支付金额和支付金额是否一致
-            if (payment.getPayPrice().subtract(notifyMessage.getActualPayPrice()).abs().floatValue() > 0.01)
-                throw new BizException(ErrorCode.PAYPRICE_AND_ACT_NOT_CONSISTENT,
-                        "paymentid: " + payment.getPaymentId());
-
             // 更改订单状态
             if (req.getNotifyType() == PaymentNotifyType.Server) {
+                // 验证实际支付金额和支付金额是否一致
+                if (payment.getPayPrice().subtract(notifyMessage.getActualPayPrice()).abs().floatValue() > 0.01)
+                    throw new BizException(ErrorCode.PAYPRICE_AND_ACT_NOT_CONSISTENT,
+                            "paymentid: " + payment.getPaymentId());
+
                 setPaymentOrderPaid(payment, notifyMessage);
             }
 
@@ -139,6 +141,7 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
         payment.setPayTime(notifyMessage.getPayTime());
         payment.setPayerId(notifyMessage.getPayerId());
         payment.setExchangeRate(1.0); // 没有接支付宝国际，默认汇率为1
+        payment.setLastUpdatedTime(new Date());
         payService.setPaymentOrderPaid(payment, notifyMessage.getTraceId());
     }
 }

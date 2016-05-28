@@ -137,6 +137,35 @@ public class SignatureServiceImplTest extends RestBaseTest {
     }
 
     @Test
+    public void testAliPayPcSign() {
+        String payType = "10";
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("_input_charset", "utf-8");
+        map.put("anti_phishing_key", "KP3DpwH1MhuYi5J5GQ==");
+        map.put("body", "商品描述");
+        map.put("buyer_email", "null");
+        map.put("defaultbank", "CMB");
+        map.put("exter_invoke_ip", "127.0.0.1");
+        map.put("notify_url", "http://sit1.paymentproxy.ymatou.com/notify/10");
+        map.put("out_trade_no", "14643461528973075");
+        map.put("partner", "2088701734809577");
+        map.put("payment_type", "1");
+        map.put("paymethod", "bankPay");
+        map.put("qr_pay_mode", "2");
+        map.put("return_url", "http://sit1.paymentproxy.ymatou.com/callback/10");
+        map.put("seller_email", "ap.ymt@ymatou.com");
+        map.put("service", "create_direct_pay_by_user");
+        map.put("show_url", "www.ymatou.com");
+        map.put("subject", "测试商品");
+        map.put("total_fee", "0.01");
+
+        String assertSign = "05ae89f8fe0cd92cb95946abeb220743";
+        String sign = signatureService.signMessage(map, instConfigManager.getConfig(payType), null);
+
+        assertEquals("验证MD5签名", assertSign, sign);
+    }
+
+    @Test
     public void testAliPayAppSign() {
         String payType = "13";
         Map<String, String> notifyMap = new LinkedHashMap<String, String>();
