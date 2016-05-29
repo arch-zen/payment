@@ -27,7 +27,9 @@ public class RefundNotifyFacadeImpl implements RefundNotifyFacade {
 
         refundNotifyService.processRefundCallback(req);
 
-        return new BaseResponse();
+        BaseResponse resp = new BaseResponse();
+        resp.setSuccess(true);
+        return resp;
     }
 
 }
