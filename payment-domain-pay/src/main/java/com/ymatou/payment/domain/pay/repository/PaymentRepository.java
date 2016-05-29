@@ -6,6 +6,7 @@ import java.util.Random;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,8 @@ import com.ymatou.payment.infrastructure.db.model.BussinessOrderPo;
 import com.ymatou.payment.infrastructure.db.model.CompensateProcessInfoPo;
 import com.ymatou.payment.infrastructure.db.model.PaymentExample;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
+import com.ymatou.payment.infrastructure.db.operate.PaymentOperate;
+import com.ymatou.payment.infrastructure.util.StringUtil;
 import com.ymatou.payment.integration.IntegrationConfig;
 
 /**
@@ -33,6 +36,9 @@ public class PaymentRepository {
 
     @Resource
     private PaymentMapper paymentMapper;
+
+    @Resource
+    private PaymentOperate paymentOperate;
 
     @Resource
     private BussinessOrderRepository bussinessOrderRepository;
@@ -125,14 +131,17 @@ public class PaymentRepository {
      * @return
      */
     private String genPaymentId(BussinessOrderPo bo) {
-        // 为符合
         /**
-         * FIXME: 并发/多机 不能绝对保证paymentId不重复，另外long型的timestamp不直观反映日期
          * 建议 YYmmDDhhMMss + 一个数据库自增长ID的后5位（不足5位，前面补0）
          */
 
-        long timestamp = new Date().getTime();
-        String paymentId = String.format("%d%04d", timestamp, new Random().nextInt(10000));
+        // long timestamp = new Date().getTime();
+        // String paymentId = String.format("%d%04d", timestamp, new Random().nextInt(10000));
+
+        long paymentSuffixId = paymentOperate.genPaymentSuffixId();
+        String prefix = StringUtil.getDateFormatString("yyMMddHHmmss");
+        String suffix = String.format("%05d", paymentSuffixId);
+        String paymentId = prefix + StringUtils.right(suffix, 5);
 
         logger.debug("genPaymentId:" + paymentId);
 

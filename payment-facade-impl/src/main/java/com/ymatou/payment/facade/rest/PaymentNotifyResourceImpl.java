@@ -3,7 +3,7 @@
  *
  * All rights reserved.
  */
-package com.ymatou.payment.facade.impl.rest;
+package com.ymatou.payment.facade.rest;
 
 import java.io.IOException;
 import java.io.InputStream;

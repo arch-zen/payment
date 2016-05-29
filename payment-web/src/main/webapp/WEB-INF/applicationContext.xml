@@ -111,21 +111,21 @@
 		extension="com.ymatou.payment.infrastructure.serialize.JacksonConfig" />
 
 
-	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.PaymentResource"
+	<dubbo:service interface="com.ymatou.payment.facade.rest.PaymentResource"
 		ref="paymentResource" protocol="rest" />
 
-	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.RefundResource"
+	<dubbo:service interface="com.ymatou.payment.facade.rest.RefundResource"
 		ref="refundResource" protocol="rest" />
 		
-	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.RefundNotifyResource"
+	<dubbo:service interface="com.ymatou.payment.facade.rest.RefundNotifyResource"
 		ref="refundNotifyResource" protocol="rest" />
 
-	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.CheckPaymentResource"
+	<dubbo:service interface="com.ymatou.payment.facade.rest.CheckPaymentResource"
 		ref="checkPaymentResource" protocol="rest" />
 
-	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.SystemResource"
+	<dubbo:service interface="com.ymatou.payment.facade.rest.SystemResource"
 		ref="systemResource" protocol="rest" />
 	
-	<dubbo:service interface="com.ymatou.payment.facade.impl.rest.PaymentNotifyResource"
+	<dubbo:service interface="com.ymatou.payment.facade.rest.PaymentNotifyResource"
 		ref="paymentNotifyResource" protocol="rest" />	
 </beans>

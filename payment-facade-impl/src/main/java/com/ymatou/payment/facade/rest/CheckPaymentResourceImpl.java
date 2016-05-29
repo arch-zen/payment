@@ -1,7 +1,7 @@
 /*
  * (C) Copyright 2016 Ymatou (http://www.ymatou.com/). All rights reserved.
  */
-package com.ymatou.payment.facade.impl.rest;
+package com.ymatou.payment.facade.rest;
 
 import java.util.Enumeration;
 import java.util.HashMap;

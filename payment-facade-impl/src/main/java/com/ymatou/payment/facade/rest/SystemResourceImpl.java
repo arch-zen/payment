@@ -3,7 +3,7 @@
  *
  * All rights reserved.
  */
-package com.ymatou.payment.facade.impl.rest;
+package com.ymatou.payment.facade.rest;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -17,6 +17,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +64,21 @@ public class SystemResourceImpl implements SystemResource {
         AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
 
         return res.getResult();
+    }
+
+    @Override
+    @GET
+    @Path("/aliwap")
+    public Response aliwap(@Context HttpServletRequest servletRequest) {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+
+        req.setPayType("11");
+        req.setPayPrice("0.01");
+
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        return Response.status(Status.FOUND).header("location", res.getResult()).build();
     }
 
     /**

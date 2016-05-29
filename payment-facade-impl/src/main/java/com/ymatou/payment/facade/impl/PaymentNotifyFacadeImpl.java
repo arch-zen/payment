@@ -105,31 +105,34 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
                 return response;
             }
 
-            // 更改订单状态
+            // 如果是服务端回调
             if (req.getNotifyType() == PaymentNotifyType.Server) {
+
                 // 验证实际支付金额和支付金额是否一致
                 if (payment.getPayPrice().subtract(notifyMessage.getActualPayPrice()).abs().floatValue() > 0.01)
                     throw new BizException(ErrorCode.PAYPRICE_AND_ACT_NOT_CONSISTENT,
                             "paymentid: " + payment.getPaymentId());
 
+                // 更改订单状态
                 setPaymentOrderPaid(payment, notifyMessage);
-            }
 
-            // 通知发货服务
-            try {
-                notifyPaymentService.doService(payment.getPaymentId(), notifyMessage.getTraceId(), req.getMockHeader());
-            } catch (Exception e) {
-                logger.error("notify deliver service failed with paymentid :" + payment.getPaymentId(), e);
+                // 通知发货服务
+                try {
+                    notifyPaymentService.doService(payment.getPaymentId(), notifyMessage.getTraceId(),
+                            req.getMockHeader());
+                } catch (Exception e) {
+                    logger.error("notify deliver service failed with paymentid :" + payment.getPaymentId(), e);
+                }
             }
         }
 
+        // 构造返回报文
+        response.setResult(notifyService.buildResponse(notifyMessage, payment, req.getNotifyType()));
         if (response.getErrorCode() == 0) {
             response.setSuccess(true);
         } else {
             response.setSuccess(false);
         }
-
-        response.setResult(notifyService.buildResponse(notifyMessage, payment, req.getNotifyType()));
         return response;
     }
 

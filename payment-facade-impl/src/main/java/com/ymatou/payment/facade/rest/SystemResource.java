@@ -3,9 +3,10 @@
  *
  * All rights reserved.
  */
-package com.ymatou.payment.facade.impl.rest;
+package com.ymatou.payment.facade.rest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response;
 
 /**
  * 系统消息接口
@@ -21,10 +22,20 @@ public interface SystemResource {
      */
     String status();
 
+
     /**
-     * 返回AppId
+     * 支付宝 PC DEMO
      * 
+     * @param servletRequest
      * @return
      */
     String alipc(HttpServletRequest servletRequest);
+
+    /**
+     * 支付宝 WAP DEMO
+     * 
+     * @param servletRequest
+     * @return
+     */
+    Response aliwap(HttpServletRequest servletRequest);
 }

@@ -3,7 +3,7 @@
  *
  * All rights reserved.
  */
-package com.ymatou.payment.facade.impl.rest;
+package com.ymatou.payment.facade.rest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;

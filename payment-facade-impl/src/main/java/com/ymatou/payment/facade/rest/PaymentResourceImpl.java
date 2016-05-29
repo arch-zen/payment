@@ -1,4 +1,4 @@
-package com.ymatou.payment.facade.impl.rest;
+package com.ymatou.payment.facade.rest;
 
 import java.util.Enumeration;
 import java.util.HashMap;

@@ -22,7 +22,7 @@ import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
-import com.ymatou.payment.facade.impl.rest.PaymentNotifyResource;
+import com.ymatou.payment.facade.rest.PaymentNotifyResource;
 import com.ymatou.payment.infrastructure.db.mapper.AlipayNotifyLogMapper;
 import com.ymatou.payment.infrastructure.db.model.AlipayNotifyLogExample;
 import com.ymatou.payment.infrastructure.db.model.AlipayNotifyLogPo;
