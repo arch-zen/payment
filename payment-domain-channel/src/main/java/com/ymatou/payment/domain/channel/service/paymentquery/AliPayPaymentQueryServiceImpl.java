@@ -62,6 +62,8 @@ public class AliPayPaymentQueryServiceImpl implements PaymentQueryService {
                 PaymentQueryResp resp = new PaymentQueryResp();
                 resp.setPayStatus(PayStatusEnum.Failed);
                 return resp;
+                
+                //FIXME:不用的代码，直接删除
                 // if ("TRADE_IS_NOT_EXIST".equalsIgnoreCase(response.getError())) {
                 // PaymentQueryResp resp = new PaymentQueryResp();
                 // resp.setPayStatus(PayStatusEnum.Failed);

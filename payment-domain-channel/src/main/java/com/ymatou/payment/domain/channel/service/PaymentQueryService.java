@@ -16,6 +16,7 @@ import com.ymatou.payment.domain.channel.model.PaymentQueryResp;
 public interface PaymentQueryService {
 
     /**
+     * FIXME: 方法名是 动宾 结构
      * 调用第三方的支付单查询接口
      * 
      * @param paymentId

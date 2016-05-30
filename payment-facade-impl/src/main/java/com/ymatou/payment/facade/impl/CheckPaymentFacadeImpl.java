@@ -41,6 +41,7 @@ public class CheckPaymentFacadeImpl implements CheckPaymentFacade {
         paymentCheckService.doCheck(generateModel(paymentQueryResp), req.getPaymentId(), req.isFinalCheck(),
                 req.getHeader());
 
+        //FIXME: 失败？？
         return new BaseResponse();
     }
 

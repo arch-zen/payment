@@ -155,7 +155,7 @@ public class HttpClientUtil {
 
 
     /**
-     * 
+     * FIXME: 实际上是同步 
      * @param url 请求路径
      * @param body 请求body
      * @param header 请求header

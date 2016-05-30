@@ -47,6 +47,7 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
     @Autowired
     private NotifyPaymentService notifyPaymentService;
 
+    //FIXME：事务?
     @Override
     public void doCheck(ThirdPartyPayment thirdPartyPayment, String paymentId, boolean finalCheck,
             HashMap<String, String> header) {
