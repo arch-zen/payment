@@ -1,5 +1,7 @@
 package com.ymatou.payment.facade.impl;
 
+import java.math.BigDecimal;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Component;
@@ -14,6 +16,7 @@ import com.ymatou.payment.domain.pay.service.PayService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.PaymentFacade;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
 
@@ -62,7 +65,11 @@ public class PaymentFacadeImpl implements PaymentFacade {
         resp.setResult(packageResp.getResult());
         resp.setResultType(packageResp.getResultType().name());
 
-        //FIXME: add resp.setSuccess(true);
+        if (resp.getErrorCode() == 0)
+            resp.setSuccess(true);
+        else
+            resp.setSuccess(false);
+
         return resp;
     }
 
@@ -72,11 +79,11 @@ public class PaymentFacadeImpl implements PaymentFacade {
      * @param req
      */
     private void validateReqParam(AcquireOrderReq req) {
-        // FIXME: 只有一行语句，也要加{}
-        if (req.getVersion() != 1)
+        if (req.getVersion() != 1) {
             throw new BizException(ErrorCode.NOT_SUPPORT_VERSION, req.getVersion().toString());
+        }
 
-        InstitutionConfig instConfig = instConfigManager.getConfig(req.getPayType());
+        InstitutionConfig instConfig = instConfigManager.getConfig(PayTypeEnum.parse(req.getPayType()));
         if (instConfig == null)
             throw new BizException(ErrorCode.INVALID_PAYTYPE, req.getPayType());
 
@@ -85,8 +92,9 @@ public class PaymentFacadeImpl implements PaymentFacade {
         // FIXME:并发问题，同时来了两笔orderId一样的请求呢?
         if (bussinessOrder != null)
             throw new BizException(ErrorCode.DB_ERROR, "OrderId已经创建过支付单");
-        
-        //FIXME:金额输入合法性检验? payType合法性校验?
+
+        if ((new BigDecimal(req.getPayPrice()).doubleValue() < 0.01))
+            throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "无效的支付金额");
     }
 
 }

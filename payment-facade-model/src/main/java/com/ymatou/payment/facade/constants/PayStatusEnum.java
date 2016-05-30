@@ -45,4 +45,25 @@ public enum PayStatusEnum {
     public String getName() {
         return this.name;
     }
+
+    /**
+     * 枚举转换
+     * 
+     * @param index
+     * @return
+     */
+    public static PayStatusEnum parse(int index) {
+        switch (index) {
+            case 0:
+                return Init;
+            case 1:
+                return Paied;
+            case 2:
+                return Refunded;
+            case -1:
+                return Failed;
+            default:
+                return null;
+        }
+    }
 }

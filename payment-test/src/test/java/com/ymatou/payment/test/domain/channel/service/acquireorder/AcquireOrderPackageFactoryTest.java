@@ -18,6 +18,7 @@ import com.ymatou.payment.domain.channel.service.acquireorder.AliPayPcAcquireOrd
 import com.ymatou.payment.domain.channel.service.acquireorder.WeiXinAppAcquireOrderServiceImpl;
 import com.ymatou.payment.domain.channel.service.acquireorder.WeiXinJSAPIAcquireOrderServiceImpl;
 import com.ymatou.payment.facade.BizException;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.test.RestBaseTest;
 
 public class AcquireOrderPackageFactoryTest extends RestBaseTest {
@@ -28,28 +29,28 @@ public class AcquireOrderPackageFactoryTest extends RestBaseTest {
     public void testGetInstanceThrowExecptionWhenPayTypeIsNull() {
         String payType = null;
 
-        acquireOrderPackageFactory.getInstance(payType);
+        acquireOrderPackageFactory.getInstance(PayTypeEnum.parse(payType));
     }
 
     @Test(expected = BizException.class)
     public void testGetInstanceThrowExecptionWhenPayTypeIsInvalidate() {
         String payType = "99";
 
-        acquireOrderPackageFactory.getInstance(payType);
+        acquireOrderPackageFactory.getInstance(PayTypeEnum.parse(payType));
     }
 
     @Test
     public void testGetInstance() {
-        AcquireOrderService aoService = acquireOrderPackageFactory.getInstance("10");
+        AcquireOrderService aoService = acquireOrderPackageFactory.getInstance(PayTypeEnum.parse("10"));
         assertEquals("10", AliPayPcAcquireOrderServiceImpl.class, aoService.getClass());
 
-        AcquireOrderService aoService1 = acquireOrderPackageFactory.getInstance("13");
+        AcquireOrderService aoService1 = acquireOrderPackageFactory.getInstance(PayTypeEnum.parse("13"));
         assertEquals("13", AliPayAppAcquireOrderServiceImpl.class, aoService1.getClass());
 
-        AcquireOrderService aoService2 = acquireOrderPackageFactory.getInstance("14");
+        AcquireOrderService aoService2 = acquireOrderPackageFactory.getInstance(PayTypeEnum.parse("14"));
         assertEquals("14", WeiXinJSAPIAcquireOrderServiceImpl.class, aoService2.getClass());
 
-        AcquireOrderService aoService3 = acquireOrderPackageFactory.getInstance("15");
+        AcquireOrderService aoService3 = acquireOrderPackageFactory.getInstance(PayTypeEnum.parse("15"));
         assertEquals("15", WeiXinAppAcquireOrderServiceImpl.class, aoService3.getClass());
     }
 

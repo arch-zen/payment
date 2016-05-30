@@ -5,6 +5,8 @@
  */
 package com.ymatou.payment.facade.impl;
 
+import java.util.Date;
+
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -23,6 +25,7 @@ import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.PaymentNotifyFacade;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.PaymentNotifyType;
 import com.ymatou.payment.facade.model.PaymentNotifyReq;
 import com.ymatou.payment.facade.model.PaymentNotifyResp;
@@ -65,7 +68,7 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
     @Override
     public PaymentNotifyResp notify(PaymentNotifyReq req) {
         // STEP.1 获取到第三方机构配置
-        InstitutionConfig instConfig = institutionConfigManager.getConfig(req.getPayType());
+        InstitutionConfig instConfig = institutionConfigManager.getConfig(PayTypeEnum.parse(req.getPayType()));
 
         // STEP.2 解析并验证报文
         PaymentNotifyService notifyService = notityMessageResolverFactory.getInstance(req.getPayType());
@@ -96,30 +99,40 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
 
 
             // 如果支付单的状态 已经成功则直接返回成功
-            if (payment.getPayStatus() == PayStatusEnum.Paied.getIndex()) {
+            if (payment.getPayStatus() == PayStatusEnum.Paied) {
                 response.setResult(notifyService.buildResponse(notifyMessage, payment, req.getNotifyType()));
+                response.setSuccess(true);
                 return response;
             }
 
-            // 验证实际支付金额和支付金额是否一致
-            if (payment.getPayPrice().subtract(notifyMessage.getActualPayPrice()).abs().floatValue() > 0.01)
-                throw new BizException(ErrorCode.PAYPRICE_AND_ACT_NOT_CONSISTENT,
-                        "paymentid: " + payment.getPaymentId());
-
-            // 更改订单状态
+            // 如果是服务端回调
             if (req.getNotifyType() == PaymentNotifyType.Server) {
-                setPaymentOrderPaid(payment, notifyMessage);
-            }
 
-            // 通知发货服务
-            try {
-                notifyPaymentService.doService(payment.getPaymentId(), notifyMessage.getTraceId(), req.getMockHeader());
-            } catch (Exception e) {
-                logger.error("notify deliver service failed with paymentid :" + payment.getPaymentId(), e);
+                // 验证实际支付金额和支付金额是否一致
+                if (payment.getPayPrice().subtract(notifyMessage.getActualPayPrice()).abs().floatValue() > 0.01)
+                    throw new BizException(ErrorCode.PAYPRICE_AND_ACT_NOT_CONSISTENT,
+                            "paymentid: " + payment.getPaymentId());
+
+                // 更改订单状态
+                setPaymentOrderPaid(payment, notifyMessage);
+
+                // 通知发货服务
+                try {
+                    notifyPaymentService.doService(payment.getPaymentId(), notifyMessage.getTraceId(),
+                            req.getMockHeader());
+                } catch (Exception e) {
+                    logger.error("notify deliver service failed with paymentid :" + payment.getPaymentId(), e);
+                }
             }
         }
 
+        // 构造返回报文
         response.setResult(notifyService.buildResponse(notifyMessage, payment, req.getNotifyType()));
+        if (response.getErrorCode() == 0) {
+            response.setSuccess(true);
+        } else {
+            response.setSuccess(false);
+        }
         return response;
     }
 
@@ -131,7 +144,7 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
      */
     private void setPaymentOrderPaid(Payment payment, PaymentNotifyMessage notifyMessage) {
         payment.setInstitutionPaymentId(notifyMessage.getInstitutionPaymentId());
-        payment.setPayStatus(PayStatusEnum.Paied.getIndex());
+        payment.setPayStatus(PayStatusEnum.Paied);
         payment.setActualPayPrice(notifyMessage.getActualPayPrice());
         payment.setActualPayCurrencyType(notifyMessage.getActualPayCurrency());
         payment.setBankId(notifyMessage.getBankId());

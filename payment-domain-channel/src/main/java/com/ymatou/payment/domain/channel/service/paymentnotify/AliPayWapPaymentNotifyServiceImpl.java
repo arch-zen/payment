@@ -35,6 +35,7 @@ import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.PaymentNotifyType;
 import com.ymatou.payment.facade.model.PaymentNotifyReq;
 import com.ymatou.payment.infrastructure.util.HttpUtil;
@@ -73,7 +74,8 @@ public class AliPayWapPaymentNotifyServiceImpl implements PaymentNotifyService {
         }
 
         // 验签
-        InstitutionConfig instConfig = institutionConfigManager.getConfig(notifyRequest.getPayType());
+        InstitutionConfig instConfig =
+                institutionConfigManager.getConfig(PayTypeEnum.parse(notifyRequest.getPayType()));
         boolean isSignValidate = signatureService.validateSign(map, instConfig, notifyRequest.getMockHeader());
         if (!isSignValidate) {
             throw new BizException(ErrorCode.SIGN_NOT_MATCH, "paymentId:" + map.get("out_trade_no"));

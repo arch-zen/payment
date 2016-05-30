@@ -89,7 +89,7 @@ public class RefundFacadeImpl implements RefundFacade {
             throw new BizException(ErrorCode.INCONSISTENT_PAYMENTID_AND_TRADINGID,
                     "inconsistent paymentId and tradingId");
         }
-        if (!payment.getPayStatus().equals(PayStatusEnum.Paied.getIndex())) {
+        if (payment.getPayStatus() != PayStatusEnum.Paied) {
             throw new BizException(ErrorCode.INVALID_PAYMENT_STATUS, "invalid payment status");
         }
 

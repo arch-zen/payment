@@ -9,6 +9,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.test.RestBaseTest;
 
 public class InstitutionConfigManagerTest extends RestBaseTest {
@@ -19,7 +20,7 @@ public class InstitutionConfigManagerTest extends RestBaseTest {
     @Test
     public void testGetConfigAliPayPc() {
         String payType = "10";
-        InstitutionConfig config = instConfigManager.getConfig(payType);
+        InstitutionConfig config = instConfigManager.getConfig(PayTypeEnum.parse(payType));
 
         assertEquals("验证商户号", "2088701734809577", config.getMerchantId());
         assertEquals("验证支付宝账号", "ap.ymt@ymatou.com", config.getSellerEmail());
@@ -30,7 +31,7 @@ public class InstitutionConfigManagerTest extends RestBaseTest {
     @Test
     public void testGetConfigAliPayApp() {
         String payType = "13";
-        InstitutionConfig config = instConfigManager.getConfig(payType);
+        InstitutionConfig config = instConfigManager.getConfig(PayTypeEnum.parse(payType));
 
         assertEquals("验证商户号", "2088701734809577", config.getMerchantId());
         assertEquals("验证支付宝账号", "ap.ymt@ymatou.com", config.getSellerEmail());
@@ -44,7 +45,7 @@ public class InstitutionConfigManagerTest extends RestBaseTest {
     @Test
     public void testGetConfigWeiXinJSAPI() {
         String payType = "14";
-        InstitutionConfig config = instConfigManager.getConfig(payType);
+        InstitutionConfig config = instConfigManager.getConfig(PayTypeEnum.parse(payType));
 
         assertEquals("验证商户号", "1278350701", config.getMerchantId());
         assertEquals("验证签名方式", "MD5", config.getSignType());
@@ -59,7 +60,7 @@ public class InstitutionConfigManagerTest extends RestBaseTest {
     public void testGetConfigWeiXinApp() {
 
         String payType = "15";
-        InstitutionConfig config = instConfigManager.getConfig(payType);
+        InstitutionConfig config = instConfigManager.getConfig(PayTypeEnum.parse(payType));
 
         assertEquals("验证商户号", "1234079001", config.getMerchantId());
         assertEquals("验证签名方式", "MD5", config.getSignType());

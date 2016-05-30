@@ -60,7 +60,7 @@ public class RefundPository {
         refundrequest.setOrderId(refundInfo.getOrderIdList().get(0));
         refundrequest.setTraceId(refundInfo.getTraceId());
         refundrequest.setAppId(refundInfo.getAppId());
-        refundrequest.setPayType(payment.getPayType());
+        refundrequest.setPayType(payment.getPayType().getCode());
         refundrequest.setRefundAmount(payment.getPayPrice());
         refundrequest.setCurrencyType(payment.getPayCurrencyType());
         refundrequest.setApproveStatus(ApproveStatusEnum.FAST_REFUND.getCode());

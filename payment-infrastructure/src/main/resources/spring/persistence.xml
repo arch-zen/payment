@@ -11,7 +11,7 @@
          http://mybatis.org/schema/mybatis-spring.xsd"
 	default-autowire="byName">
 
-	<mybatis:scan base-package="com.ymatou.payment.infrastructure.db.mapper"
+	<mybatis:scan base-package="com.ymatou.payment.infrastructure.db.mapper, com.ymatou.payment.infrastructure.db.operate"
 		template-ref="sqlSession" />
 
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">

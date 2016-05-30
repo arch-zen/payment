@@ -26,6 +26,7 @@ import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.integration.model.OrderQueryRequest;
 import com.ymatou.payment.integration.model.OrderQueryResponse;
 import com.ymatou.payment.integration.service.wxpay.OrderQueryService;
@@ -98,7 +99,7 @@ public class WeiXinPaymentQueryServiceImpl implements PaymentQueryService {
 
     private OrderQueryRequest generateRequest(String paymentId, String payType, HashMap<String, String> header) {
         // 根据payType获取appId,mchId信息
-        InstitutionConfig institutionConfig = institutionConfigManager.getConfig(payType);
+        InstitutionConfig institutionConfig = institutionConfigManager.getConfig(PayTypeEnum.parse(payType));
         String appId = institutionConfig.getAppId();
         String mchId = institutionConfig.getMerchantId();
 

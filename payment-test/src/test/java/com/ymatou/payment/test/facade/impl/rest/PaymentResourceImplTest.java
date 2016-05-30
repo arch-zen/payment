@@ -16,15 +16,16 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.apache.http.client.utils.DateUtils;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.service.PayService;
-import com.ymatou.payment.facade.impl.rest.PaymentResource;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
+import com.ymatou.payment.facade.rest.PaymentResource;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.test.RestBaseTest;
 
@@ -156,10 +157,10 @@ public class PaymentResourceImplTest extends RestBaseTest {
         Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
         assertNotNull("验证支付单不为空", payment);
 
-        assertEquals("验证PayType", req.getPayType(), payment.getPayType());
+        assertEquals("验证PayType", req.getPayType(), payment.getPayType().getCode());
         assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(), payment.getPayPrice().doubleValue(),
                 0.000001);
-        assertEquals("验证PayStatus", new Integer(0), payment.getPayStatus());
+        assertEquals("验证PayStatus", 0, payment.getPayStatus().getIndex());
     }
 
     @Test
@@ -220,10 +221,10 @@ public class PaymentResourceImplTest extends RestBaseTest {
         Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
         assertNotNull("验证支付单不为空", payment);
 
-        assertEquals("验证PayType", req.getPayType(), payment.getPayType());
+        assertEquals("验证PayType", req.getPayType(), payment.getPayType().getCode());
         assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(), payment.getPayPrice().doubleValue(),
                 0.000001);
-        assertEquals("验证PayStatus", new Integer(0), payment.getPayStatus());
+        assertEquals("验证PayStatus", 0, payment.getPayStatus().getIndex());
     }
 
     @Test
@@ -233,7 +234,7 @@ public class PaymentResourceImplTest extends RestBaseTest {
 
         req.setPayType("14");
         req.setPayPrice("1.01");
-        req.setUserId(3790800);
+        req.setUserId(3790800L);
 
         MockHttpServletRequest servletRequest = new MockHttpServletRequest();
         AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
@@ -254,10 +255,16 @@ public class PaymentResourceImplTest extends RestBaseTest {
         Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
         assertNotNull("验证支付单不为空", payment);
 
-        assertEquals("验证PayType", req.getPayType(), payment.getPayType());
+        assertEquals("验证PayType", req.getPayType(), payment.getPayType().getCode());
         assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(), payment.getPayPrice().doubleValue(),
                 0.000001);
-        assertEquals("验证PayStatus", new Integer(0), payment.getPayStatus());
+        assertEquals("验证PayStatus", 0, payment.getPayStatus().getIndex());
+    }
+
+    @Test
+    public void gmtTimeTest() {
+        String gmt_payment = "2016-05-27 20:27:08";
+        Date date = DateUtils.parseDate(gmt_payment, new String[] {"yyyy-MM-dd HH:mm:ss"});
     }
 
     /**
@@ -285,7 +292,7 @@ public class PaymentResourceImplTest extends RestBaseTest {
         req.setMemo("备注");
         req.setSignMethod("MD5");
         req.setExt("{\"SHOWMODE\":\"2\",\"PAYMETHOD\":\"2\", \"IsHangZhou\":0}");
-        req.setUserId(12345);
+        req.setUserId(12345L);
         req.setUserIp("127.0.0.1");
         req.setBankId("CMB");
     }

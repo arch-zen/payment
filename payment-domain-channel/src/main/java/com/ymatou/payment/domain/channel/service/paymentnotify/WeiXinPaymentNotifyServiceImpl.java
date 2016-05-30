@@ -6,6 +6,8 @@
 package com.ymatou.payment.domain.channel.service.paymentnotify;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -13,7 +15,9 @@ import java.util.UUID;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.channel.InstitutionConfig;
@@ -25,6 +29,7 @@ import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.PaymentNotifyType;
 import com.ymatou.payment.facade.model.PaymentNotifyReq;
 import com.ymatou.payment.infrastructure.util.MapUtil;
@@ -44,6 +49,8 @@ public class WeiXinPaymentNotifyServiceImpl implements PaymentNotifyService {
     @Resource
     private InstitutionConfigManager institutionConfigManager;
 
+    private static final Logger logger = LoggerFactory.getLogger(WeiXinPaymentNotifyServiceImpl.class);
+
     /*
      * (non-Javadoc)
      * 
@@ -62,7 +69,8 @@ public class WeiXinPaymentNotifyServiceImpl implements PaymentNotifyService {
         }
 
         // 验签
-        InstitutionConfig instConfig = institutionConfigManager.getConfig(notifyRequest.getPayType());
+        InstitutionConfig instConfig =
+                institutionConfigManager.getConfig(PayTypeEnum.parse(notifyRequest.getPayType()));
         boolean isSignValidate = signatureService.validateSign(map, instConfig, notifyRequest.getMockHeader());
         if (isSignValidate == false) {
             throw new BizException(ErrorCode.SIGN_NOT_MATCH, "paymentId:" + map.get("out_trade_no"));
@@ -91,8 +99,7 @@ public class WeiXinPaymentNotifyServiceImpl implements PaymentNotifyService {
         paymentNotifyMessage.setActualPayPrice(totalFee);
         paymentNotifyMessage.setInstitutionPaymentId(map.get("transaction_id"));
         paymentNotifyMessage.setPaymentId(map.get("out_trade_no"));
-        paymentNotifyMessage
-                .setPayTime(DateUtils.parseDate(map.get("time_end"), new String[] {"yyyyMMddHHmmss"}));
+        paymentNotifyMessage.setPayTime(parseDate(map.get("time_end")));
         paymentNotifyMessage.setPayStatus(PayStatusEnum.Paied);
 
 
@@ -119,4 +126,19 @@ public class WeiXinPaymentNotifyServiceImpl implements PaymentNotifyService {
         return sb.toString();
     }
 
+    /**
+     * 将日期字符串转成日期格式
+     * 
+     * @param dateString
+     * @return
+     */
+    private Date parseDate(String dateString) {
+        try {
+
+            return DateUtils.parseDate(dateString, new String[] {"yyyyMMddHHmmss"});
+        } catch (ParseException e) {
+            logger.error("pare date when process alipay notify with date string:" + dateString, e);
+            return new Date();
+        }
+    }
 }

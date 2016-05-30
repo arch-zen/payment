@@ -116,7 +116,7 @@ public class SignatureServiceImpl implements SignatureService {
     private String mapToString(Map<String, String> map, InstitutionConfig instConfig, boolean needSort) {
         ArrayList<String> list = new ArrayList<String>();
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            if (entry.getValue() != ""
+            if (entry.getValue() != "" && entry.getValue() != null
                     && !entry.getKey().equals("serialVersionUID")
                     && !entry.getKey().equals("sign")
                     && !entry.getKey().equals("sign_type")) {

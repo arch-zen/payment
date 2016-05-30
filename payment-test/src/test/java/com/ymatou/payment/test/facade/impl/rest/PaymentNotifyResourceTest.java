@@ -21,7 +21,8 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.service.SignatureService;
-import com.ymatou.payment.facade.impl.rest.PaymentNotifyResource;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
+import com.ymatou.payment.facade.rest.PaymentNotifyResource;
 import com.ymatou.payment.infrastructure.db.mapper.AlipayNotifyLogMapper;
 import com.ymatou.payment.infrastructure.db.model.AlipayNotifyLogExample;
 import com.ymatou.payment.infrastructure.db.model.AlipayNotifyLogPo;
@@ -200,7 +201,7 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
     }
 
     private String buildMockQueryString(String originString, String payType) throws UnsupportedEncodingException {
-        InstitutionConfig instConfig = institutionConfigManager.getConfig(payType);
+        InstitutionConfig instConfig = institutionConfigManager.getConfig(PayTypeEnum.parse(payType));
         Map<String, String> map = HttpUtil.parseQueryStringToMap(originString);
         HashMap<String, String> mockHeader = new HashMap<String, String>();
         mockHeader.put("mock", "1");

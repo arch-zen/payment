@@ -9,6 +9,7 @@ import java.util.HashMap;
 
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.Range;
 
@@ -29,10 +30,9 @@ public class AcquireOrderReq extends BaseRequest {
     private static final long serialVersionUID = -3983050225255199358L;
 
     /**
-     * FIXME: max=1? invalidate->invalid
      * 接口版本
      */
-    @Range(min = 1, max = 1, message = "invalidate version")
+    @Range(min = 1, max = 1, message = "invalid version")
     private int version;
 
     /**
@@ -52,9 +52,9 @@ public class AcquireOrderReq extends BaseRequest {
     private String originAppId;
 
     /**
-     * FIXME:所有要入库的字符串，考虑加下长度限制标签
      * 跟踪Id
      */
+    @Length(max = 36)
     private String traceId;
 
     /**
@@ -102,10 +102,9 @@ public class AcquireOrderReq extends BaseRequest {
     private String bankId;
 
     /**
-     * FIXME: Long
      * 洋码头余额账户所对应的USERID
      */
-    private Integer userId;
+    private Long userId;
 
     /**
      * 第三方用户标识
@@ -113,7 +112,7 @@ public class AcquireOrderReq extends BaseRequest {
     private String thirdPartyUserId;
 
     /// <summary>
-    /// 暂时不需要 FIXME: Long
+    /// 暂时不需要
     /// </summary>
     private Integer thirdPartyUserIdType;
 
@@ -206,7 +205,7 @@ public class AcquireOrderReq extends BaseRequest {
      */
     public void setTraceId(String traceId) {
         this.traceId = traceId;
-        // FIXME: use traceId as requestId
+        this.setRequestId(this.traceId);
     }
 
     /**
@@ -296,14 +295,14 @@ public class AcquireOrderReq extends BaseRequest {
     /**
      * @return the userId
      */
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
     /**
      * @param userId the userId to set
      */
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

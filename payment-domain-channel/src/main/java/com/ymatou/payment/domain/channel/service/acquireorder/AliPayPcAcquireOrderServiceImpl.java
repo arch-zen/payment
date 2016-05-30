@@ -98,9 +98,11 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
         reqDict.put("partner", instConfig.getMerchantId());
         reqDict.put("seller_email", instConfig.getSellerEmail());
         reqDict.put("return_url",
-                String.format("%s/callback/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPayType()));
+                String.format("%s/callback/%s", integrationConfig.getYmtPaymentBaseUrl(),
+                        payment.getPayType().getCode()));
         reqDict.put("notify_url",
-                String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPayType()));
+                String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(),
+                        payment.getPayType().getCode()));
         reqDict.put("_input_charset", AliPayConsts.INPUT_CHARSET);
         reqDict.put("show_url", payment.getBussinessOrder().getProductUrl());
         reqDict.put("out_trade_no", payment.getPaymentId());

@@ -16,7 +16,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import com.ymatou.payment.facade.impl.rest.RefundResource;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
 import com.ymatou.payment.facade.model.AcquireRefundResponse;
@@ -29,6 +28,7 @@ import com.ymatou.payment.facade.model.QueryRefundResponse;
 import com.ymatou.payment.facade.model.TradeDetail;
 import com.ymatou.payment.facade.model.TradeRefundableRequest;
 import com.ymatou.payment.facade.model.TradeRefundableResponse;
+import com.ymatou.payment.facade.rest.RefundResource;
 import com.ymatou.payment.test.RestBaseTest;
 
 /**
@@ -172,7 +172,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         req.setMemo("备注");
         req.setSignMethod("MD5");
         req.setExt("{\"SHOWMODE\":\"2\",\"PAYMETHOD\":\"2\", \"IsHangZhou\":0}");
-        req.setUserId(12345);
+        req.setUserId(12345L);
         req.setUserIp("127.0.0.1");
         req.setBankId("CMB");
     }
