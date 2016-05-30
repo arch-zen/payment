@@ -109,6 +109,7 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
             if (req.getNotifyType() == PaymentNotifyType.Server) {
 
                 // 验证实际支付金额和支付金额是否一致
+                // FIXME: 用Money类 
                 if (payment.getPayPrice().subtract(notifyMessage.getActualPayPrice()).abs().floatValue() > 0.01)
                     throw new BizException(ErrorCode.PAYPRICE_AND_ACT_NOT_CONSISTENT,
                             "paymentid: " + payment.getPaymentId());
