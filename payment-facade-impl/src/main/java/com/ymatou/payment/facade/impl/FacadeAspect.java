@@ -68,8 +68,6 @@ public class FacadeAspect {
 
             resp = joinPoint.proceed(new Object[] {req});
 
-            logger.info("Resp: {}", resp);
-
         } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("appId")) {
                 resp = builErrorResponse(joinPoint, ErrorCode.SING_SERVER_ERROR, e.getLocalizedMessage());
@@ -95,7 +93,7 @@ public class FacadeAspect {
             resp = builErrorResponse(joinPoint, ErrorCode.UNKNOWN, e.getLocalizedMessage());
             logger.error("Unknown error in executing request:{}", req, e);
         } finally {
-
+            logger.info("Resp:" + resp);
             MDC.clear();
         }
 
