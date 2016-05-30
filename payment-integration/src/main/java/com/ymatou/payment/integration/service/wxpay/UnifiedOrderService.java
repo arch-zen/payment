@@ -51,7 +51,7 @@ public class UnifiedOrderService implements InitializingBean {
 
     /**
      * 微信支付统一下单服务
-     * 
+     * FIXME: 明确throw Exception，为什么还要try/catch ??
      * @param request
      * @param header
      * @return

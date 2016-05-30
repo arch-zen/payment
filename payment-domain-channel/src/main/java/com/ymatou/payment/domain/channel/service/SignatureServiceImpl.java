@@ -123,10 +123,13 @@ public class SignatureServiceImpl implements SignatureService {
                 list.add(entry.getKey() + "=" + entry.getValue() + "&");
             }
         }
+        
+        //FIXME: Colllections.sort，无需先转为Array
 
         int size = list.size();
         String[] arrayToSort = list.toArray(new String[size]);
 
+        //FIXME: {}
         if (needSort)
             Arrays.sort(arrayToSort, String.CASE_INSENSITIVE_ORDER);
 
@@ -135,6 +138,7 @@ public class SignatureServiceImpl implements SignatureService {
             sb.append(arrayToSort[i]);
         }
 
+        //FIXME：直接sb.subString，无需先转为String
         String mapString = sb.toString();
 
         return mapString.substring(0, mapString.length() - 1);
@@ -156,6 +160,7 @@ public class SignatureServiceImpl implements SignatureService {
             String targetMessage = rawMessage + md5keyConnector + md5Key;
 
             if (StringUtils.isBlank(instConfig.getMd5KeyConnector()))
+                //FIXME, 为什么有connector就没有toUpperCase()? 加注释说明
                 return MD5Util.encode(targetMessage);
             else
                 return MD5Util.encode(targetMessage).toUpperCase();

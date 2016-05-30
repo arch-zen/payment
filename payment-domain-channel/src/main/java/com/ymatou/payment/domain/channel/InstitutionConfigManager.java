@@ -61,6 +61,8 @@ public class InstitutionConfigManager implements IDisconfUpdate{
             Unmarshaller unmarshaller = context.createUnmarshaller();
 
             instConfigCollection = (InstitutionConfigCollection) unmarshaller.unmarshal(new FileReader(configFile));
+            
+            //FIXME: 需要验证每种PaymentType都有配置?
 
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
