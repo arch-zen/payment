@@ -114,6 +114,8 @@ public class RefundFacadeImpl implements RefundFacade {
         }
 
         FastRefundResponse response = new FastRefundResponse();
+        //FIXME: setSuceess(true)
+        //FIXME: errorMessage是错误描述 ！！
         response.setErrorMessage("操作成功！");
 
         return response;
