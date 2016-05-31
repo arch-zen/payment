@@ -23,7 +23,6 @@ public class PaymentOperateTest extends RestBaseTest {
     private PaymentOperate paymentOperate;
 
     @Test
-    @Ignore
     public void testGetPaymentSuffixId() {
         long paymentSuffixId = paymentOperate.genPaymentSuffixId();
 
@@ -32,7 +31,6 @@ public class PaymentOperateTest extends RestBaseTest {
     }
 
     @Test
-    @Ignore
     public void testGetFullPaymentId() {
         long paymentSuffixId = paymentOperate.genPaymentSuffixId();
         // long paymentSuffixId = 1;

@@ -78,8 +78,6 @@ public class InstitutionConfigManager implements IDisconfUpdate, InitializingBea
 
         instConfigCollection = (InstitutionConfigCollection) unmarshaller.unmarshal(new FileReader(configFile));
 
-        //FIXME: {}
-        //FIXME: 需要验证没种PaymentType都有config吗
         if (instConfigCollection == null || instConfigCollection.size() == 0)
             throw new Exception("无效的配置文件：institutionConfig.xml");
     }

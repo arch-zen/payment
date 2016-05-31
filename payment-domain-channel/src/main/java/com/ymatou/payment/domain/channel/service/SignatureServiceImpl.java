@@ -7,6 +7,7 @@ package com.ymatou.payment.domain.channel.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -123,25 +124,18 @@ public class SignatureServiceImpl implements SignatureService {
                 list.add(entry.getKey() + "=" + entry.getValue() + "&");
             }
         }
-        
-        //FIXME: Colllections.sort，无需先转为Array
 
         int size = list.size();
-        String[] arrayToSort = list.toArray(new String[size]);
-
-        //FIXME: {}
-        if (needSort)
-            Arrays.sort(arrayToSort, String.CASE_INSENSITIVE_ORDER);
+        if (needSort) {
+            Collections.sort(list);
+        }
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < size; i++) {
-            sb.append(arrayToSort[i]);
+            sb.append(list.get(i));
         }
 
-        //FIXME：直接sb.subString，无需先转为String
-        String mapString = sb.toString();
-
-        return mapString.substring(0, mapString.length() - 1);
+        return sb.substring(0, sb.length() - 1);
     }
 
     /**
@@ -159,8 +153,8 @@ public class SignatureServiceImpl implements SignatureService {
                     StringUtils.isBlank(instConfig.getMd5KeyConnector()) ? "" : instConfig.getMd5KeyConnector();
             String targetMessage = rawMessage + md5keyConnector + md5Key;
 
+            // getMd5KeyConnector不为空说明是微信的渠道，需要对签转大写
             if (StringUtils.isBlank(instConfig.getMd5KeyConnector()))
-                //FIXME, 为什么有connector就没有toUpperCase()? 加注释说明
                 return MD5Util.encode(targetMessage);
             else
                 return MD5Util.encode(targetMessage).toUpperCase();

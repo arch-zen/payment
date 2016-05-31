@@ -102,7 +102,7 @@ public class PaymentRepository {
      * 
      * @param paymentPo
      */
-    @Transactional(rollbackFor = Throwable.class)
+    @Transactional
     public void setPaymentOrderPaid(PaymentPo paymentPo, String traceId) {
         // 更新支付单
         PaymentExample paymentExample = new PaymentExample();

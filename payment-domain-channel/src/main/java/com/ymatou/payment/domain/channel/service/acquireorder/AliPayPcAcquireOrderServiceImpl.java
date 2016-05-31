@@ -115,8 +115,7 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
         reqDict.put("buyer_email", payment.getBussinessOrder().getThirdPartyUserId());
         reqDict.put("sign_type", instConfig.getSignType());
 
-        //FIXME: NPE if acquireOrderExt.getIsHangZhou() is null
-        if (acquireOrderExt.getIsHangZhou() == 1) {
+        if (acquireOrderExt.getIsHangZhou() != null && acquireOrderExt.getIsHangZhou() == 1) {
             reqDict.put("service", "alipay.acquire.page.createandpay");
             reqDict.put("buyer_info", "{\"needBuyerRealnamed\":\"T\"}");
             reqDict.put("product_code", "FAST_INSTANT_TRADE_PAY");

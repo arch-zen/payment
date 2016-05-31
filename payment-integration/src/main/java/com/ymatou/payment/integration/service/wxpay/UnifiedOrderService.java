@@ -51,7 +51,7 @@ public class UnifiedOrderService implements InitializingBean {
 
     /**
      * 微信支付统一下单服务
-     * FIXME: 明确throw Exception，为什么还要try/catch ??
+     * 
      * @param request
      * @param header
      * @return
@@ -59,19 +59,14 @@ public class UnifiedOrderService implements InitializingBean {
      */
     public UnifiedOrderResponse doService(UnifiedOrderRequest request, HashMap<String, String> header)
             throws Exception {
-        try {
-            String respXmlStr = HttpClientUtil.sendPost(integrationConfig.getWxUnifiedOrderUrl(header),
-                    getPostDataXml(request), Constants.CONTENT_TTPE_XML, header, httpClient);
-            if (!StringUtils.isEmpty(respXmlStr) && respXmlStr.startsWith(Constants.WEIXIN_RESPONSE_BODY_START)) {
-                Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);
-                UnifiedOrderResponse response = generateResponseData(respMap);
-                return response;
-            }
-            return null;
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw e;
+        String respXmlStr = HttpClientUtil.sendPost(integrationConfig.getWxUnifiedOrderUrl(header),
+                getPostDataXml(request), Constants.CONTENT_TTPE_XML, header, httpClient);
+        if (!StringUtils.isEmpty(respXmlStr) && respXmlStr.startsWith(Constants.WEIXIN_RESPONSE_BODY_START)) {
+            Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);
+            UnifiedOrderResponse response = generateResponseData(respMap);
+            return response;
         }
+        return null;
     }
 
     private String getPostDataXml(UnifiedOrderRequest request) {

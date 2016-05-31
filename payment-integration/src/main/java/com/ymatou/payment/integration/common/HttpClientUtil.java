@@ -4,11 +4,13 @@
 package com.ymatou.payment.integration.common;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -85,7 +87,7 @@ public class HttpClientUtil {
      */
     public static String sendPost(String url, String body, String contentType, HashMap<String, String> header,
             HttpClient httpClient)
-            throws IOException {
+                    throws IOException {
         String result = null;
 
         HttpPost httpPost = new HttpPost(url);
@@ -126,7 +128,7 @@ public class HttpClientUtil {
      */
     public static String sendPost(String url, List<NameValuePair> body, HashMap<String, String> header,
             HttpClient httpClient)
-            throws IOException {
+                    throws IOException {
         String result = null;
 
         HttpPost httpPost = new HttpPost(url);
@@ -155,20 +157,21 @@ public class HttpClientUtil {
 
 
     /**
-     * FIXME: 实际上是同步 
+     * FIXME: 实际上是同步
+     * 
      * @param url 请求路径
      * @param body 请求body
      * @param header 请求header
      * @param httpClient 执行请求的HttpClient
      * @return 请求应答
+     * @throws UnsupportedEncodingException
      * @throws ParseException
      * @throws IOException
      * @throws ExecutionException
      * @throws InterruptedException
      */
     public static void sendPost(String url, List<NameValuePair> body, HashMap<String, String> header,
-            CloseableHttpAsyncClient httpClient)
-            throws IOException, InterruptedException, ExecutionException {
+            CloseableHttpAsyncClient httpClient) throws UnsupportedEncodingException {
 
         HttpPost httpPost = new HttpPost(url);
         UrlEncodedFormEntity postEntity = new UrlEncodedFormEntity(body, "UTF-8");
@@ -182,38 +185,37 @@ public class HttpClientUtil {
         logger.info("request header: " + Arrays.toString(httpPost.getAllHeaders()));
         logger.info("request body: " + body);
 
-        try {
-            httpClient.execute(httpPost, new FutureCallback<HttpResponse>() {
+        httpClient.execute(httpPost, new FutureCallback<HttpResponse>() {
 
-                @Override
-                public void failed(Exception ex) {
-                    logger.error(httpPost.getRequestLine() + " failed.", ex);
+            @Override
+            public void failed(Exception ex) {
+                logger.error(httpPost.getRequestLine() + " failed.", ex);
+                httpPost.releaseConnection();
+            }
+
+            @Override
+            public void completed(HttpResponse result) {
+
+                try {
+                    HttpEntity entity = result.getEntity();
+                    String reponseStr = EntityUtils.toString(entity, "UTF-8");
+                    logger.info("async response message:" + reponseStr);
+                } catch (org.apache.http.ParseException e) {
+                    logger.error("async response message parse occur error.", e);
+                } catch (IOException e) {
+                    logger.error("async response message read occur error.", e);
+                } finally {
+                    httpPost.releaseConnection();
                 }
 
-                @Override
-                public void completed(HttpResponse result) {
+            }
 
-                    try {
-                        HttpEntity entity = result.getEntity();
-                        String reponseStr = EntityUtils.toString(entity, "UTF-8");
-                        logger.info("async response message:" + reponseStr);
-                    } catch (org.apache.http.ParseException e) {
-                        logger.error("async response message parse occur error.", e);
-                    } catch (IOException e) {
-                        logger.error("async response message read occur error.", e);
-                    }
-
-                }
-
-                @Override
-                public void cancelled() {
-                    logger.error("{} cancelled.", httpPost.getRequestLine());
-                }
-            });
-
-        } finally {
-            httpPost.releaseConnection();
-        }
+            @Override
+            public void cancelled() {
+                logger.error("{} cancelled.", httpPost.getRequestLine());
+                httpPost.releaseConnection();
+            }
+        });
 
     }
 }

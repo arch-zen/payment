@@ -33,7 +33,7 @@ public class CheckPaymentFacadeImpl implements CheckPaymentFacade {
     public BaseResponse checkPayment(CheckPaymentRequset req) {
 
         PaymentQueryService paymentQueryService =
-                paymentQueryServiceFactory.getInstanceByPayType(req.getPayType(), req.getPaymentId());
+                paymentQueryServiceFactory.getInstanceByPayType(req.getPayType());
 
         PaymentQueryResp paymentQueryResp =
                 paymentQueryService.paymentQuery(req.getPaymentId(), req.getPayType(), req.getHeader());
@@ -41,8 +41,11 @@ public class CheckPaymentFacadeImpl implements CheckPaymentFacade {
         paymentCheckService.doCheck(generateModel(paymentQueryResp), req.getPaymentId(), req.isFinalCheck(),
                 req.getHeader());
 
-        //FIXME: 失败？？
-        return new BaseResponse();
+
+        BaseResponse resp = new BaseResponse();
+        resp.setSuccess(true);
+
+        return resp;
     }
 
 
