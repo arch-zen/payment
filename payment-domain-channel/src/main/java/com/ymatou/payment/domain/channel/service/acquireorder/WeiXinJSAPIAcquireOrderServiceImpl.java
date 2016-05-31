@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 
@@ -214,8 +215,8 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
         try {
             WeixinJSAPIOrderRequest request = new WeixinJSAPIOrderRequest();
             request.AppID = instConfig.getAppId();
-            request.NonceStr = String.valueOf(new Random().nextInt(1000000000));
-            request.TimeStamp = String.valueOf(new Date().getTime());
+            request.NonceStr = UUID.randomUUID().toString().replace("-", "");
+            request.TimeStamp = String.valueOf(new Date().getTime() / 1000);
             request.Package = String.format("prepay_id=%s", prepayId);
             request.SignType = "MD5";
 

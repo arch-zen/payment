@@ -283,6 +283,7 @@ public class PaymentResourceImplTest extends RestBaseTest {
         req.setEncoding(65001);
         req.setNotifyUrl("http://api.trading.operate.ymatou.com/api/Trading/TradingCompletedNotify");
         req.setOrderId(getDateFormatString("yyyyMMddHHmmssSSS"));
+        // req.setOrderId("123456789");
         req.setOrderTime(getDateFormatString("yyyyMMddHHmmss"));
         req.setPayPrice("0.01");
         req.setPayType("10");

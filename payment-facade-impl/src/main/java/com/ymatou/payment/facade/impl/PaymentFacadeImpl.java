@@ -90,11 +90,13 @@ public class PaymentFacadeImpl implements PaymentFacade {
         BussinessOrder bussinessOrder = payService.getBussinessOrderByOrderId(req.getOrderId());
 
         // FIXME:并发问题，同时来了两笔orderId一样的请求呢?
-        if (bussinessOrder != null)
+        if (bussinessOrder != null) {
             throw new BizException(ErrorCode.DB_ERROR, "OrderId已经创建过支付单");
+        }
 
-        if ((new BigDecimal(req.getPayPrice()).doubleValue() < 0.01))
+        if ((new BigDecimal(req.getPayPrice()).doubleValue() < 0.01)) {
             throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "无效的支付金额");
+        }
     }
 
 }

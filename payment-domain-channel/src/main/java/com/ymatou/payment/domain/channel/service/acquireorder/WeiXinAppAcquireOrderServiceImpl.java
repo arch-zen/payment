@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 
@@ -192,8 +193,8 @@ public class WeiXinAppAcquireOrderServiceImpl implements AcquireOrderService {
             request.AppID = instConfig.getAppId();
             request.MerchantId = instConfig.getMerchantId();
             request.PayToken = prepayId;
-            request.NonceStr = String.valueOf(new Random().nextInt(1000000000));
-            request.TimeStamp = String.valueOf(new Date().getTime());
+            request.NonceStr = UUID.randomUUID().toString().replace("-", "");
+            request.TimeStamp = String.valueOf(new Date().getTime() / 1000);
             request.Package = "Sign=WXPay";
 
             Map<String, String> map = getMapFromObject(request);
