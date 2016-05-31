@@ -102,6 +102,28 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
     }
 
     @Test
+    public void testAliPayPCCallbackWrongSign() {
+        String payType = "10";
+        String paymentId = "21923050800942763";
+
+        // 删除旧数据
+        AlipayNotifyLogExample example = new AlipayNotifyLogExample();
+        example.createCriteria().andBizNoEqualTo(paymentId);
+        alipaynotifylogMapper.deleteByExample(example);
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        servletRequest.setRequestURI("/callback/" + payType);
+        servletRequest.setQueryString(
+                "buyer_email=13918705020&buyer_id=2088502927970351&exterface=alipay.acquire.page.createandpay&gmt_payment=2016-05-20+17:45:17&is_success=T&notify_id=RqPnCoPT3K9%252Fvwbh3InXShl%252BTeGJOqEWsGgi2TxT9ZO8KnQY82evrWMvJPeE2R8DqU%252FJ&notify_time=2016-05-20+17:45:24&notify_type=trade_status_sync&out_trade_no=21923050800942763&seller_email=ap.ymt%40ymatou.com&seller_id=2088701734809577&subject=piaixiao%E7%9A%84%E8%AE%A2%E5%8D%95&total_fee=108.00&trade_no=2016052021001004350265453604&trade_status=TRADE_SUCCESS&sign=error-sign&sign_type=MD5");
+
+
+        Response response = paymentNotifyResource.callback(payType, servletRequest);
+
+
+        assertEquals("验证返回值", 500, response.getStatus());
+    }
+
+    @Test
     public void testAliPayPCNotifyMock() throws UnsupportedEncodingException {
         String payType = "10";
         String reqRawBody =
