@@ -23,5 +23,5 @@ public interface RefundNotifyResource {
      * @param servletRequest
      * @return
      */
-    public String refundNotify(AliPayRefundNotifyRequest req, String payType, HttpServletRequest servletRequest);
+    public String refundNotify(String payType, HttpServletRequest servletRequest);
 }

@@ -4,13 +4,13 @@
 package com.ymatou.payment.facade.model;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ymatou.payment.facade.BaseRequest;
 
 /**
@@ -23,78 +23,173 @@ public class AliPayRefundNotifyRequest extends BaseRequest {
 
     private static final long serialVersionUID = 6547133957669831614L;
 
-    @JsonProperty("notify_time")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @NotNull
-    private Date notify_time;
+    private String notifyTime;
 
-    @JsonProperty("notify_type")
     @NotEmpty
-    private String notify_type;
+    private String notifyType;
 
-    @JsonProperty("notify_id")
     @NotEmpty
-    private String notify_id;
+    private String notifyId;
 
-    @JsonProperty("sign_type")
     @NotEmpty
-    private String sign_type;
+    private String signType;
 
-    @JsonProperty("sign")
     @NotEmpty
     private String sign;
 
-    @JsonProperty("batch_no")
     @NotEmpty
-    private String batch_no;
+    private String batchNo;
 
-    @JsonProperty("success_num")
     @NotEmpty
-    private String success_num;
+    private String successNum;
 
-    @JsonProperty("result_details")
     @NotEmpty
-    private String result_details;
+    private String resultDetails;
 
     private String payType;
 
-    public Date getNotify_time() {
-        return notify_time;
+    private HashMap<String, String> mockHeader;
+
+    /**
+     * @return the notifyTime
+     */
+    public String getNotifyTime() {
+        return notifyTime;
     }
 
-    public String getNotify_type() {
-        return notify_type;
+    /**
+     * @param notifyTime the notifyTime to set
+     */
+    public void setNotifyTime(String notifyTime) {
+        this.notifyTime = notifyTime;
     }
 
-    public String getNotify_id() {
-        return notify_id;
+    /**
+     * @return the notifyType
+     */
+    public String getNotifyType() {
+        return notifyType;
     }
 
-    public String getSign_type() {
-        return sign_type;
+    /**
+     * @param notifyType the notifyType to set
+     */
+    public void setNotifyType(String notifyType) {
+        this.notifyType = notifyType;
     }
 
+    /**
+     * @return the notifyId
+     */
+    public String getNotifyId() {
+        return notifyId;
+    }
+
+    /**
+     * @param notifyId the notifyId to set
+     */
+    public void setNotifyId(String notifyId) {
+        this.notifyId = notifyId;
+    }
+
+    /**
+     * @return the signType
+     */
+    public String getSignType() {
+        return signType;
+    }
+
+    /**
+     * @param signType the signType to set
+     */
+    public void setSignType(String signType) {
+        this.signType = signType;
+    }
+
+    /**
+     * @return the sign
+     */
     public String getSign() {
         return sign;
     }
 
-    public String getBatch_no() {
-        return batch_no;
+    /**
+     * @param sign the sign to set
+     */
+    public void setSign(String sign) {
+        this.sign = sign;
     }
 
-    public String getSuccess_num() {
-        return success_num;
+    /**
+     * @return the batchNo
+     */
+    public String getBatchNo() {
+        return batchNo;
     }
 
-    public String getResult_details() {
-        return result_details;
+    /**
+     * @param batchNo the batchNo to set
+     */
+    public void setBatchNo(String batchNo) {
+        this.batchNo = batchNo;
     }
 
+    /**
+     * @return the successNum
+     */
+    public String getSuccessNum() {
+        return successNum;
+    }
+
+    /**
+     * @param successNum the successNum to set
+     */
+    public void setSuccessNum(String successNum) {
+        this.successNum = successNum;
+    }
+
+    /**
+     * @return the resultDetails
+     */
+    public String getResultDetails() {
+        return resultDetails;
+    }
+
+    /**
+     * @param resultDetails the resultDetails to set
+     */
+    public void setResultDetails(String resultDetails) {
+        this.resultDetails = resultDetails;
+    }
+
+    /**
+     * @return the payType
+     */
     public String getPayType() {
         return payType;
     }
 
+    /**
+     * @param payType the payType to set
+     */
     public void setPayType(String payType) {
         this.payType = payType;
     }
+
+    /**
+     * @return the mockHeader
+     */
+    public HashMap<String, String> getMockHeader() {
+        return mockHeader;
+    }
+
+    /**
+     * @param mockHeader the mockHeader to set
+     */
+    public void setMockHeader(HashMap<String, String> mockHeader) {
+        this.mockHeader = mockHeader;
+    }
+
+
 }

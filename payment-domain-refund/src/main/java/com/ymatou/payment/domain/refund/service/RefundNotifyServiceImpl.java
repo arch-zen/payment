@@ -3,6 +3,7 @@
  */
 package com.ymatou.payment.domain.refund.service;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,13 +60,13 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
         Map<String, String> signMap = getRequestMap(req);
         boolean signResult =
                 signatureService.validateSign(signMap, instConfigManager.getConfig(PayTypeEnum.parse(req.getPayType())),
-                        null);
+                        req.getMockHeader());
         if (!signResult) {
             throw new BizException("signdata is invalid");
         }
 
         // 解析退款回调的应答
-        List<RefundNotifyDetail> details = generateRefundNotifyDetail(req.getResult_details());
+        List<RefundNotifyDetail> details = generateRefundNotifyDetail(req.getResultDetails());
 
         // 生成退款回调日志
         List<RefundMiscRequestLogWithBLOBs> list = generateRefundmiscrequestlog(req, details, signMap);
@@ -90,7 +93,7 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
         List<RefundMiscRequestLogWithBLOBs> refundmiscrequestlogWithBLOBs = new ArrayList<>();
 
         // 根据refundBatchNo获取RefundRequest
-        List<RefundRequestPo> refundrequestPos = refundPository.queryRefundRequestByRefundBatchNo(req.getBatch_no());
+        List<RefundRequestPo> refundrequestPos = refundPository.queryRefundRequestByRefundBatchNo(req.getBatchNo());
 
         for (RefundRequestPo po : refundrequestPos) {
             if (po.getRefundStatus() == RefundStatusEnum.COMPLETE_SUCCESS.getCode()
@@ -106,7 +109,7 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
                     logger.info("The refundRequest is thirdPart success. PaymentId[{}]", po.getPaymentId());
                     logger.info("generate RefundMiscRequestLog begin.");
                     RefundMiscRequestLogWithBLOBs rmrl = new RefundMiscRequestLogWithBLOBs();
-                    rmrl.setRefundBatchNo(req.getBatch_no());
+                    rmrl.setRefundBatchNo(req.getBatchNo());
                     rmrl.setCorrelateId(po.getPaymentId());
                     rmrl.setIsException(false);
                     rmrl.setExceptionDetail("");
@@ -115,7 +118,12 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
                     rmrl.setRequestData("");
                     rmrl.setResponseData(JSON.toJSONString(signMap)); // TODO
                     rmrl.setRequestTime(new Date());
-                    rmrl.setResponseTime(req.getNotify_time());
+
+                    if (StringUtils.isBlank(req.getNotifyTime()))
+                        rmrl.setResponseTime(new Date());
+                    else
+                        rmrl.setResponseTime(parseDate(req.getNotifyTime()));
+
 
                     refundmiscrequestlogWithBLOBs.add(rmrl); // 记录退款回调日志
                 }
@@ -125,16 +133,33 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
         return refundmiscrequestlogWithBLOBs;
     }
 
+    /**
+     * 将日期字符串转成日期格式
+     * 
+     * @param dateString
+     * @return
+     */
+    private Date parseDate(String dateString) {
+        try {
+
+            return DateUtils.parseDate(dateString, new String[] {"yyyy-MM-dd HH:mm:ss"});
+        } catch (ParseException e) {
+            logger.error("pare date when process alipay notify with date string:" + dateString, e);
+            return new Date();
+        }
+    }
+
+
     private HashMap<String, String> getRequestMap(AliPayRefundNotifyRequest req) {
         HashMap<String, String> map = new HashMap<>();
-        map.put("notify_time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(req.getNotify_time()));
-        map.put("notify_type", req.getNotify_type());
-        map.put("notify_id", req.getNotify_id());
-        map.put("sign_type", req.getSign_type());
+        map.put("notify_time", req.getNotifyTime());
+        map.put("notify_type", req.getNotifyType());
+        map.put("notify_id", req.getNotifyId());
+        map.put("sign_type", req.getSignType());
         map.put("sign", req.getSign());
-        map.put("batch_no", req.getBatch_no());
-        map.put("success_num", req.getSuccess_num());
-        map.put("result_details", req.getResult_details());
+        map.put("batch_no", req.getBatchNo());
+        map.put("success_num", req.getSuccessNum());
+        map.put("result_details", req.getResultDetails());
         return map;
     }
 
