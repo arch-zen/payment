@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSON;
 import com.ymatou.payment.facade.PaymentFacade;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
@@ -44,6 +45,8 @@ public class PaymentResourceImpl implements PaymentResource {
     @Path("/{AcquireOrder:(?i:AcquireOrder)}")
     public AcquireOrderResp acquireOrder(AcquireOrderReq req, @Context HttpServletRequest servletRequest) {
         req.setMockHeader(getMockHttpHeader(servletRequest));
+
+        String rawString = JSON.toJSONString(req);
 
         AcquireOrderResp resp = paymentFacade.acquireOrder(req);
         resp.setAppId(req.getAppId());

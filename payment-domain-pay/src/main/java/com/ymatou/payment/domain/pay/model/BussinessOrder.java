@@ -359,7 +359,7 @@ public class BussinessOrder extends PrintFriendliness {
     }
 
     /**
-     * 返回商品描述
+     * 返回商品主题
      * 
      * @return
      */
@@ -373,4 +373,18 @@ public class BussinessOrder extends PrintFriendliness {
         return null;
     }
 
+    /**
+     * 返回商品描述
+     * 
+     * @return
+     */
+    public String getBody() {
+        if (productDesc != null && !productDesc.isEmpty())
+            return productDesc;
+
+        if (productName != null && !productName.isEmpty())
+            return productName;
+
+        return null;
+    }
 }

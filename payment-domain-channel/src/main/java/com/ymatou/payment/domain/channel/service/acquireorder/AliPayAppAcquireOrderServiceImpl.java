@@ -71,8 +71,9 @@ public class AliPayAppAcquireOrderServiceImpl implements AcquireOrderService {
 
         // 签名
         String sign = signatureService.signMessage(reqMap, instConfig, payment.getAcquireOrderReq().getMockHeader());
+        sign = UrlEncoder.encode(sign);
+        reqMap.put("sign", String.format("\"%s\"", sign));
         reqMap.put("sign_type", "\"RSA\"");
-        reqMap.put("sign", String.format("\"%s\"", UrlEncoder.encode(sign)));
 
         // 拼装请求报文
         String reqForm = buildForm(payment, instConfig, reqMap, sign);
@@ -96,22 +97,20 @@ public class AliPayAppAcquireOrderServiceImpl implements AcquireOrderService {
 
         // 此处必须用LinkedHashMap，保证添加的顺序
         Map<String, String> reqDict = new LinkedHashMap<String, String>();
-        reqDict.put("service", "mobile.securitypay.pay");
         reqDict.put("partner", instConfig.getMerchantId());
         reqDict.put("seller_id", instConfig.getSellerEmail());
         reqDict.put("out_trade_no", payment.getPaymentId());
         reqDict.put("subject", payment.getBussinessOrder().getSubject());
-        reqDict.put("body", payment.getBussinessOrder().getSubject());
+        reqDict.put("body", payment.getBussinessOrder().getBody());
 
-        if (acquireOrderExt.getIsHangZhou() == null) {
-            reqDict.put("rn_check", null);
-        } else {
-            reqDict.put("rn_check", acquireOrderExt.getIsHangZhou() == 1 ? "T" : null);
+        if (acquireOrderExt.getIsHangZhou() != null & acquireOrderExt.getIsHangZhou() == 1) {
+            reqDict.put("rn_check", "T");
         }
 
         reqDict.put("total_fee", String.format("%.2f", payment.getPayPrice().doubleValue()));
         reqDict.put("notify_url",
                 String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPayType()));
+        reqDict.put("service", "mobile.securitypay.pay");
         reqDict.put("payment_type", AliPayConsts.PAYMENT_TYPE_PURCHARE);
         reqDict.put("_input_charset", AliPayConsts.INPUT_CHARSET);
         reqDict.put("it_b_pay", AliPayConsts.ALI_APP_ORDER_CLOSE_TIME);
