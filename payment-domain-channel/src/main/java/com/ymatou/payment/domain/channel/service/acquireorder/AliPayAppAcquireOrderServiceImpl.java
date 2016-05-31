@@ -102,6 +102,8 @@ public class AliPayAppAcquireOrderServiceImpl implements AcquireOrderService {
         reqDict.put("out_trade_no", payment.getPaymentId());
         reqDict.put("subject", payment.getBussinessOrder().getSubject());
         reqDict.put("body", payment.getBussinessOrder().getSubject());
+        
+        //FIXME: 如果IsHangzhou为null，会有NullPointerException
         reqDict.put("rn_check", acquireOrderExt.getIsHangZhou() == 1 ? "T" : null);
         reqDict.put("total_fee", String.format("%.2f", payment.getPayPrice().doubleValue()));
         reqDict.put("notify_url",

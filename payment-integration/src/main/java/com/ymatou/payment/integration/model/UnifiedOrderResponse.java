@@ -5,7 +5,7 @@ package com.ymatou.payment.integration.model;
 
 /**
  * 微信统一下单应答model
- * 
+ * FIXME: 命名 规范或者注释为什么要这样
  * @author qianmin 2016年5月9日 上午10:42:18
  *
  */

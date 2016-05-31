@@ -11,8 +11,8 @@ package com.ymatou.payment.integration.common.constants;
 public class Constants {
     public static final Integer CONN_TIME_OUT = 3000;
     public static final Integer SOCKET_TIME_OUT = 10000;
-    public static final Integer DEFAULT_MAX_PER_ROUTE = 10;
-    public static final Integer MAX_TOTAL = 30;
+    public static final Integer DEFAULT_MAX_PER_ROUTE = 20;
+    public static final Integer MAX_TOTAL = 100;
     public static final Long CONN_MANAGER_TIMEOUT = 500L;
 
     public static final String MOCK = "1"; // http header (mock=1)

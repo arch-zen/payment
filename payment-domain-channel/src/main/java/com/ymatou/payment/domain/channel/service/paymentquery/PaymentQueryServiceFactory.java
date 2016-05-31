@@ -25,6 +25,7 @@ public class PaymentQueryServiceFactory {
     @Autowired
     private WeiXinPaymentQueryServiceImpl weiXinPaymentQueryServiceImpl;
 
+    //FIXME: paymentId无用
     public PaymentQueryService getInstanceByPayType(String payType, String paymentId) {
 
         switch (PayTypeEnum.parse(payType)) {

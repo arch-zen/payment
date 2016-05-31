@@ -52,19 +52,11 @@ public class NotifyPaymentService implements InitializingBean {
      * @throws IOException
      */
     public void doService(String paymentId, String traceId, HashMap<String, String> header) throws Exception {
-        try {
-            List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair("PaymentId", paymentId));
-            params.add(new BasicNameValuePair("TraceId", traceId));
-            String result = HttpClientUtil.sendPost(integrationConfig.getYmtNotifyPaymentUrl(header),
-                    params, header, httpClient);
-            if (!"OK".equalsIgnoreCase(result)) {
-                logger.info("refund compensate call failed on {},{}", paymentId, result);
-            }
-        } catch (Exception e) {
-            logger.error("refund compensate call failed on {}", paymentId, e);
-            throw e;
-        }
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("PaymentId", paymentId));
+        params.add(new BasicNameValuePair("TraceId", traceId));
+        HttpClientUtil.sendPost(integrationConfig.getYmtNotifyPaymentUrl(header),
+                params, header, httpClient);
     }
 
     @Override

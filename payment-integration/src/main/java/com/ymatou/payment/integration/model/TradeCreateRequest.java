@@ -4,6 +4,8 @@
 package com.ymatou.payment.integration.model;
 
 /**
+ * FIXME: 命名 CreateTradeRequest
+ * FIXME: field命名不规范
  * 支付宝授权接口Request
  * 
  * @author qianmin 2016年5月25日 下午2:13:13

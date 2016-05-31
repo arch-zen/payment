@@ -68,9 +68,8 @@ public class FacadeAspect {
 
             resp = joinPoint.proceed(new Object[] {req});
 
-            logger.info("Resp: {}", resp);
-
         } catch (IllegalArgumentException e) {
+            //FIXME: 可以去掉吗
             if (e.getMessage().contains("appId")) {
                 resp = builErrorResponse(joinPoint, ErrorCode.SING_SERVER_ERROR, e.getLocalizedMessage());
             } else {
@@ -85,6 +84,8 @@ public class FacadeAspect {
                     e.getErrorCode().getMessage() + "|" + e.getLocalizedMessage());
             logger.warn("Failed to execute request: {}, Error:{}", req.getRequestId(),
                     e.getErrorCode() + "|" + e.getErrorCode().getMessage() + "|" + e.getLocalizedMessage());
+            
+            //FIXME：可以不需要特殊处理吗？
         } catch (SQLException | DataIntegrityViolationException e) {
             resp = builErrorResponse(joinPoint, ErrorCode.UNKNOWN,
                     "EntityValidationErrors-" + e.getClass().getName());
@@ -95,7 +96,7 @@ public class FacadeAspect {
             resp = builErrorResponse(joinPoint, ErrorCode.UNKNOWN, e.getLocalizedMessage());
             logger.error("Unknown error in executing request:{}", req, e);
         } finally {
-
+            logger.info("Resp:" + resp);
             MDC.clear();
         }
 

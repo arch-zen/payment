@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -19,6 +18,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.util.EntityUtils;
@@ -155,7 +155,7 @@ public class HttpClientUtil {
 
 
     /**
-     * 
+     * FIXME: 实际上是同步 
      * @param url 请求路径
      * @param body 请求body
      * @param header 请求header
@@ -166,10 +166,9 @@ public class HttpClientUtil {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public static String sendPost(String url, List<NameValuePair> body, HashMap<String, String> header,
+    public static void sendPost(String url, List<NameValuePair> body, HashMap<String, String> header,
             CloseableHttpAsyncClient httpClient)
             throws IOException, InterruptedException, ExecutionException {
-        String result = null;
 
         HttpPost httpPost = new HttpPost(url);
         UrlEncodedFormEntity postEntity = new UrlEncodedFormEntity(body, "UTF-8");
@@ -184,14 +183,37 @@ public class HttpClientUtil {
         logger.info("request body: " + body);
 
         try {
-            Future<HttpResponse> future = httpClient.execute(httpPost, null);
-            HttpEntity entity = future.get().getEntity();
-            result = EntityUtils.toString(entity, "UTF-8");
-            logger.info("response message:" + result);
+            httpClient.execute(httpPost, new FutureCallback<HttpResponse>() {
+
+                @Override
+                public void failed(Exception ex) {
+                    logger.error(httpPost.getRequestLine() + " failed.", ex);
+                }
+
+                @Override
+                public void completed(HttpResponse result) {
+
+                    try {
+                        HttpEntity entity = result.getEntity();
+                        String reponseStr = EntityUtils.toString(entity, "UTF-8");
+                        logger.info("async response message:" + reponseStr);
+                    } catch (org.apache.http.ParseException e) {
+                        logger.error("async response message parse occur error.", e);
+                    } catch (IOException e) {
+                        logger.error("async response message read occur error.", e);
+                    }
+
+                }
+
+                @Override
+                public void cancelled() {
+                    logger.error("{} cancelled.", httpPost.getRequestLine());
+                }
+            });
+
         } finally {
             httpPost.releaseConnection();
         }
 
-        return result;
     }
 }
