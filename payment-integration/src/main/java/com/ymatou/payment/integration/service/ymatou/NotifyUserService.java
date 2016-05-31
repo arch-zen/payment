@@ -42,18 +42,13 @@ public class NotifyUserService implements InitializingBean {
     private IntegrationConfig integrationConfig;
 
     public void sendTradingMessage(NotifyUserRequest request, HashMap<String, String> header) throws Exception {
-        try {
-            List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair("BusinessType", request.getBusinessType()));
-            params.add(new BasicNameValuePair("BuyerId", request.getBuyerId()));
-            params.add(new BasicNameValuePair("IsShangouOrder", String.valueOf(request.isIsShangouOrder())));
-            params.add(new BasicNameValuePair("OrderId", request.getOrderId()));
-            HttpClientUtil.sendPost(integrationConfig.getYmtNotifytradingeventUrl(header),
-                    params, header, httpClient);
-        } catch (Exception e) {
-            logger.error("async send trading message", e);
-            throw e;
-        }
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("BusinessType", request.getBusinessType()));
+        params.add(new BasicNameValuePair("BuyerId", request.getBuyerId()));
+        params.add(new BasicNameValuePair("IsShangouOrder", String.valueOf(request.isIsShangouOrder())));
+        params.add(new BasicNameValuePair("OrderId", request.getOrderId()));
+        HttpClientUtil.sendPost(integrationConfig.getYmtNotifytradingeventUrl(header),
+                params, header, httpClient);
     }
 
     @Override
