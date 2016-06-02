@@ -173,7 +173,7 @@ public class AliPayWapPaymentNotifyServiceImpl implements PaymentNotifyService {
         sbUrl.append(queryStringFormat("Memo", bussinessOrder.getMemo()));
         sbUrl.append(queryStringFormat("TradingId", bussinessOrder.getOrderId()));
         sbUrl.append(queryStringFormat("PaymentId", notifyMessage.getPaymentId()));
-        sbUrl.append(queryStringFormat("PayPrice", notifyMessage.getActualPayPrice().setScale(2).toString()));
+        sbUrl.append(queryStringFormat("PayPrice", payment.getPayPrice().setScale(2).toString()));
         sbUrl.append(queryStringFormat("PayTime", DateUtil.formatDate(notifyMessage.getPayTime(), "yyyyMMddHHmmss")));
         sbUrl.append(queryStringFormat("TraceId", notifyMessage.getTraceId()));
         sbUrl.append(queryStringFormat("Version", bussinessOrder.getVersion().toString()));

@@ -43,7 +43,7 @@ public class RiskControlService implements InitializingBean {
         try {
             String result = HttpClientUtil.sendPost(url, JSONObject.toJSONString(request), Constants.CONTENT_TTPE_JSON,
                     header, httpClient);
-            return JSONObject.parseObject(result).getInteger("Code") == 200; // TODO ResponseCode
+            return JSONObject.parseObject(result).getInteger("Code") == 200;
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
             throw e;

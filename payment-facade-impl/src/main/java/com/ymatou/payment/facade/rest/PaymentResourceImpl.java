@@ -12,9 +12,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
+import com.ymatou.payment.domain.channel.service.acquireorder.WeiXinJSAPIAcquireOrderServiceImpl;
 import com.ymatou.payment.facade.PaymentFacade;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
@@ -31,6 +34,7 @@ import com.ymatou.payment.facade.model.AcquireOrderResp;
 @Consumes({MediaType.APPLICATION_JSON})
 public class PaymentResourceImpl implements PaymentResource {
 
+    private static Logger logger = LoggerFactory.getLogger(PaymentResourceImpl.class);
     /**
      * 支付接口
      */
@@ -47,6 +51,7 @@ public class PaymentResourceImpl implements PaymentResource {
         req.setMockHeader(getMockHttpHeader(servletRequest));
 
         String rawString = JSON.toJSONString(req);
+        logger.info("receive acquire order request: {}", rawString);
 
         AcquireOrderResp resp = paymentFacade.acquireOrder(req);
         resp.setAppId(req.getAppId());

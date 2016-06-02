@@ -79,7 +79,7 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
                 try {
                     // 异步通知退款
                     logger.info("notify refund service begin.");
-                    notifyRefundService.doService(rmrl.getCorrelateId(), UUID.randomUUID().toString(), null); // TODO
+                    notifyRefundService.doService(rmrl.getCorrelateId(), UUID.randomUUID().toString(), null);
                 } catch (Exception e) {
                     // 不做处理
                 }
@@ -116,7 +116,7 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
                     rmrl.setLogId(UUID.randomUUID().toString());
                     rmrl.setMethod("RefundNotify");
                     rmrl.setRequestData("");
-                    rmrl.setResponseData(JSON.toJSONString(signMap)); // TODO
+                    rmrl.setResponseData(JSON.toJSONString(signMap));
                     rmrl.setRequestTime(new Date());
 
                     if (StringUtils.isBlank(req.getNotifyTime()))
