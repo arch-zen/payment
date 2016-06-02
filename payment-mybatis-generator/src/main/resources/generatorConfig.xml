@@ -11,6 +11,14 @@
 			<property name="prefixes2Remove" value="tb, ymt, pp" />
 			<property name="suffix2Append" value="Po" />
 		</plugin>
+
+		<plugin
+			type="com.ymatou.payment.mybatisgenerator.ForceCreateUpdateTimePlugin">
+			<property name="insertTimeColumns" value="CreatedTime,dAddTime" />
+			<property name="lastUpdateTimeColumns" value="LastUpdatedTime" />
+			<property name="dbCurrentTimeExpr" value="getdate()" />
+		</plugin>
+		
 		<commentGenerator
 			type="com.ymatou.payment.mybatisgenerator.DBCommentGenerator">
 			<property name="suppressAllComments" value="false" />
@@ -40,28 +48,28 @@
 		</javaClientGenerator>
 
 		<table tableName="PP_Payment" domainObjectName="Payment">
-			<property name="useActualColumnNames" value="true"/>
+			<property name="useActualColumnNames" value="true" />
 		</table>
 
 		<table tableName="PP_BussinessOrder" domainObjectName="BussinessOrder">
-			<property name="useActualColumnNames" value="true"/>
+			<property name="useActualColumnNames" value="true" />
 		</table>
 		<table tableName="RefundRequest" domainObjectName="RefundRequest">
-			<property name="useActualColumnNames" value="true"/>
-			<ignoreColumn column="DataVersion"/>
+			<property name="useActualColumnNames" value="true" />
+			<ignoreColumn column="DataVersion" />
 		</table>
-		
+
 		<table tableName="PP_CompensateProcessInfo" domainObjectName="CompensateProcessInfo">
-			<property name="useActualColumnNames" value="true"/>
-			<ignoreColumn column="DataVersion"/>
+			<property name="useActualColumnNames" value="true" />
+			<ignoreColumn column="DataVersion" />
 		</table>
-		
+
 		<table tableName="RefundMiscRequestLog" domainObjectName="RefundMiscRequestLog">
-			<property name="useActualColumnNames" value="true"/>
+			<property name="useActualColumnNames" value="true" />
 		</table>
-		
+
 		<table tableName="Ymt_AlipayNotifyLog" domainObjectName="AlipayNotifyLog">
-			<property name="useActualColumnNames" value="true"/>
+			<property name="useActualColumnNames" value="true" />
 		</table>
 	</context>
 
