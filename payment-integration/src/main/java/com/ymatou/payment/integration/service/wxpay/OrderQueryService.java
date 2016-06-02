@@ -34,8 +34,8 @@ import com.ymatou.payment.integration.common.HttpClientUtil;
 import com.ymatou.payment.integration.common.XmlParser;
 import com.ymatou.payment.integration.common.constants.Constants;
 import com.ymatou.payment.integration.model.CouponData;
-import com.ymatou.payment.integration.model.OrderQueryRequest;
-import com.ymatou.payment.integration.model.OrderQueryResponse;
+import com.ymatou.payment.integration.model.QueryOrderRequest;
+import com.ymatou.payment.integration.model.QueryOrderResponse;
 
 /**
  * 微信支付查询订单
@@ -60,14 +60,14 @@ public class OrderQueryService implements InitializingBean {
      * @return
      * @throws Exception
      */
-    public OrderQueryResponse doService(OrderQueryRequest request, HashMap<String, String> header)
+    public QueryOrderResponse doService(QueryOrderRequest request, HashMap<String, String> header)
             throws Exception {
         try {
             String respXmlStr = HttpClientUtil.sendPost(integrationConfig.getWxOrderQueryUrl(header),
                     getPostDataXml(request), Constants.CONTENT_TTPE_XML, header, httpClient);
             if (!StringUtils.isEmpty(respXmlStr) && respXmlStr.startsWith(Constants.WEIXIN_RESPONSE_BODY_START)) {
                 Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);
-                OrderQueryResponse response = generateResponseData(respMap);
+                QueryOrderResponse response = generateResponseData(respMap);
                 response.setResponseOriginString(respXmlStr); // 返回原始应答
                 return response;
             }
@@ -78,7 +78,7 @@ public class OrderQueryService implements InitializingBean {
         }
     }
 
-    private String getPostDataXml(OrderQueryRequest request) {
+    private String getPostDataXml(QueryOrderRequest request) {
         XStream xStreamForRequestPostData = new XStream(new DomDriver("UTF-8",
                 new XmlFriendlyNameCoder("-_", "_"))); // 解决XStream对出现双下划线的bug
         String postDataXML = xStreamForRequestPostData.toXML(request);
@@ -86,8 +86,8 @@ public class OrderQueryService implements InitializingBean {
         return postDataXML;
     }
 
-    private OrderQueryResponse generateResponseData(Map<String, Object> responseMap) {
-        OrderQueryResponse response = new OrderQueryResponse();
+    private QueryOrderResponse generateResponseData(Map<String, Object> responseMap) {
+        QueryOrderResponse response = new QueryOrderResponse();
 
         response.setReturn_code((String) responseMap.get("return_code"));
         response.setReturn_msg((String) responseMap.get("return_msg"));

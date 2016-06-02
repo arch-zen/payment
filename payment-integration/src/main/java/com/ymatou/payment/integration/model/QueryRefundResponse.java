@@ -11,7 +11,7 @@ import java.util.List;
  * @author qianmin 2016年5月9日 上午10:42:18
  *
  */
-public class RefundQueryResponse {
+public class QueryRefundResponse {
     /**
      * 返回状态码
      */

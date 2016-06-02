@@ -6,8 +6,8 @@ package com.ymatou.payment.test.integration.service.alipay;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.ymatou.payment.integration.model.TradeCreateRequest;
-import com.ymatou.payment.integration.model.TradeCreateResponse;
+import com.ymatou.payment.integration.model.CreateTradeRequest;
+import com.ymatou.payment.integration.model.CreateTradeResponse;
 import com.ymatou.payment.integration.service.alipay.TradeCreateService;
 import com.ymatou.payment.test.RestBaseTest;
 
@@ -23,7 +23,7 @@ public class TradeCreateServiceTest extends RestBaseTest {
 
     @Test
     public void doServiceTest() throws Exception {
-        TradeCreateRequest request = new TradeCreateRequest();
+        CreateTradeRequest request = new CreateTradeRequest();
         request.setFormat("xml");
         request.setPartner("2088701734809577");
         request.setReq_id("841ded23-1e36-4163-8a0b-0830aa863fde");
@@ -34,6 +34,6 @@ public class TradeCreateServiceTest extends RestBaseTest {
         request.setReq_data(
                 "<direct_trade_create_req><subject>你好</subject><out_trade_no>13514606200642938</out_trade_no><total_fee>10.00</total_fee><seller_account_name>ap.ymt@ymatou.com</seller_account_name><notify_url>http://localhost:12345/notify/11</notify_url><out_user>20124373</out_user><call_back_url>http://localhost:12345/callback/11</call_back_url></direct_trade_create_req>");
 
-        TradeCreateResponse response = tradeCreateService.doService(request, null);
+        CreateTradeResponse response = tradeCreateService.doService(request, null);
     }
 }

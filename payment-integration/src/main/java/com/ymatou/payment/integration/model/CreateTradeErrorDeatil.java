@@ -8,7 +8,7 @@ package com.ymatou.payment.integration.model;
  * @author qianmin 2016年5月25日 下午4:29:10
  *
  */
-public class TradeCreateErrorDeatil {
+public class CreateTradeErrorDeatil {
     private String code;
     private String subCode;
     private String msg;

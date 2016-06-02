@@ -8,8 +8,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ymatou.payment.integration.common.Signature;
-import com.ymatou.payment.integration.model.RefundQueryRequest;
-import com.ymatou.payment.integration.model.RefundQueryResponse;
+import com.ymatou.payment.integration.model.QueryRefundRequest;
+import com.ymatou.payment.integration.model.QueryRefundResponse;
 import com.ymatou.payment.integration.service.wxpay.RefundQueryService;
 import com.ymatou.payment.test.RestBaseTest;
 
@@ -20,7 +20,7 @@ public class RefundQueryServiceTest extends RestBaseTest {
 
     @Test
     public void testDoServiceSuccess() throws Exception {
-        RefundQueryRequest request = new RefundQueryRequest();
+        QueryRefundRequest request = new QueryRefundRequest();
         request.setAppid("wxf51a439c0416f182");
         request.setMch_id("1234079001");
         request.setDevice_info("WEB");
@@ -35,7 +35,7 @@ public class RefundQueryServiceTest extends RestBaseTest {
         HashMap<String, String> header = new HashMap<>();
         header.put("mock", "1");
         header.put("mockId", "888888");
-        RefundQueryResponse response = refundQueryService.doService(request, header);
+        QueryRefundResponse response = refundQueryService.doService(request, header);
         Assert.assertNotNull(response);
         Assert.assertEquals(400, response.getTotal_fee());
     }

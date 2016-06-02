@@ -9,7 +9,7 @@ package com.ymatou.payment.integration.model;
  * @author qianmin 2016年5月9日 上午10:42:18
  *
  */
-public class RefundQueryRequest {
+public class QueryRefundRequest {
     /**
      * 公众账号ID(32)
      */

@@ -29,6 +29,7 @@ import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.PaymentNotifyType;
 import com.ymatou.payment.facade.model.PaymentNotifyReq;
 import com.ymatou.payment.facade.model.PaymentNotifyResp;
+import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.infrastructure.db.mapper.AlipayNotifyLogMapper;
 import com.ymatou.payment.infrastructure.db.model.AlipayNotifyLogPo;
 import com.ymatou.payment.integration.service.ymatou.NotifyPaymentService;
@@ -109,10 +110,10 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
             if (req.getNotifyType() == PaymentNotifyType.Server) {
 
                 // 验证实际支付金额和支付金额是否一致
-                // FIXME: 用Money类 
-                if (payment.getPayPrice().subtract(notifyMessage.getActualPayPrice()).abs().floatValue() > 0.01)
+                if (!payment.getPayPrice().equals(new Money(notifyMessage.getActualPayPrice()))) {
                     throw new BizException(ErrorCode.PAYPRICE_AND_ACT_NOT_CONSISTENT,
                             "paymentid: " + payment.getPaymentId());
+                }
 
                 // 更改订单状态
                 setPaymentOrderPaid(payment, notifyMessage);
@@ -146,7 +147,7 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
     private void setPaymentOrderPaid(Payment payment, PaymentNotifyMessage notifyMessage) {
         payment.setInstitutionPaymentId(notifyMessage.getInstitutionPaymentId());
         payment.setPayStatus(PayStatusEnum.Paied);
-        payment.setActualPayPrice(notifyMessage.getActualPayPrice());
+        payment.setActualPayPrice(new Money(notifyMessage.getActualPayPrice()));
         payment.setActualPayCurrencyType(notifyMessage.getActualPayCurrency());
         payment.setBankId(notifyMessage.getBankId());
         payment.setCardType(notifyMessage.getCardType());

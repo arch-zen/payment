@@ -5,6 +5,7 @@
  */
 package com.ymatou.payment.domain.channel.service.acquireorder;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -62,7 +63,7 @@ public class AliPayAppAcquireOrderServiceImpl implements AcquireOrderService {
      * .domain.pay.model.Payment)
      */
     @Override
-    public AcquireOrderPackageResp acquireOrderPackage(Payment payment) {
+    public AcquireOrderPackageResp acquireOrderPackage(Payment payment, HashMap<String, String> mockHeader) {
         // 获取第三方机构配置
         InstitutionConfig instConfig = instConfigManager.getConfig(payment.getPayType());
 
@@ -70,7 +71,7 @@ public class AliPayAppAcquireOrderServiceImpl implements AcquireOrderService {
         Map<String, String> reqMap = buildReqMap(payment, instConfig);
 
         // 签名
-        String sign = signatureService.signMessage(reqMap, instConfig, payment.getAcquireOrderReq().getMockHeader());
+        String sign = signatureService.signMessage(reqMap, instConfig, mockHeader);
         sign = UrlEncoder.encode(sign);
         reqMap.put("sign", String.format("\"%s\"", sign));
         reqMap.put("sign_type", "\"RSA\"");
@@ -107,7 +108,7 @@ public class AliPayAppAcquireOrderServiceImpl implements AcquireOrderService {
             reqDict.put("rn_check", "T");
         }
 
-        reqDict.put("total_fee", String.format("%.2f", payment.getPayPrice().doubleValue()));
+        reqDict.put("total_fee", String.format("%.2f", payment.getPayPrice().getAmount().doubleValue()));
         reqDict.put("notify_url",
                 String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPayType()));
         reqDict.put("service", "mobile.securitypay.pay");
@@ -175,7 +176,7 @@ public class AliPayAppAcquireOrderServiceImpl implements AcquireOrderService {
             result.OutTradeNo = payment.getPaymentId();
             result.Subject = payment.getBussinessOrder().getProductName();
             result.Body = payment.getBussinessOrder().getProductDesc();
-            result.TotalFee = String.format("%.2f", payment.getPayPrice().doubleValue());
+            result.TotalFee = String.format("%.2f", payment.getPayPrice().getAmount().doubleValue());
             result.NotifyUrl =
                     String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPayType());
             result.Service = "mobile.securitypay.pay";

@@ -41,8 +41,8 @@ import com.ymatou.payment.integration.common.XmlParser;
 import com.ymatou.payment.integration.common.constants.Constants;
 import com.ymatou.payment.integration.model.CouponRefundData;
 import com.ymatou.payment.integration.model.RefundOrderData;
-import com.ymatou.payment.integration.model.RefundQueryRequest;
-import com.ymatou.payment.integration.model.RefundQueryResponse;
+import com.ymatou.payment.integration.model.QueryRefundRequest;
+import com.ymatou.payment.integration.model.QueryRefundResponse;
 
 /**
  * 微信支付退款查询
@@ -70,7 +70,7 @@ public class RefundQueryService {
      * @return
      * @throws Exception
      */
-    public RefundQueryResponse doService(RefundQueryRequest request, HashMap<String, String> header)
+    public QueryRefundResponse doService(QueryRefundRequest request, HashMap<String, String> header)
             throws Exception {
         try {
             // 根据mchId获取不同的加签盐值和httpClient(不同商户证书及密码不同)
@@ -80,7 +80,7 @@ public class RefundQueryService {
 
             if (!StringUtils.isEmpty(respXmlStr) && respXmlStr.startsWith(Constants.WEIXIN_RESPONSE_BODY_START)) {
                 Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);
-                RefundQueryResponse response = generateResponseData(respMap);
+                QueryRefundResponse response = generateResponseData(respMap);
                 return response;
             }
             return null;
@@ -90,8 +90,8 @@ public class RefundQueryService {
         }
     }
 
-    private RefundQueryResponse generateResponseData(Map<String, Object> responseMap) {
-        RefundQueryResponse response = new RefundQueryResponse();
+    private QueryRefundResponse generateResponseData(Map<String, Object> responseMap) {
+        QueryRefundResponse response = new QueryRefundResponse();
         response.setReturn_code((String) responseMap.get("return_code"));
         response.setReturn_msg((String) responseMap.get("return_msg"));
 
@@ -147,7 +147,7 @@ public class RefundQueryService {
         return response;
     }
 
-    private String getPostDataXml(RefundQueryRequest request) {
+    private String getPostDataXml(QueryRefundRequest request) {
         XStream xStreamForRequestPostData = new XStream(new DomDriver("UTF-8",
                 new XmlFriendlyNameCoder("-_", "_")));// 解决XStream对出现双下划线的bug
         String postDataXML = xStreamForRequestPostData.toXML(request);

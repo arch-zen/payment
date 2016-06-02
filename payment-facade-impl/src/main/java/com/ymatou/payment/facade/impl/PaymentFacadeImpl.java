@@ -55,7 +55,8 @@ public class PaymentFacadeImpl implements PaymentFacade {
 
         // 拼装支付报文
         AcquireOrderPackageResp packageResp =
-                acquireOrderPackageFactory.getInstance(payment.getPayType()).acquireOrderPackage(payment);
+                acquireOrderPackageFactory.getInstance(payment.getPayType()).acquireOrderPackage(payment,
+                        req.getMockHeader());
 
         // 返回收单结果
         AcquireOrderResp resp = new AcquireOrderResp();
@@ -98,5 +99,4 @@ public class PaymentFacadeImpl implements PaymentFacade {
             throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "无效的支付金额");
         }
     }
-
 }

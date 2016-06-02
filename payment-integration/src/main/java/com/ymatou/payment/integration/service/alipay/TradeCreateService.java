@@ -29,10 +29,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.common.HttpClientUtil;
 import com.ymatou.payment.integration.common.constants.Constants;
-import com.ymatou.payment.integration.model.TradeCreateErrorDeatil;
-import com.ymatou.payment.integration.model.TradeCreateReqDeatil;
-import com.ymatou.payment.integration.model.TradeCreateRequest;
-import com.ymatou.payment.integration.model.TradeCreateResponse;
+import com.ymatou.payment.integration.model.CreateTradeErrorDeatil;
+import com.ymatou.payment.integration.model.CreateTradeReqDeatil;
+import com.ymatou.payment.integration.model.CreateTradeRequest;
+import com.ymatou.payment.integration.model.CreateTradeResponse;
 
 /**
  * 支付宝wap即时到账接口
@@ -58,7 +58,7 @@ public class TradeCreateService implements InitializingBean {
      * @return
      * @throws Exception
      */
-    public TradeCreateResponse doService(TradeCreateRequest request, HashMap<String, String> header) throws Exception {
+    public CreateTradeResponse doService(CreateTradeRequest request, HashMap<String, String> header) throws Exception {
         String url = integrationConfig.getAliPayWapUrl(header);
 
         try {
@@ -66,7 +66,7 @@ public class TradeCreateService implements InitializingBean {
 
             String respStr = HttpClientUtil.sendPost(url, requestEntity, header, httpClient);
 
-            TradeCreateResponse response = generateResponse(respStr);
+            CreateTradeResponse response = generateResponse(respStr);
             logger.info("trade create response: {}", JSONObject.toJSONString(response));
             return response;
         } catch (Exception e) {
@@ -76,9 +76,9 @@ public class TradeCreateService implements InitializingBean {
     }
 
 
-    private TradeCreateResponse generateResponse(String respStr)
+    private CreateTradeResponse generateResponse(String respStr)
             throws DocumentException, UnsupportedEncodingException {
-        TradeCreateResponse response = new TradeCreateResponse();
+        CreateTradeResponse response = new CreateTradeResponse();
         String[] respArr = respStr.split("&");
         HashMap<String, String> map = new HashMap<>();
         for (String str : respArr) {
@@ -93,7 +93,7 @@ public class TradeCreateService implements InitializingBean {
                 String error = URLDecoder.decode(str.substring(str.indexOf("=") + 1), "utf-8");
                 Document document = DocumentHelper.parseText(error);
                 Element root = document.getRootElement();
-                TradeCreateErrorDeatil errorDetail = new TradeCreateErrorDeatil();
+                CreateTradeErrorDeatil errorDetail = new CreateTradeErrorDeatil();
                 errorDetail.setCode(root.elementText("code"));
                 errorDetail.setDetail(root.elementText("detail"));
                 errorDetail.setMsg(root.elementText("msg"));
@@ -118,7 +118,7 @@ public class TradeCreateService implements InitializingBean {
     }
 
 
-    private List<NameValuePair> generateRequest(TradeCreateRequest request) {
+    private List<NameValuePair> generateRequest(CreateTradeRequest request) {
         List<NameValuePair> nvpList = new ArrayList<>();
         nvpList.add(new BasicNameValuePair("service", request.getService()));
         nvpList.add(new BasicNameValuePair("partner", request.getPartner()));
@@ -137,7 +137,7 @@ public class TradeCreateService implements InitializingBean {
      */
     public String generateReqDataXml(String subject, String outTradeNo, String totalFee, String sellerAccountName,
             String callBackUrl, String notifyUrl, String outUser, String merchant_url, String payExpire) {
-        TradeCreateReqDeatil detail = new TradeCreateReqDeatil();
+        CreateTradeReqDeatil detail = new CreateTradeReqDeatil();
         detail.setSubject(subject);
         detail.setOut_trade_no(outTradeNo);
         detail.setTotal_fee(totalFee);
@@ -156,7 +156,7 @@ public class TradeCreateService implements InitializingBean {
      * @param reqData
      * @return
      */
-    public String generateReqDataXml(TradeCreateReqDeatil reqData) {
+    public String generateReqDataXml(CreateTradeReqDeatil reqData) {
         Element root = DocumentHelper.createElement("direct_trade_create_req");
         Document document = DocumentHelper.createDocument(root);
         root.addElement("subject").addText(reqData.getSubject());

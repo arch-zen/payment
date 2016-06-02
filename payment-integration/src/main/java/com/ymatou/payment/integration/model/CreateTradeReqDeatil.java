@@ -8,7 +8,7 @@ package com.ymatou.payment.integration.model;
  * @author qianmin 2016年5月25日 下午4:25:14
  *
  */
-public class TradeCreateReqDeatil {
+public class CreateTradeReqDeatil {
     private String subject;
     private String out_trade_no;
     private String total_fee;

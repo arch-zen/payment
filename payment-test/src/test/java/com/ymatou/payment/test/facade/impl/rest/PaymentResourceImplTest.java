@@ -158,7 +158,8 @@ public class PaymentResourceImplTest extends RestBaseTest {
         assertNotNull("验证支付单不为空", payment);
 
         assertEquals("验证PayType", req.getPayType(), payment.getPayType().getCode());
-        assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(), payment.getPayPrice().doubleValue(),
+        assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(),
+                payment.getPayPrice().getAmount().doubleValue(),
                 0.000001);
         assertEquals("验证PayStatus", 0, payment.getPayStatus().getIndex());
     }
@@ -222,7 +223,8 @@ public class PaymentResourceImplTest extends RestBaseTest {
         assertNotNull("验证支付单不为空", payment);
 
         assertEquals("验证PayType", req.getPayType(), payment.getPayType().getCode());
-        assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(), payment.getPayPrice().doubleValue(),
+        assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(),
+                payment.getPayPrice().getAmount().doubleValue(),
                 0.000001);
         assertEquals("验证PayStatus", 0, payment.getPayStatus().getIndex());
     }
@@ -256,7 +258,8 @@ public class PaymentResourceImplTest extends RestBaseTest {
         assertNotNull("验证支付单不为空", payment);
 
         assertEquals("验证PayType", req.getPayType(), payment.getPayType().getCode());
-        assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(), payment.getPayPrice().doubleValue(),
+        assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(),
+                payment.getPayPrice().getAmount().doubleValue(),
                 0.000001);
         assertEquals("验证PayStatus", 0, payment.getPayStatus().getIndex());
     }

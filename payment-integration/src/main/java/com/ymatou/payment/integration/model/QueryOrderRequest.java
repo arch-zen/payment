@@ -9,7 +9,7 @@ package com.ymatou.payment.integration.model;
  * @author qianmin 2016年5月19日 下午2:14:24
  *
  */
-public class OrderQueryRequest {
+public class QueryOrderRequest {
 
     /**
      * 公众账号ID

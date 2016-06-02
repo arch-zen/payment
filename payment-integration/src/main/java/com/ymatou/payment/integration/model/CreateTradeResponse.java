@@ -9,7 +9,7 @@ package com.ymatou.payment.integration.model;
  * @author qianmin 2016年5月25日 下午2:13:29
  *
  */
-public class TradeCreateResponse {
+public class CreateTradeResponse {
 
     private String partner;
     private String req_id;
@@ -20,7 +20,7 @@ public class TradeCreateResponse {
     private String res_data;
     private String requestToken;
     private String error;
-    private TradeCreateErrorDeatil errorDetail;
+    private CreateTradeErrorDeatil errorDetail;
 
     public String getPartner() {
         return partner;
@@ -94,11 +94,11 @@ public class TradeCreateResponse {
         this.requestToken = requestToken;
     }
 
-    public TradeCreateErrorDeatil getErrorDetail() {
+    public CreateTradeErrorDeatil getErrorDetail() {
         return errorDetail;
     }
 
-    public void setErrorDetail(TradeCreateErrorDeatil errorDetail) {
+    public void setErrorDetail(CreateTradeErrorDeatil errorDetail) {
         this.errorDetail = errorDetail;
     }
 }

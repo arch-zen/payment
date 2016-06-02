@@ -4,14 +4,14 @@
 package com.ymatou.payment.integration.model;
 
 /**
- * FIXME: 命名 CreateTradeRequest
- * FIXME: field命名不规范
+ * 
  * 支付宝授权接口Request
+ * field命名不规范是为了解析报文
  * 
  * @author qianmin 2016年5月25日 下午2:13:13
  *
  */
-public class TradeCreateRequest {
+public class CreateTradeRequest {
 
     public static final String SEC_ID = "MD5";
     public static final String VERSION = "2.0";

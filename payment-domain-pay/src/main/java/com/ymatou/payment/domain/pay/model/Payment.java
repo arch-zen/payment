@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import com.ymatou.payment.facade.PrintFriendliness;
-import com.ymatou.payment.facade.constants.CheckStatusEnum;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
+import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 
 /**
@@ -27,8 +27,8 @@ public class Payment extends PrintFriendliness {
     private String institutionPaymentId;
 
     private PayTypeEnum payType;
-    private BigDecimal payPrice;
-    private BigDecimal actualPayPrice;
+    private Money payPrice;
+    private Money actualPayPrice;
     private String payCurrencyType;
     private String actualPayCurrencyType;
     private Double exchangeRate;
@@ -72,19 +72,19 @@ public class Payment extends PrintFriendliness {
         this.payType = payType;
     }
 
-    public BigDecimal getPayPrice() {
+    public Money getPayPrice() {
         return payPrice;
     }
 
-    public void setPayPrice(BigDecimal payPrice) {
+    public void setPayPrice(Money payPrice) {
         this.payPrice = payPrice;
     }
 
-    public BigDecimal getActualPayPrice() {
+    public Money getActualPayPrice() {
         return actualPayPrice;
     }
 
-    public void setActualPayPrice(BigDecimal actualPayPrice) {
+    public void setActualPayPrice(Money actualPayPrice) {
         this.actualPayPrice = actualPayPrice;
     }
 
@@ -168,14 +168,6 @@ public class Payment extends PrintFriendliness {
         this.bussinessOrder = bussinessOrder;
     }
 
-    public AcquireOrderReq getAcquireOrderReq() {
-        return acquireOrderReq;
-    }
-
-    public void setAcquireOrderReq(AcquireOrderReq acquireOrderReq) {
-        this.acquireOrderReq = acquireOrderReq;
-    }
-
     /**
      * 从PO转换成model
      * 
@@ -192,9 +184,9 @@ public class Payment extends PrintFriendliness {
         model.setBussinessOrderId(po.getBussinessOrderId());
         model.setInstitutionPaymentId(po.getInstitutionPaymentId());
         model.setPayType(PayTypeEnum.parse(po.getPayType()));
-        model.setPayPrice(po.getPayPrice());
+        model.setPayPrice(parseToMoney(po.getPayPrice()));
         model.setPayCurrencyType(po.getPayCurrencyType());
-        model.setActualPayPrice(po.getActualPayPrice());
+        model.setActualPayPrice(parseToMoney(po.getActualPayPrice()));
         model.setActualPayCurrencyType(po.getActualPayCurrencyType());
         model.setExchangeRate(po.getExchangeRate());
         model.setBankId(po.getBankId());
@@ -205,5 +197,13 @@ public class Payment extends PrintFriendliness {
         model.setCheckStatus(po.getCheckStatus());
 
         return model;
+    }
+
+    public static Money parseToMoney(BigDecimal amount) {
+        if (amount == null) {
+            return null;
+        } else {
+            return new Money(amount);
+        }
     }
 }

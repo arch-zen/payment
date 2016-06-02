@@ -67,10 +67,6 @@ public class PayServiceImpl implements PayService {
         Payment payment = Payment.convertFromPo(paymentPo);
         payment.setBussinessOrder(BussinessOrder.convertFromPo(bussinessOrderPo));
 
-        // FIXME: req不要放在Payment
-        // 将请求带入到模型中
-        payment.setAcquireOrderReq(req);
-
         return payment;
     }
 
@@ -156,7 +152,7 @@ public class PayServiceImpl implements PayService {
         paymentPo.setPaymentId(payment.getPaymentId());
         paymentPo.setInstitutionPaymentId(payment.getInstitutionPaymentId());
         paymentPo.setPayStatus(payment.getPayStatus().getIndex());
-        paymentPo.setActualPayPrice(payment.getActualPayPrice());
+        paymentPo.setActualPayPrice(payment.getActualPayPrice().getAmount());
         paymentPo.setActualPayCurrencyType(payment.getActualPayCurrencyType());
         paymentPo.setBankId(payment.getBankId());
         paymentPo.setCardType(payment.getCardType());

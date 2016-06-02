@@ -27,8 +27,8 @@ import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
-import com.ymatou.payment.integration.model.OrderQueryRequest;
-import com.ymatou.payment.integration.model.OrderQueryResponse;
+import com.ymatou.payment.integration.model.QueryOrderRequest;
+import com.ymatou.payment.integration.model.QueryOrderResponse;
 import com.ymatou.payment.integration.service.wxpay.OrderQueryService;
 
 /**
@@ -53,17 +53,17 @@ public class WeiXinPaymentQueryServiceImpl implements PaymentQueryService {
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 
     @Override
-    public PaymentQueryResp paymentQuery(String paymentId, String payType, HashMap<String, String> header) {
-        OrderQueryRequest orderQueryRequest = generateRequest(paymentId, payType, header);
+    public PaymentQueryResp queryPayment(String paymentId, String payType, HashMap<String, String> header) {
+        QueryOrderRequest orderQueryRequest = generateRequest(paymentId, payType, header);
 
         try {
             // 调用微信支付查询订单接口
-            OrderQueryResponse response = orderQueryService.doService(orderQueryRequest, header);
+            QueryOrderResponse response = orderQueryService.doService(orderQueryRequest, header);
 
             PaymentQueryResp resp = new PaymentQueryResp();
-            if (OrderQueryResponse.SUCCESS.equals(response.getResult_code())
-                    && OrderQueryResponse.SUCCESS.equals(response.getReturn_code())
-                    && (OrderQueryResponse.SUCCESS.equals(response.getTrade_state())
+            if (QueryOrderResponse.SUCCESS.equals(response.getResult_code())
+                    && QueryOrderResponse.SUCCESS.equals(response.getReturn_code())
+                    && (QueryOrderResponse.SUCCESS.equals(response.getTrade_state())
                             || "REFUND".equals(response.getTrade_state()))) {
                 resp = generateResponse(response);
                 resp.setPayStatus(PayStatusEnum.Paied);
@@ -80,7 +80,7 @@ public class WeiXinPaymentQueryServiceImpl implements PaymentQueryService {
         }
     }
 
-    private PaymentQueryResp generateResponse(OrderQueryResponse response) throws ParseException {
+    private PaymentQueryResp generateResponse(QueryOrderResponse response) throws ParseException {
         PaymentQueryResp resp = new PaymentQueryResp();
         resp.setActualPayCurrency("CNY");
         resp.setActualPayPrice(new BigDecimal(response.getTotal_fee() / 100d)); // 微信支付结果单位为分
@@ -97,14 +97,14 @@ public class WeiXinPaymentQueryServiceImpl implements PaymentQueryService {
         return resp;
     }
 
-    private OrderQueryRequest generateRequest(String paymentId, String payType, HashMap<String, String> header) {
+    private QueryOrderRequest generateRequest(String paymentId, String payType, HashMap<String, String> header) {
         // 根据payType获取appId,mchId信息
         InstitutionConfig institutionConfig = institutionConfigManager.getConfig(PayTypeEnum.parse(payType));
         String appId = institutionConfig.getAppId();
         String mchId = institutionConfig.getMerchantId();
 
         // 组装request
-        OrderQueryRequest orderQueryRequest = new OrderQueryRequest();
+        QueryOrderRequest orderQueryRequest = new QueryOrderRequest();
         orderQueryRequest.setAppid(appId);
         orderQueryRequest.setMch_id(mchId);
         orderQueryRequest.setNonce_str(RandomStringUtils.randomAlphabetic(32));

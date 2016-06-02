@@ -62,15 +62,15 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
      * .domain.pay.model.Payment)
      */
     @Override
-    public AcquireOrderPackageResp acquireOrderPackage(Payment payment) {
+    public AcquireOrderPackageResp acquireOrderPackage(Payment payment, HashMap<String, String> mockHeader) {
         // 获取第三方机构配置
         InstitutionConfig instConfig = instConfigManager.getConfig(payment.getPayType());
 
         // 拼装请求Map
-        HashMap<String, String> reqMap = buildReqMap(payment, instConfig);
+        HashMap<String, String> reqMap = buildReqMap(payment, instConfig, mockHeader);
 
         // 签名
-        String sign = signatureService.signMessage(reqMap, instConfig, payment.getAcquireOrderReq().getMockHeader());
+        String sign = signatureService.signMessage(reqMap, instConfig, mockHeader);
         reqMap.put("sign", sign);
 
         // 拼装请求报文
@@ -90,7 +90,8 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
      * @param payment
      * @return
      */
-    private HashMap<String, String> buildReqMap(Payment payment, InstitutionConfig instConfig) {
+    private HashMap<String, String> buildReqMap(Payment payment, InstitutionConfig instConfig,
+            HashMap<String, String> mockHeader) {
         AcquireOrderExt acquireOrderExt = getExt(payment.getBussinessOrder().getExt());
 
         HashMap<String, String> reqDict = new HashMap<String, String>();
@@ -108,9 +109,9 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
         reqDict.put("out_trade_no", payment.getPaymentId());
         reqDict.put("subject", payment.getBussinessOrder().getSubject());
         reqDict.put("body", payment.getBussinessOrder().getProductDesc());
-        reqDict.put("total_fee", String.format("%.2f", payment.getPayPrice().doubleValue()));
+        reqDict.put("total_fee", String.format("%.2f", payment.getPayPrice().getAmount().doubleValue()));
         reqDict.put("paymethod", acquireOrderExt.getPayMethod());
-        reqDict.put("anti_phishing_key", getAntiFishingKey(instConfig.getMerchantId(), payment));
+        reqDict.put("anti_phishing_key", getAntiFishingKey(instConfig.getMerchantId(), mockHeader));
         reqDict.put("exter_invoke_ip", payment.getBussinessOrder().getClientIp());
         reqDict.put("buyer_email", payment.getBussinessOrder().getThirdPartyUserId());
         reqDict.put("sign_type", instConfig.getSignType());
@@ -149,11 +150,11 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
      * @param merchantId
      * @return
      */
-    private String getAntiFishingKey(String merchantId, Payment payment) {
+    private String getAntiFishingKey(String merchantId, HashMap<String, String> mockHeader) {
         String antiFishKey = "";
         try {
             QueryTimestampResponse response = queryTimestampService.doService("query_timestamp", merchantId,
-                    payment.getAcquireOrderReq().getMockHeader());
+                    mockHeader);
             if (response != null)
                 antiFishKey = response.getTimestampEncryptKey();
         } catch (Exception ex) {

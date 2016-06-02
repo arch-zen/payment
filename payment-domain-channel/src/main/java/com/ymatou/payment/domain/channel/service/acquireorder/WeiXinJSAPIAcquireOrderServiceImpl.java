@@ -68,15 +68,15 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
     ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public AcquireOrderPackageResp acquireOrderPackage(Payment payment) {
+    public AcquireOrderPackageResp acquireOrderPackage(Payment payment, HashMap<String, String> mockHeader) {
         // 获取第三方机构配置
         InstitutionConfig instConfig = instConfigManager.getConfig(payment.getPayType());
 
         // 调用微信统一下单接口
-        String prepayId = weiXinPrepayId(instConfig, payment);
+        String prepayId = weiXinPrepayId(instConfig, payment, mockHeader);
 
         // 拼装请求报文
-        String reqForm = buildForm(prepayId, payment, instConfig);
+        String reqForm = buildForm(prepayId, payment, instConfig, mockHeader);
 
         // 返回报文结果
         AcquireOrderPackageResp resp = new AcquireOrderPackageResp();
@@ -93,7 +93,7 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
      * @param payment
      * @return
      */
-    private String weiXinPrepayId(InstitutionConfig instConfig, Payment payment) {
+    private String weiXinPrepayId(InstitutionConfig instConfig, Payment payment, HashMap<String, String> mockHeader) {
 
         try {
             UnifiedOrderRequest request = new UnifiedOrderRequest();
@@ -102,12 +102,12 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
             request.setNonce_str(String.valueOf(new Random().nextInt(1000000000)));
             request.setBody(payment.getBussinessOrder().getSubject());
             request.setOut_trade_no(payment.getPaymentId());
-            request.setTotal_fee((int) (payment.getPayPrice().doubleValue() * 100));
+            request.setTotal_fee((int) (payment.getPayPrice().getAmount().doubleValue() * 100));
             request.setSpbill_create_ip(payment.getBussinessOrder().getClientIp());
             request.setNotify_url(
                     String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPayType()));
             request.setTrade_type("JSAPI");
-            request.setOpenid(getOpenId(payment));
+            request.setOpenid(getOpenId(payment, mockHeader));
 
             request.setTime_start(StringUtil.getDateFormatString("yyyyMMddHHmmss"));
             Calendar calendar = Calendar.getInstance();
@@ -116,20 +116,19 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
             request.setTime_expire(StringUtil.getDateFormatString("yyyyMMddHHmmss", calendar.getTime()));
 
             // 加签
-            String sign = singatureService.signMessage(getMapFromObject(request), instConfig,
-                    payment.getAcquireOrderReq().getMockHeader());
+            String sign = singatureService.signMessage(getMapFromObject(request), instConfig, mockHeader);
             request.setSign(sign);
 
             // 调用微信接口
-            UnifiedOrderResponse response =
-                    unifiedOrderService.doService(request, payment.getAcquireOrderReq().getMockHeader());
+            UnifiedOrderResponse response = unifiedOrderService.doService(request, mockHeader);
             if (response.getAppid().equals(instConfig.getAppId())
                     && response.getMch_id().equals(instConfig.getMerchantId())
                     && "SUCCESS".equals(response.getResult_code())
-                    && "SUCCESS".equals(response.getReturn_code()))
+                    && "SUCCESS".equals(response.getReturn_code())) {
                 return response.getPrepay_id();
-            else
+            } else {
                 throw new Exception(response.getReturn_msg());
+            }
         } catch (Exception ex) {
             logger.error("call weixin unifed order failed", ex);
             throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
@@ -142,11 +141,10 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
      * 
      * @return
      */
-    private String getOpenId(Payment payment) {
+    private String getOpenId(Payment payment, HashMap<String, String> mockHeader) {
         try {
             Integer userId = payment.getBussinessOrder().getUserId();
-            UserServiceResponse response = userService.doService(String.valueOf(userId), "Wap",
-                    payment.getAcquireOrderReq().getMockHeader());
+            UserServiceResponse response = userService.doService(String.valueOf(userId), "Wap", mockHeader);
             if ("true".equals(response.getSuccess()))
                 return response.getResult();
             else
@@ -211,7 +209,8 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
      * @param payment
      * @return
      */
-    private String buildForm(String prepayId, Payment payment, InstitutionConfig instConfig) {
+    private String buildForm(String prepayId, Payment payment, InstitutionConfig instConfig,
+            HashMap<String, String> mockHeader) {
         try {
             WeixinJSAPIOrderRequest request = new WeixinJSAPIOrderRequest();
             request.AppID = instConfig.getAppId();
@@ -221,7 +220,7 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
             request.SignType = "MD5";
 
             Map<String, String> map = getMapFromObject(request);
-            request.Sign = singatureService.signMessage(map, instConfig, payment.getAcquireOrderReq().getMockHeader());
+            request.Sign = singatureService.signMessage(map, instConfig, mockHeader);
 
             return objectMapper.writeValueAsString(request);
         } catch (Exception e) {

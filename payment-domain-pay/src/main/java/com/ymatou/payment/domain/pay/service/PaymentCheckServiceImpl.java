@@ -20,6 +20,7 @@ import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.CheckStatusEnum;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
+import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.integration.service.ymatou.NotifyPaymentService;
 
 /**
@@ -73,7 +74,7 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
                     payment.setCheckStatus(CheckStatusEnum.REPAIR_SUCCESS.getCode()); // 补单成功
                     payment.setInstitutionPaymentId(thirdPartyPayment.getInstitutionPaymentId());
                     payment.setPayStatus(PayStatusEnum.parse(thirdPartyPayment.getPayStatus()));
-                    payment.setActualPayPrice(thirdPartyPayment.getActualPayPrice());
+                    payment.setActualPayPrice(new Money(thirdPartyPayment.getActualPayPrice()));
                     payment.setActualPayCurrencyType(thirdPartyPayment.getActualPayCurrency());
                     payment.setBankId(thirdPartyPayment.getBankId());
                     payment.setCardType(thirdPartyPayment.getCardType());

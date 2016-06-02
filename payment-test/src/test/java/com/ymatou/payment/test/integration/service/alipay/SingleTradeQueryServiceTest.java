@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.ymatou.payment.integration.model.SingleTradeQueryRequest;
+import com.ymatou.payment.integration.model.QuerySingleTradeRequest;
 import com.ymatou.payment.integration.model.SingleTradeQueryResponse;
 import com.ymatou.payment.integration.service.alipay.SingleTradeQueryService;
 import com.ymatou.payment.test.RestBaseTest;
@@ -24,7 +24,7 @@ public class SingleTradeQueryServiceTest extends RestBaseTest {
 
     @Test
     public void testDoServiceSuccessRSA() throws Exception {
-        SingleTradeQueryRequest request = new SingleTradeQueryRequest();
+        QuerySingleTradeRequest request = new QuerySingleTradeRequest();
         request.setService("single_trade_query");
         request.setPartner("2088701734809577");
         request.set_input_charset("utf-8");
@@ -40,7 +40,7 @@ public class SingleTradeQueryServiceTest extends RestBaseTest {
 
     @Test
     public void testDoServiceSuccessMD5() throws Exception {
-        SingleTradeQueryRequest request = new SingleTradeQueryRequest();
+        QuerySingleTradeRequest request = new QuerySingleTradeRequest();
         request.setService("single_trade_query");
         request.setPartner("2088701734809577");
         request.set_input_charset("utf-8");

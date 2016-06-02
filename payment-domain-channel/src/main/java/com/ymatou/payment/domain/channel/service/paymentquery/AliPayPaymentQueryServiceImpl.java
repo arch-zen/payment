@@ -22,7 +22,7 @@ import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
-import com.ymatou.payment.integration.model.SingleTradeQueryRequest;
+import com.ymatou.payment.integration.model.QuerySingleTradeRequest;
 import com.ymatou.payment.integration.model.SingleTradeQueryResponse;
 import com.ymatou.payment.integration.service.alipay.SingleTradeQueryService;
 
@@ -46,9 +46,9 @@ public class AliPayPaymentQueryServiceImpl implements PaymentQueryService {
     private SignatureService signatureService;
 
     @Override
-    public PaymentQueryResp paymentQuery(String paymentId, String payType,
+    public PaymentQueryResp queryPayment(String paymentId, String payType,
             HashMap<String, String> header) {
-        SingleTradeQueryRequest checkPaymentRequset = generateRequest(paymentId, payType, header);
+        QuerySingleTradeRequest checkPaymentRequset = generateRequest(paymentId, payType, header);
 
         try {
             // 调用支付宝单笔交易查询接口
@@ -71,11 +71,11 @@ public class AliPayPaymentQueryServiceImpl implements PaymentQueryService {
         }
     }
 
-    private SingleTradeQueryRequest generateRequest(String paymentId, String payType,
+    private QuerySingleTradeRequest generateRequest(String paymentId, String payType,
             HashMap<String, String> header) {
         InstitutionConfig institutionConfig = institutionConfigManager.getConfig(PayTypeEnum.parse(payType));
 
-        SingleTradeQueryRequest request = new SingleTradeQueryRequest();
+        QuerySingleTradeRequest request = new QuerySingleTradeRequest();
         request.setService("single_trade_query");
         request.setPartner(institutionConfig.getMerchantId());
         request.setSign_type(institutionConfig.getSignType());

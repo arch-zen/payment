@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author qianmin 2016年5月19日 下午2:14:41
  *
  */
-public class OrderQueryResponse {
+public class QueryOrderResponse {
 
     public static final String SUCCESS = "SUCCESS";
 

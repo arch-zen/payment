@@ -14,8 +14,8 @@ import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
-import com.ymatou.payment.integration.model.OrderQueryRequest;
-import com.ymatou.payment.integration.model.OrderQueryResponse;
+import com.ymatou.payment.integration.model.QueryOrderRequest;
+import com.ymatou.payment.integration.model.QueryOrderResponse;
 import com.ymatou.payment.integration.service.wxpay.OrderQueryService;
 import com.ymatou.payment.test.RestBaseTest;
 
@@ -37,7 +37,7 @@ public class OrderQueryServiceTest extends RestBaseTest {
 
     @Test
     public void testDoService() throws Exception {
-        OrderQueryRequest orderQueryRequest = new OrderQueryRequest();
+        QueryOrderRequest orderQueryRequest = new QueryOrderRequest();
         orderQueryRequest.setAppid("wxf51a439c0416f182");
         orderQueryRequest.setMch_id("1234079001");
         orderQueryRequest.setNonce_str("95f71d8d84a641209e9345788cab5c58");
@@ -50,7 +50,7 @@ public class OrderQueryServiceTest extends RestBaseTest {
                 institutionConfig, null); // 加签
         orderQueryRequest.setSign(sign);
 
-        OrderQueryResponse response = orderQueryService.doService(orderQueryRequest, null);
+        QueryOrderResponse response = orderQueryService.doService(orderQueryRequest, null);
 
         Assert.assertEquals(2900, response.getTotal_fee());
     }

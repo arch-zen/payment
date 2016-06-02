@@ -26,9 +26,9 @@ import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.AcquireOrderResultTypeEnum;
 import com.ymatou.payment.integration.IntegrationConfig;
-import com.ymatou.payment.integration.model.TradeCreateReqDeatil;
-import com.ymatou.payment.integration.model.TradeCreateRequest;
-import com.ymatou.payment.integration.model.TradeCreateResponse;
+import com.ymatou.payment.integration.model.CreateTradeReqDeatil;
+import com.ymatou.payment.integration.model.CreateTradeRequest;
+import com.ymatou.payment.integration.model.CreateTradeResponse;
 import com.ymatou.payment.integration.service.alipay.TradeCreateService;
 
 /**
@@ -55,23 +55,22 @@ public class AliPayWapAcquireOrderServiceImpl implements AcquireOrderService {
     private SignatureService signatureService;
 
     @Override
-    public AcquireOrderPackageResp acquireOrderPackage(Payment payment) {
+    public AcquireOrderPackageResp acquireOrderPackage(Payment payment, HashMap<String, String> mockHeader) {
         // 获取第三方机构配置
         InstitutionConfig instConfig = instConfigManager.getConfig(payment.getPayType());
 
         // 调用授权接口，获取RequestToken
-        String requestToken = getRequestToken(payment, instConfig);
+        String requestToken = getRequestToken(payment, instConfig, mockHeader);
 
         // 拼装请求Map
         HashMap<String, String> reqMap = buildReqMap(requestToken, instConfig);
 
         // 签名
-        String sign = signatureService.signMessage(reqMap, instConfig, payment.getAcquireOrderReq().getMockHeader());
+        String sign = signatureService.signMessage(reqMap, instConfig, mockHeader);
         reqMap.put("sign", sign);
 
         // 拼装请求报文
-        String reqQuery = buildQuery(reqMap,
-                integrationConfig.getAliPayWapUrl(payment.getAcquireOrderReq().getMockHeader()), true);
+        String reqQuery = buildQuery(reqMap, integrationConfig.getAliPayWapUrl(), true);
 
         // 返回报文结果
         AcquireOrderPackageResp resp = new AcquireOrderPackageResp();
@@ -93,10 +92,10 @@ public class AliPayWapAcquireOrderServiceImpl implements AcquireOrderService {
                 String.format("<auth_and_execute_req><request_token>%s</request_token></auth_and_execute_req>",
                         requestToken));
         map.put("service", AliPayConsts.WAP_ACQUIRE_ORDER_SERVICE);
-        map.put("sec_id", TradeCreateRequest.SEC_ID);
+        map.put("sec_id", CreateTradeRequest.SEC_ID);
         map.put("partner", instConfig.getMerchantId());
-        map.put("format", TradeCreateRequest.FORMAT);
-        map.put("v", TradeCreateRequest.VERSION);
+        map.put("format", CreateTradeRequest.FORMAT);
+        map.put("v", CreateTradeRequest.VERSION);
 
         return map;
     }
@@ -108,13 +107,12 @@ public class AliPayWapAcquireOrderServiceImpl implements AcquireOrderService {
      * @param instConfig
      * @return
      */
-    private String getRequestToken(Payment payment, InstitutionConfig instConfig) {
-        TradeCreateRequest request = new TradeCreateRequest();
-        HashMap<String, String> header = payment.getAcquireOrderReq().getMockHeader();
+    private String getRequestToken(Payment payment, InstitutionConfig instConfig, HashMap<String, String> mockHeader) {
+        CreateTradeRequest request = new CreateTradeRequest();
 
         // 组织支付宝授权接口的业务参数
         BussinessOrder bussinessOrder = payment.getBussinessOrder();
-        TradeCreateReqDeatil detail = new TradeCreateReqDeatil();
+        CreateTradeReqDeatil detail = new CreateTradeReqDeatil();
         detail.setCall_back_url(integrationConfig.getYmtPaymentBaseUrl() + "/callback/" + payment.getPayType());
         detail.setMerchant_url("");
         detail.setNotify_url(integrationConfig.getYmtPaymentBaseUrl() + "/notify/" + payment.getPayType());
@@ -133,11 +131,11 @@ public class AliPayWapAcquireOrderServiceImpl implements AcquireOrderService {
         request.setReq_data(reqData);
         request.setPartner(instConfig.getMerchantId());
         request.setReq_id(bussinessOrder.getTraceId());
-        String sign = signForTradeCreate(request, instConfig, header); // 签名
+        String sign = signForTradeCreate(request, instConfig, mockHeader); // 签名
         request.setSign(sign);
 
         try {
-            TradeCreateResponse response = tradeCreateService.doService(request, header);
+            CreateTradeResponse response = tradeCreateService.doService(request, mockHeader);
             if (StringUtils.isBlank(response.getRequestToken())) {
                 throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
                         "request token is empty.");
@@ -157,7 +155,7 @@ public class AliPayWapAcquireOrderServiceImpl implements AcquireOrderService {
      * @param header
      * @return
      */
-    private String signForTradeCreate(TradeCreateRequest request, InstitutionConfig instConfig,
+    private String signForTradeCreate(CreateTradeRequest request, InstitutionConfig instConfig,
             HashMap<String, String> header) {
         HashMap<String, String> map = new HashMap<>();
         map.put("req_data", request.getReq_data());

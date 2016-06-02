@@ -76,7 +76,7 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
                 TradeRefundDetail tradeRefundDetail = new TradeRefundDetail();
                 tradeRefundDetail.setCurrencyType(payment.getPayCurrencyType());
                 tradeRefundDetail.setRefundable(true); // 可退款
-                tradeRefundDetail.setPayAmount(payment.getPayPrice());
+                tradeRefundDetail.setPayAmount(payment.getPayPrice().getAmount());
                 tradeRefundDetail.setTradeNo(tradeNo);
                 tradeRefundDetail
                         .setPayChannel(refundPository.convertPayTypeToPayChannel(payment.getPayType().getCode()));

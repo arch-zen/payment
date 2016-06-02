@@ -36,7 +36,7 @@ import com.alibaba.fastjson.JSON;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.common.HttpClientUtil;
 import com.ymatou.payment.integration.common.constants.Constants;
-import com.ymatou.payment.integration.model.SingleTradeQueryRequest;
+import com.ymatou.payment.integration.model.QuerySingleTradeRequest;
 import com.ymatou.payment.integration.model.SingleTradeQueryResponse;
 
 /**
@@ -65,7 +65,7 @@ public class SingleTradeQueryService implements InitializingBean {
      * @return
      * @throws Exception
      */
-    public SingleTradeQueryResponse doService(SingleTradeQueryRequest req, HashMap<String, String> header)
+    public SingleTradeQueryResponse doService(QuerySingleTradeRequest req, HashMap<String, String> header)
             throws Exception {
         String url = integrationConfig.getAliPayBaseUrl(header);
         try {
@@ -81,7 +81,7 @@ public class SingleTradeQueryService implements InitializingBean {
         }
     }
 
-    private List<NameValuePair> getRequestBody(SingleTradeQueryRequest req) {
+    private List<NameValuePair> getRequestBody(QuerySingleTradeRequest req) {
         List<NameValuePair> nvp = new ArrayList<>();
         nvp.add(new BasicNameValuePair("service", req.getService()));
         nvp.add(new BasicNameValuePair("partner", req.getPartner()));

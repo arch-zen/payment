@@ -9,7 +9,7 @@ package com.ymatou.payment.integration.model;
  * @author qianmin 2016年5月19日 上午11:11:45
  *
  */
-public class SingleTradeQueryRequest {
+public class QuerySingleTradeRequest {
 
     /**
      * 接口名称
