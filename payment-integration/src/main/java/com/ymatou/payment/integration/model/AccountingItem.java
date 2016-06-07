@@ -25,7 +25,7 @@ public class AccountingItem {
     private String originalNo;
     private String bizNo;
     private String bizCode;
-    private String accountOperateType;
+    private int accountOperateType;
     private String accountingDate;
 
     public String getAccountId() {
@@ -108,11 +108,11 @@ public class AccountingItem {
         this.bizCode = bizCode;
     }
 
-    public String getAccountOperateType() {
+    public int getAccountOperateType() {
         return accountOperateType;
     }
 
-    public void setAccountOperateType(String accountOperateType) {
+    public void setAccountOperateType(int accountOperateType) {
         this.accountOperateType = accountOperateType;
     }
 

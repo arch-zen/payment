@@ -37,6 +37,8 @@ public class Payment extends PrintFriendliness {
     private String payerId;
     private PayStatusEnum payStatus;
     private Date payTime;
+    private BigDecimal refundAmt;
+    private BigDecimal completedRefundAmt;
 
     private Integer checkStatus;
 
@@ -168,6 +170,22 @@ public class Payment extends PrintFriendliness {
         this.bussinessOrder = bussinessOrder;
     }
 
+    public BigDecimal getRefundAmt() {
+        return refundAmt;
+    }
+
+    public void setRefundAmt(BigDecimal refundAmt) {
+        this.refundAmt = refundAmt;
+    }
+
+    public BigDecimal getCompletedRefundAmt() {
+        return completedRefundAmt;
+    }
+
+    public void setCompletedRefundAmt(BigDecimal completedRefundAmt) {
+        this.completedRefundAmt = completedRefundAmt;
+    }
+
     /**
      * 从PO转换成model
      * 
@@ -195,6 +213,8 @@ public class Payment extends PrintFriendliness {
         model.setPayStatus(PayStatusEnum.parse(po.getPayStatus()));
         model.setPayTime(po.getPayTime());
         model.setCheckStatus(po.getCheckStatus());
+        model.setRefundAmt(new BigDecimal("0.00")); // TODO
+        model.setCompletedRefundAmt(new BigDecimal("0.00"));// TODO
 
         return model;
     }

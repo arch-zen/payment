@@ -3,6 +3,8 @@
  */
 package com.ymatou.payment.facade;
 
+import com.ymatou.payment.facade.model.AcquireRefundPlusRequest;
+import com.ymatou.payment.facade.model.AcquireRefundPlusResponse;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
 import com.ymatou.payment.facade.model.AcquireRefundResponse;
 import com.ymatou.payment.facade.model.ApproveRefundRequest;
@@ -61,4 +63,12 @@ public interface RefundFacade {
      * @return
      */
     QueryRefundResponse query(QueryRefundRequest req);
+
+    /**
+     * 退款收单(支持部分退款)
+     * 
+     * @param req
+     * @return
+     */
+    AcquireRefundPlusResponse acquireRefund(AcquireRefundPlusRequest req);
 }

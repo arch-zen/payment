@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -87,7 +87,7 @@ public class HttpClientUtil {
      */
     public static String sendPost(String url, String body, String contentType, HashMap<String, String> header,
             HttpClient httpClient)
-                    throws IOException {
+            throws IOException {
         String result = null;
 
         HttpPost httpPost = new HttpPost(url);
@@ -128,7 +128,7 @@ public class HttpClientUtil {
      */
     public static String sendPost(String url, List<NameValuePair> body, HashMap<String, String> header,
             HttpClient httpClient)
-                    throws IOException {
+            throws IOException {
         String result = null;
 
         HttpPost httpPost = new HttpPost(url);
@@ -217,5 +217,49 @@ public class HttpClientUtil {
             }
         });
 
+    }
+
+    /**
+     * 
+     * @param url
+     * @param body
+     * @param contentType
+     * @param header
+     * @param httpClient
+     * @return int: HttpStatus
+     * @throws IOException
+     */
+    public static int sendPostToGetStatus(String url, String body, String contentType,
+            HashMap<String, String> header, HttpClient httpClient) throws IOException {
+
+        int statusCode = -1;
+
+        HttpPost httpPost = new HttpPost(url);
+        StringEntity postEntity = new StringEntity(body, "UTF-8");
+        httpPost.setEntity(postEntity); // set request body
+        if (header != null && Constants.MOCK.equals(header.get("mock"))) {
+            for (Entry<String, String> entry : header.entrySet()) {
+                httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
+            }
+        }
+        httpPost.addHeader("Content-Type", contentType); // 设置body类型
+
+        logger.info("executing request" + httpPost.getRequestLine());
+        logger.info("request header: " + Arrays.toString(httpPost.getAllHeaders()));
+        logger.info("request body: " + body);
+
+        try {
+            HttpResponse response = httpClient.execute(httpPost);
+            HttpEntity entity = response.getEntity();
+            String result = EntityUtils.toString(entity, "UTF-8");
+            StatusLine statusLine = response.getStatusLine();
+            logger.info("response message: {}; StatusLine: {}", result, statusLine);
+
+            statusCode = statusLine.getStatusCode();
+        } finally {
+            httpPost.releaseConnection();
+        }
+
+        return statusCode;
     }
 }

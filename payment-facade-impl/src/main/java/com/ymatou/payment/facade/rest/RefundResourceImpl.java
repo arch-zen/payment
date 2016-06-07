@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.facade.RefundFacade;
+import com.ymatou.payment.facade.model.AcquireRefundPlusRequest;
+import com.ymatou.payment.facade.model.AcquireRefundPlusResponse;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
 import com.ymatou.payment.facade.model.AcquireRefundResponse;
 import com.ymatou.payment.facade.model.ApproveRefundRequest;
@@ -102,5 +104,14 @@ public class RefundResourceImpl implements RefundResource {
     public QueryRefundResponse query(QueryRefundRequest req, @Context HttpServletRequest servletRequest) {
 
         return refundFacade.query(req);
+    }
+
+    @POST
+    @Path("/{Refund:(?i:Refund)}/{AcquireRefund:(?i:AcquireRefund)}")
+    @Override
+    public AcquireRefundPlusResponse acquireRefund(AcquireRefundPlusRequest req, HttpServletRequest servletRequest) {
+        // TODO ADD HEADER
+
+        return refundFacade.acquireRefund(req);
     }
 }
