@@ -103,6 +103,7 @@ public class SingleTradeQueryService implements InitializingBean {
             response.setError(root.elementText("error"));
         } else {// 当is_success=T时
             Element trade = root.element("response").element("trade");
+            response.setError(root.elementText("error"));
             response.setBuyer_email(trade.elementText("buyer_email"));
             response.setBuyer_id(trade.elementText("buyer_id"));
             response.setTrade_status(trade.elementText("trade_status"));

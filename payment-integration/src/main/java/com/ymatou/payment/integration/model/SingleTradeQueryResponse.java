@@ -11,9 +11,24 @@ import java.util.Date;
  * @author qianmin 2016年5月19日 上午11:17:14
  *
  */
+/**
+ * @author wangxudong 2016年6月7日 上午11:19:22
+ *
+ */
 public class SingleTradeQueryResponse {
 
     public static final String SUCCESS = "T";
+
+
+    /**
+     * 支付宝返回：<alipay><is_success>F</is_success><error>SYSTEM_ERROR</error></alipay>时，代表系统状态未知
+     */
+    public static final String UNKNOW = "SYSTEM_ERROR";
+
+    /**
+     * 交易不存在
+     */
+    public static final String TRADE_NOT_EXIST = "TRADE_NOT_EXIST";
 
     // 基本参数
     /**

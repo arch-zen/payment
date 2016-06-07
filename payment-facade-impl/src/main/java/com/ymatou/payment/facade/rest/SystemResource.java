@@ -22,6 +22,12 @@ public interface SystemResource {
      */
     String status();
 
+    /**
+     * 返回系统版本
+     * 
+     * @return
+     */
+    String version();
 
     /**
      * 支付宝 PC DEMO

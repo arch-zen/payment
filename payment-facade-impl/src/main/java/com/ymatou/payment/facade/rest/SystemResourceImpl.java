@@ -43,6 +43,14 @@ public class SystemResourceImpl implements SystemResource {
     @Resource
     private PaymentResource paymentResource;
 
+    @GET
+    @Path("/version")
+    @Override
+    public String version() {
+        return "2016-06-07";
+    }
+
+
     @Override
     @GET
     @Path("/warmup")
@@ -121,5 +129,4 @@ public class SystemResourceImpl implements SystemResource {
 
         return dateFormat.format(new Date());
     }
-
 }

@@ -54,6 +54,12 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
         // 记录第三方应答
         alipayNotifyLogRespository.saveAlipaynoitfylog(paymentId, thirdPartyPayment.getOriginMessage());
 
+        // 如果第三方返回系统未知的状态
+        if (thirdPartyPayment.getPayStatus() == PayStatusEnum.UNKNOW.getIndex()) {
+            throw new BizException(ErrorCode.FAIL,
+                    "check payment failed because query statues unknow with paymentid: " + paymentId);
+        }
+
         // 根据paymentId查询Payment,BussinessOrder
         Payment payment = paymentRepository.getByPaymentId(paymentId);
         if (payment == null) {
@@ -65,6 +71,7 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
                     "can not find order " + payment.getBussinessOrderId());
         }
 
+        // 对账逻辑
         if (PayStatusEnum.Paied.getIndex() == thirdPartyPayment.getPayStatus()) {
             if (PayStatusEnum.Paied == payment.getPayStatus()
                     || PayStatusEnum.Refunded == payment.getPayStatus()) {

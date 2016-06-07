@@ -58,9 +58,13 @@ public class AliPayPaymentQueryServiceImpl implements PaymentQueryService {
             if (SingleTradeQueryResponse.SUCCESS.equals(response.getIs_success())) {
                 PaymentQueryResp resp = generateResponse(response);
                 return resp;
-            } else {
+            } else if (SingleTradeQueryResponse.TRADE_NOT_EXIST.equals(response.getError())) {
                 PaymentQueryResp resp = new PaymentQueryResp();
                 resp.setPayStatus(PayStatusEnum.Failed);
+                return resp;
+            } else {
+                PaymentQueryResp resp = new PaymentQueryResp();
+                resp.setPayStatus(PayStatusEnum.UNKNOW);
                 return resp;
             }
 
