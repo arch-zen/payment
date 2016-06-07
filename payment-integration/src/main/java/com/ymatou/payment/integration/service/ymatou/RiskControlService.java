@@ -41,7 +41,7 @@ public class RiskControlService implements InitializingBean {
         String url = integrationConfig.getYmtRiskControlUrl(header);
 
         try {
-            String result = HttpClientUtil.sendPost(url, JSONObject.toJSONString(request), Constants.CONTENT_TTPE_JSON,
+            String result = HttpClientUtil.sendPost(url, JSONObject.toJSONString(request), Constants.CONTENT_TYPE_JSON,
                     header, httpClient);
             return JSONObject.parseObject(result).getInteger("Code") == 200; // TODO ResponseCode
         } catch (IOException e) {

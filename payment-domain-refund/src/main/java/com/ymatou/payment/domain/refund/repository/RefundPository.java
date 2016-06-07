@@ -3,10 +3,12 @@
  */
 package com.ymatou.payment.domain.refund.repository;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -44,8 +46,46 @@ public class RefundPository {
     @Autowired
     private RefundMiscRequestLogMapper refundMiscRequestLogMapper;
 
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+
     @Autowired
     private SqlSession sqlSession;
+
+    @Transactional
+    public void addFastRefundInfo(Payment payment, BussinessOrder bussinessorder,
+            Refund refundInfo) {
+        RefundRequestPo refundrequest = new RefundRequestPo();
+        refundrequest.setPaymentId(payment.getPaymentId());
+        refundrequest.setInstPaymentId(payment.getInstitutionPaymentId());
+        refundrequest.setTradeNo(bussinessorder.getOrderId());
+        refundrequest.setOrderId(refundInfo.getOrderIdList().get(0));
+        refundrequest.setTraceId(refundInfo.getTraceId());
+        refundrequest.setAppId(refundInfo.getAppId());
+        refundrequest.setPayType(payment.getPayType().getCode());
+        refundrequest.setRefundAmount(payment.getPayPrice());
+        refundrequest.setCurrencyType(payment.getPayCurrencyType());
+        refundrequest.setApproveStatus(ApproveStatusEnum.FAST_REFUND.getCode());
+        refundrequest.setApprovedTime(new Date());
+        refundrequest.setApprovedUser("system");
+        refundrequest.setRefundStatus(RefundStatusEnum.INIT.getCode());
+        refundrequest.setTradeType(refundInfo.getTradeType());
+        refundrequest.setRefundBatchNo(generateRefundBatchNo());
+    }
+
+    /**
+     * 获退款批次号
+     * 
+     * @return
+     */
+    public String generateRefundBatchNo() {
+        HashMap<String, Object> query = new HashMap<>();
+        query.put("sequenceType", "refund");
+        sqlSession.selectOne("ext-refundrequest.genRefundBatchNoSeq", query);
+
+        return new StringBuilder().append(sdf.format(new Date()))
+                .append(StringUtils.leftPad(String.valueOf(query.get("seed")), 10, "0"))
+                .toString();
+    }
 
     @Transactional
     public void addRefundrequestAndCompensateprocessinfo(Payment payment, BussinessOrder bussinessorder,

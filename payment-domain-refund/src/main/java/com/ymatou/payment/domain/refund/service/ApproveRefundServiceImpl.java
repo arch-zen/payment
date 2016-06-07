@@ -85,7 +85,7 @@ public class ApproveRefundServiceImpl implements ApproveRefundService {
 
         try {
             for (String paymentId : paymentIds) {
-                notifyRefundService.doService(paymentId, UUID.randomUUID().toString(), header); // TODO
+                notifyRefundService.doService(paymentId, UUID.randomUUID().toString(), header);
             }
         } catch (Exception e) {
             // 异步通知发货

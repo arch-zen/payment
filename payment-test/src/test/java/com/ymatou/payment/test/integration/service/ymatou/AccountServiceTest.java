@@ -35,7 +35,7 @@ public class AccountServiceTest extends RestBaseTest {
         AccountingItem item = new AccountingItem();
         item.setAccountId("01010099735467");
         item.setAccountingDate(new Date());
-        item.setAccountOperateType("2");
+        item.setAccountOperateType(2);
         item.setAccountType(1);
         item.setAmount("2.30");
         item.setBizCode("100001");
@@ -63,7 +63,7 @@ public class AccountServiceTest extends RestBaseTest {
         AccountingItem item = new AccountingItem();
         item.setAccountId("01010099735467");
         item.setAccountingDate(new Date());
-        item.setAccountOperateType("2");
+        item.setAccountOperateType(2);
         item.setAccountType(1);
         item.setAmount("0.01");
         item.setBizCode("100001");

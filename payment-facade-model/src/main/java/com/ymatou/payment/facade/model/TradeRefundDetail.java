@@ -25,6 +25,7 @@ public class TradeRefundDetail extends PrintFriendliness {
     private String paymentId;
     private String payType;
     private String instPaymentId;
+    private BigDecimal refundableAmt;
 
     public String getTradeNo() {
         return tradeNo;
@@ -89,4 +90,13 @@ public class TradeRefundDetail extends PrintFriendliness {
     public void setInstPaymentId(String instPaymentId) {
         this.instPaymentId = instPaymentId;
     }
+
+    public BigDecimal getRefundableAmt() {
+        return refundableAmt;
+    }
+
+    public void setRefundableAmt(BigDecimal refundableAmt) {
+        this.refundableAmt = refundableAmt;
+    }
+
 }

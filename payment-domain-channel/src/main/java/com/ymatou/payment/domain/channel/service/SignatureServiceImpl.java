@@ -65,7 +65,8 @@ public class SignatureServiceImpl implements SignatureService {
         // 收单加签不需要对参数排序
         // 单笔交易查询需要对参数排序
         boolean needSort = !PayTypeEnum.AliPayApp.getCode().equals(instConfig.getPayType())
-                || "single_trade_query".equals(rawMapData.get("service"));
+                || "single_trade_query".equals(rawMapData.get("service"))
+                || "refund_fastpay_query".equals(rawMapData.get("service"));
         String rawMessage = mapToString(rawMapData, instConfig, needSort);
         String sign = null;
 
@@ -123,13 +124,13 @@ public class SignatureServiceImpl implements SignatureService {
                 list.add(entry.getKey() + "=" + entry.getValue() + "&");
             }
         }
-        
-        //FIXME: Colllections.sort，无需先转为Array
+
+        // FIXME: Colllections.sort，无需先转为Array
 
         int size = list.size();
         String[] arrayToSort = list.toArray(new String[size]);
 
-        //FIXME: {}
+        // FIXME: {}
         if (needSort)
             Arrays.sort(arrayToSort, String.CASE_INSENSITIVE_ORDER);
 
@@ -138,7 +139,7 @@ public class SignatureServiceImpl implements SignatureService {
             sb.append(arrayToSort[i]);
         }
 
-        //FIXME：直接sb.subString，无需先转为String
+        // FIXME：直接sb.subString，无需先转为String
         String mapString = sb.toString();
 
         return mapString.substring(0, mapString.length() - 1);
@@ -160,7 +161,7 @@ public class SignatureServiceImpl implements SignatureService {
             String targetMessage = rawMessage + md5keyConnector + md5Key;
 
             if (StringUtils.isBlank(instConfig.getMd5KeyConnector()))
-                //FIXME, 为什么有connector就没有toUpperCase()? 加注释说明
+                // FIXME, 为什么有connector就没有toUpperCase()? 加注释说明
                 return MD5Util.encode(targetMessage);
             else
                 return MD5Util.encode(targetMessage).toUpperCase();

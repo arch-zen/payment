@@ -18,8 +18,8 @@
 
 
 		<jdbcConnection driverClass="net.sourceforge.jtds.jdbc.Driver"
-			connectionURL="jdbc:jtds:sqlserver://172.16.101.153:1433/YmtRelease"
-			userId="YmtRelease" password="123456">
+			connectionURL="jdbc:jtds:sqlserver://172.16.100.172:1433/YmtRelease"
+			userId="sa_test" password="123456">
 			<property name="remarksReporting" value="true" />
 		</jdbcConnection>
 
@@ -38,7 +38,7 @@
 			targetPackage="com.ymatou.payment.infrastructure.db.mapper"
 			targetProject="..\payment-infrastructure\src\main\java">
 		</javaClientGenerator>
-
+		
 		<table tableName="PP_Payment" domainObjectName="Payment">
 			<property name="useActualColumnNames" value="true"/>
 		</table>
@@ -61,6 +61,10 @@
 		</table>
 		
 		<table tableName="Ymt_AlipayNotifyLog" domainObjectName="AlipayNotifyLog">
+			<property name="useActualColumnNames" value="true"/>
+		</table>
+		
+		<table tableName="PP_AccoutingLog" domainObjectName="AccountingLog">
 			<property name="useActualColumnNames" value="true"/>
 		</table>
 	</context>

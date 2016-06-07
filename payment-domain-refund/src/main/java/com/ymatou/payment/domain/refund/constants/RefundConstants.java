@@ -15,4 +15,8 @@ public class RefundConstants {
 
     // 在退款查询时，当不传refundStatus时，默认的refundStatusList
     public static final List<Integer> REFUND_QUERY_DEFULT_STATUS = Arrays.asList(new Integer[] {-2, -1, 0, 1, 2, 3, 4});
+
+    public static final String ACCOUNTING_SUCCESS = "0"; // 成功
+    public static final String ACCOUNTING_IDEMPOTENTE = "4"; // 幂等
+    public static final String AccountingCode_SYSTEMERROR = "3"; // 系统异常
 }
