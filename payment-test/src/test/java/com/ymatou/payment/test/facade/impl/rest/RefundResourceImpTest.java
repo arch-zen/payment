@@ -140,10 +140,10 @@ public class RefundResourceImpTest extends RestBaseTest {
     public void testApproveRefund() {
         ApproveRefundRequest req = new ApproveRefundRequest();
         req.setApproveUser("testApproveRefund");
-        req.setPaymentIds(Arrays.asList(new String[] {"20151104150448396000000000027244"}));
+        req.setRefundNos(Arrays.asList(new String[] {"20151104150448396000000000027244"}));
 
         ApproveRefundResponse response = refundResource.approveRefund(req, new MockHttpServletRequest());
-        Assert.assertEquals(true, response.getDetails().getOkFlag());
+        Assert.assertEquals(true, response.getIsSuccess());
 
     }
 

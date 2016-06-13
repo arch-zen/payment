@@ -3,22 +3,16 @@
  */
 package com.ymatou.payment.integration.service.wxpay;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -26,9 +20,9 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,9 +34,9 @@ import com.ymatou.payment.integration.common.HttpClientUtil;
 import com.ymatou.payment.integration.common.XmlParser;
 import com.ymatou.payment.integration.common.constants.Constants;
 import com.ymatou.payment.integration.model.CouponRefundData;
-import com.ymatou.payment.integration.model.RefundOrderData;
 import com.ymatou.payment.integration.model.QueryRefundRequest;
 import com.ymatou.payment.integration.model.QueryRefundResponse;
+import com.ymatou.payment.integration.model.RefundOrderData;
 
 /**
  * 微信支付退款查询
@@ -51,13 +45,11 @@ import com.ymatou.payment.integration.model.QueryRefundResponse;
  *
  */
 @Component
-public class RefundQueryService {
+public class WxRefundQueryService implements InitializingBean {
 
-    private static Logger logger = LoggerFactory.getLogger(RefundQueryService.class);
+    private static Logger logger = LoggerFactory.getLogger(WxRefundQueryService.class);
 
-    private CloseableHttpClient jsapiHttpClient;
-    private CloseableHttpClient appHttpClient;
-    private volatile boolean isInit = false;
+    private CloseableHttpClient httpClient;
 
     @Autowired
     private IntegrationConfig integrationConfig;
@@ -74,13 +66,13 @@ public class RefundQueryService {
             throws Exception {
         try {
             // 根据mchId获取不同的加签盐值和httpClient(不同商户证书及密码不同)
-            String mchId = request.getMch_id();
             String respXmlStr = HttpClientUtil.sendPost(integrationConfig.getWxRefundQueryUrl(header),
-                    getPostDataXml(request), Constants.CONTENT_TTPE_XML, header, getHttpClient(mchId));
+                    getPostDataXml(request), Constants.CONTENT_TYPE_XML, header, httpClient);
 
             if (!StringUtils.isEmpty(respXmlStr) && respXmlStr.startsWith(Constants.WEIXIN_RESPONSE_BODY_START)) {
                 Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);
                 QueryRefundResponse response = generateResponseData(respMap);
+                response.setOriginalResponse(respXmlStr);
                 return response;
             }
             return null;
@@ -155,48 +147,32 @@ public class RefundQueryService {
         return postDataXML;
     }
 
-    private CloseableHttpClient getHttpClient(String mchId) throws KeyManagementException, UnrecoverableKeyException,
-            KeyStoreException, FileNotFoundException, NoSuchAlgorithmException, CertificateException, IOException {
-        if (!isInit) {
-            this.jsapiHttpClient =
-                    initHttpClient(integrationConfig.getWxJsapiCertPath(), integrationConfig.getWxJsapiCertPass());
-            this.appHttpClient =
-                    initHttpClient(integrationConfig.getWxAppCertPath(), integrationConfig.getWxAppCertPass());
-            isInit = true;
-        }
-        if (mchId.equals(integrationConfig.getWxAppMchId())) {
-            return appHttpClient;
-        } else {
-            return jsapiHttpClient;
-        }
-    }
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        SSLContext ctx = SSLContext.getInstance("SSL");
+        X509TrustManager tm = new X509TrustManager() {
+            @Override
+            public X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
 
-    public CloseableHttpClient initHttpClient(String certLocalPath, String certPassWord)
-            throws KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException,
-            CertificateException, KeyManagementException, UnrecoverableKeyException {
+            @Override
+            public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
 
-        // Load keyStore
-        KeyStore keyStore = KeyStore.getInstance("PKCS12");
-        try (FileInputStream instream = new FileInputStream(new File(certLocalPath));) {
-            keyStore.load(instream, certPassWord.toCharArray());// 设置证书密码
-        }
-        // Trust own CA and all self-signed certs
-        SSLContext sslcontext = SSLContexts.custom()
-                .loadKeyMaterial(keyStore, certPassWord.toCharArray())
-                .build();
-        // Allow TLSv1 protocol only
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-                sslcontext,
-                new String[] {"TLSv1"},
-                null,
+            @Override
+            public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
+        };
+        ctx.init(null, new TrustManager[] {tm}, null);
+
+        SSLConnectionSocketFactory ssf = new SSLConnectionSocketFactory(ctx,
                 SSLConnectionSocketFactory.getDefaultHostnameVerifier());
 
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         cm.setDefaultMaxPerRoute(Constants.DEFAULT_MAX_PER_ROUTE);
         cm.setMaxTotal(Constants.MAX_TOTAL);
 
-        return HttpClientBuilder.create()
-                .setSSLSocketFactory(sslsf)
+        this.httpClient = HttpClientBuilder.create()
+                .setSSLSocketFactory(ssf)
                 .setConnectionManager(cm)
                 .build();
     }

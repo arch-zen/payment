@@ -18,7 +18,9 @@ public enum PayStatusEnum {
 
     Refunded(2, "已退款"),
 
-    Failed(-1, "支付失败");
+    Failed(-1, "支付失败"),
+
+    UNKNOW(-99, "第三方返回SYSTEM_ERROR,支付状态未知");
 
     private int index;
     private String name;

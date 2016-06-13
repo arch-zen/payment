@@ -32,6 +32,8 @@ public class PaymentQueryServiceFactory {
                 return aliPayPaymentQueryServiceImpl;
             case AliPayApp:
                 return aliPayPaymentQueryServiceImpl;
+            case AliPayWap:
+                return aliPayPaymentQueryServiceImpl;
             case WeiXinJSAPI:
                 return weiXinPaymentQueryServiceImpl;
             case WeiXinApp:

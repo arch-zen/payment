@@ -18,6 +18,26 @@ public class QueryOrderResponse {
     public static final String SUCCESS = "SUCCESS";
 
     /**
+     * 系统错误，未知状态
+     * <xml><return_code><![CDATA[SUCCESS]]></return_code>
+     * <return_msg><![CDATA[OK]]></return_msg>
+     * <appid><![CDATA[wxf51a439c0416f182]]></appid>
+     * <mch_id><![CDATA[1234079001]]></mch_id>
+     * <nonce_str><![CDATA[7oDOx5D1X0CqUB2Z]]></nonce_str>
+     * <sign><![CDATA[EF9A7609C69C35ABB50232CFA184C4B1]]></sign>
+     * <result_code><![CDATA[FAIL]]></result_code>
+     * <err_code><![CDATA[SYSTEMERROR]]></err_code>
+     * <err_code_des><![CDATA[System Error]]></err_code_des>
+     * </xml>
+     */
+    public static final String UNKONW = "SYSTEMERROR";
+
+    /*
+     * 退款状态
+     */
+    public static final String REFUND = "REFUND";
+
+    /**
      * 返回状态码
      */
     private String return_code;

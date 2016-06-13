@@ -63,4 +63,15 @@ public enum PayTypeEnum {
                 throw new BizException(ErrorCode.INVALID_PAYTYPE, code);
         }
     }
+
+    public static String getThirdPartyName(PayTypeEnum payType) {
+        switch (payType) {
+            case AliPayPc:
+            case AliPayWap:
+            case AliPayApp:
+                return "Alipay";
+            default:
+                return "Weixin";
+        }
+    }
 }

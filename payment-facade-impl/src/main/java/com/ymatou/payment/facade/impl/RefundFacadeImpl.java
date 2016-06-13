@@ -16,19 +16,23 @@ import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.service.PayService;
 import com.ymatou.payment.domain.refund.model.Refund;
+import com.ymatou.payment.domain.refund.service.AcquireRefundService;
 import com.ymatou.payment.domain.refund.service.ApproveRefundService;
 import com.ymatou.payment.domain.refund.service.CheckRefundableService;
 import com.ymatou.payment.domain.refund.service.FastRefundService;
 import com.ymatou.payment.domain.refund.service.QueryRefundService;
+import com.ymatou.payment.domain.refund.service.RefundJobService;
 import com.ymatou.payment.domain.refund.service.SubmitRefundService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.RefundFacade;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.model.AcquireRefundDetail;
+import com.ymatou.payment.facade.model.AcquireRefundPlusRequest;
+import com.ymatou.payment.facade.model.AcquireRefundPlusResponse;
+import com.ymatou.payment.facade.model.AcquireRefundPlusResponse.RefundDetail;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
 import com.ymatou.payment.facade.model.AcquireRefundResponse;
-import com.ymatou.payment.facade.model.ApproveRefundDetail;
 import com.ymatou.payment.facade.model.ApproveRefundRequest;
 import com.ymatou.payment.facade.model.ApproveRefundResponse;
 import com.ymatou.payment.facade.model.FastRefundRequest;
@@ -40,6 +44,7 @@ import com.ymatou.payment.facade.model.TradeDetail;
 import com.ymatou.payment.facade.model.TradeRefundDetail;
 import com.ymatou.payment.facade.model.TradeRefundableRequest;
 import com.ymatou.payment.facade.model.TradeRefundableResponse;
+import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 
 /**
  * 
@@ -68,6 +73,12 @@ public class RefundFacadeImpl implements RefundFacade {
 
     @Autowired
     private QueryRefundService queryRefundService;
+
+    @Autowired
+    private AcquireRefundService acquireRefundService;
+
+    @Autowired
+    private RefundJobService refundJobService;
 
     @Override
     public FastRefundResponse fastRefund(FastRefundRequest req) {
@@ -166,16 +177,17 @@ public class RefundFacadeImpl implements RefundFacade {
 
     @Override
     public ApproveRefundResponse approveRefund(ApproveRefundRequest req) {
-        // 更新RefundRequest审核状态， 保存CompensateProcessInfo， 获取需要通知退款的PaymentIds
-        List<String> paymentIds = approveRefundService.approveRefund(req.getPaymentIds(), req.getApproveUser());
+        // 更新RefundRequest审核状态， 获取需要通知退款单
+        List<RefundRequestPo> refunds = approveRefundService.approveRefund(req.getRefundNos(), req.getApproveUser());
 
-        // 通知退款
-        approveRefundService.notifyRefund(paymentIds, req.getHeader());
+        // 提交第三方退款
+        for (RefundRequestPo refundRequest : refunds) { // TODO 异步
+            Payment payment = payService.getPaymentByPaymentId(refundRequest.getPaymentId());
+            refundJobService.submitRefund(refundRequest, payment, req.getHeader());
+        }
 
         ApproveRefundResponse response = new ApproveRefundResponse();
-        ApproveRefundDetail approveRefundDetail = new ApproveRefundDetail(true);
-        response.setDetails(approveRefundDetail);
-
+        response.setSuccess(true);
         return response;
     }
 
@@ -198,6 +210,43 @@ public class RefundFacadeImpl implements RefundFacade {
         QueryRefundResponse response = new QueryRefundResponse();
         response.setDetails(details);
         response.setCount(details.size());
+
+        return response;
+    }
+
+    @Override
+    public AcquireRefundPlusResponse acquireRefund(AcquireRefundPlusRequest req) {
+        if (StringUtils.isEmpty(req.getOrderId())) {
+            throw new BizException(ErrorCode.INVALID_ORDER_ID, "order id is empty.");
+        }
+
+        // 获取退款的相关的交易信息
+        List<AcquireRefundPlusRequest.TradeDetail> tradeDetails = req.getTradeDetails();
+        if (tradeDetails == null || tradeDetails.size() == 0)
+            throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "TradeDetail值不能为 null");
+
+        List<TradeRefundDetail> tradeRefundDetails = acquireRefundService.generateTradeRefundDetailList(tradeDetails);
+        // 筛选出可退款的交易信息
+        List<TradeRefundDetail> refundableTrades = new ArrayList<>();
+        for (TradeRefundDetail tradeRefundDetail : tradeRefundDetails) {
+            if (tradeRefundDetail.isRefundable()) {
+                refundableTrades.add(tradeRefundDetail);
+            }
+        }
+
+        // 若有不能被退款的，报错
+        if (refundableTrades.size() != tradeDetails.size()) {
+            logger.info("request refund trades size {}", tradeDetails.size());
+            logger.info("refundableTrades size {} ", refundableTrades.size());
+            throw new BizException(ErrorCode.NOT_ALL_TRADE_CAN_REFUND, "not all trade can be refunded.");
+        }
+
+        // 检查是否已经生成RefundRequest，若未生成则生成RefundRequest，并生成相应应答
+        List<RefundDetail> acquireRefundDetails =
+                acquireRefundService.checkAndSaveRefundRequest(refundableTrades, req);
+
+        AcquireRefundPlusResponse response = new AcquireRefundPlusResponse();
+        response.setDetails(acquireRefundDetails);
 
         return response;
     }

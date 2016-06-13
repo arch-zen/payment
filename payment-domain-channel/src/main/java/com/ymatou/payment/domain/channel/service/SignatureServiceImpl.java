@@ -6,7 +6,6 @@
 package com.ymatou.payment.domain.channel.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,7 +65,8 @@ public class SignatureServiceImpl implements SignatureService {
         // 收单加签不需要对参数排序
         // 单笔交易查询需要对参数排序
         boolean needSort = !PayTypeEnum.AliPayApp.getCode().equals(instConfig.getPayType())
-                || "single_trade_query".equals(rawMapData.get("service"));
+                || "single_trade_query".equals(rawMapData.get("service"))
+                || "refund_fastpay_query".equals(rawMapData.get("service"));
         String rawMessage = mapToString(rawMapData, instConfig, needSort);
         String sign = null;
 

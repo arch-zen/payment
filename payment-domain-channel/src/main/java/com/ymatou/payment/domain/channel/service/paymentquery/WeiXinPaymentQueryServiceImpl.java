@@ -64,9 +64,12 @@ public class WeiXinPaymentQueryServiceImpl implements PaymentQueryService {
             if (QueryOrderResponse.SUCCESS.equals(response.getResult_code())
                     && QueryOrderResponse.SUCCESS.equals(response.getReturn_code())
                     && (QueryOrderResponse.SUCCESS.equals(response.getTrade_state())
-                            || "REFUND".equals(response.getTrade_state()))) {
+                            || QueryOrderResponse.REFUND.equals(response.getTrade_state()))) {
                 resp = generateResponse(response);
                 resp.setPayStatus(PayStatusEnum.Paied);
+                return resp;
+            } else if (QueryOrderResponse.UNKONW.equals(response.getErr_code())) {
+                resp.setPayStatus(PayStatusEnum.UNKNOW);
                 return resp;
             } else {
                 resp.setPayStatus(PayStatusEnum.Failed);

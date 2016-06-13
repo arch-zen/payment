@@ -43,7 +43,7 @@ public class AccountService implements InitializingBean {
         String url = integrationConfig.getYmtAccountingUrl(header);
 
         try {
-            String result = HttpClientUtil.sendPost(url, JSONObject.toJSONString(request), Constants.CONTENT_TTPE_JSON,
+            String result = HttpClientUtil.sendPost(url, JSONObject.toJSONString(request), Constants.CONTENT_TYPE_JSON,
                     header, httpClient);
             AccountingResponse response = JSON.parseObject(result, AccountingResponse.class);
             return response;

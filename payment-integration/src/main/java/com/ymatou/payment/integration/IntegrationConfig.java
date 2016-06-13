@@ -23,6 +23,7 @@ public class IntegrationConfig {
     private String wxUnifiedOrderUrl; // 微信统一下单url
     private String wxRefundQueryUrl; // 微信退款查询url
     private String wxOrderQueryUrl; // 微信查询订单url
+    private String wxRefundUrl; // 微信退款申请url
     private String wxJsapiCertPath; // 微信Jsapi(1278350701)对应的证书路径
     private String wxJsapiCertPass; // 微信Jsapi(1278350701)对应的证书密码
     private String wxJsapiMchId; // 微信Jsapi的商户号(1234079001)
@@ -38,19 +39,75 @@ public class IntegrationConfig {
     private String ymtPaymentBaseUrl; // ymt.payment.baseurl
     private String ymtAccountingUrl; // 资金账户出入账服务url
     private String ymtRiskControlUrl; // 风控urk
+    private String ymtTriggerOrderRefundUrl; // 交易系统接收退款回调的url
 
     private String openMock;
     private String aliPayBaseUrlMock; // 支付宝网关url(mock)
     private String aliPayWapUrlMock; // 支付宝wap支付url(mock)
     private String wxUnifiedOrderUrlMock; // 微信统一下单url(mock)
     private String wxRefundQueryUrlMock; // 微信退款查询url(mock)
+    private String wxRefundUrlMock; // 微信退款申请url(mock)
     private String wxOrderQueryUrlMock; // 微信查询订单url(mock)
     private String ymtUserServiceUrlMock; // 用户服务url(mock)
     private String ymtNotifyRefundUrlMock; // 通知退款url(mock)
     private String ymtNotifyPaymentUrlMock; // 通知支付url(mock)
     private String ymtNotifytradingeventUrlMock; // 通知用户交易信息url(mock)
     private String ymtAccountingUrlMock; // 资金账户出入账服务url(mock)
-    private String ymtRiskControlUrlMock; // 风控urk
+    private String ymtRiskControlUrlMock; // 风控urk(mock)
+    private String ymtTriggerOrderRefundUrlMock; // 交易系统接收退款回调的url(mock)
+
+
+    public String getYmtTriggerOrderRefundUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getYmtTriggerOrderRefundUrlMock();
+        } else {
+            return getYmtTriggerOrderRefundUrl();
+        }
+    }
+
+    @DisconfFileItem(name = "ymt.triggerorderrefund.url")
+    public String getYmtTriggerOrderRefundUrl() {
+        return ymtTriggerOrderRefundUrl;
+    }
+
+    public void setYmtTriggerOrderRefundUrl(String ymtTriggerOrderRefundUrl) {
+        this.ymtTriggerOrderRefundUrl = ymtTriggerOrderRefundUrl;
+    }
+
+    @DisconfFileItem(name = "ymt.triggerorderrefund.url.mock")
+    public String getYmtTriggerOrderRefundUrlMock() {
+        return ymtTriggerOrderRefundUrlMock;
+    }
+
+    public void setYmtTriggerOrderRefundUrlMock(String ymtTriggerOrderRefundUrlMock) {
+        this.ymtTriggerOrderRefundUrlMock = ymtTriggerOrderRefundUrlMock;
+    }
+
+    public String getWxRefundUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getWxRefundUrlMock();
+        } else {
+            return getWxRefundUrl();
+        }
+    }
+
+    @DisconfFileItem(name = "wx.reund.url")
+    public String getWxRefundUrl() {
+        return wxRefundUrl;
+    }
+
+    public void setWxRefundUrl(String wxRefundUrl) {
+        this.wxRefundUrl = wxRefundUrl;
+    }
+
+    @DisconfFileItem(name = "wx.reund.url.mock")
+    public String getWxRefundUrlMock() {
+        return wxRefundUrlMock;
+    }
+
+    public void setWxRefundUrlMock(String wxRefundUrlMock) {
+        this.wxRefundUrlMock = wxRefundUrlMock;
+    }
 
     public String getYmtRiskControlUrl(HashMap<String, String> header) {
         if (isMock(header)) {
