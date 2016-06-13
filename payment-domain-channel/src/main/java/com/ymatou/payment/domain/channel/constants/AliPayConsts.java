@@ -74,4 +74,7 @@ public final class AliPayConsts {
     public final static String REFUND_SYNC_STATU_T = "T"; // 支付宝退款同步应答：成功
     public final static String REFUND_SYNC_STATU_P = "P"; // 支付宝退款同步应答：处理中
     public final static String REFUND_SYNC_STATU_F = "F"; // 支付宝退款同步应答：失败
+
+    public final static String REFUND_QUERY_STATU_T = "T"; // 支付宝退款查询：成功
+    public final static String REFUND_QUERY_STATU_F = "F"; // 支付宝退款查询：失败
 }

@@ -82,6 +82,10 @@ public class QueryRefundResponse {
      * 退款信息
      */
     private List<RefundOrderData> refundOrderDataList;
+    /**
+     * 原始应答
+     */
+    private String originalResponse;
 
     public String getReturn_code() {
         return return_code;
@@ -218,4 +222,13 @@ public class QueryRefundResponse {
     public void setRefundOrderDataList(List<RefundOrderData> refundOrderDataList) {
         this.refundOrderDataList = refundOrderDataList;
     }
+
+    public String getOriginalResponse() {
+        return originalResponse;
+    }
+
+    public void setOriginalResponse(String originalResponse) {
+        this.originalResponse = originalResponse;
+    }
+
 }

@@ -5,9 +5,7 @@ package com.ymatou.payment.domain.refund.service;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +16,8 @@ import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.ApproveStatusEnum;
-import com.ymatou.payment.infrastructure.db.model.CompensateProcessInfoPo;
+import com.ymatou.payment.infrastructure.db.mapper.RefundRequestMapper;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
-import com.ymatou.payment.integration.service.ymatou.NotifyRefundService;
 
 /**
  * 
@@ -36,62 +33,32 @@ public class ApproveRefundServiceImpl implements ApproveRefundService {
     private RefundPository refundPository;
 
     @Autowired
-    private NotifyRefundService notifyRefundService;
+    private RefundRequestMapper refundRequestMapper;
 
     @Override
-    public List<String> approveRefund(List<String> paymentIds, String approveUser) {
+    public List<RefundRequestPo> approveRefund(List<String> refundNos, String approveUser) {
         List<RefundRequestPo> refundrequestPos = new ArrayList<>();
-        List<CompensateProcessInfoPo> compensateprocessinfos = new ArrayList<>();
-        List<String> requriedNotifyRefundPaymentIds = new ArrayList<>();
-        for (String paymentId : paymentIds) {
-            RefundRequestPo refundrequestPo = refundPository.getRefundRequestByPaymentId(paymentId);
+        for (String refundNo : refundNos) {
+            RefundRequestPo refundrequestPo = refundRequestMapper.selectByPrimaryKey(refundNo);
             if (refundrequestPo == null) {
                 throw new BizException(ErrorCode.NOT_EXIST_PAYMENTID, "refund request not exist.");
             }
             if (refundrequestPo.getApproveStatus() != ApproveStatusEnum.NOT_APPROVED.getCode()) {
-                logger.info("RefundRequest ApproveStaus expected 0, but {}. PaymentId: {}",
-                        refundrequestPo.getApproveStatus(), paymentId);
+                logger.info("RefundRequest ApproveStaus expected 0, but {}. RefundBatchNo: {}",
+                        refundrequestPo.getApproveStatus(), refundNo);
                 continue;
             }
-
-            requriedNotifyRefundPaymentIds.add(paymentId); // 需要通知退款的
 
             // 组装更新RefundRequest
             refundrequestPo.setApproveStatus(ApproveStatusEnum.APPROVED.getCode());
             refundrequestPo.setApprovedTime(new Date());
             refundrequestPo.setApprovedUser(approveUser);
             refundrequestPos.add(refundrequestPo);
-
-            // 组装新增PpCompensateprocessinfo
-            CompensateProcessInfoPo compensateprocessinfo = new CompensateProcessInfoPo();
-            compensateprocessinfo.setAppId("1");
-            compensateprocessinfo.setCorrelateId(paymentId);
-            compensateprocessinfo.setMethodName("Refund");
-            compensateprocessinfo.setRequestUrl("");
-            compensateprocessinfo.setRequestData(paymentId);
-            compensateprocessinfo.setCompensateType(1); // 退款
-            compensateprocessinfos.add(compensateprocessinfo);
         }
 
-        logger.info("update refundRequest status and save compensateprocessinfo.");
-        refundPository.updateRefundRequestAndSaveCompensateprocessinfo(refundrequestPos,
-                compensateprocessinfos);
+        logger.info("update refundRequest status.");
+        refundPository.updateRefundRequest(refundrequestPos);
 
-        return requriedNotifyRefundPaymentIds;
+        return refundrequestPos;
     }
-
-    @Override
-    public void notifyRefund(List<String> paymentIds, HashMap<String, String> header) {
-
-        try {
-            for (String paymentId : paymentIds) {
-                notifyRefundService.doService(paymentId, UUID.randomUUID().toString(), header);
-            }
-        } catch (Exception e) {
-            // 异步通知发货
-        }
-
-    }
-
-
 }

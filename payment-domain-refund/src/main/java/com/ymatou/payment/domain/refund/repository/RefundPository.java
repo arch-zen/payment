@@ -22,9 +22,12 @@ import com.ymatou.payment.facade.constants.ChannelTypeEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.infrastructure.db.mapper.CompensateProcessInfoMapper;
+import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
 import com.ymatou.payment.infrastructure.db.mapper.RefundMiscRequestLogMapper;
 import com.ymatou.payment.infrastructure.db.mapper.RefundRequestMapper;
 import com.ymatou.payment.infrastructure.db.model.CompensateProcessInfoPo;
+import com.ymatou.payment.infrastructure.db.model.PaymentExample;
+import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 import com.ymatou.payment.infrastructure.db.model.RefundMiscRequestLogWithBLOBs;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestExample;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
@@ -45,6 +48,9 @@ public class RefundPository {
 
     @Autowired
     private RefundMiscRequestLogMapper refundMiscRequestLogMapper;
+
+    @Autowired
+    private PaymentMapper paymentMapper;
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
@@ -126,13 +132,30 @@ public class RefundPository {
     }
 
     /**
-     * 根据paymentId获取Refundrequest
+     * 根据paymentId获取Refundrequest TODO
      * 
      * @param paymentId
      * @return
      */
     public RefundRequestPo getRefundRequestByPaymentId(String paymentId) {
         return refundRequestMapper.selectByPrimaryKey(paymentId);
+    }
+
+    /**
+     * 根据refundNo获取Refundrequest
+     * 
+     * @param paymentId
+     * @return
+     */
+    public RefundRequestPo getRefundRequestByRefundNo(String refundNo) {
+        RefundRequestExample example = new RefundRequestExample();
+        example.createCriteria().andRefundBatchNoEqualTo(refundNo);
+        List<RefundRequestPo> result = refundRequestMapper.selectByExample(example);
+        if (result != null && result.size() > 0) {
+            return result.get(0); // 非主键但有唯一约束
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -148,6 +171,7 @@ public class RefundPository {
     }
 
     /**
+     * TODO DELETE
      * 更新RequestRequest，保存Compensateprocessinfo
      * 
      * @param refundrequestPos
@@ -165,6 +189,22 @@ public class RefundPository {
             compensateProcessInfoMapper.insertSelective(info);
         }
     }
+
+    /**
+     * 更新RequestRequest
+     * 
+     * @param refundrequestPos
+     * @param compensateprocessinfoWithBLOBs
+     */
+    @Transactional
+    public void updateRefundRequest(List<RefundRequestPo> refundrequestPos) {
+        for (RefundRequestPo refundrequestPo : refundrequestPos) {
+            RefundRequestExample example = new RefundRequestExample();
+            example.createCriteria().andPaymentIdEqualTo(refundrequestPo.getPaymentId());
+            refundRequestMapper.updateByExample(refundrequestPo, example);
+        }
+    }
+
 
     /**
      * 查询退款单
@@ -210,5 +250,45 @@ public class RefundPository {
         for (RefundMiscRequestLogWithBLOBs refundmiscrequestlog : list) {
             refundMiscRequestLogMapper.insertSelective(refundmiscrequestlog);
         }
+    }
+
+    @Transactional
+    public void updateRefundRequestAccoutingStatus(String refundNo, int accoutingStatus) {
+        RefundRequestExample example = new RefundRequestExample();
+        example.createCriteria().andRefundBatchNoEqualTo(refundNo);
+        RefundRequestPo record = new RefundRequestPo();
+        record.setRefundBatchNo(refundNo);
+        record.setAccoutingStatus(accoutingStatus);
+        refundRequestMapper.updateByExample(record, example);
+    }
+
+    /**
+     * 更新退款状态，重试次数，退款申请金额， 完成金额
+     * 
+     * @param refundRequestPo
+     * @param paymentPo
+     */
+    @Transactional
+    public void updateRefundRequestAndPayment(RefundRequestPo refundRequestPo, PaymentPo paymentPo) {
+        RefundRequestExample example = new RefundRequestExample();
+        example.createCriteria().andRefundBatchNoEqualTo(refundRequestPo.getRefundBatchNo());
+        refundRequestMapper.updateByExample(refundRequestPo, example);
+
+        PaymentExample example2 = new PaymentExample();
+        example2.createCriteria().andPaymentIdEqualTo(paymentPo.getPaymentId());
+        paymentMapper.updateByExample(paymentPo, example2);
+    }
+
+    /**
+     * 更新退款状态
+     * 
+     * @param refundRequestPo
+     * @param paymentPo
+     */
+    @Transactional
+    public void updateRefundRequest(RefundRequestPo refundRequestPo) {
+        RefundRequestExample example = new RefundRequestExample();
+        example.createCriteria().andRefundBatchNoEqualTo(refundRequestPo.getRefundBatchNo());
+        refundRequestMapper.updateByExample(refundRequestPo, example);
     }
 }

@@ -6,7 +6,6 @@ import java.util.Date;
 import com.ymatou.payment.facade.PrintFriendliness;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
-import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 
@@ -21,7 +20,6 @@ public class Payment extends PrintFriendliness {
     private static final long serialVersionUID = 2524661669277166299L;
 
     private BussinessOrder bussinessOrder;
-    private AcquireOrderReq acquireOrderReq;
     private String paymentId;
     private String bussinessOrderId;
     private String institutionPaymentId;

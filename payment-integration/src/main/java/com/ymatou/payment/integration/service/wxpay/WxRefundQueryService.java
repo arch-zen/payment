@@ -34,9 +34,9 @@ import com.ymatou.payment.integration.common.HttpClientUtil;
 import com.ymatou.payment.integration.common.XmlParser;
 import com.ymatou.payment.integration.common.constants.Constants;
 import com.ymatou.payment.integration.model.CouponRefundData;
-import com.ymatou.payment.integration.model.RefundOrderData;
 import com.ymatou.payment.integration.model.QueryRefundRequest;
 import com.ymatou.payment.integration.model.QueryRefundResponse;
+import com.ymatou.payment.integration.model.RefundOrderData;
 
 /**
  * 微信支付退款查询
@@ -45,9 +45,9 @@ import com.ymatou.payment.integration.model.QueryRefundResponse;
  *
  */
 @Component
-public class RefundQueryService implements InitializingBean {
+public class WxRefundQueryService implements InitializingBean {
 
-    private static Logger logger = LoggerFactory.getLogger(RefundQueryService.class);
+    private static Logger logger = LoggerFactory.getLogger(WxRefundQueryService.class);
 
     private CloseableHttpClient httpClient;
 
@@ -72,6 +72,7 @@ public class RefundQueryService implements InitializingBean {
             if (!StringUtils.isEmpty(respXmlStr) && respXmlStr.startsWith(Constants.WEIXIN_RESPONSE_BODY_START)) {
                 Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);
                 QueryRefundResponse response = generateResponseData(respMap);
+                response.setOriginalResponse(respXmlStr);
                 return response;
             }
             return null;

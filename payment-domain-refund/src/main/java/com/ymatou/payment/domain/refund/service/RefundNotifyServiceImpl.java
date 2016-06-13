@@ -4,7 +4,6 @@
 package com.ymatou.payment.domain.refund.service;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -76,19 +75,22 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
             refundPository.batchSaveRefundmiscrequestlog(list); // 保存退款回调日志
 
             for (RefundMiscRequestLogWithBLOBs rmrl : list) {
-                try {
-                    // 异步通知退款
-                    logger.info("notify refund service begin.");
-                    notifyRefundService.doService(rmrl.getCorrelateId(), UUID.randomUUID().toString(), null);
-                } catch (Exception e) {
-                    // 不做处理
-                }
+
+                // TODO
+                // try {
+                // // 异步通知退款
+                // logger.info("notify refund service begin.");
+                // notifyRefundService.doService(rmrl.getCorrelateId(),
+                // UUID.randomUUID().toString(), null);
+                // } catch (Exception e) {
+                // // 不做处理
+                // }
             }
 
         }
     }
 
-    public List<RefundMiscRequestLogWithBLOBs> generateRefundmiscrequestlog(AliPayRefundNotifyRequest req,
+    private List<RefundMiscRequestLogWithBLOBs> generateRefundmiscrequestlog(AliPayRefundNotifyRequest req,
             List<RefundNotifyDetail> details, Map<String, String> signMap) {
         List<RefundMiscRequestLogWithBLOBs> refundmiscrequestlogWithBLOBs = new ArrayList<>();
 

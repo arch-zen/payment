@@ -3,8 +3,9 @@
  */
 package com.ymatou.payment.domain.refund.service;
 
-import java.util.HashMap;
 import java.util.List;
+
+import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 
 /**
  * 退款审核
@@ -19,13 +20,5 @@ public interface ApproveRefundService {
      * 
      * @param paymentIds
      */
-    public List<String> approveRefund(List<String> paymentIds, String approveUser);
-
-    /**
-     * 通知退款
-     * 
-     * @param paymentIds
-     * @param header
-     */
-    public void notifyRefund(List<String> paymentIds, HashMap<String, String> header);
+    public List<RefundRequestPo> approveRefund(List<String> paymentIds, String approveUser);
 }

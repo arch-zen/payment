@@ -14,18 +14,4 @@ import com.ymatou.payment.facade.BaseResponse;
 public class ApproveRefundResponse extends BaseResponse {
 
     private static final long serialVersionUID = -481912820519871846L;
-
-    /**
-     * 结果
-     */
-    private ApproveRefundDetail details;
-
-    public ApproveRefundDetail getDetails() {
-        return details;
-    }
-
-    public void setDetails(ApproveRefundDetail details) {
-        this.details = details;
-    }
-
 }

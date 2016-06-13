@@ -54,6 +54,7 @@ public class AliPayRefundQueryService implements InitializingBean {
         String url = integrationConfig.getAliPayBaseUrl(header);
         String result = HttpClientUtil.sendPost(url, generateRequest(request), header, httpClient);
         AliPayRefundQueryResponse response = generateResponse(result);
+        response.setOriginalResponse(result);
 
         logger.info("refund query response: {}", JSONObject.toJSONString(response));
         return response;
@@ -70,17 +71,6 @@ public class AliPayRefundQueryService implements InitializingBean {
         nvps.add(new BasicNameValuePair("sign", request.getSign()));
 
         return nvps;
-    }
-
-    public HashMap<String, String> getMapForSign(AliPayRefundQueryRequest request) {
-        HashMap<String, String> map = new HashMap<>();
-        map.put("service", request.getService());
-        map.put("partner", request.getPartner());
-        map.put("_input_charset", request.getInputCharset());
-        // 无SignType
-        map.put("batch_no", request.getBatchNo());
-        map.put("trade_no", request.getTradeNo());
-        return map;
     }
 
     public AliPayRefundQueryResponse generateResponse(String result) throws DocumentException {

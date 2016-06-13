@@ -58,7 +58,7 @@ import com.ymatou.payment.integration.model.WxRefundResponse;
 @Component
 public class WxRefundService {
 
-    private static Logger logger = LoggerFactory.getLogger(RefundQueryService.class);
+    private static Logger logger = LoggerFactory.getLogger(WxRefundQueryService.class);
 
     private CloseableHttpClient jsapiHttpClient;
     private CloseableHttpClient appHttpClient;

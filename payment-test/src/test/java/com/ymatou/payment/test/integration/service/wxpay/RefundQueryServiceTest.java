@@ -10,13 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.ymatou.payment.integration.common.Signature;
 import com.ymatou.payment.integration.model.QueryRefundRequest;
 import com.ymatou.payment.integration.model.QueryRefundResponse;
-import com.ymatou.payment.integration.service.wxpay.RefundQueryService;
+import com.ymatou.payment.integration.service.wxpay.WxRefundQueryService;
 import com.ymatou.payment.test.RestBaseTest;
 
 public class RefundQueryServiceTest extends RestBaseTest {
 
     @Autowired
-    private RefundQueryService refundQueryService;
+    private WxRefundQueryService refundQueryService;
 
     @Test
     public void testDoServiceSuccess() throws Exception {

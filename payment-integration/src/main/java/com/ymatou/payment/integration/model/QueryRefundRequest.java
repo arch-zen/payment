@@ -3,6 +3,11 @@
  */
 package com.ymatou.payment.integration.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * 微信支付退款查询请求model
  * 
@@ -119,4 +124,24 @@ public class QueryRefundRequest {
         this.refund_id = refund_id;
     }
 
+    public HashMap<String, String> mapForSign() {
+        HashMap<String, String> signMap = new HashMap<>();
+        signMap.put("appid", this.getAppid());
+        signMap.put("mch_id", this.getMch_id());
+        signMap.put("nonce_str", this.getNonce_str());
+        signMap.put("out_refund_no", this.getOut_refund_no());
+
+        return signMap;
+    }
+
+    public String getRequestData() {
+        HashMap<String, String> map = mapForSign();
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            sb.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+        }
+        sb.append("sign").append("=").append(this.getSign()).append("&");
+
+        return StringUtils.removeEnd(sb.toString(), "&");
+    }
 }

@@ -19,9 +19,9 @@ public class ApproveRefundRequest extends BaseRequest {
     private static final long serialVersionUID = 704177923514574213L;
 
     /**
-     * 支付订单号列表
+     * 退款单号
      */
-    private List<String> paymentIds;
+    private List<String> refundNos;
     /**
      * 审核人
      */
@@ -31,12 +31,12 @@ public class ApproveRefundRequest extends BaseRequest {
      */
     private HashMap<String, String> header;
 
-    public List<String> getPaymentIds() {
-        return paymentIds;
+    public List<String> getRefundNos() {
+        return refundNos;
     }
 
-    public void setPaymentIds(List<String> paymentIds) {
-        this.paymentIds = paymentIds;
+    public void setRefundNos(List<String> refundNos) {
+        this.refundNos = refundNos;
     }
 
     public String getApproveUser() {

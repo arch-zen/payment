@@ -3,6 +3,11 @@
  */
 package com.ymatou.payment.integration.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * 支付宝退款查询接口Request
  * 
@@ -87,5 +92,25 @@ public class AliPayRefundQueryRequest {
         this.tradeNo = tradeNo;
     }
 
+    public HashMap<String, String> mapForSign() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("service", this.getService());
+        map.put("partner", this.getPartner());
+        map.put("_input_charset", this.getInputCharset());
+        // 无SignType
+        map.put("batch_no", this.getBatchNo());
+        map.put("trade_no", this.getTradeNo());
+        return map;
+    }
 
+    public String getRequestData() {
+        HashMap<String, String> map = mapForSign();
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            sb.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+        }
+        sb.append("sign").append("=").append(this.getSign()).append("&");
+
+        return StringUtils.removeEnd(sb.toString(), "&");
+    }
 }

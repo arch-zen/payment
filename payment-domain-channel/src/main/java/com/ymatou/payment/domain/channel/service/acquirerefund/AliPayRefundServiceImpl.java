@@ -1,7 +1,7 @@
 /*
  * (C) Copyright 2016 Ymatou (http://www.ymatou.com/). All rights reserved.
  */
-package com.ymatou.payment.domain.channel.service.refund;
+package com.ymatou.payment.domain.channel.service.acquirerefund;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -15,14 +15,13 @@ import org.springframework.stereotype.Component;
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.constants.AliPayConsts;
-import com.ymatou.payment.domain.channel.service.RefundService;
+import com.ymatou.payment.domain.channel.service.AcquireRefundService;
 import com.ymatou.payment.domain.channel.service.SignatureService;
+import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
-import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
 import com.ymatou.payment.infrastructure.db.mapper.RefundMiscRequestLogMapper;
 import com.ymatou.payment.infrastructure.db.mapper.RefundRequestMapper;
-import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 import com.ymatou.payment.infrastructure.db.model.RefundMiscRequestLogWithBLOBs;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 import com.ymatou.payment.integration.model.AliPayRefundRequest;
@@ -36,7 +35,7 @@ import com.ymatou.payment.integration.service.alipay.AliPayRefundService;
  *
  */
 @Component
-public class AliPayRefundServiceImpl implements RefundService {
+public class AliPayRefundServiceImpl implements AcquireRefundService {
 
     private static final Logger logger = LoggerFactory.getLogger(AliPayRefundServiceImpl.class);
 
@@ -50,9 +49,6 @@ public class AliPayRefundServiceImpl implements RefundService {
     private RefundRequestMapper refundRequestMapper;
 
     @Autowired
-    private PaymentMapper paymentMapper;
-
-    @Autowired
     private SignatureService signatureService;
 
     @Autowired
@@ -62,13 +58,12 @@ public class AliPayRefundServiceImpl implements RefundService {
     private RefundMiscRequestLogMapper refundMiscRequestLogMapper;
 
     @Override
-    public void notifyRefund(String refundBatchNo, HashMap<String, String> header) {
+    public void notifyRefund(RefundRequestPo refundRequest, Payment payment, HashMap<String, String> header) {
+
         taskExecutor.execute(new Runnable() {
 
             @Override
             public void run() {
-                RefundRequestPo refundRequest = refundRequestMapper.selectByPrimaryKey(refundBatchNo); // TODO
-                PaymentPo payment = paymentMapper.selectByPrimaryKey(refundRequest.getPaymentId());
                 InstitutionConfig config = configManager.getConfig(PayTypeEnum.parse(refundRequest.getPayType()));
                 Date requestTime = new Date();
 
@@ -82,7 +77,7 @@ public class AliPayRefundServiceImpl implements RefundService {
                     requestLog.setMethod("AliRefund");
                     requestLog.setRequestData(aliPayRefundRequest.getRequestData());
                     requestLog.setResponseData(response.getOriginalResponse());
-                    requestLog.setRefundBatchNo(refundBatchNo);
+                    requestLog.setRefundBatchNo(refundRequest.getRefundBatchNo());
                     requestLog.setRequestTime(requestTime); // TODO
                     requestLog.setResponseTime(new Date()); // TODO
                     refundMiscRequestLogMapper.insertSelective(requestLog);
@@ -115,7 +110,7 @@ public class AliPayRefundServiceImpl implements RefundService {
                 || AliPayConsts.REFUND_SYNC_STATU_T.equals(response.getIsSuccess());
     }
 
-    private AliPayRefundRequest generateRequest(RefundRequestPo refundRequest, PaymentPo payment,
+    private AliPayRefundRequest generateRequest(RefundRequestPo refundRequest, Payment payment,
             InstitutionConfig config, HashMap<String, String> header) {
 
         AliPayRefundRequest request = new AliPayRefundRequest();

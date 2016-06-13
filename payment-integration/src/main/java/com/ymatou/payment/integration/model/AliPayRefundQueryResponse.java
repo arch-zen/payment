@@ -3,6 +3,8 @@
  */
 package com.ymatou.payment.integration.model;
 
+import java.math.BigDecimal;
+
 /**
  * 支付宝退款查询接口Response
  * 
@@ -34,6 +36,11 @@ public class AliPayRefundQueryResponse {
      * 签名
      */
     private String sign;
+
+    /**
+     * 原始应答
+     */
+    private String originalResponse;
 
     public String getIsSuccess() {
         return isSuccess;
@@ -81,5 +88,162 @@ public class AliPayRefundQueryResponse {
 
     public void setSign(String sign) {
         this.sign = sign;
+    }
+
+    public String getOriginalResponse() {
+        return originalResponse;
+    }
+
+    public void setOriginalResponse(String originalResponse) {
+        this.originalResponse = originalResponse;
+    }
+
+    public static class RefundDetailData {
+        private ChargeAliRefundStatusType chargeRefundStatus;
+        private Boolean isRefundOk;
+        private boolean isRefundStepOneOk;
+        private String instPaymentId;
+        private String batchNo;
+        private BigDecimal refundAmount;
+
+        public ChargeAliRefundStatusType getChargeRefundStatus() {
+            return chargeRefundStatus;
+        }
+
+        public void setChargeRefundStatus(ChargeAliRefundStatusType chargeRefundStatus) {
+            this.chargeRefundStatus = chargeRefundStatus;
+        }
+
+        public Boolean isRefundOk() {
+            return isRefundOk;
+        }
+
+        public void setRefundOk(Boolean isRefundOk) {
+            this.isRefundOk = isRefundOk;
+        }
+
+        public boolean isRefundStepOneOk() {
+            return isRefundStepOneOk;
+        }
+
+        public void setRefundStepOneOk(boolean isRefundStepOneOk) {
+            this.isRefundStepOneOk = isRefundStepOneOk;
+        }
+
+        public String getInstPaymentId() {
+            return instPaymentId;
+        }
+
+        public void setInstPaymentId(String instPaymentId) {
+            this.instPaymentId = instPaymentId;
+        }
+
+        public String getBatchNo() {
+            return batchNo;
+        }
+
+        public void setBatchNo(String batchNo) {
+            this.batchNo = batchNo;
+        }
+
+        public BigDecimal getRefundAmount() {
+            return refundAmount;
+        }
+
+        public void setRefundAmount(BigDecimal refundAmount) {
+            this.refundAmount = refundAmount;
+        }
+    }
+
+    public static enum ChargeAliRefundStatusType {
+        NA, PROCESSING, SUCCESS, FAILED,
+    }
+
+    public RefundDetailData resolveResultDetails() {
+        // 201012300001^2010123016346858^0.02^SUCCESS|zen_gwen@hotmail.com^2088102210397302^alipay-test03@alipay.com^2088101568345155^0.01^SUCCESS
+        String data = this.resultDetails;
+        RefundDetailData detail = null;
+        if (data == null) {
+            return null;
+        }
+        String[] tempData = data.split("|");
+        if (tempData == null || tempData.length == 0) {
+            throw new IllegalArgumentException(data + "is not valid");
+        }
+        String[] refundTempData = tempData[0].split("$");
+        if (refundTempData == null || refundTempData.length == 0) {
+            throw new IllegalArgumentException(data + "is not valid");
+        }
+        String[] refundDetailTempData = refundTempData[0].split("^");
+        if (refundDetailTempData == null || refundDetailTempData.length == 0) {
+            throw new IllegalArgumentException(data + "is not valid");
+        }
+
+        boolean isFirstStepOk = "SUCCESS".equalsIgnoreCase(refundDetailTempData[3]);
+        if (refundDetailTempData.length == 4) {
+            detail = new RefundDetailData();
+            detail.setBatchNo(refundDetailTempData[0]);
+            detail.setInstPaymentId(refundDetailTempData[1]);
+            detail.setRefundAmount(new BigDecimal(refundDetailTempData[2]));
+            detail.setRefundStepOneOk(isFirstStepOk);
+            detail.setChargeRefundStatus(ChargeAliRefundStatusType.NA);
+
+            detail.setRefundOk(detail.isRefundStepOneOk()); // 由于无法获取充退信息，所以只能断言退款成功
+        }
+
+        if (refundDetailTempData.length == 6) {
+            if (isFirstStepOk && "false".equalsIgnoreCase(refundDetailTempData[4])) {
+                detail = new RefundDetailData();
+                detail.setBatchNo(refundDetailTempData[0]);
+                detail.setInstPaymentId(refundDetailTempData[1]);
+                detail.setRefundAmount(new BigDecimal(refundDetailTempData[2]));
+                detail.setRefundStepOneOk(isFirstStepOk);
+                detail.setChargeRefundStatus(ChargeAliRefundStatusType.NA);
+                detail.setRefundOk(detail.isRefundStepOneOk());
+            } else {
+                String refundStatusString = refundDetailTempData[5];
+                ChargeAliRefundStatusType chargeAliRefundStatus;
+                switch (refundStatusString) {
+                    case "s":
+                        chargeAliRefundStatus = ChargeAliRefundStatusType.SUCCESS;
+                        break;
+                    case "f": // 充退结果为f的情况，支付宝会处理为退余额
+                        chargeAliRefundStatus = ChargeAliRefundStatusType.SUCCESS;
+                        break;
+                    case "p":
+                        chargeAliRefundStatus = ChargeAliRefundStatusType.PROCESSING;
+                        break;
+                    case "null":
+                    default:
+                        chargeAliRefundStatus = ChargeAliRefundStatusType.NA;
+                        break;
+                }
+
+                Boolean isRefundOk;
+                switch (chargeAliRefundStatus) {
+                    case PROCESSING:
+                        isRefundOk = null;
+                        break;
+                    case SUCCESS:
+                        isRefundOk = true;
+                        break;
+                    case NA:
+                    case FAILED:
+                    default:
+                        isRefundOk = false;
+                        break;
+                }
+
+                detail = new RefundDetailData();
+                detail.setBatchNo(refundDetailTempData[0]);
+                detail.setInstPaymentId(refundDetailTempData[1]);
+                detail.setRefundAmount(new BigDecimal(refundDetailTempData[2]));
+                detail.setRefundStepOneOk(isFirstStepOk);
+                detail.setChargeRefundStatus(chargeAliRefundStatus);
+                detail.setRefundOk(isRefundOk);
+            }
+
+        }
+        return detail;
     }
 }

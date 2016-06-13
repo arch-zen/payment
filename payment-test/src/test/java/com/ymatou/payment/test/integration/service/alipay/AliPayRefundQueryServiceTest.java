@@ -45,7 +45,7 @@ public class AliPayRefundQueryServiceTest extends RestBaseTest {
         request.setBatchNo("201605310000353946");
         request.setTradeNo("2016053121001004390240047883");
         InstitutionConfig instConfig = institutionConfigManager.getConfig(PayTypeEnum.AliPayApp);
-        HashMap<String, String> map = refundQueryService.getMapForSign(request);
+        HashMap<String, String> map = request.mapForSign();
         String sign = signatureService.signMessage(map, instConfig, null);
 
         request.setSign(sign);

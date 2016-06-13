@@ -1,7 +1,7 @@
 /*
  * (C) Copyright 2016 Ymatou (http://www.ymatou.com/). All rights reserved.
  */
-package com.ymatou.payment.domain.channel.service.refund;
+package com.ymatou.payment.domain.channel.service.acquirerefund;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -15,14 +15,14 @@ import org.springframework.stereotype.Component;
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.constants.WeixinPayConstants;
-import com.ymatou.payment.domain.channel.service.RefundService;
+import com.ymatou.payment.domain.channel.service.AcquireRefundService;
 import com.ymatou.payment.domain.channel.service.SignatureService;
+import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
-import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
+import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.infrastructure.db.mapper.RefundMiscRequestLogMapper;
 import com.ymatou.payment.infrastructure.db.mapper.RefundRequestMapper;
-import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 import com.ymatou.payment.infrastructure.db.model.RefundMiscRequestLogWithBLOBs;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 import com.ymatou.payment.integration.model.WxRefundRequest;
@@ -36,7 +36,7 @@ import com.ymatou.payment.integration.service.wxpay.WxRefundService;
  *
  */
 @Component
-public class WeixinRefundServiceImpl implements RefundService {
+public class WeixinRefundServiceImpl implements AcquireRefundService {
 
     public static final Logger logger = LoggerFactory.getLogger(WeixinRefundServiceImpl.class);
 
@@ -50,9 +50,6 @@ public class WeixinRefundServiceImpl implements RefundService {
     private RefundRequestMapper refundRequestMapper;
 
     @Autowired
-    private PaymentMapper paymentMapper;
-
-    @Autowired
     private SignatureService signatureService;
 
     @Autowired
@@ -62,14 +59,12 @@ public class WeixinRefundServiceImpl implements RefundService {
     private RefundMiscRequestLogMapper refundMiscRequestLogMapper;
 
     @Override
-    public void notifyRefund(String refundBatchNo, HashMap<String, String> header) {
+    public void notifyRefund(RefundRequestPo refundRequest, Payment payment, HashMap<String, String> header) {
         taskExecutor.execute(new Runnable() {
 
             @Override
             public void run() {
 
-                RefundRequestPo refundRequest = refundRequestMapper.selectByPrimaryKey(refundBatchNo); // TODO
-                PaymentPo payment = paymentMapper.selectByPrimaryKey(refundRequest.getPaymentId());
                 InstitutionConfig config = configManager.getConfig(PayTypeEnum.parse(refundRequest.getPayType()));
                 Date requestTime = new Date();
 
@@ -80,10 +75,10 @@ public class WeixinRefundServiceImpl implements RefundService {
                     // save RefundMiscRequestLog
                     RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
                     requestLog.setCorrelateId(refundRequest.getPaymentId());
-                    requestLog.setMethod("AliRefund");
+                    requestLog.setMethod("WeixinRefund");
                     requestLog.setRequestData(wxRefundRequest.getRequestData());
                     requestLog.setResponseData(response.getOriginalResponse());
-                    requestLog.setRefundBatchNo(refundBatchNo);
+                    requestLog.setRefundBatchNo(refundRequest.getRefundBatchNo());
                     requestLog.setRequestTime(requestTime); // TODO
                     requestLog.setResponseTime(new Date()); // TODO
                     refundMiscRequestLogMapper.insertSelective(requestLog);
@@ -121,7 +116,7 @@ public class WeixinRefundServiceImpl implements RefundService {
         }
     }
 
-    private WxRefundRequest generateRequest(RefundRequestPo refundRequest, PaymentPo payment,
+    private WxRefundRequest generateRequest(RefundRequestPo refundRequest, Payment payment,
             InstitutionConfig config, HashMap<String, String> header) {
 
         WxRefundRequest request = new WxRefundRequest();
@@ -132,8 +127,8 @@ public class WeixinRefundServiceImpl implements RefundService {
         request.setOut_trade_no(refundRequest.getPaymentId());
         // request.setTransaction_id("");
         request.setOut_refund_no(refundRequest.getRefundBatchNo());
-        request.setTotal_fee((int) (payment.getActualPayPrice().setScale(2).doubleValue() * 100)); // TODO
-        request.setRefund_fee((int) (refundRequest.getRefundAmount().setScale(2).doubleValue() * 100));
+        request.setTotal_fee((int) payment.getActualPayPrice().getCent());
+        request.setRefund_fee((int) new Money(refundRequest.getRefundAmount()).getCent());
         request.setRefund_fee_type("CNY");
         request.setOp_user_id(config.getMerchantId());
 
