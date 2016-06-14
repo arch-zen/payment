@@ -27,6 +27,8 @@ import com.ymatou.payment.facade.model.FastRefundRequest;
 import com.ymatou.payment.facade.model.FastRefundResponse;
 import com.ymatou.payment.facade.model.QueryRefundRequest;
 import com.ymatou.payment.facade.model.QueryRefundResponse;
+import com.ymatou.payment.facade.model.SysApproveRefundReq;
+import com.ymatou.payment.facade.model.SysApproveRefundResp;
 import com.ymatou.payment.facade.model.TradeRefundableRequest;
 import com.ymatou.payment.facade.model.TradeRefundableResponse;
 
@@ -113,5 +115,17 @@ public class RefundResourceImpl implements RefundResource {
         // TODO ADD HEADER
 
         return refundFacade.acquireRefund(req);
+    }
+
+    @POST
+    @Path("/{Refund:(?i:Refund)}/{SysApproveRefund:(?i:SysApproveRefund)}")
+    @Produces({"text/html; charset=UTF-8"})
+    @Override
+    public String sysApproveRefund(SysApproveRefundReq req, HttpServletRequest servletRequest) {
+        SysApproveRefundResp resp = refundFacade.sysApproveRefund(req);
+        if (resp.getIsSuccess() == true)
+            return "ok";
+        else
+            return resp.getErrorMessage();
     }
 }

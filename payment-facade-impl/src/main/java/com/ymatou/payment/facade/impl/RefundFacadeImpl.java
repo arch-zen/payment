@@ -3,10 +3,13 @@
  */
 package com.ymatou.payment.facade.impl;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,7 @@ import com.ymatou.payment.domain.refund.service.FastRefundService;
 import com.ymatou.payment.domain.refund.service.QueryRefundService;
 import com.ymatou.payment.domain.refund.service.RefundJobService;
 import com.ymatou.payment.domain.refund.service.SubmitRefundService;
+import com.ymatou.payment.domain.refund.service.SysApproveRefundService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.RefundFacade;
@@ -40,6 +44,8 @@ import com.ymatou.payment.facade.model.FastRefundResponse;
 import com.ymatou.payment.facade.model.QueryRefundDetail;
 import com.ymatou.payment.facade.model.QueryRefundRequest;
 import com.ymatou.payment.facade.model.QueryRefundResponse;
+import com.ymatou.payment.facade.model.SysApproveRefundReq;
+import com.ymatou.payment.facade.model.SysApproveRefundResp;
 import com.ymatou.payment.facade.model.TradeDetail;
 import com.ymatou.payment.facade.model.TradeRefundDetail;
 import com.ymatou.payment.facade.model.TradeRefundableRequest;
@@ -79,6 +85,9 @@ public class RefundFacadeImpl implements RefundFacade {
 
     @Autowired
     private RefundJobService refundJobService;
+
+    @Autowired
+    private SysApproveRefundService sysApproveRefundService;
 
     @Override
     public FastRefundResponse fastRefund(FastRefundRequest req) {
@@ -249,5 +258,24 @@ public class RefundFacadeImpl implements RefundFacade {
         response.setDetails(acquireRefundDetails);
 
         return response;
+    }
+
+    @Override
+    public SysApproveRefundResp sysApproveRefund(SysApproveRefundReq req) {
+        SysApproveRefundResp resp = new SysApproveRefundResp();
+        Date scheduleTime = null;
+        try {
+            scheduleTime = DateUtils.parseDate(req.getBizId(), "yyyy-MM-dd HH:mm:ss");
+        } catch (ParseException e) {
+            String errMsg = "system approve refund receive invalid schedule time: " + req.getBizId();
+            logger.error(errMsg, e);
+            throw new BizException(errMsg, e);
+        }
+
+        int approveNum = sysApproveRefundService.batchApproveRefundReq(scheduleTime);
+        logger.info("system approved refund req num: {}", approveNum);
+
+        resp.setSuccess(true);
+        return resp;
     }
 }

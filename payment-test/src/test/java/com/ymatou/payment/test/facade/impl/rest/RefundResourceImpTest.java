@@ -3,10 +3,12 @@
  */
 package com.ymatou.payment.test.facade.impl.rest;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +18,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 
+import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
 import com.ymatou.payment.facade.model.AcquireRefundResponse;
@@ -25,10 +28,17 @@ import com.ymatou.payment.facade.model.FastRefundRequest;
 import com.ymatou.payment.facade.model.FastRefundResponse;
 import com.ymatou.payment.facade.model.QueryRefundRequest;
 import com.ymatou.payment.facade.model.QueryRefundResponse;
+import com.ymatou.payment.facade.model.SysApproveRefundReq;
 import com.ymatou.payment.facade.model.TradeDetail;
 import com.ymatou.payment.facade.model.TradeRefundableRequest;
 import com.ymatou.payment.facade.model.TradeRefundableResponse;
 import com.ymatou.payment.facade.rest.RefundResource;
+import com.ymatou.payment.infrastructure.db.mapper.PaymentParamMapper;
+import com.ymatou.payment.infrastructure.db.mapper.RefundRequestMapper;
+import com.ymatou.payment.infrastructure.db.model.PaymentParamExample;
+import com.ymatou.payment.infrastructure.db.model.PaymentParamPo;
+import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
+import com.ymatou.payment.infrastructure.util.StringUtil;
 import com.ymatou.payment.test.RestBaseTest;
 
 /**
@@ -41,6 +51,15 @@ public class RefundResourceImpTest extends RestBaseTest {
 
     @Autowired
     private RefundResource refundResource;
+
+    @Autowired
+    private RefundRequestMapper refundRequestMapper;
+
+    @Autowired
+    private RefundPository refundPository;
+
+    @Autowired
+    private PaymentParamMapper paymentParamMapper;
 
     // @Test
     public void testFastRefundSuccess() {
@@ -147,6 +166,122 @@ public class RefundResourceImpTest extends RestBaseTest {
 
     }
 
+    @Test
+    public void testSysApproveRefund() {
+        RefundRequestPo refund1 = buildRefundRequest();
+        RefundRequestPo refund2 = buildRefundRequest();
+        RefundRequestPo refund3 = buildRefundRequest();
+
+        // 作废的退款申请不允许审核通过
+        refund3.setSoftDeleteFlag(true);
+
+        refundRequestMapper.insertSelective(refund1);
+        refundRequestMapper.insertSelective(refund2);
+        refundRequestMapper.insertSelective(refund3);
+
+
+        SysApproveRefundReq req = new SysApproveRefundReq();
+        Calendar approveTime = Calendar.getInstance();
+        approveTime.add(Calendar.HOUR, 1);
+        req.setBizId(StringUtil.getDateFormatString("yyyy-MM-dd HH:00:00", approveTime.getTime()));
+        String sysApproveRefund = refundResource.sysApproveRefund(req, null);
+
+        Assert.assertEquals("ok", sysApproveRefund);
+
+        RefundRequestPo refundResult1 = refundPository.getRefundRequestByPaymentId(refund1.getPaymentId());
+
+        Assert.assertEquals(1, refundResult1.getApproveStatus().intValue());
+        Assert.assertEquals("system", refundResult1.getApprovedUser());
+        Assert.assertNotNull(refundResult1.getApprovedTime());
+
+
+        RefundRequestPo refundResult2 = refundPository.getRefundRequestByPaymentId(refund2.getPaymentId());
+
+        Assert.assertEquals(1, refundResult2.getApproveStatus().intValue());
+        Assert.assertEquals("system", refundResult2.getApprovedUser());
+        Assert.assertNotNull(refundResult2.getApprovedTime());
+
+        RefundRequestPo refundResult3 = refundPository.getRefundRequestByPaymentId(refund3.getPaymentId());
+
+        Assert.assertEquals(0, refundResult3.getApproveStatus().intValue());
+        Assert.assertNull(refundResult3.getApprovedUser());
+        Assert.assertNull(refundResult3.getApprovedTime());
+    }
+
+
+    @Test
+    public void testSysApproveRefund1() {
+        RefundRequestPo refund1 = buildRefundRequest();
+
+        refundRequestMapper.insertSelective(refund1);
+
+        // 不在时间范围的申请不审批
+        SysApproveRefundReq req = new SysApproveRefundReq();
+        Calendar approveTime = Calendar.getInstance();
+        approveTime.add(Calendar.HOUR, 2);
+        req.setBizId(StringUtil.getDateFormatString("yyyy-MM-dd HH:00:00", approveTime.getTime()));
+        String sysApproveRefund = refundResource.sysApproveRefund(req, null);
+
+        Assert.assertEquals("ok", sysApproveRefund);
+
+        RefundRequestPo refundResult1 = refundPository.getRefundRequestByPaymentId(refund1.getPaymentId());
+
+        Assert.assertEquals(0, refundResult1.getApproveStatus().intValue());
+        Assert.assertNull(refundResult1.getApprovedUser());
+        Assert.assertNull(refundResult1.getApprovedTime());
+
+        // 时间范围的申请审批通过
+        approveTime = Calendar.getInstance();
+        approveTime.add(Calendar.HOUR, 1);
+        req.setBizId(StringUtil.getDateFormatString("yyyy-MM-dd HH:00:00", approveTime.getTime()));
+        sysApproveRefund = refundResource.sysApproveRefund(req, null);
+        Assert.assertEquals("ok", sysApproveRefund);
+
+        refundResult1 = refundPository.getRefundRequestByPaymentId(refund1.getPaymentId());
+        Assert.assertEquals(1, refundResult1.getApproveStatus().intValue());
+        Assert.assertEquals("system", refundResult1.getApprovedUser());
+        Assert.assertNotNull(refundResult1.getApprovedTime());
+    }
+
+    @Test
+    public void testSysApproveRefund2() {
+        RefundRequestPo refund1 = buildRefundRequest();
+        RefundRequestPo refund2 = buildRefundRequest();
+        RefundRequestPo refund3 = buildRefundRequest();
+
+        refundRequestMapper.insertSelective(refund1);
+        refundRequestMapper.insertSelective(refund2);
+        refundRequestMapper.insertSelective(refund3);
+
+        SysApproveRefundReq req = new SysApproveRefundReq();
+        Calendar approveTime = Calendar.getInstance();
+        approveTime.add(Calendar.HOUR, 1);
+        req.setBizId(StringUtil.getDateFormatString("yyyy-MM-dd HH:00:00", approveTime.getTime()));
+
+        // 设置风控值
+        setRefundMaxNum(Calendar.getInstance().get(Calendar.HOUR_OF_DAY), 2);
+        String sysApproveRefund = refundResource.sysApproveRefund(req, null);
+
+        Assert.assertNotEquals("ok", sysApproveRefund);
+
+        RefundRequestPo refundResult1 = refundPository.getRefundRequestByPaymentId(refund1.getPaymentId());
+        Assert.assertEquals(0, refundResult1.getApproveStatus().intValue());
+        Assert.assertNull(refundResult1.getApprovedUser());
+        Assert.assertNull(refundResult1.getApprovedTime());
+
+
+        // 设置风控值
+        setRefundMaxNum(Calendar.getInstance().get(Calendar.HOUR_OF_DAY), 200);
+        sysApproveRefund = refundResource.sysApproveRefund(req, null);
+
+        refundResult1 = refundPository.getRefundRequestByPaymentId(refund1.getPaymentId());
+        Assert.assertEquals(1, refundResult1.getApproveStatus().intValue());
+        Assert.assertEquals("system", refundResult1.getApprovedUser());
+        Assert.assertNotNull(refundResult1.getApprovedTime());
+    }
+
+
+
     /**
      * 构造请求报文
      * 
@@ -186,5 +321,44 @@ public class RefundResourceImpTest extends RestBaseTest {
         DateFormat dateFormat = new SimpleDateFormat(format);
 
         return dateFormat.format(new Date());
+    }
+
+
+    /**
+     * 构建退款请求
+     * 
+     * @return
+     */
+    private RefundRequestPo buildRefundRequest() {
+        RefundRequestPo refund = new RefundRequestPo();
+        refund.setPaymentId(UUID.randomUUID().toString().replace("-", ""));
+        refund.setTradeNo(StringUtil.getDateFormatString());
+        refund.setOrderId(StringUtil.getDateFormatString());
+        refund.setTraceId(UUID.randomUUID().toString().replace("-", ""));
+        refund.setAppId("unitTest");
+        refund.setPayType("13");
+        refund.setRefundAmount(BigDecimal.valueOf(1.01));
+        refund.setCurrencyType("CNY");
+        refund.setAccoutingStatus(0);
+        refund.setTradeType(1);
+
+        return refund;
+    }
+
+    /**
+     * 设置自动退款最大值
+     * 
+     * @param hour
+     * @param maxNum
+     */
+    private void setRefundMaxNum(int hour, int maxNum) {
+        PaymentParamExample paymentParamExample = new PaymentParamExample();
+        paymentParamExample.createCriteria().andParamCatEqualTo("RefundApproveRisk")
+                .andParamKeyEqualTo(String.valueOf(hour));
+
+        PaymentParamPo paymentParamPo = new PaymentParamPo();
+        paymentParamPo.setParamIntValue(maxNum);
+
+        paymentParamMapper.updateByExampleSelective(paymentParamPo, paymentParamExample);
     }
 }
