@@ -48,6 +48,7 @@ public class IntegrationConfig {
     private String wxRefundQueryUrlMock; // 微信退款查询url(mock)
     private String wxRefundUrlMock; // 微信退款申请url(mock)
     private String wxOrderQueryUrlMock; // 微信查询订单url(mock)
+    private String ymtPaymentBaseUrlMock; // ymt.payment.baseurl.mock
     private String ymtUserServiceUrlMock; // 用户服务url(mock)
     private String ymtNotifyRefundUrlMock; // 通知退款url(mock)
     private String ymtNotifyPaymentUrlMock; // 通知支付url(mock)
@@ -466,18 +467,29 @@ public class IntegrationConfig {
                 && "true".equals(getOpenMock());
     }
 
-    /**
-     * @return the ymtPaymentBaseUrl
-     */
     @DisconfFileItem(name = "ymt.payment.baseurl")
     public String getYmtPaymentBaseUrl() {
         return ymtPaymentBaseUrl;
     }
 
-    /**
-     * @param ymtPaymentBaseUrl the ymtPaymentBaseUrl to set
-     */
     public void setYmtPaymentBaseUrl(String ymtPaymentBaseUrl) {
         this.ymtPaymentBaseUrl = ymtPaymentBaseUrl;
+    }
+
+    @DisconfFileItem(name = "ymt.payment.baseurl.mock")
+    public String getYmtPaymentBaseUrlMock() {
+        return ymtPaymentBaseUrlMock;
+    }
+
+    public void setYmtPaymentBaseUrlMock(String ymtPaymentBaseUrlMock) {
+        this.ymtPaymentBaseUrlMock = ymtPaymentBaseUrlMock;
+    }
+
+    public String getYmtPaymentBaseUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getYmtPaymentBaseUrlMock();
+        } else {
+            return getYmtPaymentBaseUrl();
+        }
     }
 }

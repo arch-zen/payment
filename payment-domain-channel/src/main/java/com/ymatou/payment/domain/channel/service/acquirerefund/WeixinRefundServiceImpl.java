@@ -24,6 +24,7 @@ import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.infrastructure.db.mapper.RefundMiscRequestLogMapper;
 import com.ymatou.payment.infrastructure.db.mapper.RefundRequestMapper;
 import com.ymatou.payment.infrastructure.db.model.RefundMiscRequestLogWithBLOBs;
+import com.ymatou.payment.infrastructure.db.model.RefundRequestExample;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 import com.ymatou.payment.integration.model.WxRefundRequest;
 import com.ymatou.payment.integration.model.WxRefundResponse;
@@ -79,15 +80,14 @@ public class WeixinRefundServiceImpl implements AcquireRefundService {
                     requestLog.setRequestData(wxRefundRequest.getRequestData());
                     requestLog.setResponseData(response.getOriginalResponse());
                     requestLog.setRefundBatchNo(refundRequest.getRefundBatchNo());
-                    requestLog.setRequestTime(requestTime); // TODO
-                    requestLog.setResponseTime(new Date()); // TODO
+                    requestLog.setRequestTime(requestTime);
+                    requestLog.setResponseTime(new Date());
                     refundMiscRequestLogMapper.insertSelective(requestLog);
 
                     // update RefundRequest
                     RefundStatusEnum refundStatus =
                             isSuccess(response, config) ? RefundStatusEnum.COMMIT : RefundStatusEnum.REFUND_FAILED;
-                    refundRequest.setRefundStatus(refundStatus.getCode());
-                    refundRequestMapper.updateByPrimaryKeySelective(refundRequest);
+                    updateRefundRequestStatus(refundRequest, refundStatus);
 
                 } catch (Exception e) {
                     logger.error("call WeiXin Refund fail", e);
@@ -97,10 +97,11 @@ public class WeixinRefundServiceImpl implements AcquireRefundService {
                     requestLog.setMethod("WeiXinRefund");
                     requestLog.setRequestData(wxRefundRequest.getRequestData());
                     requestLog.setExceptionDetail(e.toString());
-                    requestLog.setRequestTime(requestTime); // TODO
-                    requestLog.setResponseTime(new Date()); // TODO
+                    requestLog.setRequestTime(requestTime);
+                    requestLog.setResponseTime(new Date());
                     refundMiscRequestLogMapper.insertSelective(requestLog);
-                    // update refundRequest status? //TODO
+
+                    updateRefundRequestStatus(refundRequest, RefundStatusEnum.REFUND_FAILED);
                 }
             }
         });
@@ -136,6 +137,14 @@ public class WeixinRefundServiceImpl implements AcquireRefundService {
         request.setSign(sign);
 
         return request;
+    }
+
+    private void updateRefundRequestStatus(RefundRequestPo refundRequest, RefundStatusEnum refundStatus) {
+        refundRequest.setRefundStatus(RefundStatusEnum.REFUND_FAILED.getCode());
+        RefundRequestExample example = new RefundRequestExample();
+        example.createCriteria().andRefundBatchNoEqualTo(refundRequest.getRefundBatchNo());
+
+        refundRequestMapper.updateByExampleWithBLOBs(refundRequest, example);
     }
 
 }

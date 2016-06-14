@@ -138,7 +138,6 @@ public class WeiXinRefundQueryServiceImpl implements RefundQueryService {
         if (response != null) {
             requestLog.setResponseData(response.getOriginalResponse());
         }
-        // OriginResult TODO
         refundMiscRequestLogMapper.insertSelective(requestLog);
     }
 

@@ -121,6 +121,9 @@ public class RefundJobServiceImpl implements RefundJobService {
                 || RefundConstants.ACCOUNTING_IDEMPOTENTE.equals(response.getStatusCode());
     }
 
+    /*
+     * 保存账务操作记录， 更新RefundRequest的AccoutingStatus
+     */
     private void saveAccoutingLog(Payment payment, BussinessOrder bussinessOrder, RefundRequestPo refundRequest,
             AccountingResponse response) {
         AccountingLogPo log = new AccountingLogPo();
@@ -148,8 +151,8 @@ public class RefundJobServiceImpl implements RefundJobService {
         item.setAccountOperateType(AccountOperateTypeEnum.Fundout.code());
         item.setAccountType(AccountTypeEnum.RmbAccount.code());
         item.setAccountingDate(new Date());
-        item.setBizCode("300017"); // TODO
-        item.setBizNo(refundRequest.getRefundBatchNo()); // TODO
+        item.setBizCode("300017"); // 快速退款
+        item.setBizNo(refundRequest.getRefundBatchNo());
         item.setOriginalNo(payment.getInstitutionPaymentId());
         item.setMemo("快速退款");
         itemList.add(item);

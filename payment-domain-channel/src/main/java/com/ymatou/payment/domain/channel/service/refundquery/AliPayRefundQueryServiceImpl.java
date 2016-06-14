@@ -83,7 +83,7 @@ public class AliPayRefundQueryServiceImpl implements RefundQueryService {
             if (resultDetailData == null) { // 无退款明细
                 refundStatus = RefundStatusEnum.COMPLETE_FAILED;
             } else if (resultDetailData.isRefundOk() != null) {
-                if (!payment.getInstitutionPaymentId().equalsIgnoreCase(resultDetailData.getInstPaymentId())) { // TODO
+                if (!refundRequest.getInstPaymentId().equalsIgnoreCase(resultDetailData.getInstPaymentId())) {
                     refundStatus = RefundStatusEnum.COMPLETE_FAILED;
                 } else if (resultDetailData.isRefundOk()) {
                     if (resultDetailData.getRefundAmount().equals(refundRequest.getRefundAmount())) {
@@ -134,7 +134,6 @@ public class AliPayRefundQueryServiceImpl implements RefundQueryService {
         if (response != null) {
             requestLog.setResponseData(response.getOriginalResponse());
         }
-        // OriginResult TODO
         refundMiscRequestLogMapper.insertSelective(requestLog);
     }
 

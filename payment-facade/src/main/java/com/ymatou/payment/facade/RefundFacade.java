@@ -3,6 +3,8 @@
  */
 package com.ymatou.payment.facade;
 
+import java.util.HashMap;
+
 import com.ymatou.payment.facade.model.AcquireRefundPlusRequest;
 import com.ymatou.payment.facade.model.AcquireRefundPlusResponse;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
@@ -68,7 +70,8 @@ public interface RefundFacade {
      * 退款收单(支持部分退款)
      * 
      * @param req
+     * @param header
      * @return
      */
-    AcquireRefundPlusResponse acquireRefund(AcquireRefundPlusRequest req);
+    AcquireRefundPlusResponse acquireRefund(AcquireRefundPlusRequest req, HashMap<String, String> header);
 }

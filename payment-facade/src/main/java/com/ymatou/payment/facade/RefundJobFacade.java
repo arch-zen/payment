@@ -17,5 +17,5 @@ public interface RefundJobFacade {
      * 
      * @param refundNo
      */
-    public void excuteRefund(String refundNo, HashMap<String, String> header);
+    public int excuteRefund(String refundNo, HashMap<String, String> header);
 }

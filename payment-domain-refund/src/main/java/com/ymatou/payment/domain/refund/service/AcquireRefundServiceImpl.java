@@ -63,7 +63,6 @@ public class AcquireRefundServiceImpl implements AcquireRefundService {
         for (TradeDetail tradeDetail : tradeDetails) {
             String tradeNo = tradeDetail.getTradeNo();
             BigDecimal refundAmt = tradeDetail.getRefundAmt();
-            int tradeType = tradeDetail.getTradeType();
 
             // 根据tradeNo获取已支付，退款有效期内的BussinessOrder
             BussinessOrder bussinessOrder = bussinessOrderRepository.getBussinessOrderCanRefund(
@@ -71,13 +70,13 @@ public class AcquireRefundServiceImpl implements AcquireRefundService {
 
             if (bussinessOrder != null) {
 
-                // 根据bussinessorderid找到支付单Payment
+                // 根据BusinessOrderId找到支付单Payment
                 Payment payment = paymentRepository.getPaymentCanRefund(bussinessOrder.getBussinessOrderId(),
                         OrderStatusEnum.Paied.getIndex());
                 BigDecimal paymentRefundAmt =
                         payment.getRefundAmt() == null ? new BigDecimal(0.00) : payment.getRefundAmt();
 
-                if (payment.getActualPayPrice().compareTo(refundAmt.add(paymentRefundAmt)) > 0) { // TODO
+                if (payment.getActualPayPrice().compareTo(refundAmt.add(paymentRefundAmt)) > 0) {
                     // 组装可退款交易信息
                     TradeRefundDetail tradeRefundDetail = new TradeRefundDetail();
                     tradeRefundDetail.setCurrencyType(payment.getPayCurrencyType());
@@ -97,7 +96,7 @@ public class AcquireRefundServiceImpl implements AcquireRefundService {
                     TradeRefundDetail tradeRefundDetail = new TradeRefundDetail();
                     tradeRefundDetail.setTradeNo(tradeNo);
                     tradeRefundDetail
-                            .setRefundableAmt(payment.getActualPayPrice().getAmount().subtract(paymentRefundAmt)); // TODO
+                            .setRefundableAmt(payment.getActualPayPrice().getAmount().subtract(paymentRefundAmt));
 
                     tradeRefundDetails.add(tradeRefundDetail);
                 }

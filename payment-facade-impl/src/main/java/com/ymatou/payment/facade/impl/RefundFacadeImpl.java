@@ -4,6 +4,7 @@
 package com.ymatou.payment.facade.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -181,7 +182,7 @@ public class RefundFacadeImpl implements RefundFacade {
         List<RefundRequestPo> refunds = approveRefundService.approveRefund(req.getRefundNos(), req.getApproveUser());
 
         // 提交第三方退款
-        for (RefundRequestPo refundRequest : refunds) { // TODO 异步
+        for (RefundRequestPo refundRequest : refunds) {
             Payment payment = payService.getPaymentByPaymentId(refundRequest.getPaymentId());
             refundJobService.submitRefund(refundRequest, payment, req.getHeader());
         }
@@ -215,7 +216,7 @@ public class RefundFacadeImpl implements RefundFacade {
     }
 
     @Override
-    public AcquireRefundPlusResponse acquireRefund(AcquireRefundPlusRequest req) {
+    public AcquireRefundPlusResponse acquireRefund(AcquireRefundPlusRequest req, HashMap<String, String> header) {
         if (StringUtils.isEmpty(req.getOrderId())) {
             throw new BizException(ErrorCode.INVALID_ORDER_ID, "order id is empty.");
         }

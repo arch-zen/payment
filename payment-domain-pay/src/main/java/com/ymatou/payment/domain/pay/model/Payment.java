@@ -211,8 +211,8 @@ public class Payment extends PrintFriendliness {
         model.setPayStatus(PayStatusEnum.parse(po.getPayStatus()));
         model.setPayTime(po.getPayTime());
         model.setCheckStatus(po.getCheckStatus());
-        model.setRefundAmt(new BigDecimal("0.00")); // TODO
-        model.setCompletedRefundAmt(new BigDecimal("0.00"));// TODO
+        model.setRefundAmt(po.getRefundAmt());
+        model.setCompletedRefundAmt(po.getCompletedRefundAmt());
 
         return model;
     }

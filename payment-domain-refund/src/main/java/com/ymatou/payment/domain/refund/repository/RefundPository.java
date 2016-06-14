@@ -152,7 +152,7 @@ public class RefundPository {
         example.createCriteria().andRefundBatchNoEqualTo(refundNo);
         List<RefundRequestPo> result = refundRequestMapper.selectByExample(example);
         if (result != null && result.size() > 0) {
-            return result.get(0); // 非主键但有唯一约束
+            return result.get(0); // 有唯一约束
         } else {
             return null;
         }
@@ -171,7 +171,7 @@ public class RefundPository {
     }
 
     /**
-     * TODO DELETE
+     * 
      * 更新RequestRequest，保存Compensateprocessinfo
      * 
      * @param refundrequestPos

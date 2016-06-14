@@ -23,7 +23,9 @@ import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.infrastructure.db.mapper.RefundMiscRequestLogMapper;
 import com.ymatou.payment.infrastructure.db.mapper.RefundRequestMapper;
 import com.ymatou.payment.infrastructure.db.model.RefundMiscRequestLogWithBLOBs;
+import com.ymatou.payment.infrastructure.db.model.RefundRequestExample;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
+import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.model.AliPayRefundRequest;
 import com.ymatou.payment.integration.model.AliPayRefundResponse;
 import com.ymatou.payment.integration.service.alipay.AliPayRefundService;
@@ -57,6 +59,9 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
     @Autowired
     private RefundMiscRequestLogMapper refundMiscRequestLogMapper;
 
+    @Autowired
+    private IntegrationConfig integrationConfig;
+
     @Override
     public void notifyRefund(RefundRequestPo refundRequest, Payment payment, HashMap<String, String> header) {
 
@@ -69,6 +74,7 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
 
                 AliPayRefundRequest aliPayRefundRequest = generateRequest(refundRequest, payment, config, null);
                 try {
+                    // submit third party refund
                     AliPayRefundResponse response = aliPayRefundService.doService(aliPayRefundRequest, header);
 
                     // save RefundMiscRequestLog
@@ -78,15 +84,14 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
                     requestLog.setRequestData(aliPayRefundRequest.getRequestData());
                     requestLog.setResponseData(response.getOriginalResponse());
                     requestLog.setRefundBatchNo(refundRequest.getRefundBatchNo());
-                    requestLog.setRequestTime(requestTime); // TODO
-                    requestLog.setResponseTime(new Date()); // TODO
+                    requestLog.setRequestTime(requestTime);
+                    requestLog.setResponseTime(new Date());
                     refundMiscRequestLogMapper.insertSelective(requestLog);
 
                     // update RefundRequest
                     RefundStatusEnum refundStatus =
                             isSuccess(response) ? RefundStatusEnum.COMMIT : RefundStatusEnum.REFUND_FAILED;
-                    refundRequest.setRefundStatus(refundStatus.getCode());
-                    refundRequestMapper.updateByPrimaryKeySelective(refundRequest);
+                    updateRefundRequestStatus(refundRequest, refundStatus);
 
                 } catch (Exception e) {
                     logger.error("call AliPay Refund fail", e);
@@ -96,10 +101,11 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
                     requestLog.setMethod("AliRefund");
                     requestLog.setRequestData(aliPayRefundRequest.getRequestData());
                     requestLog.setExceptionDetail(e.toString());
-                    requestLog.setRequestTime(requestTime); // TODO
-                    requestLog.setResponseTime(new Date()); // TODO
+                    requestLog.setRequestTime(requestTime);
+                    requestLog.setResponseTime(new Date());
                     refundMiscRequestLogMapper.insertSelective(requestLog);
-                    // update refundRequest status? //TODO
+
+                    updateRefundRequestStatus(refundRequest, RefundStatusEnum.REFUND_FAILED);
                 }
             }
         });
@@ -112,12 +118,13 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
 
     private AliPayRefundRequest generateRequest(RefundRequestPo refundRequest, Payment payment,
             InstitutionConfig config, HashMap<String, String> header) {
-
+        String url = new StringBuilder().append(integrationConfig.getYmtPaymentBaseUrl(header))
+                .append("/RefundNotify/").append(payment.getPayType()).toString();
         AliPayRefundRequest request = new AliPayRefundRequest();
         request.setPartner(config.getMerchantId());
-        request.setNotifyUrl(""); // TODO
+        request.setNotifyUrl(url);
         request.setSignType(config.getSignType());
-        request.setDbackNotifyUrl("http://ymatou.com"); // TODO
+        request.setDbackNotifyUrl(url);
         request.setBatchNo(refundRequest.getRefundBatchNo());
         request.setRefundDate(new Date());
         request.setBatchNum("1");
@@ -130,6 +137,14 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
         request.setSign(sign);
 
         return request;
+    }
+
+    private void updateRefundRequestStatus(RefundRequestPo refundRequest, RefundStatusEnum refundStatus) {
+        refundRequest.setRefundStatus(RefundStatusEnum.REFUND_FAILED.getCode());
+        RefundRequestExample example = new RefundRequestExample();
+        example.createCriteria().andRefundBatchNoEqualTo(refundRequest.getRefundBatchNo());
+
+        refundRequestMapper.updateByExampleWithBLOBs(refundRequest, example);
     }
 
 }

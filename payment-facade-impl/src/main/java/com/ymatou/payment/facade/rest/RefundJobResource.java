@@ -20,5 +20,5 @@ public interface RefundJobResource {
      * @param refundNo
      * @param servletRequest
      */
-    public void excuteRefund(String refundNo, @Context HttpServletRequest servletRequest);
+    public String excuteRefund(String refundNo, @Context HttpServletRequest servletRequest);
 }

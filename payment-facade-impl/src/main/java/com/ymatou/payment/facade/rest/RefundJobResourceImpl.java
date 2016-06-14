@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.facade.RefundJobFacade;
+import com.ymatou.payment.facade.constants.RefundStatusEnum;
 
 /**
  * 
@@ -35,10 +36,16 @@ public class RefundJobResourceImpl implements RefundJobResource {
     @POST
     @Path("/excuteRefund")
     @Override
-    public void excuteRefund(String refundNo, @Context HttpServletRequest servletRequest) {
+    public String excuteRefund(String refundNo, @Context HttpServletRequest servletRequest) {
         HashMap<String, String> header = generateHttpHeader(servletRequest);
 
-        refundJobFacade.excuteRefund(refundNo, header);
+        int flag = refundJobFacade.excuteRefund(refundNo, header);
+
+        if (flag == RefundStatusEnum.COMPLETE_SUCCESS.getCode()) {
+            return "ok";
+        } else {
+            return String.valueOf(flag);
+        }
     }
 
     /**

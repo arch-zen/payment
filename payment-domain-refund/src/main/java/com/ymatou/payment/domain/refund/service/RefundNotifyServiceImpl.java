@@ -22,6 +22,8 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSON;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.service.SignatureService;
+import com.ymatou.payment.domain.pay.model.Payment;
+import com.ymatou.payment.domain.pay.service.PayService;
 import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
@@ -29,7 +31,6 @@ import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.facade.model.AliPayRefundNotifyRequest;
 import com.ymatou.payment.infrastructure.db.model.RefundMiscRequestLogWithBLOBs;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
-import com.ymatou.payment.integration.service.ymatou.NotifyRefundService;
 
 /**
  * 
@@ -51,7 +52,10 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
     private RefundPository refundPository;
 
     @Autowired
-    private NotifyRefundService notifyRefundService;
+    private RefundJobService refundJobService;
+
+    @Autowired
+    private PayService payService;
 
     @Override
     public void processRefundCallback(AliPayRefundNotifyRequest req) {
@@ -75,16 +79,21 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
             refundPository.batchSaveRefundmiscrequestlog(list); // 保存退款回调日志
 
             for (RefundMiscRequestLogWithBLOBs rmrl : list) {
+                // 重新查询退款结果
+                String refundBatchNo = rmrl.getRefundBatchNo();
+                RefundRequestPo refundRequest = refundJobService.getRefundRequestById(refundBatchNo);
+                Payment payment = payService.getPaymentByPaymentId(refundRequest.getPaymentId());
 
-                // TODO
-                // try {
-                // // 异步通知退款
-                // logger.info("notify refund service begin.");
-                // notifyRefundService.doService(rmrl.getCorrelateId(),
-                // UUID.randomUUID().toString(), null);
-                // } catch (Exception e) {
-                // // 不做处理
-                // }
+                RefundStatusEnum refundStatus =
+                        refundJobService.queryRefund(refundRequest, payment, req.getMockHeader());
+                refundJobService.updateRefundRequestAndPayment(refundRequest, payment, refundStatus);
+                if (RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) {
+                    boolean isSuccess =
+                            refundJobService.callbackTradingSystem(refundRequest, payment, req.getMockHeader());
+                    if (isSuccess) {
+                        refundJobService.updateRefundRequestToCompletedSuccess(refundRequest);
+                    }
+                }
             }
 
         }
@@ -95,40 +104,39 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
         List<RefundMiscRequestLogWithBLOBs> refundmiscrequestlogWithBLOBs = new ArrayList<>();
 
         // 根据refundBatchNo获取RefundRequest
-        List<RefundRequestPo> refundrequestPos = refundPository.queryRefundRequestByRefundBatchNo(req.getBatchNo());
+        RefundRequestPo refundrequest = refundPository.getRefundRequestByRefundNo(req.getBatchNo());
 
-        for (RefundRequestPo po : refundrequestPos) {
-            if (po.getRefundStatus() == RefundStatusEnum.COMPLETE_SUCCESS.getCode()
-                    || po.getRefundStatus() == RefundStatusEnum.RETURN_TRANSACTION.getCode()) { // 已退款成功的，忽略
-                logger.info("The refundRequest is success. PaymentId[{}]", po.getPaymentId());
-                continue;
-            }
+        if (refundrequest.getRefundStatus() == RefundStatusEnum.COMPLETE_SUCCESS.getCode()
+                || refundrequest.getRefundStatus() == RefundStatusEnum.RETURN_TRANSACTION.getCode()) { // 已退款成功的，忽略
+            logger.info("The refundRequest is success. RefundBatchNo[{}]", refundrequest.getRefundBatchNo());
+            return refundmiscrequestlogWithBLOBs;
+        }
 
-            for (RefundNotifyDetail detail : details) {
-                // 第三方退款成功的， 并在RefundRequest找到记录的
-                if (detail.getInstitutionPaymentId().equals(po.getPaymentId()) && detail.isSuccess()) {
+        for (RefundNotifyDetail detail : details) {
+            // 第三方退款成功的， 并在RefundRequest找到记录的
+            if (detail.getInstitutionPaymentId().equals(refundrequest.getInstPaymentId()) && detail.isSuccess()) {
 
-                    logger.info("The refundRequest is thirdPart success. PaymentId[{}]", po.getPaymentId());
-                    logger.info("generate RefundMiscRequestLog begin.");
-                    RefundMiscRequestLogWithBLOBs rmrl = new RefundMiscRequestLogWithBLOBs();
-                    rmrl.setRefundBatchNo(req.getBatchNo());
-                    rmrl.setCorrelateId(po.getPaymentId());
-                    rmrl.setIsException(false);
-                    rmrl.setExceptionDetail("");
-                    rmrl.setLogId(UUID.randomUUID().toString());
-                    rmrl.setMethod("RefundNotify");
-                    rmrl.setRequestData("");
-                    rmrl.setResponseData(JSON.toJSONString(signMap));
-                    rmrl.setRequestTime(new Date());
+                logger.info("The refundRequest is thirdPart success. RefundBatchNo[{}]",
+                        refundrequest.getRefundBatchNo());
+                logger.info("generate RefundMiscRequestLog begin.");
+                RefundMiscRequestLogWithBLOBs rmrl = new RefundMiscRequestLogWithBLOBs();
+                rmrl.setRefundBatchNo(req.getBatchNo());
+                rmrl.setCorrelateId(refundrequest.getPaymentId());
+                rmrl.setIsException(false);
+                rmrl.setExceptionDetail("");
+                rmrl.setLogId(UUID.randomUUID().toString());
+                rmrl.setMethod("RefundNotify");
+                rmrl.setRequestData("");
+                rmrl.setResponseData(JSON.toJSONString(signMap)); // TODO
+                rmrl.setRequestTime(new Date());
 
-                    if (StringUtils.isBlank(req.getNotifyTime()))
-                        rmrl.setResponseTime(new Date());
-                    else
-                        rmrl.setResponseTime(parseDate(req.getNotifyTime()));
+                if (StringUtils.isBlank(req.getNotifyTime()))
+                    rmrl.setResponseTime(new Date());
+                else
+                    rmrl.setResponseTime(parseDate(req.getNotifyTime()));
 
 
-                    refundmiscrequestlogWithBLOBs.add(rmrl); // 记录退款回调日志
-                }
+                refundmiscrequestlogWithBLOBs.add(rmrl); // 记录退款回调日志
             }
         }
 
