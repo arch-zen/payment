@@ -15,6 +15,7 @@ import com.ymatou.payment.facade.model.FastRefundRequest;
 import com.ymatou.payment.facade.model.FastRefundResponse;
 import com.ymatou.payment.facade.model.QueryRefundRequest;
 import com.ymatou.payment.facade.model.QueryRefundResponse;
+import com.ymatou.payment.facade.model.SysApproveRefundReq;
 import com.ymatou.payment.facade.model.TradeRefundableRequest;
 import com.ymatou.payment.facade.model.TradeRefundableResponse;
 
@@ -78,4 +79,14 @@ public interface RefundResource {
      * @return
      */
     AcquireRefundPlusResponse acquireRefund(AcquireRefundPlusRequest req, HttpServletRequest servletRequest);
+
+
+    /**
+     * 系统自动审核退款（供调度使用）
+     * 
+     * @param req
+     * @param servletRequest
+     * @return
+     */
+    String sysApproveRefund(SysApproveRefundReq req, HttpServletRequest servletRequest);
 }

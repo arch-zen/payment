@@ -75,6 +75,10 @@
 		<table tableName="PP_AccoutingLog" domainObjectName="AccountingLog">
 			<property name="useActualColumnNames" value="true"/>
 		</table>
+		
+		<table tableName="PP_PaymentParam" domainObjectName="PaymentParam">
+			<property name="useActualColumnNames" value="true"/>
+		</table>
 	</context>
 
 </generatorConfiguration>
