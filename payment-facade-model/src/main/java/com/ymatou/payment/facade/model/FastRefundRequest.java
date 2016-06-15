@@ -3,6 +3,7 @@
  */
 package com.ymatou.payment.facade.model;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,8 +41,11 @@ public class FastRefundRequest extends BaseRequest {
     @NotBlank
     private String appId;
 
-    @NotBlank
     private String traceId;
+
+    private String requestNo;
+
+    private BigDecimal refundAmt;
 
     private HashMap<String, String> header;
 
@@ -99,5 +103,21 @@ public class FastRefundRequest extends BaseRequest {
 
     public void setHeader(HashMap<String, String> header) {
         this.header = header;
+    }
+
+    public BigDecimal getRefundAmt() {
+        return refundAmt;
+    }
+
+    public void setRefundAmt(BigDecimal refundAmt) {
+        this.refundAmt = refundAmt;
+    }
+
+    public String getRequestNo() {
+        return requestNo;
+    }
+
+    public void setRequestNo(String requestNo) {
+        this.requestNo = requestNo;
     }
 }

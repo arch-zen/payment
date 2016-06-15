@@ -21,6 +21,7 @@ import com.ymatou.payment.domain.pay.repository.PaymentRepository;
 import com.ymatou.payment.domain.refund.DomainConfig;
 import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.constants.OrderStatusEnum;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.facade.model.AcquireRefundDetail;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
@@ -78,8 +79,7 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
                 tradeRefundDetail.setRefundable(true); // 可退款
                 tradeRefundDetail.setPayAmount(payment.getPayPrice().getAmount());
                 tradeRefundDetail.setTradeNo(tradeNo);
-                tradeRefundDetail
-                        .setPayChannel(refundPository.convertPayTypeToPayChannel(payment.getPayType().getCode()));
+                tradeRefundDetail.setPayChannel(PayTypeEnum.getChannelType(payment.getPayType()).getCode());
                 tradeRefundDetail.setPaymentId(payment.getPaymentId());
                 tradeRefundDetail.setPayType(payment.getPayType().getCode());
                 tradeRefundDetail.setInstPaymentId(payment.getInstitutionPaymentId());
@@ -106,9 +106,10 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
 
         logger.info("generate RefundRequest list");
         for (TradeRefundDetail tradeRefundDetail : tradeRefundDetails) {
-            // 根据paymentId查找RefundRequest
-            RefundRequestPo refundrequestPo =
-                    refundPository.getRefundRequestByPaymentId(tradeRefundDetail.getPaymentId());
+            // 根据RequestId及TradeNo查找RefundRequest， 保证幂等
+            List<RefundRequestPo> refundRequests =
+                    refundPository.getRefundReqestByTraceIdAndTradeNo(req.getRequestId(),
+                            tradeRefundDetail.getTradeNo());
 
             // 组装AcquireRefundDetail，可被退款的交易(接口的返回参数)
             AcquireRefundDetail acquireRefundDetail = new AcquireRefundDetail();
@@ -116,7 +117,7 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
             acquireRefundDetail.setTradeNo(tradeRefundDetail.getTradeNo());
             acquireRefundDetails.add(acquireRefundDetail);
 
-            if (refundrequestPo == null) { // 若不存在RefundRequest，则插入
+            if (refundRequests.size() == 0) { // 若不存在RefundRequest，则插入
                 RefundRequestPo refundrequest = new RefundRequestPo();
                 refundrequest.setPaymentId(tradeRefundDetail.getPaymentId());
                 refundrequest.setInstPaymentId(tradeRefundDetail.getInstPaymentId());
@@ -139,9 +140,8 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
         }
         logger.info("{} RefundRequest will be saved.", refundrequestWithBLOBs.size());
 
-        logger.info("batch save RefundRequest begin.");
-        refundPository.batchSaveRefundRequest(refundrequestWithBLOBs); // 插入RefundRequest
-        logger.info("batch save RefundRequest end.");
+        logger.info("batch save RefundRequest and update refundAmt.");
+        refundPository.batchSaveRefundRequestAndUpdateRefundAmt(refundrequestWithBLOBs); // 插入RefundRequest
 
         return acquireRefundDetails;
     }

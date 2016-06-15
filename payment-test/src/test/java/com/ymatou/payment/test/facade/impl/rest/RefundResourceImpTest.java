@@ -10,16 +10,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 
+import com.alibaba.fastjson.JSON;
+import com.ymatou.payment.domain.pay.model.BussinessOrder;
+import com.ymatou.payment.domain.pay.service.PayService;
 import com.ymatou.payment.domain.refund.repository.RefundPository;
+import com.ymatou.payment.facade.constants.ApproveStatusEnum;
+import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
+import com.ymatou.payment.facade.model.AcquireRefundPlusRequest;
+import com.ymatou.payment.facade.model.AcquireRefundPlusResponse;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
 import com.ymatou.payment.facade.model.AcquireRefundResponse;
 import com.ymatou.payment.facade.model.ApproveRefundRequest;
@@ -32,11 +43,18 @@ import com.ymatou.payment.facade.model.SysApproveRefundReq;
 import com.ymatou.payment.facade.model.TradeDetail;
 import com.ymatou.payment.facade.model.TradeRefundableRequest;
 import com.ymatou.payment.facade.model.TradeRefundableResponse;
+import com.ymatou.payment.facade.rest.PaymentResource;
 import com.ymatou.payment.facade.rest.RefundResource;
+import com.ymatou.payment.infrastructure.db.mapper.BussinessOrderMapper;
+import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
 import com.ymatou.payment.infrastructure.db.mapper.PaymentParamMapper;
 import com.ymatou.payment.infrastructure.db.mapper.RefundRequestMapper;
+import com.ymatou.payment.infrastructure.db.model.BussinessOrderPo;
+import com.ymatou.payment.infrastructure.db.model.PaymentExample;
 import com.ymatou.payment.infrastructure.db.model.PaymentParamExample;
 import com.ymatou.payment.infrastructure.db.model.PaymentParamPo;
+import com.ymatou.payment.infrastructure.db.model.PaymentPo;
+import com.ymatou.payment.infrastructure.db.model.RefundRequestExample;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 import com.ymatou.payment.infrastructure.util.StringUtil;
 import com.ymatou.payment.test.RestBaseTest;
@@ -48,6 +66,8 @@ import com.ymatou.payment.test.RestBaseTest;
  * 
  */
 public class RefundResourceImpTest extends RestBaseTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(RefundResourceImpTest.class);
 
     @Autowired
     private RefundResource refundResource;
@@ -61,23 +81,17 @@ public class RefundResourceImpTest extends RestBaseTest {
     @Autowired
     private PaymentParamMapper paymentParamMapper;
 
-    // @Test
-    public void testFastRefundSuccess() {
-        FastRefundRequest fastRefundRequest = new FastRefundRequest();
-        fastRefundRequest.setAppId("100001");
-        fastRefundRequest.setPaymentId("20151107202902646000000000053774");
-        fastRefundRequest.setTradingId("PP20151107300104764");
-        fastRefundRequest.setTradeType(1);
-        ArrayList<String> a = new ArrayList<String>();
-        a.add("PP20151107300104764");
-        fastRefundRequest.setOrderIdList(a);
-        fastRefundRequest.setTraceId("1000001");
+    @Autowired
+    private PaymentResource paymentResource;
 
-        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
-        FastRefundResponse resp = refundResource.fastRefund(fastRefundRequest, servletRequest);
+    @Autowired
+    private PayService payService;
 
-        Assert.assertEquals(0, resp.getErrorCode());
-    }
+    @Autowired
+    private PaymentMapper paymentMapper;
+
+    @Autowired
+    private BussinessOrderMapper bussinessOrderMapper;
 
     @Test
     public void testFastRefundInvalidArg() {
@@ -97,75 +111,6 @@ public class RefundResourceImpTest extends RestBaseTest {
         Assert.assertEquals(1000, resp.getErrorCode());
     }
 
-
-    @Test
-    public void testSubmitRefundSuccess() {
-        AcquireRefundRequest request = new AcquireRefundRequest();
-        request.setAppId("11111111");
-        request.setOrderId("32132143");
-        request.setTraceId("12321321321");
-        List<TradeDetail> tradeDetails = new ArrayList<>();
-        TradeDetail tradeDetail = new TradeDetail();
-        tradeDetail.setTradeNo("4070149626832712");
-        tradeDetail.setTradeType(1);
-        tradeDetails.add(tradeDetail);
-        request.setTradeDetails(tradeDetails);
-
-        AcquireRefundResponse response = refundResource.submitRefund(request, new MockHttpServletRequest());
-        Assert.assertEquals(0, response.getErrorCode());
-        Assert.assertEquals(1, response.getDetails().size());
-        Assert.assertEquals("4070149626832712", response.getDetails().get(0).getTradeNo());
-    }
-
-    @Test
-    public void testCheckRefundable() {
-        TradeRefundableRequest req = new TradeRefundableRequest();
-        req.setTradeNos(Arrays
-                .asList(new String[] {"20150915133207757", "8178254", "19335806615459", "8526937", "114581437722686",
-                        "20160503194109806", "114659944449425", "4070149626832712", "8198025", "4092297615140378"}));
-        TradeRefundableResponse response = refundResource.checkRefundable(req, new MockHttpServletRequest());
-        Assert.assertEquals(2, response.getDetails().size());
-    }
-
-    // @Test
-    public void testQueryRefund() {
-        QueryRefundRequest req = new QueryRefundRequest();
-        req.setKey("");
-        req.setPageSize(10);
-        req.setPageIndex(5); // 41之后的，
-        req.setApproveStatus(9);
-
-        QueryRefundResponse resp = refundResource.query(req, new MockHttpServletRequest());
-
-        Assert.assertEquals("21568176200183545", resp.getDetails().get(0).getPaymentId());
-    }
-
-    @Test
-    public void testQueryRefundWithOrderId() {
-        QueryRefundRequest req = new QueryRefundRequest();
-        req.setKey("");
-        req.setPageSize(10);
-        req.setPageIndex(1);
-        req.setApproveStatus(9);
-        req.setKey("127822744");
-
-        QueryRefundResponse resp = refundResource.query(req, new MockHttpServletRequest());
-
-        Assert.assertEquals(1, resp.getDetails().size());
-        Assert.assertEquals("127822744", resp.getDetails().get(0).getOrderId());
-    }
-
-    @Test
-    public void testApproveRefund() {
-        ApproveRefundRequest req = new ApproveRefundRequest();
-        req.setApproveUser("testApproveRefund");
-        req.setRefundNos(Arrays.asList(new String[] {"20151104150448396000000000027244"}));
-
-        ApproveRefundResponse response = refundResource.approveRefund(req, new MockHttpServletRequest());
-        Assert.assertEquals(true, response.getIsSuccess());
-
-    }
-
     @Test
     public void testSysApproveRefund() {
         RefundRequestPo refund1 = buildRefundRequest();
@@ -179,6 +124,8 @@ public class RefundResourceImpTest extends RestBaseTest {
         refundRequestMapper.insertSelective(refund2);
         refundRequestMapper.insertSelective(refund3);
 
+        // 设置风控值
+        setRefundMaxNum(Calendar.getInstance().get(Calendar.HOUR_OF_DAY), 200);
 
         SysApproveRefundReq req = new SysApproveRefundReq();
         Calendar approveTime = Calendar.getInstance();
@@ -188,20 +135,20 @@ public class RefundResourceImpTest extends RestBaseTest {
 
         Assert.assertEquals("ok", sysApproveRefund);
 
-        RefundRequestPo refundResult1 = refundPository.getRefundRequestByPaymentId(refund1.getPaymentId());
+        RefundRequestPo refundResult1 = refundPository.getRefundRequestByRefundNo(refund1.getRefundBatchNo());
 
         Assert.assertEquals(1, refundResult1.getApproveStatus().intValue());
         Assert.assertEquals("system", refundResult1.getApprovedUser());
         Assert.assertNotNull(refundResult1.getApprovedTime());
 
 
-        RefundRequestPo refundResult2 = refundPository.getRefundRequestByPaymentId(refund2.getPaymentId());
+        RefundRequestPo refundResult2 = refundPository.getRefundRequestByRefundNo(refund2.getRefundBatchNo());
 
         Assert.assertEquals(1, refundResult2.getApproveStatus().intValue());
         Assert.assertEquals("system", refundResult2.getApprovedUser());
         Assert.assertNotNull(refundResult2.getApprovedTime());
 
-        RefundRequestPo refundResult3 = refundPository.getRefundRequestByPaymentId(refund3.getPaymentId());
+        RefundRequestPo refundResult3 = refundPository.getRefundRequestByRefundNo(refund3.getRefundBatchNo());
 
         Assert.assertEquals(0, refundResult3.getApproveStatus().intValue());
         Assert.assertNull(refundResult3.getApprovedUser());
@@ -224,7 +171,7 @@ public class RefundResourceImpTest extends RestBaseTest {
 
         Assert.assertEquals("ok", sysApproveRefund);
 
-        RefundRequestPo refundResult1 = refundPository.getRefundRequestByPaymentId(refund1.getPaymentId());
+        RefundRequestPo refundResult1 = refundPository.getRefundRequestByRefundNo(refund1.getRefundBatchNo());
 
         Assert.assertEquals(0, refundResult1.getApproveStatus().intValue());
         Assert.assertNull(refundResult1.getApprovedUser());
@@ -237,7 +184,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         sysApproveRefund = refundResource.sysApproveRefund(req, null);
         Assert.assertEquals("ok", sysApproveRefund);
 
-        refundResult1 = refundPository.getRefundRequestByPaymentId(refund1.getPaymentId());
+        refundResult1 = refundPository.getRefundRequestByRefundNo(refund1.getRefundBatchNo());
         Assert.assertEquals(1, refundResult1.getApproveStatus().intValue());
         Assert.assertEquals("system", refundResult1.getApprovedUser());
         Assert.assertNotNull(refundResult1.getApprovedTime());
@@ -264,7 +211,7 @@ public class RefundResourceImpTest extends RestBaseTest {
 
         Assert.assertNotEquals("ok", sysApproveRefund);
 
-        RefundRequestPo refundResult1 = refundPository.getRefundRequestByPaymentId(refund1.getPaymentId());
+        RefundRequestPo refundResult1 = refundPository.getRefundRequestByRefundNo(refund1.getRefundBatchNo());
         Assert.assertEquals(0, refundResult1.getApproveStatus().intValue());
         Assert.assertNull(refundResult1.getApprovedUser());
         Assert.assertNull(refundResult1.getApprovedTime());
@@ -274,7 +221,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         setRefundMaxNum(Calendar.getInstance().get(Calendar.HOUR_OF_DAY), 200);
         sysApproveRefund = refundResource.sysApproveRefund(req, null);
 
-        refundResult1 = refundPository.getRefundRequestByPaymentId(refund1.getPaymentId());
+        refundResult1 = refundPository.getRefundRequestByRefundNo(refund1.getRefundBatchNo());
         Assert.assertEquals(1, refundResult1.getApproveStatus().intValue());
         Assert.assertEquals("system", refundResult1.getApprovedUser());
         Assert.assertNotNull(refundResult1.getApprovedTime());
@@ -341,6 +288,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         refund.setCurrencyType("CNY");
         refund.setAccoutingStatus(0);
         refund.setTradeType(1);
+        refund.setRefundBatchNo(UUID.randomUUID().toString().replace("-", ""));
 
         return refund;
     }
@@ -360,5 +308,401 @@ public class RefundResourceImpTest extends RestBaseTest {
         paymentParamPo.setParamIntValue(maxNum);
 
         paymentParamMapper.updateByExampleSelective(paymentParamPo, paymentParamExample);
+    }
+
+    @Test
+    public void testAcquireRefund() {
+        HashMap<String, Object> result = generatePayment();
+        BussinessOrderPo bussinessOrderPo = (BussinessOrderPo) result.get("businessOrder");
+
+        AcquireRefundPlusRequest request = new AcquireRefundPlusRequest();
+        request.setAppId(bussinessOrderPo.getAppId());
+        request.setOrderId(bussinessOrderPo.getBussinessOrderId());
+        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setTradeNo(bussinessOrderPo.getOrderId());
+        request.setTradeType(1);
+        request.setRefundAmt(new BigDecimal(20));
+
+        AcquireRefundPlusResponse response = refundResource.acquireRefund(request, new MockHttpServletRequest());
+        Assert.assertEquals(0, response.getErrorCode());
+    }
+
+    @Test
+    public void testAcquireRefundFail() {
+        HashMap<String, Object> result = generatePayment();
+        BussinessOrderPo bussinessOrderPo = (BussinessOrderPo) result.get("businessOrder");
+
+        AcquireRefundPlusRequest request = new AcquireRefundPlusRequest();
+        request.setAppId(bussinessOrderPo.getAppId());
+        request.setOrderId(bussinessOrderPo.getBussinessOrderId());
+        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setTradeNo(bussinessOrderPo.getOrderId());
+        request.setTradeType(1);
+        request.setRefundAmt(new BigDecimal(32));
+
+        AcquireRefundPlusResponse response = refundResource.acquireRefund(request, new MockHttpServletRequest());
+        Assert.assertEquals(5000, response.getErrorCode());
+    }
+
+    @Test
+    public void testAcquireRefundFail2() {
+        HashMap<String, Object> result = generatePayment();
+        BussinessOrderPo bussinessOrderPo = (BussinessOrderPo) result.get("businessOrder");
+
+
+        AcquireRefundPlusRequest request = new AcquireRefundPlusRequest();
+        request.setAppId(bussinessOrderPo.getAppId());
+        request.setOrderId(bussinessOrderPo.getBussinessOrderId());
+        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setTradeNo(bussinessOrderPo.getOrderId());
+        request.setTradeType(1);
+        request.setRefundAmt(new BigDecimal(20));
+
+        AcquireRefundPlusResponse response = refundResource.acquireRefund(request, new MockHttpServletRequest());
+        Assert.assertEquals(0, response.getErrorCode());
+
+        AcquireRefundPlusRequest request2 = new AcquireRefundPlusRequest();
+        request2.setAppId(bussinessOrderPo.getAppId());
+        request2.setOrderId(bussinessOrderPo.getBussinessOrderId());
+        request2.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request2.setTradeNo(bussinessOrderPo.getOrderId());
+        request2.setTradeType(1);
+        request2.setRefundAmt(new BigDecimal(15));
+
+        AcquireRefundPlusResponse response2 = refundResource.acquireRefund(request2, new MockHttpServletRequest());
+        Assert.assertEquals(5000, response2.getErrorCode());
+    }
+
+
+    private HashMap<String, Object> generatePayment() {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+        req.setPayPrice("20.01");
+
+        req.setPayType("11");
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        paymentResource.acquireOrder(req, servletRequest);
+        BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
+
+        PaymentExample example = new PaymentExample();
+        example.createCriteria().andBussinessOrderIdEqualTo(bo.getBussinessOrderId());
+        PaymentPo paymentPo = paymentMapper.selectByExample(example).get(0);
+        paymentPo.setPayStatus(PayStatusEnum.Paied.getIndex());
+        paymentPo.setActualPayPrice(paymentPo.getPayPrice());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        paymentPo.setInstitutionPaymentId(simpleDateFormat.format(new Date()) + RandomStringUtils.randomNumeric(2));
+
+        paymentMapper.updateByExampleSelective(paymentPo, example);
+
+        BussinessOrderPo bussinessOrderPo = bussinessOrderMapper.selectByPrimaryKey(bo.getBussinessOrderId());
+        bussinessOrderPo.setOrderStatus(1);
+        bussinessOrderMapper.updateByPrimaryKey(bussinessOrderPo);
+
+        System.out.println(bo.getOrderId() + " " + bo.getBussinessOrderId());
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("payment", paymentPo);
+        result.put("businessOrder", bussinessOrderPo);
+
+        return result;
+    }
+
+    @Test
+    public void testApproveRefund() throws InterruptedException {
+        HashMap<String, Object> result = generatePayment();
+        BussinessOrderPo bussinessOrderPo = (BussinessOrderPo) result.get("businessOrder");
+        PaymentPo paymentPo = (PaymentPo) result.get("payment");
+
+        AcquireRefundPlusRequest request = new AcquireRefundPlusRequest();
+        request.setAppId(bussinessOrderPo.getAppId());
+        request.setOrderId(bussinessOrderPo.getBussinessOrderId());
+        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setTradeNo(bussinessOrderPo.getOrderId());
+        request.setTradeType(1);
+        request.setRefundAmt(new BigDecimal(7.8));
+
+        AcquireRefundPlusResponse response = refundResource.acquireRefund(request, new MockHttpServletRequest());
+        Assert.assertEquals(0, response.getErrorCode());
+
+        AcquireRefundPlusRequest request2 = new AcquireRefundPlusRequest();
+        request2.setAppId(bussinessOrderPo.getAppId());
+        request2.setOrderId(bussinessOrderPo.getBussinessOrderId());
+        request2.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request2.setTradeNo(bussinessOrderPo.getOrderId());
+        request2.setTradeType(1);
+        request2.setRefundAmt(new BigDecimal(3.2));
+
+        AcquireRefundPlusResponse response2 = refundResource.acquireRefund(request2, new MockHttpServletRequest());
+        Assert.assertEquals(0, response2.getErrorCode());
+
+        System.out.println(paymentPo.getPaymentId());
+        RefundRequestExample example = new RefundRequestExample();
+        example.createCriteria().andPaymentIdEqualTo(paymentPo.getPaymentId());
+        List<RefundRequestPo> refundRequestPos = refundRequestMapper.selectByExample(example);
+        System.out.println(refundRequestPos.size());
+        List<String> refundNos = new ArrayList<>();
+        for (RefundRequestPo refundRequestPo : refundRequestPos) {
+            refundNos.add(refundRequestPo.getRefundBatchNo());
+        }
+
+        ApproveRefundRequest approveRefundRequest = new ApproveRefundRequest();
+        approveRefundRequest.setApproveUser("test");
+        approveRefundRequest.setRefundNos(refundNos);
+
+        ApproveRefundResponse approveRefundResponse =
+                refundResource.approveRefund(approveRefundRequest, new MockHttpServletRequest());
+        logger.info(JSON.toJSONString(approveRefundResponse));
+
+        Assert.assertEquals(0, approveRefundResponse.getErrorCode());
+        Assert.assertEquals(true, approveRefundResponse.getIsSuccess());
+        Thread.sleep(1000);
+    }
+
+    @Test
+    public void testFastRefundFail() throws InterruptedException {
+        HashMap<String, Object> result = generatePayment();
+        BussinessOrderPo bussinessOrderPo = (BussinessOrderPo) result.get("businessOrder");
+        PaymentPo paymentPo = (PaymentPo) result.get("payment");
+
+        FastRefundRequest request = new FastRefundRequest();
+        request.setPaymentId(paymentPo.getPaymentId());
+        request.setAppId(bussinessOrderPo.getAppId());
+        request.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
+        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setTradingId(bussinessOrderPo.getOrderId());
+        request.setTradeType(1);
+        request.setRefundAmt(new BigDecimal(7.8));
+
+        FastRefundResponse response = refundResource.fastRefund(request, new MockHttpServletRequest());
+        Assert.assertEquals(0, response.getErrorCode());
+
+        FastRefundRequest request2 = new FastRefundRequest();
+        request2.setPaymentId(paymentPo.getPaymentId());
+        request2.setAppId(bussinessOrderPo.getAppId());
+        request2.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
+        request2.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request2.setTradingId(bussinessOrderPo.getOrderId());
+        request2.setTradeType(1);
+        request2.setRefundAmt(new BigDecimal(27.8));
+
+        FastRefundResponse response2 = refundResource.fastRefund(request2, new MockHttpServletRequest());
+        Assert.assertEquals(5000, response2.getErrorCode());
+    }
+
+    @Test
+    public void testFastRefund() throws InterruptedException {
+        HashMap<String, Object> result = generatePayment();
+        BussinessOrderPo bussinessOrderPo = (BussinessOrderPo) result.get("businessOrder");
+        PaymentPo paymentPo = (PaymentPo) result.get("payment");
+
+        FastRefundRequest request = new FastRefundRequest();
+        request.setPaymentId(paymentPo.getPaymentId());
+        request.setAppId(bussinessOrderPo.getAppId());
+        request.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
+        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setTradingId(bussinessOrderPo.getOrderId());
+        request.setTradeType(1);
+        request.setRefundAmt(new BigDecimal(7.8));
+
+        FastRefundResponse response = refundResource.fastRefund(request, new MockHttpServletRequest());
+        Assert.assertEquals(0, response.getErrorCode());
+
+        FastRefundRequest request2 = new FastRefundRequest();
+        request2.setPaymentId(paymentPo.getPaymentId());
+        request2.setAppId(bussinessOrderPo.getAppId());
+        request2.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
+        request2.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request2.setTradingId(bussinessOrderPo.getOrderId());
+        request2.setTradeType(1);
+        request2.setRefundAmt(new BigDecimal(7.8));
+
+        FastRefundResponse response2 = refundResource.fastRefund(request2, new MockHttpServletRequest());
+        Assert.assertEquals(0, response2.getErrorCode());
+    }
+
+    @Test
+    public void testFastRefundFail2() throws InterruptedException {
+        HashMap<String, Object> result = generatePayment();
+        BussinessOrderPo bussinessOrderPo = (BussinessOrderPo) result.get("businessOrder");
+        PaymentPo paymentPo = (PaymentPo) result.get("payment");
+
+        FastRefundRequest request = new FastRefundRequest();
+        request.setPaymentId(paymentPo.getPaymentId());
+        request.setAppId(bussinessOrderPo.getAppId());
+        request.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
+        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setTradingId(bussinessOrderPo.getOrderId());
+        request.setTradeType(1);
+        // request.setRefundAmt(new BigDecimal(7.8));
+
+        FastRefundResponse response = refundResource.fastRefund(request, new MockHttpServletRequest());
+        Assert.assertEquals(0, response.getErrorCode());
+
+        FastRefundRequest request2 = new FastRefundRequest();
+        request2.setPaymentId(paymentPo.getPaymentId());
+        request2.setAppId(bussinessOrderPo.getAppId());
+        request2.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
+        request2.setTraceId(RandomStringUtils.randomAlphabetic(8));
+        request2.setTradingId(bussinessOrderPo.getOrderId());
+        request2.setTradeType(1);
+
+        FastRefundResponse response2 = refundResource.fastRefund(request2, new MockHttpServletRequest());
+        Assert.assertEquals(5000, response2.getErrorCode());
+    }
+
+    @Test
+    public void testCheckRefundable() {
+        HashMap<String, Object> result = generatePayment();
+        BussinessOrderPo bussinessOrderPo = (BussinessOrderPo) result.get("businessOrder");
+        PaymentPo paymentPo = (PaymentPo) result.get("payment");
+
+        HashMap<String, Object> result2 = generatePayment();
+        BussinessOrderPo bussinessOrderPo2 = (BussinessOrderPo) result2.get("businessOrder");
+
+        FastRefundRequest request = new FastRefundRequest();
+        request.setPaymentId(paymentPo.getPaymentId());
+        request.setAppId(bussinessOrderPo.getAppId());
+        request.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
+        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setTradingId(bussinessOrderPo.getOrderId());
+        request.setTradeType(1);
+        request.setRefundAmt(new BigDecimal(7.8));
+
+        FastRefundResponse response = refundResource.fastRefund(request, new MockHttpServletRequest());
+        Assert.assertEquals(0, response.getErrorCode());
+
+
+        TradeRefundableRequest req = new TradeRefundableRequest();
+        List<String> tradeNos = new ArrayList<>();
+        tradeNos.add(bussinessOrderPo.getOrderId());
+        tradeNos.add(bussinessOrderPo2.getOrderId());
+        req.setTradeNos(tradeNos);
+
+        TradeRefundableResponse response2 = refundResource.checkRefundable(req, new MockHttpServletRequest());
+        logger.info(JSON.toJSONString(response));
+        Assert.assertEquals(true, response2.getDetails().get(0).isRefundable());
+        Assert.assertEquals(1, response2.getDetails().size());
+    }
+
+    @Test
+    public void testCheckRefundable2() {
+        HashMap<String, Object> result = generatePayment();
+        BussinessOrderPo bussinessOrderPo = (BussinessOrderPo) result.get("businessOrder");
+
+        HashMap<String, Object> result2 = generatePayment();
+        BussinessOrderPo bussinessOrderPo2 = (BussinessOrderPo) result2.get("businessOrder");
+
+        TradeRefundableRequest req = new TradeRefundableRequest();
+        List<String> tradeNos = new ArrayList<>();
+        tradeNos.add(bussinessOrderPo.getOrderId());
+        tradeNos.add(bussinessOrderPo2.getOrderId());
+        req.setTradeNos(tradeNos);
+
+        TradeRefundableResponse response = refundResource.checkRefundable(req, new MockHttpServletRequest());
+        logger.info(JSON.toJSONString(response));
+        Assert.assertEquals(true, response.getDetails().get(0).isRefundable());
+        Assert.assertEquals(2, response.getDetails().size());
+    }
+
+    @Test
+    public void testCheckRefundable3() {
+        HashMap<String, Object> result = generatePayment();
+        BussinessOrderPo bussinessOrderPo = (BussinessOrderPo) result.get("businessOrder");
+        PaymentPo paymentPo = (PaymentPo) result.get("payment");
+
+        HashMap<String, Object> result2 = generatePayment();
+        BussinessOrderPo bussinessOrderPo2 = (BussinessOrderPo) result2.get("businessOrder");
+
+        FastRefundRequest request = new FastRefundRequest();
+        request.setPaymentId(paymentPo.getPaymentId());
+        request.setAppId(bussinessOrderPo.getAppId());
+        request.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
+        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setTradingId(bussinessOrderPo.getOrderId());
+        request.setTradeType(1);
+        request.setRefundAmt(new BigDecimal(7.8));
+
+        FastRefundResponse response = refundResource.fastRefund(request, new MockHttpServletRequest());
+        Assert.assertEquals(0, response.getErrorCode());
+
+        TradeRefundableRequest req = new TradeRefundableRequest();
+        List<TradeRefundableRequest.TradeDetail> tradeDetails = new ArrayList<>();
+        TradeRefundableRequest.TradeDetail detail = new TradeRefundableRequest.TradeDetail();
+        detail.setTradeNo(bussinessOrderPo.getOrderId());
+        detail.setRefundAmt(new BigDecimal(7.8));
+        TradeRefundableRequest.TradeDetail detail2 = new TradeRefundableRequest.TradeDetail();
+        detail2.setTradeNo(bussinessOrderPo2.getOrderId());
+        detail2.setRefundAmt(new BigDecimal(20.1));
+        tradeDetails.add(detail);
+        tradeDetails.add(detail2);
+        req.setTradeDetails(tradeDetails);
+
+        TradeRefundableResponse response2 = refundResource.checkRefundable(req, new MockHttpServletRequest());
+        logger.info(JSON.toJSONString(response2));
+        Assert.assertEquals(true, response2.getDetails().get(0).isRefundable());
+        Assert.assertEquals(false, response2.getDetails().get(1).isRefundable());
+        Assert.assertEquals(2, response2.getDetails().size());
+    }
+
+    @Test
+    public void testQueryRefundWithOrderId() {
+        HashMap<String, Object> result = generatePayment();
+        BussinessOrderPo bussinessOrderPo = (BussinessOrderPo) result.get("businessOrder");
+        PaymentPo paymentPo = (PaymentPo) result.get("payment");
+
+        FastRefundRequest request = new FastRefundRequest();
+        request.setPaymentId(paymentPo.getPaymentId());
+        request.setAppId(bussinessOrderPo.getAppId());
+        request.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
+        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setTradingId(bussinessOrderPo.getOrderId());
+        request.setTradeType(1);
+        request.setRefundAmt(new BigDecimal(7.8));
+
+        FastRefundResponse response = refundResource.fastRefund(request, new MockHttpServletRequest());
+        Assert.assertEquals(0, response.getErrorCode());
+
+        RefundRequestExample example = new RefundRequestExample();
+        example.createCriteria().andPaymentIdEqualTo(paymentPo.getPaymentId());
+        List<RefundRequestPo> refundRequestPos = refundRequestMapper.selectByExample(example);
+
+        QueryRefundRequest req = new QueryRefundRequest();
+        req.setKey("");
+        req.setPageSize(10);
+        req.setPageIndex(1);
+        req.setApproveStatus(9);
+        req.setKey(refundRequestPos.get(0).getOrderId());
+        System.out.println(refundRequestPos.get(0).getOrderId());
+
+        QueryRefundResponse resp = refundResource.query(req, new MockHttpServletRequest());
+
+        Assert.assertEquals(1, resp.getDetails().size());
+        Assert.assertEquals(new BigDecimal(7.8).setScale(2, BigDecimal.ROUND_HALF_UP),
+                resp.getDetails().get(0).getRefundAmount().setScale(2));
+        Assert.assertEquals(ApproveStatusEnum.FAST_REFUND.getCode(), resp.getDetails().get(0).getApproveStatus());
+        Assert.assertEquals(bussinessOrderPo.getOrderId(), resp.getDetails().get(0).getTradeNo());
+        Assert.assertEquals(refundRequestPos.get(0).getOrderId(), resp.getDetails().get(0).getOrderId());
+    }
+
+    @Test
+    public void testSubmitRefundSuccess() {
+        HashMap<String, Object> result = generatePayment();
+        BussinessOrderPo bussinessOrderPo = (BussinessOrderPo) result.get("businessOrder");
+
+        AcquireRefundRequest request = new AcquireRefundRequest();
+        request.setAppId("11111111");
+        request.setOrderId("32132143");
+        request.setTraceId("12321321321");
+        List<TradeDetail> tradeDetails = new ArrayList<>();
+        TradeDetail tradeDetail = new TradeDetail();
+        tradeDetail.setTradeNo(bussinessOrderPo.getOrderId());
+        tradeDetail.setTradeType(1);
+        tradeDetails.add(tradeDetail);
+        request.setTradeDetails(tradeDetails);
+
+        AcquireRefundResponse response = refundResource.submitRefund(request, new MockHttpServletRequest());
+        logger.info(JSON.toJSONString(response));
+        Assert.assertEquals(0, response.getErrorCode());
+        Assert.assertEquals(1, response.getDetails().size());
+        Assert.assertEquals(bussinessOrderPo.getOrderId(), response.getDetails().get(0).getTradeNo());
     }
 }

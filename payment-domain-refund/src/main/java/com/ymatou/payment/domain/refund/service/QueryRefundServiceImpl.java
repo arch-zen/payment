@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.refund.constants.RefundConstants;
 import com.ymatou.payment.domain.refund.repository.RefundPository;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.model.QueryRefundDetail;
 import com.ymatou.payment.facade.model.QueryRefundRequest;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
@@ -94,8 +95,7 @@ public class QueryRefundServiceImpl implements QueryRefundService {
             detail.setRefundTime(rq.getRefundTime());
             detail.setRefundBatchNo(rq.getRefundBatchNo());
             detail.setPaymentId(rq.getPaymentId());
-            detail.setPayChannel(Integer.valueOf(
-                    refundPository.convertPayTypeToPayChannel(rq.getPayType())));
+            detail.setPayChannel(Integer.valueOf(PayTypeEnum.getChannelType(rq.getPayType()).getCode()));
             detail.setTradeType(rq.getTradeType());
 
             queryRefundDetails.add(detail);

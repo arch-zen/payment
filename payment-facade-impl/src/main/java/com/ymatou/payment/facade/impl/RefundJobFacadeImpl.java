@@ -62,6 +62,7 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
                 logger.info("Step 3: submit third party refund.");
                 refundJobService.submitRefund(refundRequest, payment, header);
             }
+
         } else {// 查询退款结果
             RefundStatusEnum refundStatus = null;
             if (!refundRequest.getRefundStatus().equals(RefundStatusEnum.THIRDPART_REFUND_SUCCESS.getCode())) {

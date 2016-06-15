@@ -16,7 +16,6 @@ import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.ApproveStatusEnum;
-import com.ymatou.payment.infrastructure.db.mapper.RefundRequestMapper;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 
 /**
@@ -32,14 +31,11 @@ public class ApproveRefundServiceImpl implements ApproveRefundService {
     @Autowired
     private RefundPository refundPository;
 
-    @Autowired
-    private RefundRequestMapper refundRequestMapper;
-
     @Override
     public List<RefundRequestPo> approveRefund(List<String> refundNos, String approveUser) {
         List<RefundRequestPo> refundrequestPos = new ArrayList<>();
         for (String refundNo : refundNos) {
-            RefundRequestPo refundrequestPo = refundRequestMapper.selectByPrimaryKey(refundNo);
+            RefundRequestPo refundrequestPo = refundPository.getRefundRequestByRefundNo(refundNo);
             if (refundrequestPo == null) {
                 throw new BizException(ErrorCode.NOT_EXIST_PAYMENTID, "refund request not exist.");
             }

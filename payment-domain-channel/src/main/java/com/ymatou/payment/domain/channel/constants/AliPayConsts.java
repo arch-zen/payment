@@ -69,7 +69,7 @@ public final class AliPayConsts {
 
     public final static String WAP_ACQUIRE_ORDER_SERVICE = "alipay.wap.auth.authAndExecute";
 
-    public final static String REFUND_REASON = "trade refund";
+    public final static String REFUND_REASON = "tradeRefund";
 
     public final static String REFUND_SYNC_STATU_T = "T"; // 支付宝退款同步应答：成功
     public final static String REFUND_SYNC_STATU_P = "P"; // 支付宝退款同步应答：处理中

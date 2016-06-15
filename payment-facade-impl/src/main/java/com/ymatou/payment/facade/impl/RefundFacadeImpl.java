@@ -3,9 +3,9 @@
  */
 package com.ymatou.payment.facade.impl;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Date;
 import java.util.List;
 
@@ -35,7 +35,6 @@ import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.model.AcquireRefundDetail;
 import com.ymatou.payment.facade.model.AcquireRefundPlusRequest;
 import com.ymatou.payment.facade.model.AcquireRefundPlusResponse;
-import com.ymatou.payment.facade.model.AcquireRefundPlusResponse.RefundDetail;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
 import com.ymatou.payment.facade.model.AcquireRefundResponse;
 import com.ymatou.payment.facade.model.ApproveRefundRequest;
@@ -120,18 +119,42 @@ public class RefundFacadeImpl implements RefundFacade {
         refundInfo.setTradeType(req.getTradeType());
         refundInfo.setOrderIdList(req.getOrderIdList());
         refundInfo.setPaymentId(req.getPaymentId());
-        refundInfo.setTraceId(req.getTraceId());
+        refundInfo.setTraceId(StringUtils.isBlank(req.getTraceId())
+                ? req.getRequestNo() : req.getTraceId()); // .net,java请求参数不同
 
-        // Save RefundRequest And CompensateProcessInfo
-        fastRefundService.saveRefundRequest(payment, bussinessOrder, refundInfo);
+        // 判断，设置退款金额
+        BigDecimal requestedRefundAmt =
+                payment.getRefundAmt() == null ? BigDecimal.ZERO : payment.getRefundAmt();
+        if (req.getRefundAmt() == null || req.getRefundAmt().compareTo(BigDecimal.ZERO) <= 0) {
+            if (requestedRefundAmt.compareTo(BigDecimal.ZERO) > 0) { // 未输入退款申请金额，默认全额退款
+                throw new BizException(ErrorCode.FAIL, "refund amt limit.");
+            } else {
+                refundInfo.setRefundAmt(payment.getPayPrice().getAmount());
+            }
+        } else {
+            if (requestedRefundAmt.add(req.getRefundAmt()).compareTo(payment.getPayPrice().getAmount()) > 0) {
+                throw new BizException(ErrorCode.FAIL, "refund amt limit.");
+            } else {
+                refundInfo.setRefundAmt(req.getRefundAmt());
+            }
+        }
 
-        // notify refund service
-        fastRefundService.notifyRefund(refundInfo, req.getHeader());
+        // Save RefundRequest
+        RefundRequestPo refundRequest = fastRefundService.saveRefundRequest(payment, bussinessOrder, refundInfo);
 
         // send trading message
         for (String orderId : req.getOrderIdList()) {
             fastRefundService.sendFastRefundTradingMessage(bussinessOrder.getUserId().toString(), orderId,
                     req.getHeader());
+        }
+
+        // 扣除账户码头余额
+        boolean accountingSuccess =
+                refundJobService.dedcutBalance(payment, bussinessOrder, refundRequest, req.getHeader());
+
+        // notify refund service
+        if (accountingSuccess) {
+            refundJobService.submitRefund(refundRequest, payment, req.getHeader());
         }
 
         FastRefundResponse response = new FastRefundResponse();
@@ -181,6 +204,7 @@ public class RefundFacadeImpl implements RefundFacade {
 
         AcquireRefundResponse response = new AcquireRefundResponse();
         response.setDetails(acquireRefundDetails);
+        response.setSuccess(true);
 
         return response;
     }
@@ -203,11 +227,32 @@ public class RefundFacadeImpl implements RefundFacade {
 
     @Override
     public TradeRefundableResponse checkRefundable(TradeRefundableRequest req) {
+        // 兼容新老接口
+        boolean isDotNet = false;
+        if (req.getTradeDetails() == null || req.getTradeDetails().size() == 0) {
+            isDotNet = true;
+            List<TradeRefundableRequest.TradeDetail> tradeDetails = new ArrayList<>();
+            for (String tradeNo : req.getTradeNos()) {
+                TradeRefundableRequest.TradeDetail tradeDetail = new TradeRefundableRequest.TradeDetail();
+                tradeDetail.setTradeNo(tradeNo);
+                tradeDetail.setRefundAmt(null);
+                tradeDetails.add(tradeDetail);
+            }
+            req.setTradeDetails(tradeDetails);
+        }
+
         // 获取是否可以退款信息
-        List<TradeRefundDetail> tradeRefundDetails = checkRefundableService.generateRefundableTrades(req.getTradeNos());
+        List<TradeRefundDetail> tradeRefundDetails =
+                checkRefundableService.generateTradeRefundDetailList(req.getTradeDetails());
+
+        // 剔除不可退款交易
+        if (isDotNet) {
+            tradeRefundDetails = checkRefundableService.removeNonRefundable(tradeRefundDetails);
+        }
 
         TradeRefundableResponse response = new TradeRefundableResponse();
         response.setDetails(tradeRefundDetails);
+        response.setSuccess(true);
 
         return response;
     }
@@ -220,44 +265,21 @@ public class RefundFacadeImpl implements RefundFacade {
         QueryRefundResponse response = new QueryRefundResponse();
         response.setDetails(details);
         response.setCount(details.size());
+        response.setSuccess(true);
 
         return response;
     }
 
     @Override
-    public AcquireRefundPlusResponse acquireRefund(AcquireRefundPlusRequest req, HashMap<String, String> header) {
-        if (StringUtils.isEmpty(req.getOrderId())) {
-            throw new BizException(ErrorCode.INVALID_ORDER_ID, "order id is empty.");
-        }
-
-        // 获取退款的相关的交易信息
-        List<AcquireRefundPlusRequest.TradeDetail> tradeDetails = req.getTradeDetails();
-        if (tradeDetails == null || tradeDetails.size() == 0)
-            throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "TradeDetail值不能为 null");
-
-        List<TradeRefundDetail> tradeRefundDetails = acquireRefundService.generateTradeRefundDetailList(tradeDetails);
-        // 筛选出可退款的交易信息
-        List<TradeRefundDetail> refundableTrades = new ArrayList<>();
-        for (TradeRefundDetail tradeRefundDetail : tradeRefundDetails) {
-            if (tradeRefundDetail.isRefundable()) {
-                refundableTrades.add(tradeRefundDetail);
-            }
-        }
-
-        // 若有不能被退款的，报错
-        if (refundableTrades.size() != tradeDetails.size()) {
-            logger.info("request refund trades size {}", tradeDetails.size());
-            logger.info("refundableTrades size {} ", refundableTrades.size());
-            throw new BizException(ErrorCode.NOT_ALL_TRADE_CAN_REFUND, "not all trade can be refunded.");
-        }
-
-        // 检查是否已经生成RefundRequest，若未生成则生成RefundRequest，并生成相应应答
-        List<RefundDetail> acquireRefundDetails =
-                acquireRefundService.checkAndSaveRefundRequest(refundableTrades, req);
-
+    public AcquireRefundPlusResponse acquireRefund(AcquireRefundPlusRequest req) {
         AcquireRefundPlusResponse response = new AcquireRefundPlusResponse();
-        response.setDetails(acquireRefundDetails);
-
+        if (acquireRefundService.acquireRefund(req)) {
+            response.setSuccess(true);
+        } else {
+            response.setSuccess(false);
+            response.setErrorCode(ErrorCode.FAIL);
+            response.setErrorMessage("退款收单失败");
+        }
         return response;
     }
 
