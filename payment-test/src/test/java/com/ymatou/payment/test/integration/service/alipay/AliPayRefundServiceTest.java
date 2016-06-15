@@ -5,8 +5,10 @@ package com.ymatou.payment.test.integration.service.alipay;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Random;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -58,4 +60,31 @@ public class AliPayRefundServiceTest extends RestBaseTest {
         System.out.println(JSONObject.toJSONString(response));
     }
 
+    @Test
+    public void testDoServiceWithMock() throws Exception {
+        AliPayRefundRequest request = new AliPayRefundRequest();
+        request.setPartner("2088701734809577");
+        request.setNotifyUrl("http://ymatou.com");
+        request.setSignType("MD5");
+        request.setDbackNotifyUrl("http://ymatou.com");
+        request.setBatchNo(sdf.format(new Date()) + "000" + new Random().nextInt(10));
+        request.setRefundDate(new Date());
+        request.setBatchNum("1");
+        request.setDetailData("2016052721001004980280896845^0.01^abc");
+        request.setUseFreezeAmount("N");
+
+        InstitutionConfig instConfig = institutionConfigManager.getConfig(PayTypeEnum.AliPayWap);
+        String sign = signatureService.signMessage(request.mapForSign(), instConfig, null);
+
+        request.setSign(sign);
+
+
+        HashMap<String, String> mockHeader = buildMockHeader();
+        mockHeader.put("MockResult-AliPay-is_success", "F");
+        mockHeader.put("MockResult-AliPay-error", "BATCH_NO_FORMAT_ERROR");
+        AliPayRefundResponse response = refundService.doService(request, mockHeader);
+
+        Assert.assertEquals("F", response.getIsSuccess());;
+        Assert.assertEquals("BATCH_NO_FORMAT_ERROR", response.getError());;
+    }
 }

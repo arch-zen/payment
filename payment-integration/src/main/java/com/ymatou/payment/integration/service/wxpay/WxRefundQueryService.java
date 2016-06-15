@@ -110,9 +110,9 @@ public class WxRefundQueryService implements InitializingBean {
                 refundOrderData.setOutRefundNo((String) responseMap.get("out_refund_no_" + index));
                 refundOrderData.setRefundID((String) responseMap.get("refund_id_" + index));
                 refundOrderData.setRefundChannel((String) responseMap.get("refund_channel_" + index));
-                refundOrderData.setRefundFee(Integer.valueOf((String) responseMap.get("refund_fee_" + index)));
+                refundOrderData.setRefundFee(NumberUtils.toInt((String) responseMap.get("refund_fee_" + index)));
                 refundOrderData
-                        .setCouponRefundFee(Integer.valueOf((String) responseMap.get("coupon_refund_fee_" + index)));
+                        .setCouponRefundFee(NumberUtils.toInt((String) responseMap.get("coupon_refund_fee_" + index)));
                 refundOrderData.setRefundStatus((String) responseMap.get("refund_status_" + index));
                 refundOrderData
                         .setCouponRefundCount(

@@ -54,4 +54,27 @@ public class AliPayRefundQueryServiceTest extends RestBaseTest {
         Assert.assertEquals("T", response.getIsSuccess());
     }
 
+    @Test
+    public void testDoServiceWithMock() throws Exception {
+        AliPayRefundQueryRequest request = new AliPayRefundQueryRequest();
+        request.setPartner("2088701734809577");
+        request.setSignType("RSA");
+        request.setBatchNo("201605310000353946");
+        request.setTradeNo("2016053121001004390240047883");
+        InstitutionConfig instConfig = institutionConfigManager.getConfig(PayTypeEnum.AliPayApp);
+        HashMap<String, String> map = request.mapForSign();
+        String sign = signatureService.signMessage(map, instConfig, null);
+
+        request.setSign(sign);
+
+        HashMap<String, String> mockHeader = buildMockHeader();
+        mockHeader.put("MockResult-AliPay-Result",
+                "is_success=T&result_details=201510160000000007^2015101621001004480043768719^0.01^SUCCESS^true^S");
+
+        AliPayRefundQueryResponse response = refundQueryService.doService(request, mockHeader);
+        Assert.assertEquals("T", response.getIsSuccess());
+        Assert.assertEquals("201510160000000007^2015101621001004480043768719^0.01^SUCCESS^true^S",
+                response.getResultDetails());
+    }
+
 }
