@@ -6,6 +6,7 @@ package com.ymatou.payment.domain.refund.service;
 import java.util.List;
 
 import com.ymatou.payment.facade.model.TradeRefundDetail;
+import com.ymatou.payment.facade.model.TradeRefundableRequest.TradeDetail;
 
 /**
  * 查看是否可以退款
@@ -16,10 +17,18 @@ import com.ymatou.payment.facade.model.TradeRefundDetail;
 public interface CheckRefundableService {
 
     /**
-     * 获取可退款交易的信息
+     * 获取是否可退款交易的信息
      * 
-     * @param tradeNos
+     * @param tradeDetails
      * @return
      */
-    public List<TradeRefundDetail> generateRefundableTrades(List<String> tradeNos);
+    public List<TradeRefundDetail> generateTradeRefundDetailList(List<TradeDetail> tradeDetails);
+
+    /**
+     * 剔除不可退款的交易信息
+     * 
+     * @param tradeDetails
+     * @return
+     */
+    public List<TradeRefundDetail> removeNonRefundable(List<TradeRefundDetail> tradeRefundDetails);
 }

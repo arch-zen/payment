@@ -143,7 +143,7 @@ public class WxRefundQueryService implements InitializingBean {
         XStream xStreamForRequestPostData = new XStream(new DomDriver("UTF-8",
                 new XmlFriendlyNameCoder("-_", "_")));// 解决XStream对出现双下划线的bug
         String postDataXML = xStreamForRequestPostData.toXML(request);
-        postDataXML = postDataXML.replace("com.ymatou.payment.integration.model.RefundQueryRequest", "xml");
+        postDataXML = postDataXML.replace("com.ymatou.payment.integration.model.QueryRefundRequest", "xml");
         return postDataXML;
     }
 

@@ -10,8 +10,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
@@ -28,7 +26,6 @@ import com.ymatou.payment.infrastructure.db.model.BussinessOrderPo;
  */
 @Component
 public class BussinessOrderRepository {
-    private static final Logger logger = LoggerFactory.getLogger(BussinessOrderRepository.class);
 
     @Resource
     private BussinessOrderMapper mapper;

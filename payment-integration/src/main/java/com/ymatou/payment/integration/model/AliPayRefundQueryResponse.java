@@ -166,7 +166,7 @@ public class AliPayRefundQueryResponse {
         if (data == null) {
             return null;
         }
-        String[] tempData = data.split("|");
+        String[] tempData = data.split("\\|");
         if (tempData == null || tempData.length == 0) {
             throw new IllegalArgumentException(data + "is not valid");
         }
@@ -174,7 +174,7 @@ public class AliPayRefundQueryResponse {
         if (refundTempData == null || refundTempData.length == 0) {
             throw new IllegalArgumentException(data + "is not valid");
         }
-        String[] refundDetailTempData = refundTempData[0].split("^");
+        String[] refundDetailTempData = refundTempData[0].split("\\^");
         if (refundDetailTempData == null || refundDetailTempData.length == 0) {
             throw new IllegalArgumentException(data + "is not valid");
         }
@@ -203,7 +203,7 @@ public class AliPayRefundQueryResponse {
             } else {
                 String refundStatusString = refundDetailTempData[5];
                 ChargeAliRefundStatusType chargeAliRefundStatus;
-                switch (refundStatusString) {
+                switch (refundStatusString.toLowerCase()) {
                     case "s":
                         chargeAliRefundStatus = ChargeAliRefundStatusType.SUCCESS;
                         break;

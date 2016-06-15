@@ -74,4 +74,24 @@ public enum PayTypeEnum {
                 return "Weixin";
         }
     }
+
+    public static ChannelTypeEnum getChannelType(PayTypeEnum payType) {
+        switch (payType) {
+            case AliPayPc:
+            case AliPayWap:
+            case AliPayApp:
+                return ChannelTypeEnum.AliPay;
+            default:
+                return ChannelTypeEnum.WeiXinPay;
+        }
+    }
+
+    public static ChannelTypeEnum getChannelType(String payType) {
+        if (payType.equals(PayTypeEnum.AliPayApp.getCode()) || payType.equals(PayTypeEnum.AliPayPc.getCode())
+                || payType.equals(PayTypeEnum.AliPayWap.getCode())) {
+            return ChannelTypeEnum.AliPay;
+        } else {
+            return ChannelTypeEnum.WeiXinPay;
+        }
+    }
 }

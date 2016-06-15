@@ -4,7 +4,7 @@
 package com.ymatou.payment.facade.model;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.HashMap;
 
 import org.hibernate.validator.constraints.Length;
 
@@ -21,60 +21,40 @@ public class AcquireRefundPlusRequest extends BaseRequest {
     private static final long serialVersionUID = -2259236919876681507L;
 
     /**
-     * 订单号
-     */
-    private String orderId;
-    /**
-     * 交易信息
-     */
-    private List<TradeDetail> tradeDetails;
-    /**
      * 应用编号
      */
     private String appId;
     /**
-     * 跟踪Id
+     * 订单号
      */
-    @Length(min = 1, max = 32, message = "traceid not valid")
-    private String traceId;
+    private String orderId;
+    /**
+     * 交易号
+     */
+    @Length(min = 1, max = 32, message = "tradeNo not valid")
+    private String tradeNo;
+    /**
+     * 退款申请号
+     */
+    @Length(min = 1, max = 32, message = "requestNo not valid")
+    private String requestNo;
+    /**
+     * 退款金额
+     */
+    private BigDecimal refundAmt;
+    /**
+     * 退款金额
+     */
+    private int tradeType;
 
-    public static class TradeDetail {
-        /**
-         * 交易号
-         */
-        private String tradeNo;
-        /**
-         * 交易类型
-         */
-        private int tradeType;
-        /**
-         * 退款金额
-         */
-        private BigDecimal refundAmt;
+    private HashMap<String, String> header;
 
-        public String getTradeNo() {
-            return tradeNo;
-        }
+    public String getAppId() {
+        return appId;
+    }
 
-        public void setTradeNo(String tradeNo) {
-            this.tradeNo = tradeNo;
-        }
-
-        public int getTradeType() {
-            return tradeType;
-        }
-
-        public void setTradeType(int tradeType) {
-            this.tradeType = tradeType;
-        }
-
-        public BigDecimal getRefundAmt() {
-            return refundAmt;
-        }
-
-        public void setRefundAmt(BigDecimal refundAmt) {
-            this.refundAmt = refundAmt;
-        }
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
     public String getOrderId() {
@@ -85,27 +65,43 @@ public class AcquireRefundPlusRequest extends BaseRequest {
         this.orderId = orderId;
     }
 
-    public List<TradeDetail> getTradeDetails() {
-        return tradeDetails;
+    public String getTradeNo() {
+        return tradeNo;
     }
 
-    public void setTradeDetails(List<TradeDetail> tradeDetails) {
-        this.tradeDetails = tradeDetails;
+    public void setTradeNo(String tradeNo) {
+        this.tradeNo = tradeNo;
     }
 
-    public String getAppId() {
-        return appId;
+    public String getRequestNo() {
+        return requestNo;
     }
 
-    public void setAppId(String appId) {
-        this.appId = appId;
+    public void setRequestNo(String requestNo) {
+        this.requestNo = requestNo;
     }
 
-    public String getTraceId() {
-        return traceId;
+    public BigDecimal getRefundAmt() {
+        return refundAmt;
     }
 
-    public void setTraceId(String traceId) {
-        this.traceId = traceId;
+    public void setRefundAmt(BigDecimal refundAmt) {
+        this.refundAmt = refundAmt;
+    }
+
+    public int getTradeType() {
+        return tradeType;
+    }
+
+    public void setTradeType(int tradeType) {
+        this.tradeType = tradeType;
+    }
+
+    public HashMap<String, String> getHeader() {
+        return header;
+    }
+
+    public void setHeader(HashMap<String, String> header) {
+        this.header = header;
     }
 }

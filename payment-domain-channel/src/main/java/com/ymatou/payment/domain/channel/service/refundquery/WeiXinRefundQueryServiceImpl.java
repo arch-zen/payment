@@ -127,7 +127,7 @@ public class WeiXinRefundQueryServiceImpl implements RefundQueryService {
             QueryRefundRequest queryRefundRequest, QueryRefundResponse response, Exception e) {
 
         RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
-        requestLog.setCorrelateId(refundRequest.getPaymentId());
+        requestLog.setCorrelateId(refundRequest.getRefundBatchNo());
         requestLog.setMethod("WeiXinRefund");
         requestLog.setRequestData(queryRefundRequest.getRequestData());
         requestLog.setRequestTime(requestTime);

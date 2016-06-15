@@ -121,7 +121,7 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
                 logger.info("generate RefundMiscRequestLog begin.");
                 RefundMiscRequestLogWithBLOBs rmrl = new RefundMiscRequestLogWithBLOBs();
                 rmrl.setRefundBatchNo(req.getBatchNo());
-                rmrl.setCorrelateId(refundrequest.getPaymentId());
+                rmrl.setCorrelateId(req.getBatchNo());
                 rmrl.setIsException(false);
                 rmrl.setExceptionDetail("");
                 rmrl.setLogId(UUID.randomUUID().toString());

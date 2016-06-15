@@ -60,6 +60,10 @@ public class RefundCallbackRequest {
      * 交易号
      */
     private String tradeNo;
+    /**
+     * 退款申请号
+     */
+    private String requestNo;
 
     public boolean getIsFastRefund() {
         return isFastRefund;
@@ -139,5 +143,17 @@ public class RefundCallbackRequest {
 
     public void setTradeNo(String tradeNo) {
         this.tradeNo = tradeNo;
+    }
+
+    public String getRequestNo() {
+        return requestNo;
+    }
+
+    public void setRequestNo(String requestNo) {
+        this.requestNo = requestNo;
+    }
+
+    public void setFastRefund(boolean isFastRefund) {
+        this.isFastRefund = isFastRefund;
     }
 }

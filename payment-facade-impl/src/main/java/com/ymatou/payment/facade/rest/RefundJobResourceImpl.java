@@ -24,7 +24,7 @@ import com.ymatou.payment.facade.constants.RefundStatusEnum;
  * @author qianmin 2016年6月8日 上午10:42:24
  *
  */
-@Path("/api")
+@Path("/{api:(?i:api)}")
 @Component("refundJobResource")
 @Consumes({"application/json; charset=UTF-8"})
 @Produces({"text/html; charset=UTF-8"})
@@ -34,7 +34,7 @@ public class RefundJobResourceImpl implements RefundJobResource {
     private RefundJobFacade refundJobFacade;
 
     @POST
-    @Path("/excuteRefund")
+    @Path("/{Refund:(?i:Refund)}/{ExcuteRefund:(?i:ExcuteRefund)}")
     @Override
     public String excuteRefund(String refundNo, @Context HttpServletRequest servletRequest) {
         HashMap<String, String> header = generateHttpHeader(servletRequest);

@@ -74,5 +74,4 @@ public interface RefundJobService {
      * @param refundRequest
      */
     public void updateRefundRequestToCompletedSuccess(RefundRequestPo refundRequest);
-
 }

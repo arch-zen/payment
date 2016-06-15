@@ -3,6 +3,7 @@
  */
 package com.ymatou.payment.domain.refund.model;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.ymatou.payment.facade.PrintFriendliness;
@@ -21,6 +22,7 @@ public class Refund extends PrintFriendliness {
     private List<String> orderIdList;
     private String appId;
     private String traceId;
+    private BigDecimal refundAmt;
 
     public String getPaymentId() {
         return paymentId;
@@ -68,5 +70,13 @@ public class Refund extends PrintFriendliness {
 
     public void setTraceId(String traceId) {
         this.traceId = traceId;
+    }
+
+    public BigDecimal getRefundAmt() {
+        return refundAmt;
+    }
+
+    public void setRefundAmt(BigDecimal refundAmt) {
+        this.refundAmt = refundAmt;
     }
 }

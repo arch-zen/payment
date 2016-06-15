@@ -112,8 +112,9 @@ public class RefundResourceImpl implements RefundResource {
     @Path("/{Refund:(?i:Refund)}/{AcquireRefund:(?i:AcquireRefund)}")
     @Override
     public AcquireRefundPlusResponse acquireRefund(AcquireRefundPlusRequest req, HttpServletRequest servletRequest) {
+        req.setHeader(generateHttpHeader(servletRequest));
 
-        return refundFacade.acquireRefund(req, generateHttpHeader(servletRequest));
+        return refundFacade.acquireRefund(req);
     }
 
     @POST

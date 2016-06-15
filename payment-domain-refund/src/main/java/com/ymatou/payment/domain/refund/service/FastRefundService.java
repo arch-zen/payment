@@ -8,6 +8,7 @@ import java.util.HashMap;
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.refund.model.Refund;
+import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 
 /**
  * 快速退款
@@ -23,17 +24,9 @@ public interface FastRefundService {
      * @param payment
      * @param bussinessorder
      * @param refundInfo
-     */
-    public void saveRefundRequest(Payment payment, BussinessOrder bussinessorder, Refund refundInfo);
-
-    /**
-     * 通知退款
-     * 
-     * @param refundInfo
-     * @param header
      * @return
      */
-    public void notifyRefund(Refund refundInfo, HashMap<String, String> header);
+    public RefundRequestPo saveRefundRequest(Payment payment, BussinessOrder bussinessorder, Refund refundInfo);
 
     /**
      * 发送交易信息给用户

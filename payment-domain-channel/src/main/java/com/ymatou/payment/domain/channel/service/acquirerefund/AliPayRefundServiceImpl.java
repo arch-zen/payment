@@ -3,6 +3,7 @@
  */
 package com.ymatou.payment.domain.channel.service.acquirerefund;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -79,7 +80,7 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
 
                     // save RefundMiscRequestLog
                     RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
-                    requestLog.setCorrelateId(refundRequest.getPaymentId());
+                    requestLog.setCorrelateId(refundRequest.getRefundBatchNo());
                     requestLog.setMethod("AliRefund");
                     requestLog.setRequestData(aliPayRefundRequest.getRequestData());
                     requestLog.setResponseData(response.getOriginalResponse());
@@ -129,7 +130,9 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
         request.setRefundDate(new Date());
         request.setBatchNum("1");
         String detailData = new StringBuilder().append(refundRequest.getInstPaymentId()).append("^")
-                .append(refundRequest.getRefundAmount()).append("^").append(AliPayConsts.REFUND_REASON).toString();
+                .append(refundRequest.getRefundAmount().setScale(2, BigDecimal.ROUND_HALF_UP)).append("^") // TODO
+                .append(AliPayConsts.REFUND_REASON)
+                .toString();
         request.setDetailData(detailData);
         request.setUseFreezeAmount("N");
 
@@ -144,7 +147,7 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
         RefundRequestExample example = new RefundRequestExample();
         example.createCriteria().andRefundBatchNoEqualTo(refundRequest.getRefundBatchNo());
 
-        refundRequestMapper.updateByExampleWithBLOBs(refundRequest, example);
+        refundRequestMapper.updateByExampleSelective(refundRequest, example);
     }
 
 }

@@ -123,7 +123,7 @@ public class AliPayRefundQueryServiceImpl implements RefundQueryService {
             AliPayRefundQueryRequest queryRefundRequest, AliPayRefundQueryResponse response, Exception e) {
 
         RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
-        requestLog.setCorrelateId(refundRequest.getPaymentId());
+        requestLog.setCorrelateId(refundRequest.getRefundBatchNo());
         requestLog.setMethod("WeiXinRefund");
         requestLog.setRequestData(queryRefundRequest.getRequestData());
         requestLog.setRequestTime(requestTime);

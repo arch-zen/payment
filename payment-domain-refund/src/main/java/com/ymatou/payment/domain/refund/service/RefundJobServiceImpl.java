@@ -28,6 +28,7 @@ import com.ymatou.payment.facade.constants.AccountOperateTypeEnum;
 import com.ymatou.payment.facade.constants.AccountTypeEnum;
 import com.ymatou.payment.facade.constants.ApproveStatusEnum;
 import com.ymatou.payment.facade.constants.CurrencyTypeEnum;
+import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.infrastructure.db.mapper.AccountingLogMapper;
@@ -111,7 +112,7 @@ public class RefundJobServiceImpl implements RefundJobService {
                 return false;
             }
         } catch (IOException e) {
-            logger.info("accouting error.", e);
+            logger.info("accouting error.", e); // 扣款异常只影响是否提交第三方扣款， 不影响返回给交易的应答
         }
         return false;
     }
@@ -167,6 +168,7 @@ public class RefundJobServiceImpl implements RefundJobService {
             RefundStatusEnum refundStatus) {
         RefundRequestPo refundRequestPo = new RefundRequestPo();
         PaymentPo paymentPo = new PaymentPo();
+        paymentPo.setPaymentId(payment.getPaymentId());
         if (RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) {
             refundRequestPo.setRefundBatchNo(refundRequest.getRefundBatchNo());
             refundRequestPo.setRefundStatus(refundStatus.getCode());
@@ -174,7 +176,8 @@ public class RefundJobServiceImpl implements RefundJobService {
             refundRequestPo.setRetryCount(retryCount);
             BigDecimal refundAmt = payment.getCompletedRefundAmt() == null ? refundRequest.getRefundAmount()
                     : refundRequest.getRefundAmount().add(payment.getCompletedRefundAmt());
-            paymentPo.setPaymentId(payment.getPaymentId());
+
+            paymentPo.setPayStatus(PayStatusEnum.Refunded.getIndex());
             paymentPo.setCompletedRefundAmt(refundAmt); // 更新退款完成金额
         } else if (RefundStatusEnum.COMPLETE_FAILED.equals(refundStatus)) {
             refundRequestPo.setRefundBatchNo(refundRequest.getRefundBatchNo());
@@ -183,7 +186,6 @@ public class RefundJobServiceImpl implements RefundJobService {
             refundRequestPo.setRetryCount(retryCount);
 
             BigDecimal refundAmt = payment.getRefundAmt().subtract(refundRequest.getRefundAmount());
-            paymentPo.setPaymentId(payment.getPaymentId());
             paymentPo.setRefundAmt(refundAmt); // 更新退款申请金额
         } else {
             refundRequestPo.setRefundBatchNo(refundRequest.getRefundBatchNo());
@@ -209,6 +211,7 @@ public class RefundJobServiceImpl implements RefundJobService {
         request.setThirdPartyTradingNo(refundRequest.getInstPaymentId());
         request.setTradeNo(refundRequest.getTradeNo());
         request.setIsFastRefund(refundRequest.getApproveStatus().equals(ApproveStatusEnum.FAST_REFUND.getCode()));
+        request.setRequestNo(refundRequest.getTraceId());
 
         boolean isSuccess = false;
         try {

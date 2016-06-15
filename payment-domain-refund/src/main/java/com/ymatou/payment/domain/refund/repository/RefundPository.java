@@ -3,6 +3,7 @@
  */
 package com.ymatou.payment.domain.refund.repository;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,8 +19,6 @@ import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.refund.model.Refund;
 import com.ymatou.payment.facade.constants.ApproveStatusEnum;
-import com.ymatou.payment.facade.constants.ChannelTypeEnum;
-import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.infrastructure.db.mapper.CompensateProcessInfoMapper;
 import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
@@ -57,27 +56,6 @@ public class RefundPository {
     @Autowired
     private SqlSession sqlSession;
 
-    @Transactional
-    public void addFastRefundInfo(Payment payment, BussinessOrder bussinessorder,
-            Refund refundInfo) {
-        RefundRequestPo refundrequest = new RefundRequestPo();
-        refundrequest.setPaymentId(payment.getPaymentId());
-        refundrequest.setInstPaymentId(payment.getInstitutionPaymentId());
-        refundrequest.setTradeNo(bussinessorder.getOrderId());
-        refundrequest.setOrderId(refundInfo.getOrderIdList().get(0));
-        refundrequest.setTraceId(refundInfo.getTraceId());
-        refundrequest.setAppId(refundInfo.getAppId());
-        refundrequest.setPayType(payment.getPayType().getCode());
-        refundrequest.setRefundAmount(payment.getPayPrice().getAmount());
-        refundrequest.setCurrencyType(payment.getPayCurrencyType());
-        refundrequest.setApproveStatus(ApproveStatusEnum.FAST_REFUND.getCode());
-        refundrequest.setApprovedTime(new Date());
-        refundrequest.setApprovedUser("system");
-        refundrequest.setRefundStatus(RefundStatusEnum.INIT.getCode());
-        refundrequest.setTradeType(refundInfo.getTradeType());
-        refundrequest.setRefundBatchNo(generateRefundBatchNo());
-    }
-
     /**
      * 获退款批次号
      * 
@@ -94,7 +72,7 @@ public class RefundPository {
     }
 
     @Transactional
-    public void addRefundrequestAndCompensateprocessinfo(Payment payment, BussinessOrder bussinessorder,
+    public RefundRequestPo saveFastRefundrequest(Payment payment, BussinessOrder bussinessorder,
             Refund refundInfo) {
         RefundRequestPo refundrequest = new RefundRequestPo();
 
@@ -102,43 +80,27 @@ public class RefundPository {
         refundrequest.setInstPaymentId(payment.getInstitutionPaymentId());
         refundrequest.setTradeNo(bussinessorder.getOrderId());
 
-
         refundrequest.setOrderId(refundInfo.getOrderIdList().get(0));
         refundrequest.setTraceId(refundInfo.getTraceId());
         refundrequest.setAppId(refundInfo.getAppId());
         refundrequest.setPayType(payment.getPayType().getCode());
-        refundrequest.setRefundAmount(payment.getPayPrice().getAmount());
+        refundrequest.setRefundAmount(refundInfo.getRefundAmt());
         refundrequest.setCurrencyType(payment.getPayCurrencyType());
         refundrequest.setApproveStatus(ApproveStatusEnum.FAST_REFUND.getCode());
         refundrequest.setApprovedTime(new Date());
         refundrequest.setApprovedUser("system");
         refundrequest.setRefundStatus(RefundStatusEnum.INIT.getCode());
         refundrequest.setTradeType(refundInfo.getTradeType());
-
-        CompensateProcessInfoPo compensateprocessinfo = new CompensateProcessInfoPo();
-
-        compensateprocessinfo.setCorrelateId(payment.getPaymentId());
-        compensateprocessinfo.setAppId("1");
-        compensateprocessinfo.setPayType(null);
-        compensateprocessinfo.setMethodName("Refund");
-        compensateprocessinfo.setRequestUrl("");
-        compensateprocessinfo.setRequestData(payment.getPaymentId());
-        compensateprocessinfo.setProcessMachineName(null);
-        compensateprocessinfo.setLastProcessedTime(null);
-        compensateprocessinfo.setCompensateType(1); // 退款
-
-        compensateProcessInfoMapper.insertSelective(compensateprocessinfo);
+        refundrequest.setRefundBatchNo(generateRefundBatchNo());
         refundRequestMapper.insertSelective(refundrequest);
-    }
 
-    /**
-     * 根据paymentId获取Refundrequest TODO
-     * 
-     * @param paymentId
-     * @return
-     */
-    public RefundRequestPo getRefundRequestByPaymentId(String paymentId) {
-        return refundRequestMapper.selectByPrimaryKey(paymentId);
+        BigDecimal refundAmt = payment.getRefundAmt() == null ? new BigDecimal(0.00) : payment.getRefundAmt();
+        PaymentPo paymentPo = new PaymentPo();
+        paymentPo.setPaymentId(payment.getPaymentId());
+        paymentPo.setRefundAmt(refundAmt.add(refundrequest.getRefundAmount()));
+        paymentMapper.updateByPrimaryKeySelective(paymentPo);
+
+        return refundrequest;
     }
 
     /**
@@ -159,15 +121,38 @@ public class RefundPository {
     }
 
     /**
-     * 保存RefundRequest
+     * 保存RefundRequest, 更新退款金额
      * 
      * @param refundrequestWithBLOBs
      */
     @Transactional
-    public void batchSaveRefundRequest(List<RefundRequestPo> refundrequestWithBLOBs) {
+    public void batchSaveRefundRequestAndUpdateRefundAmt(List<RefundRequestPo> refundrequestWithBLOBs) {
         for (RefundRequestPo refundrequest : refundrequestWithBLOBs) {
             refundRequestMapper.insertSelective(refundrequest);
+
+            PaymentPo result = paymentMapper.selectByPrimaryKey(refundrequest.getPaymentId());
+            BigDecimal refundAmt = result.getRefundAmt() == null ? new BigDecimal(0.00) : result.getRefundAmt();
+            PaymentPo paymentPo = new PaymentPo();
+            paymentPo.setPaymentId(result.getPaymentId());
+            paymentPo.setRefundAmt(refundAmt.add(refundrequest.getRefundAmount()));
+            paymentMapper.updateByPrimaryKeySelective(paymentPo);
         }
+    }
+
+    /**
+     * 保存RefundRequest, 更新退款金额
+     * 
+     * @param refundrequestWithBLOBs
+     */
+    @Transactional
+    public void saveRefundRequestAndUpdateRefundAmt(RefundRequestPo refundrequest, Payment payment) {
+        refundRequestMapper.insertSelective(refundrequest);
+
+        BigDecimal refundAmt = payment.getRefundAmt() == null ? new BigDecimal(0.00) : payment.getRefundAmt();
+        PaymentPo paymentPo = new PaymentPo();
+        paymentPo.setPaymentId(payment.getPaymentId());
+        paymentPo.setRefundAmt(refundAmt.add(refundrequest.getRefundAmount()));
+        paymentMapper.updateByPrimaryKeySelective(paymentPo);
     }
 
     /**
@@ -183,7 +168,7 @@ public class RefundPository {
         for (RefundRequestPo refundrequestPo : refundrequestPos) {
             RefundRequestExample example = new RefundRequestExample();
             example.createCriteria().andPaymentIdEqualTo(refundrequestPo.getPaymentId());
-            refundRequestMapper.updateByExample(refundrequestPo, example);
+            refundRequestMapper.updateByExampleSelective(refundrequestPo, example);
         }
         for (CompensateProcessInfoPo info : compensateprocessinfoWithBLOBs) {
             compensateProcessInfoMapper.insertSelective(info);
@@ -201,7 +186,7 @@ public class RefundPository {
         for (RefundRequestPo refundrequestPo : refundrequestPos) {
             RefundRequestExample example = new RefundRequestExample();
             example.createCriteria().andPaymentIdEqualTo(refundrequestPo.getPaymentId());
-            refundRequestMapper.updateByExample(refundrequestPo, example);
+            refundRequestMapper.updateByExampleSelective(refundrequestPo, example);
         }
     }
 
@@ -214,16 +199,6 @@ public class RefundPository {
      */
     public List<RefundRequestPo> queryRefundRequest(HashMap<String, Object> query) {
         return sqlSession.selectList("ext-refundrequest.selectRefundrequestByPage", query);
-    }
-
-    public String convertPayTypeToPayChannel(String payType) {
-
-        if (payType.equals(PayTypeEnum.AliPayApp.getCode()) || payType.equals(PayTypeEnum.AliPayPc.getCode())
-                || payType.equals(PayTypeEnum.AliPayWap.getCode())) {
-            return ChannelTypeEnum.AliPay.getCode();
-        } else {
-            return ChannelTypeEnum.WeiXinPay.getCode();
-        }
     }
 
     /**
@@ -259,7 +234,7 @@ public class RefundPository {
         RefundRequestPo record = new RefundRequestPo();
         record.setRefundBatchNo(refundNo);
         record.setAccoutingStatus(accoutingStatus);
-        refundRequestMapper.updateByExample(record, example);
+        refundRequestMapper.updateByExampleSelective(record, example);
     }
 
     /**
@@ -272,11 +247,11 @@ public class RefundPository {
     public void updateRefundRequestAndPayment(RefundRequestPo refundRequestPo, PaymentPo paymentPo) {
         RefundRequestExample example = new RefundRequestExample();
         example.createCriteria().andRefundBatchNoEqualTo(refundRequestPo.getRefundBatchNo());
-        refundRequestMapper.updateByExample(refundRequestPo, example);
+        refundRequestMapper.updateByExampleSelective(refundRequestPo, example);
 
         PaymentExample example2 = new PaymentExample();
         example2.createCriteria().andPaymentIdEqualTo(paymentPo.getPaymentId());
-        paymentMapper.updateByExample(paymentPo, example2);
+        paymentMapper.updateByExampleSelective(paymentPo, example2);
     }
 
     /**
@@ -289,6 +264,13 @@ public class RefundPository {
     public void updateRefundRequest(RefundRequestPo refundRequestPo) {
         RefundRequestExample example = new RefundRequestExample();
         example.createCriteria().andRefundBatchNoEqualTo(refundRequestPo.getRefundBatchNo());
-        refundRequestMapper.updateByExample(refundRequestPo, example);
+        refundRequestMapper.updateByExampleSelective(refundRequestPo, example);
+    }
+
+    public List<RefundRequestPo> getRefundReqestByTraceIdAndTradeNo(String traceId, String tradeNo) {
+        RefundRequestExample example = new RefundRequestExample();
+        example.createCriteria().andTraceIdEqualTo(traceId).andTradeNoEqualTo(tradeNo);
+
+        return refundRequestMapper.selectByExample(example);
     }
 }

@@ -75,7 +75,7 @@ public class WeixinRefundServiceImpl implements AcquireRefundService {
 
                     // save RefundMiscRequestLog
                     RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
-                    requestLog.setCorrelateId(refundRequest.getPaymentId());
+                    requestLog.setCorrelateId(refundRequest.getRefundBatchNo());
                     requestLog.setMethod("WeixinRefund");
                     requestLog.setRequestData(wxRefundRequest.getRequestData());
                     requestLog.setResponseData(response.getOriginalResponse());

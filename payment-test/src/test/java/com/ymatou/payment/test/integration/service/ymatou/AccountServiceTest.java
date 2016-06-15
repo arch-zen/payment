@@ -33,7 +33,7 @@ public class AccountServiceTest extends RestBaseTest {
     public void testAccounting() throws IOException {
         List<AccountingItem> itemList = new ArrayList<>();
         AccountingItem item = new AccountingItem();
-        item.setAccountId("01010099735467");
+        // item.setAccountId("01010099735467");
         item.setAccountingDate(new Date());
         item.setAccountOperateType(2);
         item.setAccountType(1);
@@ -44,7 +44,7 @@ public class AccountServiceTest extends RestBaseTest {
         item.setMemo("unit test");
         item.setOperator("tester");
         item.setOriginalNo("7238ce81-9862-4b8f-8d91-4d876cf9568G");
-        item.setUserId(99735467);
+        item.setUserId(168);
         itemList.add(item);
 
         AccountingRequest request = new AccountingRequest();
@@ -61,7 +61,7 @@ public class AccountServiceTest extends RestBaseTest {
     public void testAccounting2() throws IOException {
         List<AccountingItem> itemList = new ArrayList<>();
         AccountingItem item = new AccountingItem();
-        item.setAccountId("01010099735467");
+        // item.setAccountId("01010099735467");
         item.setAccountingDate(new Date());
         item.setAccountOperateType(2);
         item.setAccountType(1);
@@ -72,7 +72,7 @@ public class AccountServiceTest extends RestBaseTest {
         item.setMemo("unit test");
         item.setOperator("tester");
         item.setOriginalNo(UUID.randomUUID().toString());
-        item.setUserId(99735467);
+        item.setUserId(168);
         itemList.add(item);
 
         AccountingRequest request = new AccountingRequest();
