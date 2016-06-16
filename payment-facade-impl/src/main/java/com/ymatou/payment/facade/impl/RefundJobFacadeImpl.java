@@ -64,9 +64,9 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
             }
 
         } else {// 查询退款结果
-            RefundStatusEnum refundStatus = null;
+            RefundStatusEnum refundStatus = RefundStatusEnum.withCode(refundRequest.getRefundStatus());
             if (!refundRequest.getRefundStatus().equals(RefundStatusEnum.THIRDPART_REFUND_SUCCESS.getCode())) {
-                logger.info("Step 4: submit third party refund query.");
+                logger.info("Stg ep 4: submit third party refund query.");
                 refundStatus = refundJobService.queryRefund(refundRequest, payment, header);
                 refundStatusFlag = refundStatus.getCode();
 

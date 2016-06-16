@@ -22,7 +22,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
 
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.service.PayService;
-import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
@@ -33,7 +32,6 @@ import com.ymatou.payment.facade.rest.RefundJobResource;
 import com.ymatou.payment.facade.rest.RefundResource;
 import com.ymatou.payment.infrastructure.db.mapper.BussinessOrderMapper;
 import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
-import com.ymatou.payment.infrastructure.db.mapper.PaymentParamMapper;
 import com.ymatou.payment.infrastructure.db.mapper.RefundRequestMapper;
 import com.ymatou.payment.infrastructure.db.model.BussinessOrderPo;
 import com.ymatou.payment.infrastructure.db.model.PaymentExample;
@@ -57,12 +55,6 @@ public class RefundJobResourceImplTest extends RestBaseTest {
 
     @Autowired
     private RefundRequestMapper refundRequestMapper;
-
-    @Autowired
-    private RefundPository refundPository;
-
-    @Autowired
-    private PaymentParamMapper paymentParamMapper;
 
     @Autowired
     private PaymentResource paymentResource;
@@ -144,7 +136,7 @@ public class RefundJobResourceImplTest extends RestBaseTest {
         Assert.assertEquals("-1", respMsg);
     }
 
-    // @Test
+    @Test
     public void testThirdPartySuccess() throws InterruptedException {
         HashMap<String, Object> result = generatePayment();
         BussinessOrderPo bussinessOrderPo = (BussinessOrderPo) result.get("businessOrder");
@@ -153,7 +145,7 @@ public class RefundJobResourceImplTest extends RestBaseTest {
         FastRefundRequest request = new FastRefundRequest();
         request.setPaymentId(paymentPo.getPaymentId());
         request.setAppId(bussinessOrderPo.getAppId());
-        request.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
+        request.setOrderIdList(Arrays.asList(new String[] {RandomStringUtils.randomNumeric(8)}));
         request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
         request.setTradingId(bussinessOrderPo.getOrderId());
         request.setTradeType(1);
@@ -170,6 +162,7 @@ public class RefundJobResourceImplTest extends RestBaseTest {
         String refundBatchNo = refundRequestPos.get(0).getRefundBatchNo();
 
         RefundRequestPo refundRequestPo = new RefundRequestPo();
+        refundRequestPo.setRefundTime(new Date());
         refundRequestPo.setRefundStatus(RefundStatusEnum.THIRDPART_REFUND_SUCCESS.getCode());
         RefundRequestExample example2 = new RefundRequestExample();
         example2.createCriteria().andRefundBatchNoEqualTo(refundBatchNo);
