@@ -134,6 +134,7 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
                         break;
                     }
                 }
+                refundrequest.setRefundBatchNo(refundPository.generateRefundBatchNo()); // 生成退款批次号
                 refundrequestWithBLOBs.add(refundrequest); // 需要被插入的RefundRequest
             }
         }

@@ -24,6 +24,11 @@
 	    <result column="TradeType" property="tradeType" jdbcType="INTEGER" />
 	</resultMap>
 	
+	<parameterMap type="java.util.Map" id="genRefundBatchNoSeqMap">
+		<parameter property="sequenceType" mode="IN" jdbcType="VARCHAR" />
+		<parameter property="seed" mode="OUT" jdbcType="INTEGER" />
+	</parameterMap>
+	
 	<sql id="Base_Column_List" >
 	    PaymentId, TradeNo, OrderId, TraceId, AppId, PayType, RefundAmount, CurrencyType, 
 	    ApproveStatus, ApprovedTime, SoftDeleteFlag, CreatedTime, ApprovedUser, RefundStatus, 
@@ -45,4 +50,9 @@
 		) A
 		where rownumber > ${pageSize} * (${pageIndex} - 1)
 	</select>
+	<select id="genRefundBatchNoSeq" statementType="CALLABLE" parameterMap="genRefundBatchNoSeqMap">
+		<![CDATA[
+          CALL csp_GenerateSeed(?,?)
+		]]> 
+ 	</select>
 </mapper>
