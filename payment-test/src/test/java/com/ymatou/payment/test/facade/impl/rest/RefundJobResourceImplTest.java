@@ -81,7 +81,7 @@ public class RefundJobResourceImplTest extends RestBaseTest {
         request.setPaymentId(paymentPo.getPaymentId());
         request.setAppId(bussinessOrderPo.getAppId());
         request.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
-        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request.setTradingId(bussinessOrderPo.getOrderId());
         request.setTradeType(1);
         request.setRefundAmt(new BigDecimal(7.8));
@@ -115,7 +115,7 @@ public class RefundJobResourceImplTest extends RestBaseTest {
         request.setPaymentId(paymentPo.getPaymentId());
         request.setAppId(bussinessOrderPo.getAppId());
         request.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
-        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request.setTradingId(bussinessOrderPo.getOrderId());
         request.setTradeType(1);
         request.setRefundAmt(new BigDecimal(7.8));
@@ -145,8 +145,8 @@ public class RefundJobResourceImplTest extends RestBaseTest {
         FastRefundRequest request = new FastRefundRequest();
         request.setPaymentId(paymentPo.getPaymentId());
         request.setAppId(bussinessOrderPo.getAppId());
-        request.setOrderIdList(Arrays.asList(new String[] {RandomStringUtils.randomNumeric(8)}));
-        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setOrderIdList(Arrays.asList(new String[] {RandomStringUtils.randomNumeric(6)}));
+        request.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request.setTradingId(bussinessOrderPo.getOrderId());
         request.setTradeType(1);
         request.setRefundAmt(new BigDecimal(7.8));
@@ -171,8 +171,7 @@ public class RefundJobResourceImplTest extends RestBaseTest {
 
         String respMsg = refundJobResource.excuteRefund(refundBatchNo, servletRequest);
         Thread.sleep(1000);
-        System.out.println(respMsg);
-        Assert.assertEquals("-1", respMsg);
+        Assert.assertEquals("ok", respMsg);
     }
 
     private HashMap<String, Object> generatePayment() {
@@ -217,7 +216,7 @@ public class RefundJobResourceImplTest extends RestBaseTest {
         req.setCurrency("CNY");
         req.setEncoding(65001);
         req.setNotifyUrl("http://api.trading.operate.ymatou.com/api/Trading/TradingCompletedNotify");
-        req.setOrderId(getDateFormatString("yyyyMMddHHmmssSSS"));
+        req.setOrderId(RandomStringUtils.randomNumeric(8));
         req.setOrderTime(getDateFormatString("yyyyMMddHHmmss"));
         req.setPayPrice("0.01");
         req.setPayType("10");

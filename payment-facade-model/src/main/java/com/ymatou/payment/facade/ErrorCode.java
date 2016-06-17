@@ -60,6 +60,8 @@ public enum ErrorCode {
 
     FAIL_TRADE_CEREAT_DIRECT(1009, "授权接口调用失败"),
 
+    UNABLE_REFUND(1010, "不能退款"),
+
     FAIL(5000, "请求处理失败"),
 
     UNKNOWN(-9999, "未知错误，系统异常");

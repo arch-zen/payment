@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ymatou.payment.domain.pay.model.Payment;
+import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.infrastructure.db.mapper.CompensateProcessInfoMapper;
 import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
 import com.ymatou.payment.infrastructure.db.model.BussinessOrderPo;
@@ -171,10 +172,10 @@ public class PaymentRepository {
      * @param payStatus
      * @return
      */
-    public Payment getPaymentCanPartRefund(String bussinessOrderId, Integer payStatus) {
+    public Payment getPaymentCanPartRefund(String bussinessOrderId) {
         PaymentExample example = new PaymentExample();
         example.createCriteria().andBussinessOrderIdEqualTo(bussinessOrderId)
-                .andPayStatusNotEqualTo(payStatus);
+                .andPayStatusBetween(PayStatusEnum.Paied.getIndex(), PayStatusEnum.Refunded.getIndex());
         List<PaymentPo> pos = paymentMapper.selectByExample(example);
         if (pos == null || pos.size() == 0) {
             return null;

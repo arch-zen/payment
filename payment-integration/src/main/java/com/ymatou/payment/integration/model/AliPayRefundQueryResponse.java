@@ -5,6 +5,8 @@ package com.ymatou.payment.integration.model;
 
 import java.math.BigDecimal;
 
+import com.ymatou.payment.facade.constants.RefundStatusEnum;
+
 /**
  * 支付宝退款查询接口Response
  * 
@@ -99,36 +101,10 @@ public class AliPayRefundQueryResponse {
     }
 
     public static class RefundDetailData {
-        private ChargeAliRefundStatusType chargeRefundStatus;
-        private Boolean isRefundOk;
-        private boolean isRefundStepOneOk;
         private String instPaymentId;
         private String batchNo;
         private BigDecimal refundAmount;
-
-        public ChargeAliRefundStatusType getChargeRefundStatus() {
-            return chargeRefundStatus;
-        }
-
-        public void setChargeRefundStatus(ChargeAliRefundStatusType chargeRefundStatus) {
-            this.chargeRefundStatus = chargeRefundStatus;
-        }
-
-        public Boolean isRefundOk() {
-            return isRefundOk;
-        }
-
-        public void setRefundOk(Boolean isRefundOk) {
-            this.isRefundOk = isRefundOk;
-        }
-
-        public boolean isRefundStepOneOk() {
-            return isRefundStepOneOk;
-        }
-
-        public void setRefundStepOneOk(boolean isRefundStepOneOk) {
-            this.isRefundStepOneOk = isRefundStepOneOk;
-        }
+        private RefundStatusEnum refundStatus;
 
         public String getInstPaymentId() {
             return instPaymentId;
@@ -153,97 +129,167 @@ public class AliPayRefundQueryResponse {
         public void setRefundAmount(BigDecimal refundAmount) {
             this.refundAmount = refundAmount;
         }
+
+        public RefundStatusEnum getRefundStatus() {
+            return refundStatus;
+        }
+
+        public void setRefundStatus(RefundStatusEnum refundStatus) {
+            this.refundStatus = refundStatus;
+        }
     }
 
-    public static enum ChargeAliRefundStatusType {
-        NA, PROCESSING, SUCCESS, FAILED,
-    }
-
+    /*
+     * is_success=T&result_details=201606160000375820^20160415210010255^210.00^SUCCESS^true^P
+     * is_success=T&result_details=201606150000373568^20160527210010776^195.00^SUCCESS^true^S
+     * is_success=T&result_details=201510160000000001^20151016210010640^2.40^SUCCESS^false^null
+     * is_success=F&error_code=REFUND_NOT_EXIST
+     */
     public RefundDetailData resolveResultDetails() {
-        // 201012300001^2010123016346858^0.02^SUCCESS|zen_gwen@hotmail.com^2088102210397302^alipay-test03@alipay.com^2088101568345155^0.01^SUCCESS
-        String data = this.resultDetails;
         RefundDetailData detail = null;
-        if (data == null) {
+        if (this.resultDetails == null) {
             return null;
         }
-        String[] tempData = data.split("\\|");
-        if (tempData == null || tempData.length == 0) {
-            throw new IllegalArgumentException(data + "is not valid");
-        }
+        String[] tempData = this.resultDetails.split("\\|");
         String[] refundTempData = tempData[0].split("$");
-        if (refundTempData == null || refundTempData.length == 0) {
-            throw new IllegalArgumentException(data + "is not valid");
-        }
         String[] refundDetailTempData = refundTempData[0].split("\\^");
-        if (refundDetailTempData == null || refundDetailTempData.length == 0) {
-            throw new IllegalArgumentException(data + "is not valid");
-        }
 
-        boolean isFirstStepOk = "SUCCESS".equalsIgnoreCase(refundDetailTempData[3]);
+        // result_details=BatchNo^InstPaymentId^RefundAmount^ProcessResult^isChargeBack^ChargeBackResult
+        RefundStatusEnum refundStatus = null;
         if (refundDetailTempData.length == 4) {
-            detail = new RefundDetailData();
-            detail.setBatchNo(refundDetailTempData[0]);
-            detail.setInstPaymentId(refundDetailTempData[1]);
-            detail.setRefundAmount(new BigDecimal(refundDetailTempData[2]));
-            detail.setRefundStepOneOk(isFirstStepOk);
-            detail.setChargeRefundStatus(ChargeAliRefundStatusType.NA);
-
-            detail.setRefundOk(detail.isRefundStepOneOk()); // 由于无法获取充退信息，所以只能断言退款成功
-        }
-
-        if (refundDetailTempData.length == 6) {
-            if (isFirstStepOk && "false".equalsIgnoreCase(refundDetailTempData[4])) {
-                detail = new RefundDetailData();
-                detail.setBatchNo(refundDetailTempData[0]);
-                detail.setInstPaymentId(refundDetailTempData[1]);
-                detail.setRefundAmount(new BigDecimal(refundDetailTempData[2]));
-                detail.setRefundStepOneOk(isFirstStepOk);
-                detail.setChargeRefundStatus(ChargeAliRefundStatusType.NA);
-                detail.setRefundOk(detail.isRefundStepOneOk());
+            // resultDetail长度为4时， 以处理结果为准
+            if ("SUCCESS".equalsIgnoreCase(refundDetailTempData[3])) {
+                refundStatus = RefundStatusEnum.THIRDPART_REFUND_SUCCESS;
             } else {
-                String refundStatusString = refundDetailTempData[5];
-                ChargeAliRefundStatusType chargeAliRefundStatus;
-                switch (refundStatusString.toLowerCase()) {
-                    case "s":
-                        chargeAliRefundStatus = ChargeAliRefundStatusType.SUCCESS;
+                refundStatus = RefundStatusEnum.REFUND_FAILED;
+            }
+        } else if (refundDetailTempData.length == 6) {
+            if ("false".equalsIgnoreCase(refundDetailTempData[4])) {
+                // 非充退时， 以处理结果为准
+                if ("SUCCESS".equalsIgnoreCase(refundDetailTempData[3])) {
+                    refundStatus = RefundStatusEnum.THIRDPART_REFUND_SUCCESS;
+                } else {
+                    refundStatus = RefundStatusEnum.REFUND_FAILED;
+                }
+            } else {
+                // 冲退时，以充退结果为准
+                switch (refundDetailTempData[5].toUpperCase()) {
+                    case "S":
+                    case "F":
+                        refundStatus = RefundStatusEnum.THIRDPART_REFUND_SUCCESS;
                         break;
-                    case "f": // 充退结果为f的情况，支付宝会处理为退余额
-                        chargeAliRefundStatus = ChargeAliRefundStatusType.SUCCESS;
-                        break;
-                    case "p":
-                        chargeAliRefundStatus = ChargeAliRefundStatusType.PROCESSING;
+                    case "P":
+                        refundStatus = RefundStatusEnum.WAIT_THIRDPART_REFUND;
                         break;
                     case "null":
                     default:
-                        chargeAliRefundStatus = ChargeAliRefundStatusType.NA;
+                        refundStatus = RefundStatusEnum.REFUND_FAILED;
                         break;
                 }
-
-                Boolean isRefundOk;
-                switch (chargeAliRefundStatus) {
-                    case PROCESSING:
-                        isRefundOk = null;
-                        break;
-                    case SUCCESS:
-                        isRefundOk = true;
-                        break;
-                    case NA:
-                    case FAILED:
-                    default:
-                        isRefundOk = false;
-                        break;
-                }
-
-                detail = new RefundDetailData();
-                detail.setBatchNo(refundDetailTempData[0]);
-                detail.setInstPaymentId(refundDetailTempData[1]);
-                detail.setRefundAmount(new BigDecimal(refundDetailTempData[2]));
-                detail.setRefundStepOneOk(isFirstStepOk);
-                detail.setChargeRefundStatus(chargeAliRefundStatus);
-                detail.setRefundOk(isRefundOk);
             }
-
+        } else {
+            refundStatus = RefundStatusEnum.REFUND_FAILED;
         }
+
+        detail = new RefundDetailData();
+        detail.setBatchNo(refundDetailTempData[0]);
+        detail.setInstPaymentId(refundDetailTempData[1]);
+        detail.setRefundAmount(new BigDecimal(refundDetailTempData[2]));
+        detail.setRefundStatus(refundStatus);
         return detail;
     }
+
+
+    // public static enum ChargeAliRefundStatusType {
+    // NA, PROCESSING, SUCCESS, FAILED,
+    // }
+
+    // public RefundDetailData resolveResultDetails() {
+    // //
+    // //201012300001^2010123016346858^0.02^SUCCESS|zen_gwen@hotmail.com^2088102210397302^alipay-test03@alipay.com^2088101568345155^0.01^SUCCESS
+    // String data = this.resultDetails;
+    // RefundDetailData detail = null;
+    // if (data == null) {
+    // return null;
+    // }
+    // String[] tempData = data.split("\\|");
+    // if (tempData == null || tempData.length == 0) {
+    // throw new IllegalArgumentException(data + "is not valid");
+    // }
+    // String[] refundTempData = tempData[0].split("$");
+    // if (refundTempData == null || refundTempData.length == 0) {
+    // throw new IllegalArgumentException(data + "is not valid");
+    // }
+    // String[] refundDetailTempData = refundTempData[0].split("\\^");
+    // if (refundDetailTempData == null || refundDetailTempData.length == 0) {
+    // throw new IllegalArgumentException(data + "is not valid");
+    // }
+    //
+    // boolean isFirstStepOk = "SUCCESS".equalsIgnoreCase(refundDetailTempData[3]);
+    // if (refundDetailTempData.length == 4) {
+    // detail = new RefundDetailData();
+    // detail.setBatchNo(refundDetailTempData[0]);
+    // detail.setInstPaymentId(refundDetailTempData[1]);
+    // detail.setRefundAmount(new BigDecimal(refundDetailTempData[2]));
+    // detail.setRefundStepOneOk(isFirstStepOk);
+    // detail.setChargeRefundStatus(ChargeAliRefundStatusType.NA);
+    //
+    // detail.setRefundOk(detail.isRefundStepOneOk()); // 由于无法获取充退信息，所以只能断言退款成功
+    // }
+    //
+    // if (refundDetailTempData.length == 6) {
+    // if (isFirstStepOk && "false".equalsIgnoreCase(refundDetailTempData[4])) {
+    // detail = new RefundDetailData();
+    // detail.setBatchNo(refundDetailTempData[0]);
+    // detail.setInstPaymentId(refundDetailTempData[1]);
+    // detail.setRefundAmount(new BigDecimal(refundDetailTempData[2]));
+    // detail.setRefundStepOneOk(isFirstStepOk);
+    // detail.setChargeRefundStatus(ChargeAliRefundStatusType.NA);
+    // detail.setRefundOk(detail.isRefundStepOneOk());
+    // } else {
+    // String refundStatusString = refundDetailTempData[5];
+    // ChargeAliRefundStatusType chargeAliRefundStatus;
+    // switch (refundStatusString.toLowerCase()) {
+    // case "s":
+    // chargeAliRefundStatus = ChargeAliRefundStatusType.SUCCESS;
+    // break;
+    // case "f": // 充退结果为f的情况，支付宝会处理为退余额
+    // chargeAliRefundStatus = ChargeAliRefundStatusType.SUCCESS;
+    // break;
+    // case "p":
+    // chargeAliRefundStatus = ChargeAliRefundStatusType.PROCESSING;
+    // break;
+    // case "null":
+    // default:
+    // chargeAliRefundStatus = ChargeAliRefundStatusType.NA;
+    // break;
+    // }
+    //
+    // Boolean isRefundOk;
+    // switch (chargeAliRefundStatus) {
+    // case PROCESSING:
+    // isRefundOk = null;
+    // break;
+    // case SUCCESS:
+    // isRefundOk = true;
+    // break;
+    // case NA:
+    // case FAILED:
+    // default:
+    // isRefundOk = false;
+    // break;
+    // }
+    //
+    // detail = new RefundDetailData();
+    // detail.setBatchNo(refundDetailTempData[0]);
+    // detail.setInstPaymentId(refundDetailTempData[1]);
+    // detail.setRefundAmount(new BigDecimal(refundDetailTempData[2]));
+    // detail.setRefundStepOneOk(isFirstStepOk);
+    // detail.setChargeRefundStatus(chargeAliRefundStatus);
+    // detail.setRefundOk(isRefundOk);
+    // }
+    //
+    // }
+    // return detail;
+    // }
 }

@@ -30,6 +30,8 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
 
     private static final Logger logger = LoggerFactory.getLogger(RefundJobFacadeImpl.class);
 
+    private static final int SOFT_DELETED = -3;
+
     @Autowired
     private RefundJobService refundJobService;
 
@@ -43,6 +45,9 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
         if (refundRequest == null // 退款申请不不存在或未审核
                 || refundRequest.getApproveStatus().equals(ApproveStatusEnum.NOT_APPROVED.getCode())) {
             return RefundStatusEnum.INIT.getCode();
+        }
+        if (refundRequest.getSoftDeleteFlag()) {
+            return SOFT_DELETED;
         }
         Payment payment = payService.getPaymentByPaymentId(refundRequest.getPaymentId());
         BussinessOrder bussinessOrder = payService.getBussinessOrderById(payment.getBussinessOrderId());
@@ -66,7 +71,7 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
         } else {// 查询退款结果
             RefundStatusEnum refundStatus = RefundStatusEnum.withCode(refundRequest.getRefundStatus());
             if (!refundRequest.getRefundStatus().equals(RefundStatusEnum.THIRDPART_REFUND_SUCCESS.getCode())) {
-                logger.info("Stg ep 4: submit third party refund query.");
+                logger.info("Step 4: submit third party refund query.");
                 refundStatus = refundJobService.queryRefund(refundRequest, payment, header);
                 refundStatusFlag = refundStatus.getCode();
 

@@ -6,6 +6,9 @@ package com.ymatou.payment.facade.model;
 import java.math.BigDecimal;
 import java.util.HashMap;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
 import org.hibernate.validator.constraints.Length;
 
 import com.ymatou.payment.facade.BaseRequest;
@@ -23,28 +26,33 @@ public class AcquireRefundPlusRequest extends BaseRequest {
     /**
      * 应用编号
      */
+    @Length(min = 1, max = 16, message = "appId not valid")
     private String appId;
     /**
      * 订单号
      */
+    @Length(min = 1, max = 64, message = "orderId not valid")
     private String orderId;
     /**
      * 交易号
      */
-    @Length(min = 1, max = 32, message = "tradeNo not valid")
+    @Length(min = 1, max = 64, message = "tradeNo not valid")
     private String tradeNo;
     /**
      * 退款申请号
      */
-    @Length(min = 1, max = 32, message = "requestNo not valid")
-    private String requestNo;
+    @Length(min = 1, max = 32, message = "refundNo not valid")
+    private String refundNo;
     /**
      * 退款金额
      */
+    @Min(0)
     private BigDecimal refundAmt;
     /**
-     * 退款金额
+     * 交易类型
      */
+    @Max(2)
+    @Min(1)
     private int tradeType;
 
     private HashMap<String, String> header;
@@ -73,12 +81,12 @@ public class AcquireRefundPlusRequest extends BaseRequest {
         this.tradeNo = tradeNo;
     }
 
-    public String getRequestNo() {
-        return requestNo;
+    public String getRefundNo() {
+        return refundNo;
     }
 
-    public void setRequestNo(String requestNo) {
-        this.requestNo = requestNo;
+    public void setRefundNo(String refundNo) {
+        this.refundNo = refundNo;
     }
 
     public BigDecimal getRefundAmt() {

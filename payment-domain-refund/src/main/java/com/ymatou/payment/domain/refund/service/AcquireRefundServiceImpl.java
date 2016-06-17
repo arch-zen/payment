@@ -58,19 +58,17 @@ public class AcquireRefundServiceImpl implements AcquireRefundService {
         BussinessOrder bussinessOrder = bussinessOrderRepository.getBussinessOrderCanRefund(
                 req.getTradeNo(), OrderStatusEnum.Paied.getIndex(), Date.valueOf(validDate));
         if (bussinessOrder != null) {
+
             // 根据BusinessOrderId找到支付单Payment
-            Payment payment = paymentRepository.getPaymentCanPartRefund(bussinessOrder.getBussinessOrderId(),
-                    OrderStatusEnum.Init.getIndex());
+            Payment payment = paymentRepository.getPaymentCanPartRefund(bussinessOrder.getBussinessOrderId());
+            // 根据RequestNo及TradeNo查找RefundRequest， 保证幂等
+            List<RefundRequestPo> refundRequests =
+                    refundPository.getRefundReqestByTraceIdAndTradeNo(req.getRefundNo(), req.getTradeNo());
 
-            BigDecimal paymentRefundAmt =
-                    payment.getRefundAmt() == null ? new BigDecimal(0.00) : payment.getRefundAmt();
-            if (payment.getPayPrice().compareTo(new Money(req.getRefundAmt().add(paymentRefundAmt))) > 0) {// 申请金额小于支付金额
+            if (refundRequests.size() == 0) { // 若不存在RefundRequest，则新增
 
-                // 根据RequestNo及TradeNo查找RefundRequest， 保证幂等
-                List<RefundRequestPo> refundRequests =
-                        refundPository.getRefundReqestByTraceIdAndTradeNo(req.getRequestNo(), req.getTradeNo());
-
-                if (refundRequests.size() == 0) { // 若不存在RefundRequest，则新增
+                BigDecimal paymentRefundAmt = payment.getRefundAmt() == null ? BigDecimal.ZERO : payment.getRefundAmt();
+                if (payment.getPayPrice().compareTo(new Money(req.getRefundAmt().add(paymentRefundAmt))) > 0) {// 申请金额小于支付金额
                     RefundRequestPo refundrequest = new RefundRequestPo();
                     refundrequest.setPaymentId(payment.getPaymentId());
                     refundrequest.setInstPaymentId(payment.getInstitutionPaymentId());
@@ -90,14 +88,16 @@ public class AcquireRefundServiceImpl implements AcquireRefundService {
                             refundrequest.getRefundBatchNo());
                     refundPository.saveRefundRequestAndUpdateRefundAmt(refundrequest, payment);
                     return true;
-                } else { // 已存在， 幂等， 返回成功
-                    logger.info("RefundRequest already exists. RefundBatchNo:{}",
-                            refundRequests.get(0).getRefundBatchNo());
-                    return true;
+                } else {
+                    logger.info("Refundable Amount limited.");
                 }
-            } else {
-                logger.info("Refundable Amount limited.");
+
+            } else { // 已存在， 幂等， 返回成功
+                logger.info("RefundRequest already exists. RefundBatchNo:{}",
+                        refundRequests.get(0).getRefundBatchNo());
+                return true;
             }
+
         } else {
             logger.info("Paied BusinessOrder not exists. TradeNo{}", req.getTradeNo());
         }

@@ -39,7 +39,7 @@ public class RefundCallbackServiceTest extends RestBaseTest {
         request.setTradeNo("13912628");
         request.setIsFastRefund(true);
 
-        boolean isSuccess = refundCallbackService.doService(request, null);
+        boolean isSuccess = refundCallbackService.doService(request, false, null);
 
         Assert.assertEquals(true, isSuccess);
     }

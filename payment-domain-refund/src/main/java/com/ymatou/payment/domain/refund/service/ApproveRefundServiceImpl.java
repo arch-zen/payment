@@ -40,7 +40,7 @@ public class ApproveRefundServiceImpl implements ApproveRefundService {
                 throw new BizException(ErrorCode.NOT_EXIST_PAYMENTID, "refund request not exist.");
             }
             if (refundrequestPo.getApproveStatus() != ApproveStatusEnum.NOT_APPROVED.getCode()) {
-                logger.info("RefundRequest ApproveStaus expected 0, but {}. RefundBatchNo: {}",
+                logger.info("RefundRequest ApproveStaus expected 0, but {}. RefundNo: {}",
                         refundrequestPo.getApproveStatus(), refundNo);
                 continue;
             }

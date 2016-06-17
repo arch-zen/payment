@@ -211,11 +211,14 @@ public class RefundJobServiceImpl implements RefundJobService {
         request.setThirdPartyTradingNo(refundRequest.getInstPaymentId());
         request.setTradeNo(refundRequest.getTradeNo());
         request.setIsFastRefund(refundRequest.getApproveStatus().equals(ApproveStatusEnum.FAST_REFUND.getCode()));
-        request.setRequestNo(refundRequest.getTraceId());
+        boolean isNewSystem = refundRequest.getTraceId().length() == 24; // Java版交易系统RequestNo长度
+        if (isNewSystem) {
+            request.setRequestNo(refundRequest.getTraceId());
+        }
 
         boolean isSuccess = false;
         try {
-            isSuccess = refundCallbackService.doService(request, header);
+            isSuccess = refundCallbackService.doService(request, isNewSystem, header);
         } catch (IOException e) {
             logger.error("refund notify to trade service failed on {}", refundRequest.getRefundBatchNo());
         }

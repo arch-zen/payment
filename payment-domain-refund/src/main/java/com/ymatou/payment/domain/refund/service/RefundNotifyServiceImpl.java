@@ -151,7 +151,6 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
      */
     private Date parseDate(String dateString) {
         try {
-
             return DateUtils.parseDate(dateString, new String[] {"yyyy-MM-dd HH:mm:ss"});
         } catch (ParseException e) {
             logger.error("pare date when process alipay notify with date string:" + dateString, e);

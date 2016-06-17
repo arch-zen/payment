@@ -38,14 +38,22 @@ public class RefundCallbackService implements InitializingBean {
     @Autowired
     private IntegrationConfig integrationConfig;
 
-    public boolean doService(RefundCallbackRequest request, HashMap<String, String> header) throws IOException {
-        String url = integrationConfig.getYmtTriggerOrderRefundUrl(header);
-        int statusCode = HttpClientUtil.sendPostToGetStatus(url,
-                JSONObject.toJSONString(request),
+    public boolean doService(RefundCallbackRequest request, boolean isNewSystem, HashMap<String, String> header)
+            throws IOException {
+        String url = getRequestUrl(isNewSystem, header);
+        int statusCode = HttpClientUtil.sendPostToGetStatus(url, JSONObject.toJSONString(request),
                 Constants.CONTENT_TYPE_JSON, header, httpClient);
         logger.info("refund callback response status: {}", statusCode);
 
         return statusCode == HttpStatus.OK.value(); // HttpStatus=200代表成功，其余都是失败
+    }
+
+    private String getRequestUrl(boolean isNewSystem, HashMap<String, String> header) {
+        if (isNewSystem) {
+            return integrationConfig.getYmtTriggerOrderRefundUrlJava(header);
+        } else {
+            return integrationConfig.getYmtTriggerOrderRefundUrl(header);
+        }
     }
 
     @Override
