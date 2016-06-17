@@ -40,7 +40,7 @@ public class RefundCallbackServiceTest extends RestBaseTest {
         request.setTradeNo("13912628");
         request.setIsFastRefund(true);
 
-        boolean isSuccess = refundCallbackService.doService(request, null);
+        boolean isSuccess = refundCallbackService.doService(request, false, null);
 
         Assert.assertEquals(true, isSuccess);
     }
@@ -61,7 +61,7 @@ public class RefundCallbackServiceTest extends RestBaseTest {
 
         HashMap<String, String> mockHeader = buildMockHeader();
         mockHeader.put("MockResult-Trading-Status", "OK");
-        boolean isSuccess = refundCallbackService.doService(request, mockHeader);
+        boolean isSuccess = refundCallbackService.doService(request, true, mockHeader);
 
         Assert.assertEquals(true, isSuccess);
     }
@@ -83,7 +83,7 @@ public class RefundCallbackServiceTest extends RestBaseTest {
 
         HashMap<String, String> mockHeader = buildMockHeader();
         mockHeader.put("MockResult-Trading-Status", "FAILD");
-        boolean isSuccess = refundCallbackService.doService(request, mockHeader);
+        boolean isSuccess = refundCallbackService.doService(request, false, mockHeader);
 
         Assert.assertEquals(false, isSuccess);
     }

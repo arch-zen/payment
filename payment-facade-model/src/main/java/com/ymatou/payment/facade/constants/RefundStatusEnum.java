@@ -29,5 +29,28 @@ public enum RefundStatusEnum {
         this.code = code;
     }
 
-
+    public static RefundStatusEnum withCode(int code) {
+        switch (code) {
+            case 0:
+                return INIT;
+            case 1:
+                return COMMIT;
+            case 2:
+                return WAIT_THIRDPART_REFUND;
+            case 3:
+                return THIRDPART_REFUND_SUCCESS;
+            case 4:
+                return COMPLETE_SUCCESS;
+            case 5:
+                return RETURN_TRANSACTION;
+            case 6:
+                return RETURN_BALANCE;
+            case -1:
+                return REFUND_FAILED;
+            case -2:
+                return COMPLETE_FAILED;
+            default:
+                return INIT;
+        }
+    }
 }

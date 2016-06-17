@@ -3,7 +3,6 @@
  */
 package com.ymatou.payment.facade.impl;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -120,27 +119,11 @@ public class RefundFacadeImpl implements RefundFacade {
         refundInfo.setOrderIdList(req.getOrderIdList());
         refundInfo.setPaymentId(req.getPaymentId());
         refundInfo.setTraceId(StringUtils.isBlank(req.getTraceId())
-                ? req.getRequestNo() : req.getTraceId()); // .net,java请求参数不同
-
-        // 判断，设置退款金额
-        BigDecimal requestedRefundAmt =
-                payment.getRefundAmt() == null ? BigDecimal.ZERO : payment.getRefundAmt();
-        if (req.getRefundAmt() == null || req.getRefundAmt().compareTo(BigDecimal.ZERO) <= 0) {
-            if (requestedRefundAmt.compareTo(BigDecimal.ZERO) > 0) { // 未输入退款申请金额，默认全额退款
-                throw new BizException(ErrorCode.FAIL, "refund amt limit.");
-            } else {
-                refundInfo.setRefundAmt(payment.getPayPrice().getAmount());
-            }
-        } else {
-            if (requestedRefundAmt.add(req.getRefundAmt()).compareTo(payment.getPayPrice().getAmount()) > 0) {
-                throw new BizException(ErrorCode.FAIL, "refund amt limit.");
-            } else {
-                refundInfo.setRefundAmt(req.getRefundAmt());
-            }
-        }
+                ? req.getRefundNo() : req.getTraceId()); // .net,java请求参数不同
 
         // Save RefundRequest
-        RefundRequestPo refundRequest = fastRefundService.saveRefundRequest(payment, bussinessOrder, refundInfo);
+        RefundRequestPo refundRequest =
+                fastRefundService.saveRefundRequest(req.getRefundAmt(), payment, bussinessOrder, refundInfo);
 
         // send trading message
         for (String orderId : req.getOrderIdList()) {
@@ -277,8 +260,8 @@ public class RefundFacadeImpl implements RefundFacade {
             response.setSuccess(true);
         } else {
             response.setSuccess(false);
-            response.setErrorCode(ErrorCode.FAIL);
-            response.setErrorMessage("退款收单失败");
+            response.setErrorCode(ErrorCode.UNABLE_REFUND);
+            response.setErrorMessage("拒绝退款");
         }
         return response;
     }

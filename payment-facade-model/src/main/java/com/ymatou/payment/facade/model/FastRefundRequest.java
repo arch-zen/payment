@@ -43,7 +43,7 @@ public class FastRefundRequest extends BaseRequest {
 
     private String traceId;
 
-    private String requestNo;
+    private String refundNo;
 
     private BigDecimal refundAmt;
 
@@ -113,11 +113,11 @@ public class FastRefundRequest extends BaseRequest {
         this.refundAmt = refundAmt;
     }
 
-    public String getRequestNo() {
-        return requestNo;
+    public String getRefundNo() {
+        return refundNo;
     }
 
-    public void setRequestNo(String requestNo) {
-        this.requestNo = requestNo;
+    public void setRefundNo(String refundNo) {
+        this.refundNo = refundNo;
     }
 }

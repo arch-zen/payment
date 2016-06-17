@@ -5,8 +5,6 @@ package com.ymatou.payment.facade.rest;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.ymatou.payment.facade.model.AliPayRefundNotifyRequest;
-
 /**
  * 接收回调
  * 

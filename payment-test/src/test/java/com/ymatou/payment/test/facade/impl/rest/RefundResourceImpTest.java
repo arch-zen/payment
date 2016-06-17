@@ -318,7 +318,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         AcquireRefundPlusRequest request = new AcquireRefundPlusRequest();
         request.setAppId(bussinessOrderPo.getAppId());
         request.setOrderId(bussinessOrderPo.getBussinessOrderId());
-        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request.setTradeNo(bussinessOrderPo.getOrderId());
         request.setTradeType(1);
         request.setRefundAmt(new BigDecimal(20));
@@ -335,13 +335,13 @@ public class RefundResourceImpTest extends RestBaseTest {
         AcquireRefundPlusRequest request = new AcquireRefundPlusRequest();
         request.setAppId(bussinessOrderPo.getAppId());
         request.setOrderId(bussinessOrderPo.getBussinessOrderId());
-        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request.setTradeNo(bussinessOrderPo.getOrderId());
         request.setTradeType(1);
         request.setRefundAmt(new BigDecimal(32));
 
         AcquireRefundPlusResponse response = refundResource.acquireRefund(request, new MockHttpServletRequest());
-        Assert.assertEquals(5000, response.getErrorCode());
+        Assert.assertEquals(1010, response.getErrorCode());
     }
 
     @Test
@@ -353,7 +353,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         AcquireRefundPlusRequest request = new AcquireRefundPlusRequest();
         request.setAppId(bussinessOrderPo.getAppId());
         request.setOrderId(bussinessOrderPo.getBussinessOrderId());
-        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request.setTradeNo(bussinessOrderPo.getOrderId());
         request.setTradeType(1);
         request.setRefundAmt(new BigDecimal(20));
@@ -364,13 +364,13 @@ public class RefundResourceImpTest extends RestBaseTest {
         AcquireRefundPlusRequest request2 = new AcquireRefundPlusRequest();
         request2.setAppId(bussinessOrderPo.getAppId());
         request2.setOrderId(bussinessOrderPo.getBussinessOrderId());
-        request2.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request2.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request2.setTradeNo(bussinessOrderPo.getOrderId());
         request2.setTradeType(1);
         request2.setRefundAmt(new BigDecimal(15));
 
         AcquireRefundPlusResponse response2 = refundResource.acquireRefund(request2, new MockHttpServletRequest());
-        Assert.assertEquals(5000, response2.getErrorCode());
+        Assert.assertEquals(1010, response2.getErrorCode());
     }
 
 
@@ -415,7 +415,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         AcquireRefundPlusRequest request = new AcquireRefundPlusRequest();
         request.setAppId(bussinessOrderPo.getAppId());
         request.setOrderId(bussinessOrderPo.getBussinessOrderId());
-        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request.setTradeNo(bussinessOrderPo.getOrderId());
         request.setTradeType(1);
         request.setRefundAmt(new BigDecimal(7.8));
@@ -426,7 +426,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         AcquireRefundPlusRequest request2 = new AcquireRefundPlusRequest();
         request2.setAppId(bussinessOrderPo.getAppId());
         request2.setOrderId(bussinessOrderPo.getBussinessOrderId());
-        request2.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request2.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request2.setTradeNo(bussinessOrderPo.getOrderId());
         request2.setTradeType(1);
         request2.setRefundAmt(new BigDecimal(3.2));
@@ -467,7 +467,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         request.setPaymentId(paymentPo.getPaymentId());
         request.setAppId(bussinessOrderPo.getAppId());
         request.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
-        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request.setTradingId(bussinessOrderPo.getOrderId());
         request.setTradeType(1);
         request.setRefundAmt(new BigDecimal(7.8));
@@ -479,7 +479,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         request2.setPaymentId(paymentPo.getPaymentId());
         request2.setAppId(bussinessOrderPo.getAppId());
         request2.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
-        request2.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request2.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request2.setTradingId(bussinessOrderPo.getOrderId());
         request2.setTradeType(1);
         request2.setRefundAmt(new BigDecimal(27.8));
@@ -498,7 +498,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         request.setPaymentId(paymentPo.getPaymentId());
         request.setAppId(bussinessOrderPo.getAppId());
         request.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
-        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request.setTradingId(bussinessOrderPo.getOrderId());
         request.setTradeType(1);
         request.setRefundAmt(new BigDecimal(7.8));
@@ -510,7 +510,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         request2.setPaymentId(paymentPo.getPaymentId());
         request2.setAppId(bussinessOrderPo.getAppId());
         request2.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
-        request2.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request2.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request2.setTradingId(bussinessOrderPo.getOrderId());
         request2.setTradeType(1);
         request2.setRefundAmt(new BigDecimal(7.8));
@@ -529,7 +529,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         request.setPaymentId(paymentPo.getPaymentId());
         request.setAppId(bussinessOrderPo.getAppId());
         request.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
-        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request.setTradingId(bussinessOrderPo.getOrderId());
         request.setTradeType(1);
         // request.setRefundAmt(new BigDecimal(7.8));
@@ -562,7 +562,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         request.setPaymentId(paymentPo.getPaymentId());
         request.setAppId(bussinessOrderPo.getAppId());
         request.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
-        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request.setTradingId(bussinessOrderPo.getOrderId());
         request.setTradeType(1);
         request.setRefundAmt(new BigDecimal(7.8));
@@ -616,7 +616,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         request.setPaymentId(paymentPo.getPaymentId());
         request.setAppId(bussinessOrderPo.getAppId());
         request.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
-        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request.setTradingId(bussinessOrderPo.getOrderId());
         request.setTradeType(1);
         request.setRefundAmt(new BigDecimal(7.8));
@@ -653,7 +653,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         request.setPaymentId(paymentPo.getPaymentId());
         request.setAppId(bussinessOrderPo.getAppId());
         request.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
-        request.setRequestNo(RandomStringUtils.randomAlphabetic(8));
+        request.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request.setTradingId(bussinessOrderPo.getOrderId());
         request.setTradeType(1);
         request.setRefundAmt(new BigDecimal(7.8));

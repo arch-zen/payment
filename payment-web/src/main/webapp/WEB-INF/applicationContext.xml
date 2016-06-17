@@ -128,4 +128,10 @@
 	
 	<dubbo:service interface="com.ymatou.payment.facade.rest.PaymentNotifyResource"
 		ref="paymentNotifyResource" protocol="rest" />	
+		
+	<dubbo:service interface="com.ymatou.payment.facade.rest.RefundJobResource"
+		ref="refundJobResource" protocol="rest" />	
+		
+	<dubbo:service interface="com.ymatou.payment.facade.rest.TestPaymentResource"
+		ref="testPaymentResource" protocol="rest" />	
 </beans>

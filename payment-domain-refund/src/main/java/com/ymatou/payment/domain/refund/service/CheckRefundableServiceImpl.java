@@ -58,8 +58,7 @@ public class CheckRefundableServiceImpl implements CheckRefundableService {
             BussinessOrder bussinessOrder = bussinessOrderRepository.getBussinessOrderCanRefund(
                     tradeDetail.getTradeNo(), OrderStatusEnum.Paied.getIndex(), Date.valueOf(validDate));
             if (bussinessOrder != null) {
-                Payment payment = paymentRepository.getPaymentCanPartRefund(bussinessOrder.getBussinessOrderId(),
-                        OrderStatusEnum.Init.getIndex());
+                Payment payment = paymentRepository.getPaymentCanPartRefund(bussinessOrder.getBussinessOrderId());
                 BigDecimal paymentRefundAmt = // 已申请退款金额
                         payment.getRefundAmt() == null ? BigDecimal.ZERO : payment.getRefundAmt();
                 BigDecimal refundableAmt = payment.getPayPrice().getAmount().subtract(paymentRefundAmt);

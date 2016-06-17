@@ -3,6 +3,7 @@
  */
 package com.ymatou.payment.domain.refund.service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
@@ -21,12 +22,14 @@ public interface FastRefundService {
     /**
      * 退款申请，发货信息落地
      * 
+     * @param refundAmt
      * @param payment
      * @param bussinessorder
      * @param refundInfo
      * @return
      */
-    public RefundRequestPo saveRefundRequest(Payment payment, BussinessOrder bussinessorder, Refund refundInfo);
+    public RefundRequestPo saveRefundRequest(BigDecimal refundAmt, Payment payment, BussinessOrder bussinessorder,
+            Refund refundInfo);
 
     /**
      * 发送交易信息给用户

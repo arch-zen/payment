@@ -40,6 +40,7 @@ public class IntegrationConfig {
     private String ymtAccountingUrl; // 资金账户出入账服务url
     private String ymtRiskControlUrl; // 风控urk
     private String ymtTriggerOrderRefundUrl; // 交易系统接收退款回调的url
+    private String ymtTriggerOrderRefundUrlJava; // 交易系统接收退款回调的url(Java)
 
     private String openMock;
     private String aliPayBaseUrlMock; // 支付宝网关url(mock)
@@ -56,6 +57,7 @@ public class IntegrationConfig {
     private String ymtAccountingUrlMock; // 资金账户出入账服务url(mock)
     private String ymtRiskControlUrlMock; // 风控urk(mock)
     private String ymtTriggerOrderRefundUrlMock; // 交易系统接收退款回调的url(mock)
+    private String ymtTriggerOrderRefundUrlJavaMock; // 交易系统接收退款回调的url(Java mock)
 
 
     public String getYmtTriggerOrderRefundUrl(HashMap<String, String> header) {
@@ -490,6 +492,32 @@ public class IntegrationConfig {
             return getYmtPaymentBaseUrlMock();
         } else {
             return getYmtPaymentBaseUrl();
+        }
+    }
+
+    @DisconfFileItem(name = "ymt.triggerorderrefund.url.java")
+    public String getYmtTriggerOrderRefundUrlJava() {
+        return ymtTriggerOrderRefundUrlJava;
+    }
+
+    public void setYmtTriggerOrderRefundUrlJava(String ymtTriggerOrderRefundUrlJava) {
+        this.ymtTriggerOrderRefundUrlJava = ymtTriggerOrderRefundUrlJava;
+    }
+
+    @DisconfFileItem(name = "ymt.triggerorderrefund.url.java.mock")
+    public String getYmtTriggerOrderRefundUrlJavaMock() {
+        return ymtTriggerOrderRefundUrlJavaMock;
+    }
+
+    public void setYmtTriggerOrderRefundUrlJavaMock(String ymtTriggerOrderRefundUrlJavaMock) {
+        this.ymtTriggerOrderRefundUrlJavaMock = ymtTriggerOrderRefundUrlJavaMock;
+    }
+
+    public String getYmtTriggerOrderRefundUrlJava(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getYmtTriggerOrderRefundUrlJavaMock();
+        } else {
+            return getYmtTriggerOrderRefundUrlJava();
         }
     }
 }
