@@ -90,6 +90,10 @@ public class RefundFacadeImpl implements RefundFacade {
 
     @Override
     public FastRefundResponse fastRefund(FastRefundRequest req) {
+        if (StringUtils.isBlank(req.getRefundNo()) && StringUtils.isBlank(req.getTraceId())) {
+            throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "RefundNo and TraceId cannot be empty.");
+        }
+
         // query and verify payment
         Payment payment = payService.getPaymentByPaymentId(req.getPaymentId());
         if (payment == null) {
