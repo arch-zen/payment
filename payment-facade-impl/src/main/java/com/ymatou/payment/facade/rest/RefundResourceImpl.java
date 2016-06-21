@@ -111,7 +111,8 @@ public class RefundResourceImpl implements RefundResource {
     @POST
     @Path("/{Refund:(?i:Refund)}/{AcquireRefund:(?i:AcquireRefund)}")
     @Override
-    public AcquireRefundPlusResponse acquireRefund(AcquireRefundPlusRequest req, HttpServletRequest servletRequest) {
+    public AcquireRefundPlusResponse acquireRefund(AcquireRefundPlusRequest req,
+            @Context HttpServletRequest servletRequest) {
         req.setHeader(generateHttpHeader(servletRequest));
 
         return refundFacade.acquireRefund(req);
@@ -121,7 +122,7 @@ public class RefundResourceImpl implements RefundResource {
     @Path("/{Refund:(?i:Refund)}/{SysApproveRefund:(?i:SysApproveRefund)}")
     @Produces({"text/html; charset=UTF-8"})
     @Override
-    public String sysApproveRefund(SysApproveRefundReq req, HttpServletRequest servletRequest) {
+    public String sysApproveRefund(SysApproveRefundReq req, @Context HttpServletRequest servletRequest) {
         SysApproveRefundResp resp = refundFacade.sysApproveRefund(req);
         if (resp.getIsSuccess() == true)
             return "ok";
