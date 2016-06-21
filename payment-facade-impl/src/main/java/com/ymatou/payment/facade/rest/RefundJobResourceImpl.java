@@ -27,7 +27,7 @@ import com.ymatou.payment.facade.constants.RefundStatusEnum;
 @Path("/{api:(?i:api)}")
 @Component("refundJobResource")
 @Consumes({"application/json; charset=UTF-8"})
-@Produces({"text/html; charset=UTF-8"})
+// @Produces({"text/html; charset=UTF-8"})
 public class RefundJobResourceImpl implements RefundJobResource {
 
     @Autowired
