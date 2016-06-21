@@ -68,7 +68,7 @@ public class AcquireRefundServiceImpl implements AcquireRefundService {
             if (refundRequests.size() == 0) { // 若不存在RefundRequest，则新增
 
                 BigDecimal paymentRefundAmt = payment.getRefundAmt() == null ? BigDecimal.ZERO : payment.getRefundAmt();
-                if (payment.getPayPrice().compareTo(new Money(req.getRefundAmt().add(paymentRefundAmt))) > 0) {// 申请金额小于支付金额
+                if (payment.getPayPrice().compareTo(new Money(req.getRefundAmt().add(paymentRefundAmt))) >= 0) {// 申请金额小于支付金额
                     RefundRequestPo refundrequest = new RefundRequestPo();
                     refundrequest.setPaymentId(payment.getPaymentId());
                     refundrequest.setInstPaymentId(payment.getInstitutionPaymentId());
