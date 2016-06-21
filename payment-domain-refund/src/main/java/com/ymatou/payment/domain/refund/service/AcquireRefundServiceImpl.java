@@ -74,7 +74,7 @@ public class AcquireRefundServiceImpl implements AcquireRefundService {
                     refundrequest.setInstPaymentId(payment.getInstitutionPaymentId());
                     refundrequest.setTradeNo(req.getTradeNo());
                     refundrequest.setOrderId(req.getOrderId());
-                    refundrequest.setTraceId(req.getRequestId());
+                    refundrequest.setTraceId(req.getRefundNo());
                     refundrequest.setAppId(req.getAppId());
                     refundrequest.setPayType(payment.getPayType().getCode());
                     refundrequest.setRefundAmount(req.getRefundAmt());

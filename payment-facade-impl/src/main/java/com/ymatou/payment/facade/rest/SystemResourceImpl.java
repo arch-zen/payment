@@ -5,12 +5,17 @@
  */
 package com.ymatou.payment.facade.rest;
 
+import java.io.File;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.ymatou.payment.integration.IntegrationConfig;
 
 /**
  * 系统消息实现
@@ -22,6 +27,9 @@ import org.springframework.stereotype.Component;
 @Path("/")
 @Produces(MediaType.TEXT_HTML)
 public class SystemResourceImpl implements SystemResource {
+
+    @Autowired
+    private IntegrationConfig integrationConfig;
 
     @GET
     @Path("/version")
@@ -35,7 +43,12 @@ public class SystemResourceImpl implements SystemResource {
     @GET
     @Path("/warmup")
     public String status() {
-
-        return "ok";
+        File jsapiCert = new File(integrationConfig.getWxJsapiCertPath());
+        File appCert = new File(integrationConfig.getWxAppCertPath());
+        if (jsapiCert.exists() && appCert.exists()) {
+            return "ok";
+        } else {
+            return "weixin cert not exist.";
+        }
     }
 }
