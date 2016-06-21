@@ -185,7 +185,7 @@ public class RefundPository {
     public void updateRefundRequest(List<RefundRequestPo> refundrequestPos) {
         for (RefundRequestPo refundrequestPo : refundrequestPos) {
             RefundRequestExample example = new RefundRequestExample();
-            example.createCriteria().andPaymentIdEqualTo(refundrequestPo.getPaymentId());
+            example.createCriteria().andRefundBatchNoEqualTo(refundrequestPo.getRefundBatchNo());
             refundRequestMapper.updateByExampleSelective(refundrequestPo, example);
         }
     }

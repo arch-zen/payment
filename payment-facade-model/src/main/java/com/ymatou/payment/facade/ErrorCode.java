@@ -62,6 +62,8 @@ public enum ErrorCode {
 
     UNABLE_REFUND(1010, "不能退款"),
 
+    NOT_EXIST_REFUNDNO(1011, "退款单号不存在"),
+
     FAIL(5000, "请求处理失败"),
 
     UNKNOWN(-9999, "未知错误，系统异常");

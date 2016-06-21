@@ -74,7 +74,6 @@ public class WeiXinRefundQueryServiceImpl implements RefundQueryService {
             saveRefundMiscRequestLog(refundRequest, requestTime, queryRefundRequest, null, e);
             refundStatus = RefundStatusEnum.REFUND_FAILED;
         }
-
         logger.info("weixin refund query end. RefundStatus:{}", refundRequest.getRefundStatus());
         return refundStatus;
     }

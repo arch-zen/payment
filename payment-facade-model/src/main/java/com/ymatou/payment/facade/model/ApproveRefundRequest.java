@@ -6,6 +6,8 @@ package com.ymatou.payment.facade.model;
 import java.util.HashMap;
 import java.util.List;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 import com.ymatou.payment.facade.BaseRequest;
 
 /**
@@ -21,10 +23,12 @@ public class ApproveRefundRequest extends BaseRequest {
     /**
      * 退款单号
      */
+    @NotEmpty
     private List<String> refundNos;
     /**
      * 审核人
      */
+    @NotEmpty
     private String approveUser;
     /**
      * http请求header(可不填)

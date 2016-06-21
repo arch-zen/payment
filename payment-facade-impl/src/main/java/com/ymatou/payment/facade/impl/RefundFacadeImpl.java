@@ -214,6 +214,11 @@ public class RefundFacadeImpl implements RefundFacade {
 
     @Override
     public TradeRefundableResponse checkRefundable(TradeRefundableRequest req) {
+        if ((req.getTradeNos() == null || req.getTradeNos().isEmpty())
+                && (req.getTradeDetails() == null || req.getTradeDetails().isEmpty())) {
+            throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "TradeNos and TradeDetails cannot be empty.");
+        }
+
         // 兼容新老接口
         boolean isDotNet = false;
         if (req.getTradeDetails() == null || req.getTradeDetails().size() == 0) {

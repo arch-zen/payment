@@ -154,7 +154,7 @@ public class RefundJobServiceImpl implements RefundJobService {
         item.setAccountingDate(new Date());
         item.setBizCode("300017"); // 快速退款
         item.setBizNo(refundRequest.getRefundBatchNo());
-        item.setOriginalNo(payment.getInstitutionPaymentId());
+        item.setOriginalNo(bussinessOrder.getOrderId());
         item.setMemo("快速退款");
         itemList.add(item);
 
