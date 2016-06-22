@@ -183,7 +183,7 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
 
         for (String temp : tempDatas) {
 
-            String[] refundData = temp.split("$"); // 退款信息$退费信息
+            String[] refundData = temp.split("\\$"); // 退款信息$退费信息
             if (refundData.length == 0) {
                 throw new BizException("refund data detail is invalid.");
             }

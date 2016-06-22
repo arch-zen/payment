@@ -112,6 +112,7 @@ public class RefundJobServiceImpl implements RefundJobService {
                 return false;
             }
         } catch (IOException e) {
+            saveAccoutingLog(payment, bussinessOrder, refundRequest, e);
             logger.info("accouting error.", e); // 扣款异常只影响是否提交第三方扣款， 不影响返回给交易的应答
         }
         return false;
@@ -120,6 +121,26 @@ public class RefundJobServiceImpl implements RefundJobService {
     private boolean isAccoutingSuccess(AccountingResponse response) {
         return RefundConstants.ACCOUNTING_SUCCESS.equals(response.getStatusCode())
                 || RefundConstants.ACCOUNTING_IDEMPOTENTE.equals(response.getStatusCode());
+    }
+
+    /*
+     * 保存账务操作记录， 更新RefundRequest的AccoutingStatus
+     */
+    private void saveAccoutingLog(Payment payment, BussinessOrder bussinessOrder, RefundRequestPo refundRequest,
+            IOException e) {
+        AccountingLogPo log = new AccountingLogPo();
+        log.setCreatedTime(new Date());
+        log.setAccoutingAmt(refundRequest.getRefundAmount());
+        log.setAccountingType("Refund");
+        log.setStatus(0); // 成功为1，失败为0
+        log.setUserId((long) bussinessOrder.getUserId().intValue());
+        log.setBizNo(refundRequest.getRefundBatchNo());
+        log.setRespCode("3"); // 系统异常
+        log.setRespMsg(e.getMessage());
+        log.setMemo("快速退款");
+        accountingLogMapper.insertSelective(log);
+
+        refundPository.updateRefundRequestAccoutingStatus(refundRequest.getRefundBatchNo(), log.getStatus());
     }
 
     /*

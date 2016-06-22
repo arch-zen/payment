@@ -56,7 +56,7 @@ import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
  * @author qianmin 2016年5月11日 上午10:56:11
  * 
  */
-@Component
+@Component("refundFacade")
 public class RefundFacadeImpl implements RefundFacade {
 
     private static final Logger logger = LoggerFactory.getLogger(RefundFacadeImpl.class);
