@@ -174,7 +174,7 @@ public class PaymentResourceImplTest extends RestBaseTest {
         MockHttpServletRequest servletRequest = new MockHttpServletRequest();
         AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
 
-        assertEquals("验证返回码", -2106, res.getErrorCode());
+        assertEquals("验证返回码", 5000, res.getErrorCode());
     }
 
     @Test
@@ -191,7 +191,7 @@ public class PaymentResourceImplTest extends RestBaseTest {
         req.setVersion(1);
         req.setPayType("99");
         res = paymentResource.acquireOrder(req, servletRequest);
-        assertEquals("验证无效PayType返回码", 1005, res.getErrorCode());
+        assertEquals("验证无效PayType返回码", 3104, res.getErrorCode());
         System.out.println(res.getErrorMessage());
     }
 

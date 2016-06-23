@@ -341,7 +341,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         request.setRefundAmt(new BigDecimal(32));
 
         AcquireRefundPlusResponse response = refundResource.acquireRefund(request, new MockHttpServletRequest());
-        Assert.assertEquals(1010, response.getErrorCode());
+        Assert.assertEquals(3501, response.getErrorCode());
     }
 
     @Test
@@ -370,7 +370,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         request2.setRefundAmt(new BigDecimal(15));
 
         AcquireRefundPlusResponse response2 = refundResource.acquireRefund(request2, new MockHttpServletRequest());
-        Assert.assertEquals(1010, response2.getErrorCode());
+        Assert.assertEquals(3501, response2.getErrorCode());
     }
 
 

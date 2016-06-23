@@ -45,7 +45,7 @@ public enum PayTypeEnum {
 
     public static PayTypeEnum parse(String code) {
         if (StringUtils.isBlank(code)) {
-            throw new BizException(ErrorCode.INVALID_PAYTYPE, "payType is null or empty");
+            throw new BizException(ErrorCode.INVALID_PAY_TYPE, "payType is null or empty");
         }
 
         switch (code) {
@@ -60,7 +60,7 @@ public enum PayTypeEnum {
             case "15":
                 return WeiXinApp;
             default:
-                throw new BizException(ErrorCode.INVALID_PAYTYPE, code);
+                throw new BizException(ErrorCode.INVALID_PAY_TYPE, code);
         }
     }
 

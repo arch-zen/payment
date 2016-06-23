@@ -81,18 +81,18 @@ public class PaymentFacadeImpl implements PaymentFacade {
      */
     private void validateReqParam(AcquireOrderReq req) {
         if (req.getVersion() != 1) {
-            throw new BizException(ErrorCode.NOT_SUPPORT_VERSION, req.getVersion().toString());
+            throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, req.getVersion().toString());
         }
 
         InstitutionConfig instConfig = instConfigManager.getConfig(PayTypeEnum.parse(req.getPayType()));
         if (instConfig == null)
-            throw new BizException(ErrorCode.INVALID_PAYTYPE, req.getPayType());
+            throw new BizException(ErrorCode.INVALID_PAY_TYPE, req.getPayType());
 
         BussinessOrder bussinessOrder = payService.getBussinessOrderByOrderId(req.getOrderId());
 
         // FIXME:并发问题，同时来了两笔orderId一样的请求呢?
         if (bussinessOrder != null) {
-            throw new BizException(ErrorCode.DB_ERROR, "OrderId已经创建过支付单");
+            throw new BizException(ErrorCode.FAIL, "OrderId已经创建过支付单");
         }
 
         if ((new BigDecimal(req.getPayPrice()).doubleValue() < 0.01)) {

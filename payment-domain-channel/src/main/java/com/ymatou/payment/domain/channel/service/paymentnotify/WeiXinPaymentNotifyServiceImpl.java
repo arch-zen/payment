@@ -87,7 +87,8 @@ public class WeiXinPaymentNotifyServiceImpl implements PaymentNotifyService {
         if (!resultCode.equals("SUCCESS") || !returnCode.equals("SUCCESS") || StringUtils.isBlank(transactionId)
                 || StringUtils.isBlank(outTradeNo) || !mchId.equals(instConfig.getMerchantId())
                 || totalFee.doubleValue() < 0.00001) {
-            throw new BizException(ErrorCode.NOTIFY_VERIFY_FAILED, "weixin notify with paymentid: " + outTradeNo);
+            logger.error("weixin payment notify error. paymentid: {}", outTradeNo);
+            throw new BizException(ErrorCode.PAYMENT_NOTIFY_VERIFY_FAILED, "weixin notify with paymentid: " + outTradeNo);
         }
 
 

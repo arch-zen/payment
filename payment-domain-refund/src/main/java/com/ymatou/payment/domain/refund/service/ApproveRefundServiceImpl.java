@@ -37,7 +37,7 @@ public class ApproveRefundServiceImpl implements ApproveRefundService {
         for (String refundNo : refundNos) {
             RefundRequestPo refundrequestPo = refundPository.getRefundRequestByRefundNo(refundNo);
             if (refundrequestPo == null) {
-                throw new BizException(ErrorCode.NOT_EXIST_REFUNDNO, "refund request not exist.");
+                throw new BizException(ErrorCode.NOT_EXIST_REFUND_NO, "refund request not exist.");
             }
             if (refundrequestPo.getApproveStatus() != ApproveStatusEnum.NOT_APPROVED.getCode()) {
                 logger.info("RefundRequest ApproveStaus expected 0, but {}. RefundNo: {}",
