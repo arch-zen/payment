@@ -95,7 +95,7 @@ public class RefundJobResourceImplTest extends RestBaseTest {
         String refundBatchNo = refundRequestPos.get(0).getRefundBatchNo();
 
         // 此时同步应答还没回来，从新提交了退款请求
-        String respMsg = refundJobResource.excuteRefund(refundBatchNo, servletRequest);
+        String respMsg = refundJobResource.executeRefund(refundBatchNo, servletRequest);
         System.out.println(respMsg);
 
         Assert.assertEquals("0", respMsg);
@@ -130,7 +130,7 @@ public class RefundJobResourceImplTest extends RestBaseTest {
         List<RefundRequestPo> refundRequestPos = refundRequestMapper.selectByExample(example);
         String refundBatchNo = refundRequestPos.get(0).getRefundBatchNo();
 
-        String respMsg = refundJobResource.excuteRefund(refundBatchNo, servletRequest);
+        String respMsg = refundJobResource.executeRefund(refundBatchNo, servletRequest);
         Thread.sleep(1000);
         System.out.println(respMsg);
         Assert.assertEquals("-1", respMsg);
@@ -169,7 +169,7 @@ public class RefundJobResourceImplTest extends RestBaseTest {
         refundRequestMapper.updateByExampleSelective(refundRequestPo, example2);
 
 
-        String respMsg = refundJobResource.excuteRefund(refundBatchNo, servletRequest);
+        String respMsg = refundJobResource.executeRefund(refundBatchNo, servletRequest);
         Thread.sleep(1000);
         Assert.assertEquals("ok", respMsg);
     }

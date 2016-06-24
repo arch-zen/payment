@@ -71,6 +71,11 @@ public class RefundJobServiceImpl implements RefundJobService {
     private RefundCallbackService refundCallbackService;
 
     @Override
+    public void updateRetryCount(String refundNo) {
+        refundPository.updateRetryCount(refundNo);
+    }
+
+    @Override
     public RefundRequestPo getRefundRequestById(String refundNo) {
         RefundRequestPo refundRequest = refundPository.getRefundRequestByRefundNo(refundNo);
         logger.info("the refund will be excuting. {}", JSONObject.toJSONString(refundRequest));

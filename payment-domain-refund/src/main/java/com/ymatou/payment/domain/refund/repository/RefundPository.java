@@ -273,4 +273,18 @@ public class RefundPository {
 
         return refundRequestMapper.selectByExample(example);
     }
+
+    @Transactional
+    public void updateRetryCount(String refundNo) {
+        RefundRequestPo refundRequestPo = getRefundRequestByRefundNo(refundNo);
+        if (refundRequestPo.getRetryCount() == null) {
+            refundRequestPo.setRetryCount(1);
+        } else {
+            refundRequestPo.setRetryCount(refundRequestPo.getRetryCount() + 1);
+        }
+
+        RefundRequestExample example = new RefundRequestExample();
+        example.createCriteria().andRefundBatchNoEqualTo(refundNo);
+        refundRequestMapper.updateByExampleSelective(refundRequestPo, example);
+    }
 }

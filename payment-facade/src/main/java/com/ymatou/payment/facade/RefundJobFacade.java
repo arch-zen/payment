@@ -3,7 +3,7 @@
  */
 package com.ymatou.payment.facade;
 
-import java.util.HashMap;
+import com.ymatou.payment.facade.model.ExecuteRefundRequest;
 
 /**
  * 
@@ -15,7 +15,7 @@ public interface RefundJobFacade {
     /**
      * 定时任务，根据RefundNo来处理退款申请单
      * 
-     * @param refundNo
+     * @param request
      */
-    public int excuteRefund(String refundNo, HashMap<String, String> header);
+    public int executeRefund(ExecuteRefundRequest request);
 }

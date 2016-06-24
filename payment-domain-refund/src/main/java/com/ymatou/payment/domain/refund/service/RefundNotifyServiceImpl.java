@@ -172,7 +172,7 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
         return map;
     }
 
-    private List<RefundNotifyDetail> generateRefundNotifyDetail(String details) {
+    public List<RefundNotifyDetail> generateRefundNotifyDetail(String details) {
         logger.info("refund notify details: {}", details);
 
         List<RefundNotifyDetail> detailList = new ArrayList<>();

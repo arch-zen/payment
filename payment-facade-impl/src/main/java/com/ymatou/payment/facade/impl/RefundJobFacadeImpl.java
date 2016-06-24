@@ -18,6 +18,7 @@ import com.ymatou.payment.facade.RefundJobFacade;
 import com.ymatou.payment.facade.constants.AccountingStatusEnum;
 import com.ymatou.payment.facade.constants.ApproveStatusEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
+import com.ymatou.payment.facade.model.ExecuteRefundRequest;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 
 /**
@@ -39,21 +40,25 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
     private PayService payService;
 
     @Override
-    public int excuteRefund(String refundNo, HashMap<String, String> header) {
+    public int executeRefund(ExecuteRefundRequest request) {
+        String refundNo = request.getRefundNo();
+        HashMap<String, String> header = request.getHeader();
+
         logger.info("Step 1: query refundRequest, payment, businessOrder. {}", refundNo);
         RefundRequestPo refundRequest = refundJobService.getRefundRequestById(refundNo);
         if (refundRequest == null // 退款申请不不存在或未审核
                 || refundRequest.getApproveStatus().equals(ApproveStatusEnum.NOT_APPROVED.getCode())) {
             return RefundStatusEnum.INIT.getCode();
         }
+        refundJobService.updateRetryCount(refundNo); // 更新重试次数
+
         if (refundRequest.getSoftDeleteFlag()) {
             return SOFT_DELETED;
         }
+
         Payment payment = payService.getPaymentByPaymentId(refundRequest.getPaymentId());
         BussinessOrder bussinessOrder = payService.getBussinessOrderById(payment.getBussinessOrderId());
         int refundStatusFlag = refundRequest.getRefundStatus(); // 返回给定时调度器，告知当前退款申请的状态
-
-
         if (refundRequest.getRefundStatus().equals(RefundStatusEnum.INIT.getCode())) {// 提交退款申请
             boolean accountingSuccess = true;
 
@@ -70,7 +75,7 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
 
         } else {// 查询退款结果
             RefundStatusEnum refundStatus = RefundStatusEnum.withCode(refundRequest.getRefundStatus());
-            if (!refundRequest.getRefundStatus().equals(RefundStatusEnum.THIRDPART_REFUND_SUCCESS.getCode())) {
+            if (!RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) {
                 logger.info("Step 4: submit third party refund query.");
                 refundStatus = refundJobService.queryRefund(refundRequest, payment, header);
                 refundStatusFlag = refundStatus.getCode();

@@ -5,6 +5,7 @@ package com.ymatou.payment.test.integration.service.ymatou;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -34,7 +35,9 @@ public class AccountServiceTest extends RestBaseTest {
         List<AccountingItem> itemList = new ArrayList<>();
         AccountingItem item = new AccountingItem();
         // item.setAccountId("01010099735467");
-        item.setAccountingDate(new Date());
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, 3);
+        item.setAccountingDate(calendar.getTime());
         item.setAccountOperateType(2);
         item.setAccountType(1);
         item.setAmount("2.30");
