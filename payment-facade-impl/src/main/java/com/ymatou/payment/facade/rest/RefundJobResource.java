@@ -6,6 +6,8 @@ package com.ymatou.payment.facade.rest;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 
+import com.ymatou.payment.facade.model.ExecuteRefundRequest;
+
 /**
  * 退款定时任务
  * 
@@ -20,5 +22,5 @@ public interface RefundJobResource {
      * @param refundNo
      * @param servletRequest
      */
-    public String executeRefund(String refundNo, @Context HttpServletRequest servletRequest);
+    public String executeRefund(ExecuteRefundRequest request, @Context HttpServletRequest servletRequest);
 }

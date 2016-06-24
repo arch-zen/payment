@@ -56,7 +56,9 @@ public class HttpClientUtil {
         HttpGet httpGet = new HttpGet(url);
         if (header != null && Constants.MOCK.equals(header.get("mock"))) { // mock
             for (Entry<String, String> entry : header.entrySet()) {
-                httpGet.addHeader(entry.getKey(), entry.getValue()); // add request header
+                if (entry.getKey().startsWith("mock")) {
+                    httpGet.addHeader(entry.getKey(), entry.getValue()); // add request header
+                }
             }
         }
         logger.info("executing request" + httpGet.getRequestLine());
@@ -95,7 +97,9 @@ public class HttpClientUtil {
         httpPost.setEntity(postEntity); // set request body
         if (header != null && Constants.MOCK.equals(header.get("mock"))) {
             for (Entry<String, String> entry : header.entrySet()) {
-                httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
+                if (entry.getKey().startsWith("mock")) {
+                    httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
+                }
             }
         }
         httpPost.addHeader("Content-Type", contentType); // 设置body类型
@@ -136,7 +140,9 @@ public class HttpClientUtil {
         httpPost.setEntity(postEntity); // set request body
         if (header != null && Constants.MOCK.equals(header.get("mock"))) {
             for (Entry<String, String> entry : header.entrySet()) {
-                httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
+                if (entry.getKey().startsWith("mock")) {
+                    httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
+                }
             }
         }
         logger.info("executing request" + httpPost.getRequestLine());
@@ -178,7 +184,9 @@ public class HttpClientUtil {
         httpPost.setEntity(postEntity); // set request body
         if (header != null && Constants.MOCK.equals(header.get("mock"))) {
             for (Entry<String, String> entry : header.entrySet()) {
-                httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
+                if (entry.getKey().startsWith("mock")) {
+                    httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
+                }
             }
         }
         logger.info("executing request" + httpPost.getRequestLine());
@@ -239,7 +247,9 @@ public class HttpClientUtil {
         httpPost.setEntity(postEntity); // set request body
         if (header != null && Constants.MOCK.equals(header.get("mock"))) {
             for (Entry<String, String> entry : header.entrySet()) {
-                httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
+                if (entry.getKey().startsWith("mock")) {
+                    httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
+                }
             }
         }
         httpPost.addHeader("Content-Type", contentType); // 设置body类型
