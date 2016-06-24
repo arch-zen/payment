@@ -15,6 +15,7 @@ import javax.ws.rs.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ymatou.payment.facade.RefundJobFacade;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.facade.model.ExecuteRefundRequest;
@@ -39,7 +40,7 @@ public class RefundJobResourceImpl implements RefundJobResource {
     public String executeRefund(String refundNo, @Context HttpServletRequest servletRequest) {
         HashMap<String, String> header = generateHttpHeader(servletRequest);
         ExecuteRefundRequest request = new ExecuteRefundRequest();
-        request.setRefundNo(refundNo);
+        request.setRefundNo(JSONObject.parseObject(refundNo).getString("RefundNo"));
         request.setHeader(header);
 
         int flag = refundJobFacade.executeRefund(request);
