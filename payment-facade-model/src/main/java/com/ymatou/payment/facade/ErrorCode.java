@@ -64,6 +64,10 @@ public enum ErrorCode {
 
     NOT_EXIST_REFUNDNO(1011, "退款单号不存在"),
 
+    PAYMENT_NOTIFY_INNER_SYSTEM_FAILED(4004, "支付成功通知内部系统失败"),
+
+    PAYMENT_NOTIFY_ACCOUNTING_FAILED(4005, "支付成功充值失败"),
+
     FAIL(5000, "请求处理失败"),
 
     UNKNOWN(-9999, "未知错误，系统异常");

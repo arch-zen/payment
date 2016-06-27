@@ -6,6 +6,7 @@ import java.util.Date;
 import com.ymatou.payment.facade.PrintFriendliness;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
+import com.ymatou.payment.facade.constants.PaymentNotifyStatusEnum;
 import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 
@@ -19,26 +20,86 @@ public class Payment extends PrintFriendliness {
 
     private static final long serialVersionUID = 2524661669277166299L;
 
+    /**
+     * 商户订单
+     */
     private BussinessOrder bussinessOrder;
+    /**
+     * 支付单Id
+     */
     private String paymentId;
+    /**
+     * 商户订单Id
+     */
     private String bussinessOrderId;
+    /**
+     * 第三方支付单Id
+     */
     private String institutionPaymentId;
-
+    /**
+     * 支付类型
+     */
     private PayTypeEnum payType;
+    /**
+     * 支付金额
+     */
     private Money payPrice;
+    /**
+     * 实际支付金额
+     */
     private Money actualPayPrice;
+    /**
+     * 支付货币
+     */
     private String payCurrencyType;
+    /**
+     * 实际支付货币
+     */
     private String actualPayCurrencyType;
+    /**
+     * 汇率
+     */
     private Double exchangeRate;
+    /**
+     * 银行Id
+     */
     private String bankId;
+    /**
+     * 银行卡Id
+     */
     private Integer cardType;
+    /**
+     * 第三方支付者Id
+     */
     private String payerId;
+    /**
+     * 支付状态枚举
+     */
     private PayStatusEnum payStatus;
+    /**
+     * 支付时间
+     */
     private Date payTime;
+    /**
+     * 退款金额
+     */
     private BigDecimal refundAmt;
+    /**
+     * 完成退款金额
+     */
     private BigDecimal completedRefundAmt;
-
+    /**
+     * 对账状态
+     */
     private Integer checkStatus;
+    /**
+     * 通知状态
+     */
+    private PaymentNotifyStatusEnum notifyStatus;
+    /**
+     * 重试次数
+     */
+    private Integer retryCount;
 
     public String getPaymentId() {
         return paymentId;
@@ -213,6 +274,10 @@ public class Payment extends PrintFriendliness {
         model.setCheckStatus(po.getCheckStatus());
         model.setRefundAmt(po.getRefundAmt());
         model.setCompletedRefundAmt(po.getCompletedRefundAmt());
+        model.setRetryCount(po.getRetryCount());
+
+        if (po.getNotifyStatus() != null)
+            model.setNotifyStatus(PaymentNotifyStatusEnum.parse(po.getNotifyStatus()));
 
         return model;
     }
@@ -223,5 +288,33 @@ public class Payment extends PrintFriendliness {
         } else {
             return new Money(amount);
         }
+    }
+
+    /**
+     * @return the notifyStatus
+     */
+    public PaymentNotifyStatusEnum getNotifyStatus() {
+        return notifyStatus;
+    }
+
+    /**
+     * @param notifyStatus the notifyStatus to set
+     */
+    public void setNotifyStatus(PaymentNotifyStatusEnum notifyStatus) {
+        this.notifyStatus = notifyStatus;
+    }
+
+    /**
+     * @return the retryCount
+     */
+    public Integer getRetryCount() {
+        return retryCount;
+    }
+
+    /**
+     * @param retryCount the retryCount to set
+     */
+    public void setRetryCount(Integer retryCount) {
+        this.retryCount = retryCount;
     }
 }

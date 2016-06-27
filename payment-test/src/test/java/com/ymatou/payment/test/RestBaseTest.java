@@ -9,10 +9,9 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import org.junit.runner.RunWith;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.StringKeySerializer;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/applicationContextRestTest.xml"})
@@ -29,5 +28,15 @@ public class RestBaseTest extends BaseTest {
         header.put("mockId", UUID.randomUUID().toString());
 
         return header;
+    }
+
+    /**
+     * 设置MockHeader
+     * 
+     * @param servletRequest
+     */
+    protected void setMockHeader(MockHttpServletRequest servletRequest) {
+        servletRequest.addHeader("mock", 1);
+        servletRequest.addHeader("mockId", UUID.randomUUID().toString());
     }
 }

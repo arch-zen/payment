@@ -8,6 +8,7 @@ package com.ymatou.payment.test.domain.channel.service;
 import static org.junit.Assert.assertEquals;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -18,7 +19,9 @@ import org.junit.Test;
 
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.service.SignatureService;
+import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
+import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.test.RestBaseTest;
 
@@ -110,6 +113,58 @@ public class SignatureServiceImplTest extends RestBaseTest {
     }
 
     /**
+     * Weixin App 验签
+     * 
+     * @throws UnsupportedEncodingException
+     */
+    @Test
+    public void test1WeixinAppNotify() throws UnsupportedEncodingException {
+        String payType = "15";
+        Map<String, String> notifyMap = new HashMap<String, String>();
+        notifyMap.put("appid", "wxf51a439c0416f182");
+        notifyMap.put("bank_type", "CCB_DEBIT");
+        notifyMap.put("cash_fee", "13620");
+        notifyMap.put("fee_type", "CNY");
+        notifyMap.put("is_subscribe", "N");
+        notifyMap.put("mch_id", "1234079001");
+        notifyMap.put("nonce_str", "473717198");
+        notifyMap.put("openid", "oASzYjqH4qpvUokDhDKWNncihKZo");
+        notifyMap.put("out_trade_no", "16062619545631898");
+        notifyMap.put("result_code", "SUCCESS");
+        notifyMap.put("return_code", "SUCCESS");
+        notifyMap.put("sign", "CCCA88D71C99EE91C41C1ACD9294CC38");
+        notifyMap.put("time_end", "20160626195506");
+        notifyMap.put("total_fee", "13620");
+        notifyMap.put("trade_type", "APP");
+        notifyMap.put("transaction_id", "4008082001201606267929960673");
+
+        boolean signResult =
+                signatureService.validateSign(notifyMap, instConfigManager.getConfig(PayTypeEnum.parse(payType)), null);
+
+        assertEquals("验证MD5签名", true, signResult);
+    }
+
+    @Test
+    public void testMoney() {
+        Payment payment = new Payment();
+        payment.setPayPrice(new Money(136.20));
+
+        double testmoney = 1.10;
+
+        // for (int i = 0; i < 1000; i++) {
+        // testmoney += 1 * 0.01;
+        //
+        // int weixinPrice = (int) (testmoney * 100);
+        // Money actPrice = new Money(testmoney);
+        //
+        // assertEquals("验证金额", actPrice.getCent(), weixinPrice);
+        // }
+        // int weixinPrice = (int) (payment.getPayPrice().getCent());
+
+
+    }
+
+    /**
      * Weixin JSAPI 验签
      * 
      * @throws UnsupportedEncodingException
@@ -142,7 +197,7 @@ public class SignatureServiceImplTest extends RestBaseTest {
     }
 
     @Test
-    public void testAliPayPcSign() {
+    public void testAliPayPSign() {
         String payType = "10";
         Map<String, String> map = new HashMap<String, String>();
         map.put("_input_charset", "utf-8");
@@ -229,6 +284,32 @@ public class SignatureServiceImplTest extends RestBaseTest {
 
         String assertSign = "FB9FC0359274BCF3464B9D94FD11F235";
         String sign = signatureService.signMessage(map, instConfigManager.getConfig(PayTypeEnum.parse(payType)), null);
+
+        assertEquals("验证MD5签名", assertSign, sign);
+    }
+
+    @Test
+    public void testNotifySign() {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("Version", "1");
+        map.put("BizCode", "5");
+        map.put("AppId", "2");
+        map.put("PayPrice", "0.01");
+        map.put("PayChannel", "Alipay");
+        map.put("PayType", "10");
+        map.put("Currency", "CNY");
+        map.put("TraceId", "43f231c6-caa5-4caf-86ed-3bf17f98121b");
+        map.put("PayTime", "20160623163052");
+        map.put("TradingId", "FCZ2016062310136896");
+        map.put("PaymentId", "16062316304186777");
+        map.put("InstPaymentId", "2016062321001004190259990084");
+        map.put("InternalUserId", "3383");
+        map.put("ExternalUserId", "344570209@qq.com");
+        map.put("Memo", null);
+        map.put("SignMethod", "MD5");
+
+        String assertSign = "D41B451F9E8DC3969F83A6BC8A02739D";
+        String sign = signatureService.signNotify(map);
 
         assertEquals("验证MD5签名", assertSign, sign);
     }

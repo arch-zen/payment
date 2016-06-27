@@ -7,6 +7,7 @@ package com.ymatou.payment.domain.channel.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.channel.InstitutionConfig;
+import com.ymatou.payment.domain.pay.PaymentConfig;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
@@ -49,6 +51,9 @@ public class SignatureServiceImpl implements SignatureService {
 
     @Resource
     private IntegrationConfig integrationConfig;
+
+    @Resource
+    private PaymentConfig paymentConfig;
 
     /*
      * (non-Javadoc)
@@ -202,5 +207,56 @@ public class SignatureServiceImpl implements SignatureService {
                     e);
         }
     }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.ymatou.payment.domain.channel.service.SignatureService#signNotify(java.util.Map,
+     * java.lang.String)
+     */
+    @Override
+    public String signNotify(Map<String, String> notifyData) {
+        String rawString = flatNotifyMessage(notifyData);
+
+        try {
+            String targetMessage = rawString + paymentConfig.getNotifySignSalt();
+            return MD5Util.encode(targetMessage).toUpperCase();
+
+        } catch (Exception e) {
+            throw new BizException(ErrorCode.FAIL, "notify md5 sign failed with rawString: " + rawString, e);
+        }
+    }
+
+    /**
+     * 将NotifyMesssage转成String
+     * 
+     * @param map
+     * @param instConfig
+     * @return
+     */
+    private String flatNotifyMessage(Map<String, String> map) {
+        ArrayList<String> list = new ArrayList<String>();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            if (entry.getValue() != "" && entry.getValue() != null
+                    && !entry.getKey().equals("serialVersionUID")
+                    && !entry.getKey().equals("Sign")) {
+                list.add(entry.getKey() + "=" + entry.getValue() + "&");
+            }
+        }
+        int size = list.size();
+        Collections.sort(list, new Comparator<String>() {
+            public int compare(String arg0, String arg1) {
+                return arg0.compareToIgnoreCase(arg1);
+            }
+        });
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size; i++) {
+            sb.append(list.get(i));
+        }
+
+        return sb.substring(0, sb.length() - 1);
+    }
+
 
 }

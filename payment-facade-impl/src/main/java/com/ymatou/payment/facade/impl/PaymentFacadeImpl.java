@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.channel.InstitutionConfig;
@@ -16,9 +18,14 @@ import com.ymatou.payment.domain.pay.service.PayService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.PaymentFacade;
+import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
+import com.ymatou.payment.facade.constants.PaymentNotifyStatusEnum;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
+import com.ymatou.payment.facade.model.ExecutePayNotifyReq;
+import com.ymatou.payment.facade.model.ExecutePayNotifyResp;
+import com.ymatou.payment.facade.rest.PaymentResourceImpl;
 
 /**
  * 支付接口实现
@@ -28,6 +35,8 @@ import com.ymatou.payment.facade.model.AcquireOrderResp;
  */
 @Component("paymentFacade")
 public class PaymentFacadeImpl implements PaymentFacade {
+
+    private static Logger logger = LoggerFactory.getLogger(PaymentFacadeImpl.class);
 
     @Resource
     private PayService payService;
@@ -90,7 +99,6 @@ public class PaymentFacadeImpl implements PaymentFacade {
 
         BussinessOrder bussinessOrder = payService.getBussinessOrderByOrderId(req.getOrderId());
 
-        // FIXME:并发问题，同时来了两笔orderId一样的请求呢?
         if (bussinessOrder != null) {
             throw new BizException(ErrorCode.DB_ERROR, "OrderId已经创建过支付单");
         }
@@ -98,5 +106,33 @@ public class PaymentFacadeImpl implements PaymentFacade {
         if ((new BigDecimal(req.getPayPrice()).doubleValue() < 0.01)) {
             throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "无效的支付金额");
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.ymatou.payment.facade.PaymentFacade#executePayNotify(com.ymatou.payment.facade.model.
+     * ExecutePayNotifyReq)
+     */
+    @Override
+    public ExecutePayNotifyResp executePayNotify(ExecutePayNotifyReq req) {
+        Payment payment = payService.getPaymentByPaymentId(req.getPaymentId());
+        ExecutePayNotifyResp resp = new ExecutePayNotifyResp();
+
+        if (payment == null) {
+            logger.error("execute pay notify failed because payment id not exist:{}", req.getPaymentId());
+            throw new BizException(ErrorCode.FAIL, "payment id not exist:" + req.getPaymentId());
+        }
+
+        if (payment.getPayStatus() != PayStatusEnum.Paied) {
+            logger.error("execute pay notify failed because payment id not exist:{}", req.getPaymentId());
+            throw new BizException(ErrorCode.FAIL, "payment status not paied:" + req.getPaymentId());
+        }
+
+        payService.executePayNotify(payment, req.getMockHeader());
+
+
+        return resp;
     }
 }

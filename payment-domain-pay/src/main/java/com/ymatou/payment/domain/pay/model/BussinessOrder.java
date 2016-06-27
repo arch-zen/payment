@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import com.ymatou.payment.facade.PrintFriendliness;
+import com.ymatou.payment.facade.constants.BizCodeEnum;
 import com.ymatou.payment.infrastructure.db.model.BussinessOrderPo;
 
 /**
@@ -21,34 +22,121 @@ public class BussinessOrder extends PrintFriendliness {
 
     private static final long serialVersionUID = 5438330052260748278L;
 
+    /**
+     * 商户订单Id
+     */
     private String bussinessOrderId;
+    /**
+     * 应用编号
+     */
     private String appId;
+    /**
+     * 原始AppId
+     */
     private String originAppId;
+    /**
+     * 商户订单Id
+     */
     private String orderId;
+    /**
+     * 支付类型
+     */
     private String payType;
+    /**
+     * 订单金额
+     */
     private BigDecimal orderPrice;
+    /**
+     * 货币类型
+     */
     private String currencyType;
+    /**
+     * 码头用户Id
+     */
     private Integer userId;
+    /**
+     * 版本
+     */
     private Integer version;
+    /**
+     * 跟踪Id
+     */
     private String traceId;
+    /**
+     * 收单时间
+     */
     private String orderTime;
+    /**
+     * 第三方用户Id
+     */
     private String thirdPartyUserId;
+    /**
+     * 第三方用户类型
+     */
     private Integer thirdPartyUserType;
+    /**
+     * 客户端Ip
+     */
     private String clientIp;
+    /**
+     * 客户端回调URL
+     */
     private String callbackUrl;
+    /**
+     * 服务端回调URL
+     */
     private String notifyUrl;
+    /**
+     * 商品名称
+     */
     private String productName;
+    /**
+     * 商品描述
+     */
     private String productDesc;
+    /**
+     * 商品链接
+     */
     private String productUrl;
+    /**
+     * 代码页
+     */
     private Integer codePage;
+    /**
+     * 扩展信息
+     */
     private String ext;
+    /**
+     * 备注
+     */
     private String memo;
+    /**
+     * 签名方式
+     */
     private String signMethod;
-    private Integer bizCode;
+    /**
+     * 支付类型
+     */
+    private BizCodeEnum bizCode;
+    /**
+     * 创建时间
+     */
     private Date createdTime;
+    /**
+     * 最后更新时间
+     */
     private Date lastUpdatedTime;
+    /**
+     * 订单状态
+     */
     private Integer orderStatus;
+    /**
+     * 通知状态
+     */
     private Integer notifyStatus;
+    /**
+     * 通知时间
+     */
     private Date notifyTime;
 
 
@@ -236,11 +324,11 @@ public class BussinessOrder extends PrintFriendliness {
         this.signMethod = signMethod;
     }
 
-    public Integer getBizCode() {
+    public BizCodeEnum getBizCode() {
         return bizCode;
     }
 
-    public void setBizCode(Integer bizCode) {
+    public void setBizCode(BizCodeEnum bizCode) {
         this.bizCode = bizCode;
     }
 
@@ -348,7 +436,7 @@ public class BussinessOrder extends PrintFriendliness {
         model.setExt(po.getExt());
         model.setMemo(po.getMemo());
         model.setSignMethod(po.getSignMethod());
-        model.setBizCode(po.getBizCode());
+        model.setBizCode(BizCodeEnum.parse(po.getBizCode()));
         model.setCreatedTime(po.getCreatedTime());
         model.setLastUpdatedTime(po.getLastUpdatedTime());
         model.setOrderStatus(po.getOrderStatus());

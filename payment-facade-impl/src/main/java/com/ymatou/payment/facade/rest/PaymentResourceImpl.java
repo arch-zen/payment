@@ -18,9 +18,12 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.ymatou.payment.domain.channel.service.acquireorder.WeiXinJSAPIAcquireOrderServiceImpl;
+import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.PaymentFacade;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
+import com.ymatou.payment.facade.model.ExecutePayNotifyReq;
+import com.ymatou.payment.facade.model.ExecutePayNotifyResp;
 
 /**
  * 支付REST接口实现
@@ -58,6 +61,28 @@ public class PaymentResourceImpl implements PaymentResource {
         resp.setTraceId(req.getTraceId());
 
         return resp;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.ymatou.payment.facade.rest.PaymentResource#executePayNotify(com.ymatou.payment.facade.
+     * model.ExecutePayNotifyReq, javax.servlet.http.HttpServletRequest)
+     */
+    @Override
+    @POST
+    @Path("/{ExecutePayNotify:(?i:ExecutePayNotify)}")
+    @Produces({"text/xml"})
+    public String executePayNotify(ExecutePayNotifyReq req, HttpServletRequest servletRequest) {
+        req.setMockHeader(getMockHttpHeader(servletRequest));
+        ExecutePayNotifyResp resp = paymentFacade.executePayNotify(req);
+        if (resp.getErrorCode() == ErrorCode.PAYMENT_NOTIFY_ACCOUNTING_FAILED.getCode()
+                || resp.getErrorCode() == ErrorCode.PAYMENT_NOTIFY_INNER_SYSTEM_FAILED.getCode()) {
+            return "failed-" + resp.getErrorCode() + "|" + resp.getErrorMessage();
+        }
+
+        return "ok";
     }
 
     /**

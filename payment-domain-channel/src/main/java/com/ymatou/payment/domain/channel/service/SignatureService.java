@@ -39,4 +39,13 @@ public interface SignatureService {
      */
     boolean validateSign(Map<String, String> signMapData, InstitutionConfig instConfig,
             HashMap<String, String> mockHeader);
+
+    /**
+     * 支付通知签名
+     * 
+     * @param notifyData
+     * @param salt MD5盐值
+     * @return
+     */
+    String signNotify(Map<String, String> notifyData);
 }

@@ -196,4 +196,45 @@ public class PaymentRepository {
         paymentPo.setPaymentId(paymentId);
         paymentMapper.updateByPrimaryKeySelective(paymentPo);
     }
+
+    /**
+     * 更新支付通知状态
+     * 
+     * @param payment
+     */
+    public void updatePaymentNotifyStatus(Payment payment) {
+        PaymentPo paymentPo = new PaymentPo();
+
+        paymentPo.setPaymentId(payment.getPaymentId());
+
+        if (payment.getNotifyStatus() != null) {
+            paymentPo.setNotifyStatus(payment.getNotifyStatus().code());
+        }
+
+        if (payment.getRetryCount() == null) {
+            paymentPo.setRetryCount(0);
+        } else {
+            paymentPo.setRetryCount(payment.getRetryCount() + 1);
+        }
+
+        paymentMapper.updateByPrimaryKeySelective(paymentPo);
+    }
+
+    /**
+     * 更新支付通知重试次数
+     * 
+     * @param payment
+     */
+    public void increaseRetryCount(Payment payment) {
+        PaymentPo paymentPo = new PaymentPo();
+
+        paymentPo.setPaymentId(payment.getPaymentId());
+        if (payment.getRetryCount() == null) {
+            paymentPo.setRetryCount(0);
+        } else {
+            paymentPo.setRetryCount(payment.getRetryCount() + 1);
+        }
+
+        paymentMapper.updateByPrimaryKeySelective(paymentPo);
+    }
 }

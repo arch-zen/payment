@@ -1,5 +1,7 @@
 package com.ymatou.payment.domain.pay.service;
 
+import java.util.HashMap;
+
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
@@ -60,4 +62,11 @@ public interface PayService {
      * @param traceId
      */
     void setPaymentOrderPaid(Payment payment, String traceId);
+
+    /**
+     * 执行支付通知
+     * 
+     * @param payment
+     */
+    void executePayNotify(Payment payment, HashMap<String, String> mockHeader);
 }

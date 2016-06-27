@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.UUID;
 
 import javax.annotation.Resource;
@@ -25,7 +26,10 @@ import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.service.PayService;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
+import com.ymatou.payment.facade.model.ExecutePayNotifyReq;
 import com.ymatou.payment.facade.rest.PaymentResource;
+import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
+import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.test.RestBaseTest;
 
@@ -45,6 +49,9 @@ public class PaymentResourceImplTest extends RestBaseTest {
 
     @Resource
     private IntegrationConfig config;
+
+    @Resource
+    private PaymentMapper paymentMapper;
 
     @Test
     public void testAcquireOrderWap() {
@@ -79,7 +86,7 @@ public class PaymentResourceImplTest extends RestBaseTest {
         assertEquals("验证Ext", req.getExt(), bo.getExt());
         assertEquals("验证Memo", req.getMemo(), bo.getMemo());
         assertEquals("验证SignMethod", req.getSignMethod(), bo.getSignMethod());
-        assertEquals("验证BizCode", req.getBizCode(), bo.getBizCode());
+        assertEquals("验证BizCode", req.getBizCode(), bo.getBizCode().code());
         assertEquals("验证OrderStatus", new Integer(0), bo.getOrderStatus());
         assertEquals("验证NotifyStatus", new Integer(0), bo.getNotifyStatus());
     }
@@ -125,7 +132,7 @@ public class PaymentResourceImplTest extends RestBaseTest {
         assertEquals("验证Ext", req.getExt(), bo.getExt());
         assertEquals("验证Memo", req.getMemo(), bo.getMemo());
         assertEquals("验证SignMethod", req.getSignMethod(), bo.getSignMethod());
-        assertEquals("验证BizCode", req.getBizCode(), bo.getBizCode());
+        assertEquals("验证BizCode", req.getBizCode(), bo.getBizCode().code());
         assertEquals("验证OrderStatus", new Integer(0), bo.getOrderStatus());
         assertEquals("验证NotifyStatus", new Integer(0), bo.getNotifyStatus());
     }
@@ -268,6 +275,131 @@ public class PaymentResourceImplTest extends RestBaseTest {
     public void gmtTimeTest() {
         String gmt_payment = "2016-05-27 20:27:08";
         Date date = DateUtils.parseDate(gmt_payment, new String[] {"yyyy-MM-dd HH:mm:ss"});
+    }
+
+    @Test
+    public void executePayNotifyTest1() {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+        req.setPayType("10");
+        req.setPayPrice("1.01");
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        assertEquals("验证返回码", 0, res.getErrorCode());
+
+        BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
+        assertNotNull("验证商户订单", bo);
+
+        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertNotNull("验证支付单", payment);
+
+
+        ExecutePayNotifyReq executePayNotifyReq = new ExecutePayNotifyReq();
+        executePayNotifyReq.setPaymentId(payment.getPaymentId());
+        String response = paymentResource.executePayNotify(executePayNotifyReq, servletRequest);
+
+        assertEquals("验证执行结果", "ok", response);
+    }
+
+    @Test
+    public void executePayNotifyTest2() {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+        req.setPayType("10");
+        req.setPayPrice("1.01");
+        req.setOrderId(String.valueOf(new Date().getTime()).substring(4));
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        assertEquals("验证返回码", 0, res.getErrorCode());
+
+        BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
+        assertNotNull("验证商户订单", bo);
+
+        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertNotNull("验证支付单", payment);
+
+        PaymentPo paymentPo = new PaymentPo();
+        paymentPo.setPaymentId(payment.getPaymentId());
+        paymentPo.setPayStatus(1);
+
+        paymentMapper.updateByPrimaryKeySelective(paymentPo);
+
+        ExecutePayNotifyReq executePayNotifyReq = new ExecutePayNotifyReq();
+        executePayNotifyReq.setPaymentId(payment.getPaymentId());
+        String response = paymentResource.executePayNotify(executePayNotifyReq, servletRequest);
+
+        assertEquals("验证执行结果", true, response.contains("failed"));
+
+        payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertEquals("验证回调状态", 1, payment.getNotifyStatus().code().intValue());
+        assertEquals("验证重试次数", 0, payment.getRetryCount().intValue());
+
+
+        executePayNotifyReq.setPaymentId(payment.getPaymentId());
+        response = paymentResource.executePayNotify(executePayNotifyReq, servletRequest);
+        assertEquals("验证执行结果", true, response.contains("failed"));
+        assertEquals("验证执行结果包含异常码", true, response.contains("4004"));
+
+        payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertEquals("验证回调状态", 1, payment.getNotifyStatus().code().intValue());
+        assertEquals("验证重试次数", 1, payment.getRetryCount().intValue());
+
+    }
+
+    @Test
+    public void executePayNotifyTest3() {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+        req.setPayType("10");
+        req.setPayPrice("1.01");
+        req.setNotifyUrl("http://mockforpay.iapi.ymatou.com/api/Buyer/TriggerOrderRefund");
+        req.setOrderId(String.valueOf(new Date().getTime()).substring(4));
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        assertEquals("验证返回码", 0, res.getErrorCode());
+
+        BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
+        assertNotNull("验证商户订单", bo);
+
+        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertNotNull("验证支付单", payment);
+
+        PaymentPo paymentPo = new PaymentPo();
+        paymentPo.setPaymentId(payment.getPaymentId());
+        paymentPo.setPayStatus(1);
+
+        paymentMapper.updateByPrimaryKeySelective(paymentPo);
+
+
+        setMockHeader(servletRequest);
+
+        ExecutePayNotifyReq executePayNotifyReq = new ExecutePayNotifyReq();
+        executePayNotifyReq.setPaymentId(payment.getPaymentId());
+        String response = paymentResource.executePayNotify(executePayNotifyReq, servletRequest);
+
+        assertEquals("验证执行结果", true, response.contains("failed"));
+
+        payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertEquals("验证回调状态", 1, payment.getNotifyStatus().code().intValue());
+        assertEquals("验证重试次数", 0, payment.getRetryCount().intValue());
+
+
+
+        setMockHeader(servletRequest);
+        response = paymentResource.executePayNotify(executePayNotifyReq, servletRequest);
+        assertEquals("验证执行结果", true, response.contains("failed"));
+        assertEquals("验证执行结果包含异常码", true, response.contains("4004"));
+
+        payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertEquals("验证回调状态", 1, payment.getNotifyStatus().code().intValue());
+        assertEquals("验证重试次数", 1, payment.getRetryCount().intValue());
+
     }
 
     /**

@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
+import com.ymatou.payment.facade.model.ExecutePayNotifyReq;
 
 /**
  * 支付REST接口
@@ -21,4 +22,13 @@ public interface PaymentResource {
      * @return
      */
     AcquireOrderResp acquireOrder(AcquireOrderReq req, HttpServletRequest servletRequest);
+
+    /**
+     * 执行支付通知
+     * 
+     * @param req
+     * @param servletRequest
+     * @return
+     */
+    String executePayNotify(ExecutePayNotifyReq req, HttpServletRequest servletRequest);
 }

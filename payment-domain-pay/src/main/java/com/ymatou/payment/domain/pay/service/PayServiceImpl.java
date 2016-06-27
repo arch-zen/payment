@@ -2,18 +2,26 @@ package com.ymatou.payment.domain.pay.service;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.ymatou.payment.domain.pay.integration.AccountingService;
+import com.ymatou.payment.domain.pay.integration.PaymentNotifyService;
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.repository.BussinessOrderRepository;
 import com.ymatou.payment.domain.pay.repository.PaymentRepository;
+import com.ymatou.payment.facade.BizException;
+import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.OrderStatusEnum;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
+import com.ymatou.payment.facade.constants.PaymentNotifyStatusEnum;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.infrastructure.db.model.BussinessOrderPo;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
@@ -22,13 +30,19 @@ import com.ymatou.payment.infrastructure.util.StringUtil;
 @Component
 public class PayServiceImpl implements PayService {
 
+    private static Logger logger = LoggerFactory.getLogger(PayServiceImpl.class);
+
     @Resource
     private PaymentRepository paymentRepository;
 
     @Resource
     private BussinessOrderRepository bussinessOrderRepository;
 
+    @Resource
+    private AccountingService accountingService;
 
+    @Resource
+    private PaymentNotifyService paymentNotifyService;
 
     /*
      * (non-Javadoc)
@@ -163,6 +177,50 @@ public class PayServiceImpl implements PayService {
         paymentPo.setLastUpdatedTime(new Date());
 
         paymentRepository.setPaymentOrderPaid(paymentPo, traceId);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.ymatou.payment.domain.pay.service.PayService#executePayNotify(com.ymatou.payment.domain.
+     * pay.model.Payment)
+     */
+    @Override
+    public void executePayNotify(Payment payment, HashMap<String, String> mockHeader) {
+        if (payment.getNotifyStatus() == PaymentNotifyStatusEnum.NOTIFIED) {
+            return;
+        }
+
+        BussinessOrder bussinessOrder = getBussinessOrderById(payment.getBussinessOrderId());
+        if (bussinessOrder == null) {
+            logger.error("execute pay notify found payment[{}] has not bussiness order", payment.getPaymentId());
+            throw new BizException(ErrorCode.NOT_EXIST_BUSSINESS_ORDERID, "paymentId:" + payment.getPaymentId());
+        }
+
+        paymentRepository.increaseRetryCount(payment);
+
+        // 执行充值操作
+        if (payment.getNotifyStatus() == null) {
+            if (!accountingService.recharge(payment, bussinessOrder)) {
+                logger.error("pay notify execute accounting failed:" + payment.getPaymentId());
+                throw new BizException(ErrorCode.PAYMENT_NOTIFY_ACCOUNTING_FAILED,
+                        "pay notify execute accounting failed:" + payment.getPaymentId());
+            }
+            payment.setNotifyStatus(PaymentNotifyStatusEnum.ACCOUNTED);
+            paymentRepository.updatePaymentNotifyStatus(payment);
+        }
+
+        // 执行通知业务系统的操作
+        if (payment.getNotifyStatus() == PaymentNotifyStatusEnum.ACCOUNTED) {
+            if (!paymentNotifyService.notifyBizSystem(payment, bussinessOrder, mockHeader)) {
+                logger.error("pay notify call inner system failed:" + payment.getPaymentId());
+                throw new BizException(ErrorCode.PAYMENT_NOTIFY_INNER_SYSTEM_FAILED,
+                        "pay notify call inner system failed:" + payment.getPaymentId());
+            }
+            payment.setNotifyStatus(PaymentNotifyStatusEnum.NOTIFIED);
+            paymentRepository.updatePaymentNotifyStatus(payment);
+        }
     }
 
 }

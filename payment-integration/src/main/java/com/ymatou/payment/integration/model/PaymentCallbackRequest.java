@@ -76,6 +76,11 @@ public class PaymentCallbackRequest {
      */
     private String payType;
 
+    /**
+     * 签名
+     */
+    private String sign;
+
     public String getAppId() {
         return appId;
     }
@@ -194,5 +199,19 @@ public class PaymentCallbackRequest {
 
     public void setPayTime(Date payTime) {
         this.payTime = payTime;
+    }
+
+    /**
+     * @return the sign
+     */
+    public String getSign() {
+        return sign;
+    }
+
+    /**
+     * @param sign the sign to set
+     */
+    public void setSign(String sign) {
+        this.sign = sign;
     }
 }
