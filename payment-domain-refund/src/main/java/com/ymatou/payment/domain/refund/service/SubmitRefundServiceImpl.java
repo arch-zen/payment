@@ -134,7 +134,9 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
                         break;
                     }
                 }
-                refundrequest.setRefundBatchNo(refundPository.generateRefundBatchNo()); // 生成退款批次号
+                // refundrequest.setRefundBatchNo(refundPository.generateRefundBatchNo()); //
+                // 生成退款批次号
+                // 此处不能生成退款批次号，否则隔天审批的退款申请将无法提交支付宝
                 refundrequestWithBLOBs.add(refundrequest); // 需要被插入的RefundRequest
             }
         }

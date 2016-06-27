@@ -87,7 +87,8 @@ public class RefundPository {
         refundrequest.setApprovedUser("system");
         refundrequest.setRefundStatus(RefundStatusEnum.INIT.getCode());
         refundrequest.setTradeType(refundInfo.getTradeType());
-        refundrequest.setRefundBatchNo(generateRefundBatchNo()); // 生成退款批次号
+        // 此处不能生成退款批次号，否则会造成隔天审批的退款申请无法提交到支付宝
+        // refundrequest.setRefundBatchNo(generateRefundBatchNo()); // 生成退款批次号
 
         CompensateProcessInfoPo compensateprocessinfo = new CompensateProcessInfoPo();
 

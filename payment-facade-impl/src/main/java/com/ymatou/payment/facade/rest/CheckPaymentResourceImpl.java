@@ -27,7 +27,7 @@ import com.ymatou.payment.facade.model.CheckPaymentRequset;
 @Path("/{api:(?i:api)}")
 @Component("checkPaymentResource")
 @Consumes({"application/json; charset=UTF-8"})
-@Produces({"text/html; charset=UTF-8"})
+// @Produces({"text/html; charset=UTF-8"})
 public class CheckPaymentResourceImpl implements CheckPaymentResource {
 
     @Autowired
