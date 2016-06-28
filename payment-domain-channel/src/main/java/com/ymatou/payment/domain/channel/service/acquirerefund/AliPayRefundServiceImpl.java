@@ -143,11 +143,12 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
     }
 
     private void updateRefundRequestStatus(RefundRequestPo refundRequest, RefundStatusEnum refundStatus) {
-        refundRequest.setRefundStatus(RefundStatusEnum.REFUND_FAILED.getCode());
+        RefundRequestPo record = new RefundRequestPo();
+        record.setRefundStatus(RefundStatusEnum.REFUND_FAILED.getCode());
         RefundRequestExample example = new RefundRequestExample();
         example.createCriteria().andRefundBatchNoEqualTo(refundRequest.getRefundBatchNo());
 
-        refundRequestMapper.updateByExampleSelective(refundRequest, example);
+        refundRequestMapper.updateByExampleSelective(record, example);
     }
 
 }

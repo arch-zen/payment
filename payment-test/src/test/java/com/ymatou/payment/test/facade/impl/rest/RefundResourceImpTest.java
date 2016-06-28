@@ -439,14 +439,14 @@ public class RefundResourceImpTest extends RestBaseTest {
         example.createCriteria().andPaymentIdEqualTo(paymentPo.getPaymentId());
         List<RefundRequestPo> refundRequestPos = refundRequestMapper.selectByExample(example);
         System.out.println(refundRequestPos.size());
-        List<String> refundNos = new ArrayList<>();
+        List<Integer> refundIds = new ArrayList<>();
         for (RefundRequestPo refundRequestPo : refundRequestPos) {
-            refundNos.add(refundRequestPo.getRefundBatchNo());
+            refundIds.add(refundRequestPo.getRefundId());
         }
 
         ApproveRefundRequest approveRefundRequest = new ApproveRefundRequest();
         approveRefundRequest.setApproveUser("test");
-        approveRefundRequest.setRefundNos(refundNos);
+        approveRefundRequest.setRefundIds(refundIds);
 
         ApproveRefundResponse approveRefundResponse =
                 refundResource.approveRefund(approveRefundRequest, new MockHttpServletRequest());

@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
@@ -20,6 +22,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
@@ -28,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.dubbo.common.json.ParseException;
+import com.alibaba.fastjson.JSONObject;
 import com.ymatou.payment.integration.common.constants.Constants;
 
 /**
@@ -54,13 +58,7 @@ public class HttpClientUtil {
         String result = null;
 
         HttpGet httpGet = new HttpGet(url);
-        if (header != null && Constants.MOCK.equals(header.get("mock"))) { // mock
-            for (Entry<String, String> entry : header.entrySet()) {
-                if (entry.getKey().startsWith("mock")) {
-                    httpGet.addHeader(entry.getKey(), entry.getValue()); // add request header
-                }
-            }
-        }
+        addMock(httpGet, header);
         logger.info("executing request" + httpGet.getRequestLine());
         logger.info("request header: " + Arrays.toString(httpGet.getAllHeaders()));
 
@@ -95,13 +93,7 @@ public class HttpClientUtil {
         HttpPost httpPost = new HttpPost(url);
         StringEntity postEntity = new StringEntity(body, "UTF-8");
         httpPost.setEntity(postEntity); // set request body
-        if (header != null && Constants.MOCK.equals(header.get("mock"))) {
-            for (Entry<String, String> entry : header.entrySet()) {
-                if (entry.getKey().startsWith("mock")) {
-                    httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
-                }
-            }
-        }
+        addMock(httpPost, header);
         httpPost.addHeader("Content-Type", contentType); // 设置body类型
 
         logger.info("executing request" + httpPost.getRequestLine());
@@ -131,20 +123,13 @@ public class HttpClientUtil {
      * @throws IOException
      */
     public static String sendPost(String url, List<NameValuePair> body, HashMap<String, String> header,
-            HttpClient httpClient)
-            throws IOException {
+            HttpClient httpClient) throws IOException {
         String result = null;
 
         HttpPost httpPost = new HttpPost(url);
         UrlEncodedFormEntity postEntity = new UrlEncodedFormEntity(body, "UTF-8");
         httpPost.setEntity(postEntity); // set request body
-        if (header != null && Constants.MOCK.equals(header.get("mock"))) {
-            for (Entry<String, String> entry : header.entrySet()) {
-                if (entry.getKey().startsWith("mock")) {
-                    httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
-                }
-            }
-        }
+        addMock(httpPost, header);
         logger.info("executing request" + httpPost.getRequestLine());
         logger.info("request header: " + Arrays.toString(httpPost.getAllHeaders()));
         logger.info("request body: " + body);
@@ -182,13 +167,7 @@ public class HttpClientUtil {
         HttpPost httpPost = new HttpPost(url);
         UrlEncodedFormEntity postEntity = new UrlEncodedFormEntity(body, "UTF-8");
         httpPost.setEntity(postEntity); // set request body
-        if (header != null && Constants.MOCK.equals(header.get("mock"))) {
-            for (Entry<String, String> entry : header.entrySet()) {
-                if (entry.getKey().startsWith("mock")) {
-                    httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
-                }
-            }
-        }
+        addMock(httpPost, header);
         logger.info("executing request" + httpPost.getRequestLine());
         logger.info("request header: " + Arrays.toString(httpPost.getAllHeaders()));
         logger.info("request body: " + body);
@@ -228,48 +207,65 @@ public class HttpClientUtil {
     }
 
     /**
+     * 退款回调交易系统
      * 
      * @param url
      * @param body
      * @param contentType
      * @param header
      * @param httpClient
-     * @return int: HttpStatus
+     * @return boolean
      * @throws IOException
      */
-    public static int sendPostToGetStatus(String url, String body, String contentType,
+    public static boolean sendPostToGetStatus(String url, String body, String contentType,
             HashMap<String, String> header, HttpClient httpClient) throws IOException {
-
-        int statusCode = -1;
 
         HttpPost httpPost = new HttpPost(url);
         StringEntity postEntity = new StringEntity(body, "UTF-8");
         httpPost.setEntity(postEntity); // set request body
-        if (header != null && Constants.MOCK.equals(header.get("mock"))) {
-            for (Entry<String, String> entry : header.entrySet()) {
-                if (entry.getKey().startsWith("mock")) {
-                    httpPost.addHeader(entry.getKey(), entry.getValue()); // add request header
-                }
-            }
-        }
+        addMock(httpPost, header);
         httpPost.addHeader("Content-Type", contentType); // 设置body类型
 
         logger.info("executing request" + httpPost.getRequestLine());
         logger.info("request header: " + Arrays.toString(httpPost.getAllHeaders()));
         logger.info("request body: " + body);
 
+        boolean isSuccess = false;
         try {
             HttpResponse response = httpClient.execute(httpPost);
             HttpEntity entity = response.getEntity();
             String result = EntityUtils.toString(entity, "UTF-8");
             StatusLine statusLine = response.getStatusLine();
+            // 退款回调交易， .net:HttpStatus=200视为成功; java:HttpStatus=200, code=200视为成功
+            if (HttpStatus.SC_OK == statusLine.getStatusCode()) {
+                if (StringUtils.isBlank(result)) {
+                    isSuccess = true;
+                } else {
+                    Integer code = (Integer) JSONObject.parseObject(result).get("Code");
+                    if (code != null && code != 200) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+
+                }
+            }
             logger.info("response message: {}; StatusLine: {}", result, statusLine);
 
-            statusCode = statusLine.getStatusCode();
         } finally {
             httpPost.releaseConnection();
         }
 
-        return statusCode;
+        return isSuccess;
+    }
+
+    private static void addMock(HttpRequestBase httpRequest, HashMap<String, String> header) {
+        if (header != null && Constants.MOCK.equals(header.get("mock"))) { // mock
+            for (Entry<String, String> entry : header.entrySet()) {
+                if (entry.getKey().toLowerCase().startsWith("mock")) {
+                    httpRequest.addHeader(entry.getKey(), entry.getValue()); // add mock header
+                }
+            }
+        }
     }
 }

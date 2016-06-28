@@ -198,7 +198,7 @@ public class RefundFacadeImpl implements RefundFacade {
     @Override
     public ApproveRefundResponse approveRefund(ApproveRefundRequest req) {
         // 更新RefundRequest审核状态， 获取需要通知退款单
-        List<RefundRequestPo> refunds = approveRefundService.approveRefund(req.getRefundNos(), req.getApproveUser());
+        List<RefundRequestPo> refunds = approveRefundService.approveRefund(req.getRefundIds(), req.getApproveUser());
 
         // 提交第三方退款
         for (RefundRequestPo refundRequest : refunds) {

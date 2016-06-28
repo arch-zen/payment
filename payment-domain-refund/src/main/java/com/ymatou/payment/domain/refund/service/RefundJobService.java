@@ -23,15 +23,15 @@ public interface RefundJobService {
      * 
      * @param refundNo
      */
-    public void updateRetryCount(String refundNo);
+    public void updateRetryCount(Integer refundNo);
 
     /**
      * 根据退款单号获取退款申请单
      * 
-     * @param refundNo
+     * @param refundId
      * @return
      */
-    public RefundRequestPo getRefundRequestById(String refundNo);
+    public RefundRequestPo getRefundRequestByRefundId(Integer refundId);
 
     /**
      * 扣除码头账户余额

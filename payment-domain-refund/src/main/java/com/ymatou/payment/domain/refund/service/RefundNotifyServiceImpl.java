@@ -81,7 +81,7 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
             for (RefundMiscRequestLogWithBLOBs rmrl : list) {
                 // 重新查询退款结果
                 String refundBatchNo = rmrl.getRefundBatchNo();
-                RefundRequestPo refundRequest = refundJobService.getRefundRequestById(refundBatchNo);
+                RefundRequestPo refundRequest = refundPository.getRefundRequestByRefundNo(refundBatchNo);
                 Payment payment = payService.getPaymentByPaymentId(refundRequest.getPaymentId());
 
                 RefundStatusEnum refundStatus =

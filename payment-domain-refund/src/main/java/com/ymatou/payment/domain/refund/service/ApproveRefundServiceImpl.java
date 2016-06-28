@@ -32,16 +32,16 @@ public class ApproveRefundServiceImpl implements ApproveRefundService {
     private RefundPository refundPository;
 
     @Override
-    public List<RefundRequestPo> approveRefund(List<String> refundNos, String approveUser) {
+    public List<RefundRequestPo> approveRefund(List<Integer> refundIds, String approveUser) {
         List<RefundRequestPo> refundrequestPos = new ArrayList<>();
-        for (String refundNo : refundNos) {
-            RefundRequestPo refundrequestPo = refundPository.getRefundRequestByRefundNo(refundNo);
+        for (Integer refundId : refundIds) {
+            RefundRequestPo refundrequestPo = refundPository.getRefundRequestByRefundId(refundId);
             if (refundrequestPo == null) {
                 throw new BizException(ErrorCode.NOT_EXIST_REFUND_NO, "refund request not exist.");
             }
             if (refundrequestPo.getApproveStatus() != ApproveStatusEnum.NOT_APPROVED.getCode()) {
                 logger.info("RefundRequest ApproveStaus expected 0, but {}. RefundNo: {}",
-                        refundrequestPo.getApproveStatus(), refundNo);
+                        refundrequestPo.getApproveStatus(), refundId);
                 continue;
             }
 
@@ -53,7 +53,7 @@ public class ApproveRefundServiceImpl implements ApproveRefundService {
         }
 
         logger.info("update refundRequest status.");
-        refundPository.updateRefundRequest(refundrequestPos);
+        refundPository.approveRefundRequest(refundrequestPos);
 
         return refundrequestPos;
     }

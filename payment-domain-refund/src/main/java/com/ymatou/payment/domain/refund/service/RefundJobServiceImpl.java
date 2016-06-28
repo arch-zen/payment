@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,19 +72,24 @@ public class RefundJobServiceImpl implements RefundJobService {
     private RefundCallbackService refundCallbackService;
 
     @Override
-    public void updateRetryCount(String refundNo) {
-        refundPository.updateRetryCount(refundNo);
+    public void updateRetryCount(Integer refundId) {
+        refundPository.updateRetryCount(refundId);
     }
 
     @Override
-    public RefundRequestPo getRefundRequestById(String refundNo) {
-        RefundRequestPo refundRequest = refundPository.getRefundRequestByRefundNo(refundNo);
+    public RefundRequestPo getRefundRequestByRefundId(Integer refundId) {
+        RefundRequestPo refundRequest = refundPository.getRefundRequestByRefundId(refundId);
         logger.info("the refund will be excuting. {}", JSONObject.toJSONString(refundRequest));
         return refundRequest;
     }
 
     @Override
     public void submitRefund(RefundRequestPo refundRequest, Payment payment, HashMap<String, String> header) {
+        String refundBatchNo = StringUtils.isBlank(refundRequest.getRefundBatchNo())
+                ? refundPository.generateRefundBatchNo() : refundRequest.getRefundBatchNo();
+        refundRequest.setRefundBatchNo(refundBatchNo);
+        refundPository.updateRefundBatchNoByRefundId(refundBatchNo, refundRequest.getRefundId()); // 提交第三方退款前，添加RefundBatchNo
+
         PayTypeEnum payType = payment.getPayType();
         AcquireRefundService refundService = refundServiceFactory.getInstanceByPayType(payType);
         refundService.notifyRefund(refundRequest, payment, header);
@@ -145,7 +151,7 @@ public class RefundJobServiceImpl implements RefundJobService {
         log.setMemo("快速退款");
         accountingLogMapper.insertSelective(log);
 
-        refundPository.updateRefundRequestAccoutingStatus(refundRequest.getRefundBatchNo(), log.getStatus());
+        refundPository.updateRefundRequestAccoutingStatus(refundRequest.getRefundId(), log.getStatus());
     }
 
     /*
@@ -159,13 +165,13 @@ public class RefundJobServiceImpl implements RefundJobService {
         log.setAccountingType("Refund");
         log.setStatus(isAccoutingSuccess(response) ? 1 : 0); // 成功为1，失败为0
         log.setUserId((long) bussinessOrder.getUserId().intValue());
-        log.setBizNo(refundRequest.getRefundBatchNo());
+        log.setBizNo(String.valueOf(refundRequest.getRefundId()));
         log.setRespCode(response.getStatusCode());
         log.setRespMsg(response.getMessage());
         log.setMemo("快速退款");
         accountingLogMapper.insertSelective(log);
 
-        refundPository.updateRefundRequestAccoutingStatus(refundRequest.getRefundBatchNo(), log.getStatus());
+        refundPository.updateRefundRequestAccoutingStatus(refundRequest.getRefundId(), log.getStatus());
     }
 
     private AccountingRequest generateRequest(RefundRequestPo refundRequest, Payment payment,
@@ -179,7 +185,7 @@ public class RefundJobServiceImpl implements RefundJobService {
         item.setAccountType(AccountTypeEnum.RmbAccount.code());
         item.setAccountingDate(new Date());
         item.setBizCode("300017"); // 快速退款
-        item.setBizNo(refundRequest.getRefundBatchNo());
+        item.setBizNo(String.valueOf(refundRequest.getRefundId()));
         item.setOriginalNo(bussinessOrder.getOrderId());
         item.setMemo("快速退款");
         itemList.add(item);

@@ -41,16 +41,16 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
 
     @Override
     public int executeRefund(ExecuteRefundRequest request) {
-        String refundNo = request.getRefundNo();
+        Integer refundId = request.getRefundId();
         HashMap<String, String> header = request.getHeader();
 
-        logger.info("Step 1: query refundRequest, payment, businessOrder. {}", refundNo);
-        RefundRequestPo refundRequest = refundJobService.getRefundRequestById(refundNo);
+        logger.info("Step 1: query refundRequest, payment, businessOrder. {}", refundId);
+        RefundRequestPo refundRequest = refundJobService.getRefundRequestByRefundId(refundId);
         if (refundRequest == null // 退款申请不不存在或未审核
                 || refundRequest.getApproveStatus().equals(ApproveStatusEnum.NOT_APPROVED.getCode())) {
             return RefundStatusEnum.INIT.getCode();
         }
-        refundJobService.updateRetryCount(refundNo); // 更新重试次数
+        refundJobService.updateRetryCount(refundId); // 更新重试次数
 
         if (refundRequest.getSoftDeleteFlag()) {
             return SOFT_DELETED;

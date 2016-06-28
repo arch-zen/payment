@@ -20,5 +20,5 @@ public interface ApproveRefundService {
      * 
      * @param paymentIds
      */
-    public List<RefundRequestPo> approveRefund(List<String> paymentIds, String approveUser);
+    public List<RefundRequestPo> approveRefund(List<Integer> paymentIds, String approveUser);
 }

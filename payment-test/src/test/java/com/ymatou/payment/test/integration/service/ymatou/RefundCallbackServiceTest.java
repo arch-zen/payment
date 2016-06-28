@@ -60,7 +60,7 @@ public class RefundCallbackServiceTest extends RestBaseTest {
         request.setIsFastRefund(true);
 
         HashMap<String, String> mockHeader = buildMockHeader();
-        mockHeader.put("MockResult-Trading-Status", "OK");
+        mockHeader.put("MockResult-Trading-Status", "{'code':'200'}");
         boolean isSuccess = refundCallbackService.doService(request, true, mockHeader);
 
         Assert.assertEquals(true, isSuccess);

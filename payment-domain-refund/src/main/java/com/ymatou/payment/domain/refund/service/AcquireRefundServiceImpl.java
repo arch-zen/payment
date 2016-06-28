@@ -81,7 +81,7 @@ public class AcquireRefundServiceImpl implements AcquireRefundService {
                     refundrequest.setCurrencyType(payment.getPayCurrencyType());
                     refundrequest.setRefundStatus(RefundStatusEnum.INIT.getCode());
                     refundrequest.setTradeType(req.getTradeType());
-                    refundrequest.setRefundBatchNo(refundPository.generateRefundBatchNo());
+                    // refundrequest.setRefundBatchNo(refundPository.generateRefundBatchNo());
 
                     // 新增退款申请， 更新退款申请金额
                     logger.info("Save RefundRequest and update RefundAmt. RefundBatchNo:{}",

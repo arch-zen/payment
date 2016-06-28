@@ -17,16 +17,16 @@ public class ExecuteRefundRequest extends BaseRequest {
 
     private static final long serialVersionUID = -3031119076319521163L;
 
-    private String refundNo;
+    private Integer refundId;
 
     private HashMap<String, String> header;
 
-    public String getRefundNo() {
-        return refundNo;
+    public Integer getRefundId() {
+        return refundId;
     }
 
-    public void setRefundNo(String refundNo) {
-        this.refundNo = refundNo;
+    public void setRefundId(Integer refundId) {
+        this.refundId = refundId;
     }
 
     public HashMap<String, String> getHeader() {
