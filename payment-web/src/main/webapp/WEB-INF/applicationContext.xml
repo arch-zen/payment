@@ -90,7 +90,7 @@
 						|| execution(* com.ymatou.payment.infrastructure.db.mapper.*Mapper.*(..))
 						|| execution(* com.ymatou.payment.infrastructure.db.query.*Query.*(..))
 						|| execution(* com.ymatou.payment..*Repository.*(..))
-						|| execution(* com.ymatou.payment.integration.service.*.*(..))
+						|| execution(* com.ymatou.payment.integration.service..*(..))
 						" />
 	</aop:config>
 

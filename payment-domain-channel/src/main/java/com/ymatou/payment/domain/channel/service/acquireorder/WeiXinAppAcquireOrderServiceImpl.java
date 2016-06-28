@@ -96,7 +96,7 @@ public class WeiXinAppAcquireOrderServiceImpl implements AcquireOrderService {
             request.setNonce_str(String.valueOf(new Random().nextInt(1000000000)));
             request.setBody(payment.getBussinessOrder().getSubject());
             request.setOut_trade_no(payment.getPaymentId());
-            request.setTotal_fee((int) (payment.getPayPrice().getAmount().doubleValue() * 100));
+            request.setTotal_fee((int) (payment.getPayPrice().getCent()));
             request.setSpbill_create_ip(payment.getBussinessOrder().getClientIp());
             request.setNotify_url(
                     String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPayType()));
