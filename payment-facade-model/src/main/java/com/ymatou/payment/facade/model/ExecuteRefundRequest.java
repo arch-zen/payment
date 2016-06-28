@@ -5,6 +5,8 @@ package com.ymatou.payment.facade.model;
 
 import java.util.HashMap;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 import com.ymatou.payment.facade.BaseRequest;
 
 /**
@@ -17,6 +19,7 @@ public class ExecuteRefundRequest extends BaseRequest {
 
     private static final long serialVersionUID = -3031119076319521163L;
 
+    @NotEmpty(message = "refundId not be empty")
     private Integer refundId;
 
     private HashMap<String, String> header;

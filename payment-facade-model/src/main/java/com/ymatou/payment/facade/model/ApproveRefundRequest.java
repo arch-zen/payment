@@ -23,12 +23,12 @@ public class ApproveRefundRequest extends BaseRequest {
     /**
      * 退款单号
      */
-    @NotEmpty
+    @NotEmpty(message = "refundIds not be empty")
     private List<Integer> refundIds;
     /**
      * 审核人
      */
-    @NotEmpty
+    @NotEmpty(message = "approveUser not be empty")
     private String approveUser;
     /**
      * http请求header(可不填)
