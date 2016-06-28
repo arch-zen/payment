@@ -94,7 +94,7 @@ public class RefundFacadeImpl implements RefundFacade {
         if (StringUtils.isBlank(req.getRefundNo()) && StringUtils.isBlank(req.getTraceId())) {
             throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "RefundNo and TraceId cannot be empty.");
         }
-        if (req.getRefundAmt() == null || req.getRefundAmt().compareTo(BigDecimal.ZERO) <= 0) {
+        if (req.getRefundAmt() != null && req.getRefundAmt().compareTo(BigDecimal.ZERO) <= 0) {
             throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "RefundAmt should be greater than 0.");
         }
 
