@@ -199,6 +199,7 @@ public class RefundJobServiceImpl implements RefundJobService {
     public void updateRefundRequestAndPayment(RefundRequestPo refundRequest, Payment payment,
             RefundStatusEnum refundStatus) {
         RefundRequestPo refundRequestPo = new RefundRequestPo();
+        refundRequestPo.setRefundTime(new Date());
         PaymentPo paymentPo = new PaymentPo();
         paymentPo.setPaymentId(payment.getPaymentId());
         if (RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) {
@@ -261,6 +262,7 @@ public class RefundJobServiceImpl implements RefundJobService {
     @Override
     public void updateRefundRequestToCompletedSuccess(RefundRequestPo refundRequest) {
         RefundRequestPo refundRequestPo = new RefundRequestPo();
+        refundRequestPo.setRefundTime(new Date());
         refundRequestPo.setRefundBatchNo(refundRequest.getRefundBatchNo());
         refundRequestPo.setRefundStatus(RefundStatusEnum.COMPLETE_SUCCESS.getCode());
 

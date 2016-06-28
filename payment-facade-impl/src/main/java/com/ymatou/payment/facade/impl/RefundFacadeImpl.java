@@ -267,6 +267,10 @@ public class RefundFacadeImpl implements RefundFacade {
 
     @Override
     public AcquireRefundPlusResponse acquireRefund(AcquireRefundPlusRequest req) {
+        if (req.getRefundAmt().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "RefundAmt should be greater than 0.");
+        }
+
         AcquireRefundPlusResponse response = new AcquireRefundPlusResponse();
         if (acquireRefundService.acquireRefund(req)) {
             response.setSuccess(true);

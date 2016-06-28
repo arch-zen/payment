@@ -35,11 +35,11 @@ public class RefundCallbackRequest {
     /**
      * 扩展类型(10-正常; 20-无法原路退回)
      */
-    private Integer optType;
+    private int optType;
     /**
      * 订单号
      */
-    private Long orderID;
+    private long orderID;
     /**
      * 退款时间
      */
@@ -106,7 +106,11 @@ public class RefundCallbackRequest {
     }
 
     public String getPassAuditTime() {
-        return sdf.format(passAuditTime);
+        if (passAuditTime == null) {
+            return null;
+        } else {
+            return sdf.format(passAuditTime);
+        }
     }
 
     public void setPassAuditTime(Date passAuditTime) {

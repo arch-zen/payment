@@ -46,7 +46,6 @@ public class AcquireRefundPlusRequest extends BaseRequest {
     /**
      * 退款金额
      */
-    @Min(0)
     private BigDecimal refundAmt;
     /**
      * 交易类型
