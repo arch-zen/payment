@@ -18,6 +18,7 @@ import com.ymatou.payment.domain.channel.service.RefundQueryService;
 import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
+import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.infrastructure.db.mapper.RefundMiscRequestLogMapper;
 import com.ymatou.payment.infrastructure.db.model.RefundMiscRequestLogWithBLOBs;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
@@ -84,7 +85,8 @@ public class AliPayRefundQueryServiceImpl implements RefundQueryService {
                 refundStatus = RefundStatusEnum.COMPLETE_FAILED;
             } else {
                 if (!refundRequest.getInstPaymentId().equalsIgnoreCase(resultDetailData.getInstPaymentId())
-                        || resultDetailData.getRefundAmount().compareTo(refundRequest.getRefundAmount()) != 0) {
+                        || new Money(resultDetailData.getRefundAmount())
+                                .compareTo(new Money(refundRequest.getRefundAmount())) != 0) {
                     refundStatus = RefundStatusEnum.COMPLETE_FAILED;
                 } else {
                     refundStatus = resultDetailData.getRefundStatus();

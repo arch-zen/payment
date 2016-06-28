@@ -140,11 +140,13 @@ public class WeixinRefundServiceImpl implements AcquireRefundService {
     }
 
     private void updateRefundRequestStatus(RefundRequestPo refundRequest, RefundStatusEnum refundStatus) {
-        refundRequest.setRefundStatus(RefundStatusEnum.REFUND_FAILED.getCode());
+        RefundRequestPo record = new RefundRequestPo();
+        record.setRefundStatus(refundStatus.getCode());
+        record.setRefundTime(new Date());
         RefundRequestExample example = new RefundRequestExample();
         example.createCriteria().andRefundBatchNoEqualTo(refundRequest.getRefundBatchNo());
 
-        refundRequestMapper.updateByExampleWithBLOBs(refundRequest, example);
+        refundRequestMapper.updateByExampleWithBLOBs(record, example);
     }
 
 }

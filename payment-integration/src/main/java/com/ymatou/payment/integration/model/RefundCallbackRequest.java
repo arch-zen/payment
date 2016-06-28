@@ -106,7 +106,11 @@ public class RefundCallbackRequest {
     }
 
     public String getPassAuditTime() {
-        return sdf.format(passAuditTime);
+        if (passAuditTime == null) {
+            return null;
+        } else {
+            return sdf.format(passAuditTime);
+        }
     }
 
     public void setPassAuditTime(Date passAuditTime) {

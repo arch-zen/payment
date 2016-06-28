@@ -144,6 +144,7 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
 
     private void updateRefundRequestStatus(RefundRequestPo refundRequest, RefundStatusEnum refundStatus) {
         RefundRequestPo record = new RefundRequestPo();
+        record.setRefundTime(new Date());
         record.setRefundStatus(refundStatus.getCode());
         RefundRequestExample example = new RefundRequestExample();
         example.createCriteria().andRefundBatchNoEqualTo(refundRequest.getRefundBatchNo());

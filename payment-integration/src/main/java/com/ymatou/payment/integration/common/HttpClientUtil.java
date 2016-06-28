@@ -241,7 +241,7 @@ public class HttpClientUtil {
                 if (StringUtils.isBlank(result)) {
                     isSuccess = true;
                 } else {
-                    Integer code = (Integer) JSONObject.parseObject(result).get("Code");
+                    Integer code = (Integer) JSONObject.parseObject(result).get("code");
                     if (code != null && code != 200) {
                         return false;
                     } else {

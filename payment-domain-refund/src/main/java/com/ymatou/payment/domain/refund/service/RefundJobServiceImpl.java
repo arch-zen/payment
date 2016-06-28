@@ -145,7 +145,7 @@ public class RefundJobServiceImpl implements RefundJobService {
         log.setAccountingType("Refund");
         log.setStatus(0); // 成功为1，失败为0
         log.setUserId((long) bussinessOrder.getUserId().intValue());
-        log.setBizNo(refundRequest.getRefundBatchNo());
+        log.setBizNo(String.valueOf(refundRequest.getRefundId()));
         log.setRespCode("3"); // 系统异常
         log.setRespMsg(e.getMessage());
         log.setMemo("快速退款");
@@ -199,6 +199,7 @@ public class RefundJobServiceImpl implements RefundJobService {
     public void updateRefundRequestAndPayment(RefundRequestPo refundRequest, Payment payment,
             RefundStatusEnum refundStatus) {
         RefundRequestPo refundRequestPo = new RefundRequestPo();
+        refundRequestPo.setRefundTime(new Date());
         PaymentPo paymentPo = new PaymentPo();
         paymentPo.setPaymentId(payment.getPaymentId());
         if (RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) {
@@ -236,7 +237,7 @@ public class RefundJobServiceImpl implements RefundJobService {
         request.setActualRefundAmount(refundRequest.getRefundAmount());
         request.setAuditor(refundRequest.getApprovedUser());
         request.setOptType(10);
-        request.setOrderID(Integer.valueOf(refundRequest.getOrderId()));
+        request.setOrderID(Long.valueOf(refundRequest.getOrderId()));
         request.setPassAuditTime(refundRequest.getRefundTime());
         request.setRequiredRefundAmount(refundRequest.getRefundAmount());
         request.setThirdPartyName(PayTypeEnum.getThirdPartyName(payment.getPayType()));
@@ -261,6 +262,7 @@ public class RefundJobServiceImpl implements RefundJobService {
     @Override
     public void updateRefundRequestToCompletedSuccess(RefundRequestPo refundRequest) {
         RefundRequestPo refundRequestPo = new RefundRequestPo();
+        refundRequestPo.setRefundTime(new Date());
         refundRequestPo.setRefundBatchNo(refundRequest.getRefundBatchNo());
         refundRequestPo.setRefundStatus(RefundStatusEnum.COMPLETE_SUCCESS.getCode());
 
