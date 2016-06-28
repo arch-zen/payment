@@ -19,12 +19,19 @@ import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 public interface RefundJobService {
 
     /**
-     * 根据退款单号获取退款申请单
+     * 更新重试次数
      * 
      * @param refundNo
+     */
+    public void updateRetryCount(Integer refundNo);
+
+    /**
+     * 根据退款单号获取退款申请单
+     * 
+     * @param refundId
      * @return
      */
-    public RefundRequestPo getRefundRequestById(String refundNo);
+    public RefundRequestPo getRefundRequestByRefundId(Integer refundId);
 
     /**
      * 扣除码头账户余额

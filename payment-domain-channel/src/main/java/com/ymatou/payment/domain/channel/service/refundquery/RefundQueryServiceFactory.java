@@ -43,7 +43,7 @@ public class RefundQueryServiceFactory {
             case WeiXinApp:
                 return weiXinRefundQueryServiceImpl;
             default:
-                throw new BizException(ErrorCode.INVALID_PAYTYPE, payType.getCode());
+                throw new BizException(ErrorCode.INVALID_PAY_TYPE, payType.getCode());
 
         }
     }

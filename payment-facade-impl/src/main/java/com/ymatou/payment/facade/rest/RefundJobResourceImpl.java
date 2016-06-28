@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.facade.RefundJobFacade;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
+import com.ymatou.payment.facade.model.ExecuteRefundRequest;
 
 /**
  * 
@@ -34,12 +34,13 @@ public class RefundJobResourceImpl implements RefundJobResource {
     private RefundJobFacade refundJobFacade;
 
     @POST
-    @Path("/{Refund:(?i:Refund)}/{ExcuteRefund:(?i:ExcuteRefund)}")
+    @Path("/{Refund:(?i:Refund)}/{ExecuteRefund:(?i:ExecuteRefund)}")
     @Override
-    public String excuteRefund(String refundNo, @Context HttpServletRequest servletRequest) {
+    public String executeRefund(ExecuteRefundRequest request, @Context HttpServletRequest servletRequest) {
         HashMap<String, String> header = generateHttpHeader(servletRequest);
+        request.setHeader(header);
 
-        int flag = refundJobFacade.excuteRefund(refundNo, header);
+        int flag = refundJobFacade.executeRefund(request);
 
         if (flag == RefundStatusEnum.COMPLETE_SUCCESS.getCode()) {
             return "ok";

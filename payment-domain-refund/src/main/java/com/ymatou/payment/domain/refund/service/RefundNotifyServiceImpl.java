@@ -81,7 +81,7 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
             for (RefundMiscRequestLogWithBLOBs rmrl : list) {
                 // 重新查询退款结果
                 String refundBatchNo = rmrl.getRefundBatchNo();
-                RefundRequestPo refundRequest = refundJobService.getRefundRequestById(refundBatchNo);
+                RefundRequestPo refundRequest = refundPository.getRefundRequestByRefundNo(refundBatchNo);
                 Payment payment = payService.getPaymentByPaymentId(refundRequest.getPaymentId());
 
                 RefundStatusEnum refundStatus =
@@ -172,7 +172,7 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
         return map;
     }
 
-    private List<RefundNotifyDetail> generateRefundNotifyDetail(String details) {
+    public List<RefundNotifyDetail> generateRefundNotifyDetail(String details) {
         logger.info("refund notify details: {}", details);
 
         List<RefundNotifyDetail> detailList = new ArrayList<>();
@@ -183,7 +183,7 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
 
         for (String temp : tempDatas) {
 
-            String[] refundData = temp.split("$"); // 退款信息$退费信息
+            String[] refundData = temp.split("\\$"); // 退款信息$退费信息
             if (refundData.length == 0) {
                 throw new BizException("refund data detail is invalid.");
             }

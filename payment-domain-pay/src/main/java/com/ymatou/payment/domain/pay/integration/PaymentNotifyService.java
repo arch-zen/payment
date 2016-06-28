@@ -7,8 +7,12 @@ package com.ymatou.payment.domain.pay.integration;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.Resource;
@@ -18,11 +22,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.domain.pay.PaymentConfig;
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
+import com.ymatou.payment.facade.BizException;
+import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
+import com.ymatou.payment.infrastructure.security.MD5Util;
 import com.ymatou.payment.integration.model.PaymentCallbackRequest;
 import com.ymatou.payment.integration.service.ymatou.PaymentCallbackService;
 
@@ -44,9 +50,6 @@ public class PaymentNotifyService {
     @Resource
     PaymentConfig paymentConfig;
 
-    @Resource
-    SignatureService signatureService;
-
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 
 
@@ -61,7 +64,7 @@ public class PaymentNotifyService {
 
         try {
             return paymentCallbackService.doService(bussinessOrder.getNotifyUrl(), request, mockHeader);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("pay notify biz system failed:" + payment.getPaymentId(), e);
             return false;
         }
@@ -156,8 +159,58 @@ public class PaymentNotifyService {
         map.put("PayChannel", req.getPayChannel());
         map.put("PayType", req.getPayType());
 
-        String sign = signatureService.signNotify(map);
+        String sign = signNotify(map);
 
         return sign;
+    }
+
+
+    /**
+     * 支付通知签名
+     * 
+     * @param notifyData
+     * @return
+     */
+    public String signNotify(Map<String, String> notifyData) {
+        String rawString = flatNotifyMessage(notifyData);
+
+        try {
+            String targetMessage = rawString + paymentConfig.getNotifySignSalt();
+            return MD5Util.encode(targetMessage).toUpperCase();
+
+        } catch (Exception e) {
+            throw new BizException(ErrorCode.FAIL, "notify md5 sign failed with rawString: " + rawString, e);
+        }
+    }
+
+    /**
+     * 将NotifyMesssage转成String
+     * 
+     * @param map
+     * @param instConfig
+     * @return
+     */
+    private String flatNotifyMessage(Map<String, String> map) {
+        ArrayList<String> list = new ArrayList<String>();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            if (entry.getValue() != "" && entry.getValue() != null
+                    && !entry.getKey().equals("serialVersionUID")
+                    && !entry.getKey().equals("Sign")) {
+                list.add(entry.getKey() + "=" + entry.getValue() + "&");
+            }
+        }
+        int size = list.size();
+        Collections.sort(list, new Comparator<String>() {
+            public int compare(String arg0, String arg1) {
+                return arg0.compareToIgnoreCase(arg1);
+            }
+        });
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size; i++) {
+            sb.append(list.get(i));
+        }
+
+        return sb.substring(0, sb.length() - 1);
     }
 }

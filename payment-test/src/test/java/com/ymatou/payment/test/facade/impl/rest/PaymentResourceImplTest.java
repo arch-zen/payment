@@ -12,12 +12,12 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.UUID;
 
 import javax.annotation.Resource;
 
 import org.apache.http.client.utils.DateUtils;
+import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
@@ -28,9 +28,11 @@ import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
 import com.ymatou.payment.facade.model.ExecutePayNotifyReq;
 import com.ymatou.payment.facade.rest.PaymentResource;
+import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 import com.ymatou.payment.integration.IntegrationConfig;
+import com.ymatou.payment.test.AccountEntry;
 import com.ymatou.payment.test.RestBaseTest;
 
 
@@ -52,6 +54,9 @@ public class PaymentResourceImplTest extends RestBaseTest {
 
     @Resource
     private PaymentMapper paymentMapper;
+
+    @Resource
+    private SqlSession sqlSession;
 
     @Test
     public void testAcquireOrderWap() {
@@ -181,7 +186,7 @@ public class PaymentResourceImplTest extends RestBaseTest {
         MockHttpServletRequest servletRequest = new MockHttpServletRequest();
         AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
 
-        assertEquals("验证返回码", -2106, res.getErrorCode());
+        assertEquals("验证返回码", 5000, res.getErrorCode());
     }
 
     @Test
@@ -198,7 +203,7 @@ public class PaymentResourceImplTest extends RestBaseTest {
         req.setVersion(1);
         req.setPayType("99");
         res = paymentResource.acquireOrder(req, servletRequest);
-        assertEquals("验证无效PayType返回码", 1005, res.getErrorCode());
+        assertEquals("验证无效PayType返回码", 3104, res.getErrorCode());
         System.out.println(res.getErrorMessage());
     }
 
@@ -356,7 +361,7 @@ public class PaymentResourceImplTest extends RestBaseTest {
         buildBaseRequest(req);
         req.setPayType("10");
         req.setPayPrice("1.01");
-        req.setNotifyUrl("http://mockforpay.iapi.ymatou.com/api/Buyer/TriggerOrderRefund");
+        req.setNotifyUrl("http://mockforpay.iapi.ymatou.com/api/Trading/NotifyTradingEvent");
         req.setOrderId(String.valueOf(new Date().getTime()).substring(4));
 
         MockHttpServletRequest servletRequest = new MockHttpServletRequest();
@@ -376,12 +381,12 @@ public class PaymentResourceImplTest extends RestBaseTest {
 
         paymentMapper.updateByPrimaryKeySelective(paymentPo);
 
-
-        setMockHeader(servletRequest);
+        MockHttpServletRequest servletRequestMock = buildServletRequestWithMock();
+        servletRequestMock.addHeader("MockResult-Trading-Status", "FAIL");
 
         ExecutePayNotifyReq executePayNotifyReq = new ExecutePayNotifyReq();
         executePayNotifyReq.setPaymentId(payment.getPaymentId());
-        String response = paymentResource.executePayNotify(executePayNotifyReq, servletRequest);
+        String response = paymentResource.executePayNotify(executePayNotifyReq, servletRequestMock);
 
         assertEquals("验证执行结果", true, response.contains("failed"));
 
@@ -390,9 +395,9 @@ public class PaymentResourceImplTest extends RestBaseTest {
         assertEquals("验证重试次数", 0, payment.getRetryCount().intValue());
 
 
-
-        setMockHeader(servletRequest);
-        response = paymentResource.executePayNotify(executePayNotifyReq, servletRequest);
+        servletRequestMock = buildServletRequestWithMock();
+        servletRequestMock.addHeader("MockResult-Trading-Status", "Fail");
+        response = paymentResource.executePayNotify(executePayNotifyReq, servletRequestMock);
         assertEquals("验证执行结果", true, response.contains("failed"));
         assertEquals("验证执行结果包含异常码", true, response.contains("4004"));
 
@@ -400,7 +405,77 @@ public class PaymentResourceImplTest extends RestBaseTest {
         assertEquals("验证回调状态", 1, payment.getNotifyStatus().code().intValue());
         assertEquals("验证重试次数", 1, payment.getRetryCount().intValue());
 
+
+        servletRequestMock = buildServletRequestWithMock();
+        servletRequestMock.addHeader("MockResult-Trading-Status", "OK");
+        response = paymentResource.executePayNotify(executePayNotifyReq, servletRequestMock);
+        assertEquals("验证执行结果", true, response.equals("ok"));
+
+        payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertEquals("验证回调状态", 2, payment.getNotifyStatus().code().intValue());
+        assertEquals("验证重试次数", 2, payment.getRetryCount().intValue());
+
+
+        AccountEntry accountEntry = getAccountEntry(payment.getPaymentId());
+
+        assertEquals("验证BizCode", "100001", accountEntry.getBizCode());
+        assertEquals("验证Amount", payment.getPayPrice(), new Money(accountEntry.getAmount()));
+
     }
+
+    @Test
+    public void executePayNotifyTest4() {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+        req.setBizCode(1);
+        req.setPayType("10");
+        req.setPayPrice("1.01");
+        req.setNotifyUrl("http://mockforpay.iapi.ymatou.com/api/Trading/NotifyTradingEvent");
+        req.setOrderId(String.valueOf(new Date().getTime()).substring(4));
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        assertEquals("验证返回码", 0, res.getErrorCode());
+
+        BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
+        assertNotNull("验证商户订单", bo);
+
+        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertNotNull("验证支付单", payment);
+
+        PaymentPo paymentPo = new PaymentPo();
+        paymentPo.setPaymentId(payment.getPaymentId());
+        paymentPo.setPayStatus(1);
+
+        paymentMapper.updateByPrimaryKeySelective(paymentPo);
+
+        MockHttpServletRequest servletRequestMock = buildServletRequestWithMock();
+        servletRequestMock.addHeader("MockResult-Trading-Status", "FAIL");
+
+        ExecutePayNotifyReq executePayNotifyReq = new ExecutePayNotifyReq();
+        executePayNotifyReq.setPaymentId(payment.getPaymentId());
+        String response = paymentResource.executePayNotify(executePayNotifyReq, servletRequestMock);
+
+        assertEquals("验证执行结果", true, response.contains("failed"));
+
+        payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertEquals("验证回调状态", 1, payment.getNotifyStatus().code().intValue());
+        assertEquals("验证重试次数", 0, payment.getRetryCount().intValue());
+
+
+        servletRequestMock = buildServletRequestWithMock();
+        servletRequestMock.addHeader("MockResult-Trading-Status", "OK");
+        response = paymentResource.executePayNotify(executePayNotifyReq, servletRequestMock);
+        assertEquals("验证执行结果", true, response.equals("ok"));
+
+
+        AccountEntry accountEntry = getAccountEntry(payment.getPaymentId());
+
+        assertEquals("验证BizCode", "100002", accountEntry.getBizCode());
+        assertEquals("验证Amount", payment.getPayPrice(), new Money(accountEntry.getAmount()));
+    }
+
 
     /**
      * 构造请求报文

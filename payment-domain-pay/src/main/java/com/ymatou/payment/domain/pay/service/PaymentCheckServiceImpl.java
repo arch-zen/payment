@@ -63,11 +63,11 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
         // 根据paymentId查询Payment,BussinessOrder
         Payment payment = paymentRepository.getByPaymentId(paymentId);
         if (payment == null) {
-            throw new BizException(ErrorCode.DATA_NOT_FOUND, "can not find paymentid " + paymentId);
+            throw new BizException(ErrorCode.NOT_EXIST_PAYMENT_ID, "can not find paymentid " + paymentId);
         }
         BussinessOrder bussinessOrder = bussinessOrderRepository.getBussinessOrderById(payment.getBussinessOrderId());
         if (bussinessOrder == null) {
-            throw new BizException(ErrorCode.DATA_NOT_FOUND,
+            throw new BizException(ErrorCode.NOT_EXIST_BUSINESS_ORDER_ID,
                     "can not find order " + payment.getBussinessOrderId());
         }
 

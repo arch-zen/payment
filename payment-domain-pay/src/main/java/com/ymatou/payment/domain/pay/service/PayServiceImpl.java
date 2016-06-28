@@ -195,7 +195,7 @@ public class PayServiceImpl implements PayService {
         BussinessOrder bussinessOrder = getBussinessOrderById(payment.getBussinessOrderId());
         if (bussinessOrder == null) {
             logger.error("execute pay notify found payment[{}] has not bussiness order", payment.getPaymentId());
-            throw new BizException(ErrorCode.NOT_EXIST_BUSSINESS_ORDERID, "paymentId:" + payment.getPaymentId());
+            throw new BizException(ErrorCode.NOT_EXIST_BUSINESS_ORDER_ID, "paymentId:" + payment.getPaymentId());
         }
 
         paymentRepository.increaseRetryCount(payment);

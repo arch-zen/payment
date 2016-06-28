@@ -33,9 +33,22 @@ public class UnifiedOrderServiceTest extends RestBaseTest {
         request.setNotify_url("www.qq.com");
         request.setTrade_type("JSAPI");
         request.setOpenid("oR5W7jg8-T62LtAvEShpuL-vCxXE");
-
-        // 加签
         String sign = Signature.getSign(request, "es839gnc8451lp0s943n568xzskjgdbv");
+
+        // request.setAppid("wxf51a439c0416f182");
+        // request.setMch_id("1234079001");
+        // request.setDevice_info("WEB");
+        // request.setNonce_str("weixin" + String.valueOf(new Random().nextInt(10)));
+        // request.setBody("Ipad mini 16G");
+        // request.setOut_trade_no("test20160503125346");
+        // request.setTotal_fee(888);
+        // request.setSpbill_create_ip("192.168.1.1");
+        // request.setNotify_url("www.qq.com");
+        // request.setTrade_type("APP");
+        // request.setOpenid("obZLIjg__Pik0IyV1TU6m2t1_rIg");
+        // String sign = Signature.getSign(request, "c5781df6b8f149adca6094cdac4ac684");
+
+
         request.setSign(sign);
 
         UnifiedOrderResponse response = unifiedOrderService.doService(request, new HashMap<String, String>());

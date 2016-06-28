@@ -24,7 +24,7 @@ public class ApproveRefundRequest extends BaseRequest {
      * 退款单号
      */
     @NotEmpty
-    private List<String> refundNos;
+    private List<Integer> refundIds;
     /**
      * 审核人
      */
@@ -35,12 +35,12 @@ public class ApproveRefundRequest extends BaseRequest {
      */
     private HashMap<String, String> header;
 
-    public List<String> getRefundNos() {
-        return refundNos;
+    public List<Integer> getRefundIds() {
+        return refundIds;
     }
 
-    public void setRefundNos(List<String> refundNos) {
-        this.refundNos = refundNos;
+    public void setRefundIds(List<Integer> refundIds) {
+        this.refundIds = refundIds;
     }
 
     public String getApproveUser() {

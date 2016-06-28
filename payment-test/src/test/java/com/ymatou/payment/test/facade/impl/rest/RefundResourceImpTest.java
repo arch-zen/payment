@@ -341,7 +341,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         request.setRefundAmt(new BigDecimal(32));
 
         AcquireRefundPlusResponse response = refundResource.acquireRefund(request, new MockHttpServletRequest());
-        Assert.assertEquals(1010, response.getErrorCode());
+        Assert.assertEquals(3501, response.getErrorCode());
     }
 
     @Test
@@ -370,7 +370,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         request2.setRefundAmt(new BigDecimal(15));
 
         AcquireRefundPlusResponse response2 = refundResource.acquireRefund(request2, new MockHttpServletRequest());
-        Assert.assertEquals(1010, response2.getErrorCode());
+        Assert.assertEquals(3501, response2.getErrorCode());
     }
 
 
@@ -439,14 +439,14 @@ public class RefundResourceImpTest extends RestBaseTest {
         example.createCriteria().andPaymentIdEqualTo(paymentPo.getPaymentId());
         List<RefundRequestPo> refundRequestPos = refundRequestMapper.selectByExample(example);
         System.out.println(refundRequestPos.size());
-        List<String> refundNos = new ArrayList<>();
+        List<Integer> refundIds = new ArrayList<>();
         for (RefundRequestPo refundRequestPo : refundRequestPos) {
-            refundNos.add(refundRequestPo.getRefundBatchNo());
+            refundIds.add(refundRequestPo.getRefundId());
         }
 
         ApproveRefundRequest approveRefundRequest = new ApproveRefundRequest();
         approveRefundRequest.setApproveUser("test");
-        approveRefundRequest.setRefundNos(refundNos);
+        approveRefundRequest.setRefundIds(refundIds);
 
         ApproveRefundResponse approveRefundResponse =
                 refundResource.approveRefund(approveRefundRequest, new MockHttpServletRequest());

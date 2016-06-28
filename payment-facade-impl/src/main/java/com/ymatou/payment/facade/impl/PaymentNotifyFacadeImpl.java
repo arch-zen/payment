@@ -5,8 +5,6 @@
  */
 package com.ymatou.payment.facade.impl;
 
-import java.util.Date;
-
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -88,13 +86,13 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
             // 校验支付单Id
             payment = payService.getPaymentByPaymentId(notifyMessage.getPaymentId());
             if (payment == null)
-                throw new BizException(ErrorCode.DATA_NOT_FOUND,
+                throw new BizException(ErrorCode.NOT_EXIST_PAYMENT_ID,
                         String.format("can not find paymentid %s", notifyMessage.getPaymentId()));
 
             // 校验商户订单
             BussinessOrder bussinessOrder = payService.getBussinessOrderById(payment.getBussinessOrderId());
             if (bussinessOrder == null)
-                throw new BizException(ErrorCode.DATA_NOT_FOUND,
+                throw new BizException(ErrorCode.NOT_EXIST_BUSINESS_ORDER_ID,
                         String.format("can not find order %s", payment.getBussinessOrderId()));
             payment.setBussinessOrder(bussinessOrder);
 
@@ -111,7 +109,8 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
 
                 // 验证实际支付金额和支付金额是否一致
                 if (!payment.getPayPrice().equals(new Money(notifyMessage.getActualPayPrice()))) {
-                    throw new BizException(ErrorCode.PAYPRICE_AND_ACT_NOT_CONSISTENT,
+                    logger.error("inconsistent payPrice and actualPayPrice. PaymentId: {}", payment.getPaymentId());
+                    throw new BizException(ErrorCode.INCONSISTENT_PAYPRICE_AND_ACTUALPAYPRICE,
                             "paymentid: " + payment.getPaymentId());
                 }
 

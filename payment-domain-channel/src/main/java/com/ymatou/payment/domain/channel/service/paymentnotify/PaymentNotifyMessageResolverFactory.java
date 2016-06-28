@@ -51,7 +51,7 @@ public class PaymentNotifyMessageResolverFactory {
             case WeiXinApp:
                 return weiXinPaymentNotifyServiceImpl;
             default:
-                throw new BizException(ErrorCode.INVALID_PAYTYPE, payType);
+                throw new BizException(ErrorCode.INVALID_PAY_TYPE, payType);
         }
     }
 }

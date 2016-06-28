@@ -39,7 +39,7 @@ public class PaymentQueryServiceFactory {
             case WeiXinApp:
                 return weiXinPaymentQueryServiceImpl;
             default:
-                throw new BizException(ErrorCode.INVALID_PAYTYPE, payType);
+                throw new BizException(ErrorCode.INVALID_PAY_TYPE, payType);
 
         }
     }

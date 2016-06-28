@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 import com.baidu.disconf.client.DisConf;
 import com.baidu.disconf.client.common.annotations.DisconfUpdateService;
 import com.baidu.disconf.client.common.update.IDisconfUpdate;
-import com.ymatou.payment.domain.pay.repository.BussinessOrderRepository;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 
 /**
@@ -49,7 +48,7 @@ public class InstitutionConfigManager implements IDisconfUpdate, InitializingBea
      */
     private ReadWriteLock myLock = new ReentrantReadWriteLock();;
 
-    private static final Logger logger = LoggerFactory.getLogger(BussinessOrderRepository.class);
+    private static final Logger logger = LoggerFactory.getLogger(InstitutionConfigManager.class);
 
     /**
      * 重新加载配置文件

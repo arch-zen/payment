@@ -64,7 +64,7 @@ public class AccountingService {
                 saveAccoutingLog(payment, bussinessOrder, response);
                 return false;
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("accouting when pay notify error with paymentId:" + payment.getPaymentId(), e);
             AccountingResponse response = new AccountingResponse();
             response.setStatusCode("3");

@@ -24,7 +24,6 @@ import com.ymatou.payment.infrastructure.db.mapper.CompensateProcessInfoMapper;
 import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
 import com.ymatou.payment.infrastructure.db.mapper.RefundMiscRequestLogMapper;
 import com.ymatou.payment.infrastructure.db.mapper.RefundRequestMapper;
-import com.ymatou.payment.infrastructure.db.model.CompensateProcessInfoPo;
 import com.ymatou.payment.infrastructure.db.model.PaymentExample;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 import com.ymatou.payment.infrastructure.db.model.RefundMiscRequestLogWithBLOBs;
@@ -72,7 +71,7 @@ public class RefundPository {
     }
 
     @Transactional
-    public RefundRequestPo saveFastRefundrequest(Payment payment, BussinessOrder bussinessorder,
+    public void saveFastRefundrequest(Payment payment, BussinessOrder bussinessorder,
             Refund refundInfo) {
         RefundRequestPo refundrequest = new RefundRequestPo();
 
@@ -91,7 +90,7 @@ public class RefundPository {
         refundrequest.setApprovedUser("system");
         refundrequest.setRefundStatus(RefundStatusEnum.INIT.getCode());
         refundrequest.setTradeType(refundInfo.getTradeType());
-        refundrequest.setRefundBatchNo(generateRefundBatchNo());
+        // refundrequest.setRefundBatchNo(generateRefundBatchNo()); //需在提交第三方退款时生成
         refundRequestMapper.insertSelective(refundrequest);
 
         BigDecimal refundAmt = payment.getRefundAmt() == null ? new BigDecimal(0.00) : payment.getRefundAmt();
@@ -99,8 +98,6 @@ public class RefundPository {
         paymentPo.setPaymentId(payment.getPaymentId());
         paymentPo.setRefundAmt(refundAmt.add(refundrequest.getRefundAmount()));
         paymentMapper.updateByPrimaryKeySelective(paymentPo);
-
-        return refundrequest;
     }
 
     /**
@@ -115,6 +112,17 @@ public class RefundPository {
         List<RefundRequestPo> result = refundRequestMapper.selectByExample(example);
         if (result != null && result.size() > 0) {
             return result.get(0); // 有唯一约束
+        } else {
+            return null;
+        }
+    }
+
+    public RefundRequestPo getRefundRequestByRefundId(Integer refundId) {
+        RefundRequestExample example = new RefundRequestExample();
+        example.createCriteria().andRefundIdEqualTo(refundId);
+        List<RefundRequestPo> result = refundRequestMapper.selectByExample(example);
+        if (result != null && result.size() > 0) {
+            return result.get(0); // 自增长
         } else {
             return null;
         }
@@ -156,37 +164,22 @@ public class RefundPository {
     }
 
     /**
-     * 
-     * 更新RequestRequest，保存Compensateprocessinfo
-     * 
-     * @param refundrequestPos
-     * @param compensateprocessinfoWithBLOBs
-     */
-    @Transactional
-    public void updateRefundRequestAndSaveCompensateprocessinfo(List<RefundRequestPo> refundrequestPos,
-            List<CompensateProcessInfoPo> compensateprocessinfoWithBLOBs) {
-        for (RefundRequestPo refundrequestPo : refundrequestPos) {
-            RefundRequestExample example = new RefundRequestExample();
-            example.createCriteria().andPaymentIdEqualTo(refundrequestPo.getPaymentId());
-            refundRequestMapper.updateByExampleSelective(refundrequestPo, example);
-        }
-        for (CompensateProcessInfoPo info : compensateprocessinfoWithBLOBs) {
-            compensateProcessInfoMapper.insertSelective(info);
-        }
-    }
-
-    /**
      * 更新RequestRequest
      * 
      * @param refundrequestPos
      * @param compensateprocessinfoWithBLOBs
      */
     @Transactional
-    public void updateRefundRequest(List<RefundRequestPo> refundrequestPos) {
+    public void approveRefundRequest(List<RefundRequestPo> refundrequestPos) {
         for (RefundRequestPo refundrequestPo : refundrequestPos) {
             RefundRequestExample example = new RefundRequestExample();
-            example.createCriteria().andRefundBatchNoEqualTo(refundrequestPo.getRefundBatchNo());
-            refundRequestMapper.updateByExampleSelective(refundrequestPo, example);
+            example.createCriteria().andRefundIdEqualTo(refundrequestPo.getRefundId());
+
+            RefundRequestPo record = new RefundRequestPo();
+            record.setApprovedUser(refundrequestPo.getApprovedUser());
+            record.setApproveStatus(ApproveStatusEnum.APPROVED.getCode());
+            record.setApprovedTime(new Date());
+            refundRequestMapper.updateByExampleSelective(record, example);
         }
     }
 
@@ -202,20 +195,6 @@ public class RefundPository {
     }
 
     /**
-     * 通过RefundBatchNo查询RefundRequest
-     * 
-     * @param batchNo
-     * @return
-     */
-    public List<RefundRequestPo> queryRefundRequestByRefundBatchNo(String batchNo) {
-        RefundRequestExample example = new RefundRequestExample();
-        example.createCriteria().andRefundBatchNoEqualTo(batchNo);
-        List<RefundRequestPo> pos = refundRequestMapper.selectByExample(example);
-
-        return pos;
-    }
-
-    /**
      * 保存退款回调日志
      * 
      * @param list
@@ -228,11 +207,10 @@ public class RefundPository {
     }
 
     @Transactional
-    public void updateRefundRequestAccoutingStatus(String refundNo, int accoutingStatus) {
+    public void updateRefundRequestAccoutingStatus(Integer refundId, int accoutingStatus) {
         RefundRequestExample example = new RefundRequestExample();
-        example.createCriteria().andRefundBatchNoEqualTo(refundNo);
+        example.createCriteria().andRefundIdEqualTo(refundId);
         RefundRequestPo record = new RefundRequestPo();
-        record.setRefundBatchNo(refundNo);
         record.setAccoutingStatus(accoutingStatus);
         refundRequestMapper.updateByExampleSelective(record, example);
     }
@@ -272,5 +250,27 @@ public class RefundPository {
         example.createCriteria().andTraceIdEqualTo(traceId).andTradeNoEqualTo(tradeNo);
 
         return refundRequestMapper.selectByExample(example);
+    }
+
+    @Transactional
+    public void updateRetryCount(Integer refundId) {
+        RefundRequestPo refundRequestPo = getRefundRequestByRefundId(refundId);
+        Integer retryCount = refundRequestPo.getRetryCount() == null ? 1 : refundRequestPo.getRetryCount() + 1;
+
+        RefundRequestPo record = new RefundRequestPo();
+        record.setRetryCount(retryCount);
+        RefundRequestExample example = new RefundRequestExample();
+        example.createCriteria().andRefundIdEqualTo(refundId);
+        refundRequestMapper.updateByExampleSelective(record, example);
+    }
+
+    @Transactional
+    public void updateRefundBatchNoByRefundId(String refundBatchNo, Integer refundId) {
+        RefundRequestPo refundRequest = new RefundRequestPo();
+        refundRequest.setRefundBatchNo(refundBatchNo);
+        RefundRequestExample example = new RefundRequestExample();
+        example.createCriteria().andRefundIdEqualTo(refundId);
+
+        refundRequestMapper.updateByExampleSelective(refundRequest, example);
     }
 }

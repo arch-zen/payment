@@ -48,13 +48,15 @@ public class FastRefundServiceImpl implements FastRefundService {
         if (refundRequests.size() == 0) { // 若不存在RefundRequest，则新增， 更新退款申请金额
             logger.info("Save RefundRequest.");
             setRefundAmt(refundAmt, refundInfo, payment); // 设置退款金额
-            RefundRequestPo refundRequestPo = refundPository.saveFastRefundrequest(payment, bussinessorder, refundInfo);
-            return refundRequestPo;
+            refundPository.saveFastRefundrequest(payment, bussinessorder, refundInfo);
+            refundRequests = refundPository.getRefundReqestByTraceIdAndTradeNo(refundInfo.getTraceId(),
+                    refundInfo.getTradingId());
         } else { // 已存在， 幂等， 返回成功
             logger.info("RefundRequest already exists. RefundBatchNo:{}",
                     refundRequests.get(0).getRefundBatchNo());
-            return refundRequests.get(0);
         }
+
+        return refundRequests.get(0);
     }
 
     private void setRefundAmt(BigDecimal refundAmt, Refund refundInfo, Payment payment) {

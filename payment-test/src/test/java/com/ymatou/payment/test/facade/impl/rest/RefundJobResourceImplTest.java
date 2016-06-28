@@ -25,6 +25,7 @@ import com.ymatou.payment.domain.pay.service.PayService;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
+import com.ymatou.payment.facade.model.ExecuteRefundRequest;
 import com.ymatou.payment.facade.model.FastRefundRequest;
 import com.ymatou.payment.facade.model.FastRefundResponse;
 import com.ymatou.payment.facade.rest.PaymentResource;
@@ -92,10 +93,12 @@ public class RefundJobResourceImplTest extends RestBaseTest {
         RefundRequestExample example = new RefundRequestExample();
         example.createCriteria().andPaymentIdEqualTo(paymentPo.getPaymentId());
         List<RefundRequestPo> refundRequestPos = refundRequestMapper.selectByExample(example);
-        String refundBatchNo = refundRequestPos.get(0).getRefundBatchNo();
+        Integer refundId = refundRequestPos.get(0).getRefundId();
 
         // 此时同步应答还没回来，从新提交了退款请求
-        String respMsg = refundJobResource.excuteRefund(refundBatchNo, servletRequest);
+        ExecuteRefundRequest request2 = new ExecuteRefundRequest();
+        request2.setRefundId(refundId);
+        String respMsg = refundJobResource.executeRefund(request2, servletRequest);
         System.out.println(respMsg);
 
         Assert.assertEquals("0", respMsg);
@@ -128,9 +131,11 @@ public class RefundJobResourceImplTest extends RestBaseTest {
         RefundRequestExample example = new RefundRequestExample();
         example.createCriteria().andPaymentIdEqualTo(paymentPo.getPaymentId());
         List<RefundRequestPo> refundRequestPos = refundRequestMapper.selectByExample(example);
-        String refundBatchNo = refundRequestPos.get(0).getRefundBatchNo();
+        Integer refundId = refundRequestPos.get(0).getRefundId();
 
-        String respMsg = refundJobResource.excuteRefund(refundBatchNo, servletRequest);
+        ExecuteRefundRequest request2 = new ExecuteRefundRequest();
+        request2.setRefundId(refundId);
+        String respMsg = refundJobResource.executeRefund(request2, servletRequest);
         Thread.sleep(1000);
         System.out.println(respMsg);
         Assert.assertEquals("-1", respMsg);
@@ -159,17 +164,18 @@ public class RefundJobResourceImplTest extends RestBaseTest {
         RefundRequestExample example = new RefundRequestExample();
         example.createCriteria().andPaymentIdEqualTo(paymentPo.getPaymentId());
         List<RefundRequestPo> refundRequestPos = refundRequestMapper.selectByExample(example);
-        String refundBatchNo = refundRequestPos.get(0).getRefundBatchNo();
+        Integer refundId = refundRequestPos.get(0).getRefundId();
 
         RefundRequestPo refundRequestPo = new RefundRequestPo();
         refundRequestPo.setRefundTime(new Date());
         refundRequestPo.setRefundStatus(RefundStatusEnum.THIRDPART_REFUND_SUCCESS.getCode());
         RefundRequestExample example2 = new RefundRequestExample();
-        example2.createCriteria().andRefundBatchNoEqualTo(refundBatchNo);
+        example2.createCriteria().andRefundIdEqualTo(refundId);
         refundRequestMapper.updateByExampleSelective(refundRequestPo, example2);
 
-
-        String respMsg = refundJobResource.excuteRefund(refundBatchNo, servletRequest);
+        ExecuteRefundRequest request2 = new ExecuteRefundRequest();
+        request2.setRefundId(refundId);
+        String respMsg = refundJobResource.executeRefund(request2, servletRequest);
         Thread.sleep(1000);
         Assert.assertEquals("ok", respMsg);
     }

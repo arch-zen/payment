@@ -56,7 +56,7 @@ import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
  * @author qianmin 2016年5月11日 上午10:56:11
  * 
  */
-@Component
+@Component("refundFacade")
 public class RefundFacadeImpl implements RefundFacade {
 
     private static final Logger logger = LoggerFactory.getLogger(RefundFacadeImpl.class);
@@ -97,20 +97,19 @@ public class RefundFacadeImpl implements RefundFacade {
         // query and verify payment
         Payment payment = payService.getPaymentByPaymentId(req.getPaymentId());
         if (payment == null) {
-            throw new BizException(ErrorCode.NOT_EXIST_PAYMENTID, "Payment not exist");
+            throw new BizException(ErrorCode.NOT_EXIST_PAYMENT_ID, "Payment not exist");
         }
         logger.info("Payment result: {}", payment);
 
         // query and verify bussinessorder
         BussinessOrder bussinessOrder = payService.getBussinessOrderById(payment.getBussinessOrderId());
         if (bussinessOrder == null) {
-            throw new BizException(ErrorCode.NOT_EXIST_BUSSINESS_ORDERID, "businessOrderId not exist");
+            throw new BizException(ErrorCode.NOT_EXIST_BUSINESS_ORDER_ID, "businessOrderId not exist");
         }
         logger.info("BussinessOrder result: {}", bussinessOrder);
 
         if (!req.getTradingId().equals(bussinessOrder.getOrderId())) {
-            throw new BizException(ErrorCode.INCONSISTENT_PAYMENTID_AND_TRADINGID,
-                    "inconsistent paymentId and tradingId");
+            throw new BizException(ErrorCode.FAIL, "inconsistent paymentId and tradingId");
         }
         if (payment.getPayStatus() != PayStatusEnum.Paied) {
             throw new BizException(ErrorCode.INVALID_PAYMENT_STATUS, "invalid payment status");
@@ -154,7 +153,7 @@ public class RefundFacadeImpl implements RefundFacade {
     @Override
     public AcquireRefundResponse submitRefund(AcquireRefundRequest req) {
         if (StringUtils.isEmpty(req.getOrderId())) {
-            throw new BizException(ErrorCode.INVALID_ORDER_ID, "order id is empty.");
+            throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "order id is empty.");
         }
 
 
@@ -182,7 +181,7 @@ public class RefundFacadeImpl implements RefundFacade {
         if (refundableTrades.size() != tradeDetails.size()) {
             logger.info("request refund trades size {}", tradeDetails.size());
             logger.info("refundableTrades size {} ", refundableTrades.size());
-            throw new BizException(ErrorCode.NOT_ALL_TRADE_CAN_REFUND, "not all trade can be refunded.");
+            throw new BizException(ErrorCode.FAIL, "not all trade can be refunded.");
         }
 
         // 检查是否已经生成RefundRequest，若未生成则生成RefundRequest，并生成相应应答
@@ -199,7 +198,7 @@ public class RefundFacadeImpl implements RefundFacade {
     @Override
     public ApproveRefundResponse approveRefund(ApproveRefundRequest req) {
         // 更新RefundRequest审核状态， 获取需要通知退款单
-        List<RefundRequestPo> refunds = approveRefundService.approveRefund(req.getRefundNos(), req.getApproveUser());
+        List<RefundRequestPo> refunds = approveRefundService.approveRefund(req.getRefundIds(), req.getApproveUser());
 
         // 提交第三方退款
         for (RefundRequestPo refundRequest : refunds) {

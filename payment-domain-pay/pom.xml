@@ -26,10 +26,6 @@
 			<groupId>com.ymatou.payment</groupId>
 			<artifactId>payment-integration</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.ymatou.payment</groupId>
-			<artifactId>payment-domain-channel</artifactId>
-		</dependency>
 	</dependencies>
 
 </project>

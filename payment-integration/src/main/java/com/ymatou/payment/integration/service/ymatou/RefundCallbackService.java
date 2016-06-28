@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
@@ -41,11 +40,11 @@ public class RefundCallbackService implements InitializingBean {
     public boolean doService(RefundCallbackRequest request, boolean isNewSystem, HashMap<String, String> header)
             throws IOException {
         String url = getRequestUrl(isNewSystem, header);
-        int statusCode = HttpClientUtil.sendPostToGetStatus(url, JSONObject.toJSONString(request),
+        boolean isSuccess = HttpClientUtil.sendPostToGetStatus(url, JSONObject.toJSONString(request),
                 Constants.CONTENT_TYPE_JSON, header, httpClient);
-        logger.info("refund callback response status: {}", statusCode);
+        logger.info("refund callback response status: {}", isSuccess);
 
-        return statusCode == HttpStatus.OK.value(); // HttpStatus=200代表成功，其余都是失败
+        return isSuccess;
     }
 
     private String getRequestUrl(boolean isNewSystem, HashMap<String, String> header) {

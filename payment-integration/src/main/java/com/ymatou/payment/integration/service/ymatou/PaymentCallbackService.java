@@ -6,6 +6,7 @@ package com.ymatou.payment.integration.service.ymatou;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -37,7 +38,15 @@ public class PaymentCallbackService implements InitializingBean {
             throws IOException {
         String result = HttpClientUtil.sendPost(url, JSONObject.toJSONString(request), Constants.CONTENT_TYPE_JSON,
                 header, httpClient);
+        if (StringUtils.isEmpty(result)) {
+            return false;
+        }
+
         Integer code = (Integer) JSONObject.parseObject(result).get("Code");
+        if (code == null) {
+            code = (Integer) JSONObject.parseObject(result).get("code");
+        }
+
         logger.info("payment callback response code: {}", code);
 
         return Constants.SUCCESS_CODE.equals(code); // 200成功，其他失败

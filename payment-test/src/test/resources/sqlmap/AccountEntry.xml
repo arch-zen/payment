@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="test-accountEntry">
+	<resultMap id="BaseResultMap" type="com.ymatou.payment.test.AccountEntry" >
+	    <result column="BizCode" property="bizCode" jdbcType="VARCHAR" />
+	    <result column="BizNo" property="bizNo" jdbcType="VARCHAR" />
+	    <result column="AccountId" property="accountId" jdbcType="VARCHAR" />
+	    <result column="Amount" property="amount" jdbcType="DECIMAL" />
+	</resultMap>
+	
+	<select id="selectAccountEntry" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select BizCode, BizNo, AccountId, Amount from Ymt_AccountEntry where BizNo = #{bizNo}
+	</select>
+</mapper>

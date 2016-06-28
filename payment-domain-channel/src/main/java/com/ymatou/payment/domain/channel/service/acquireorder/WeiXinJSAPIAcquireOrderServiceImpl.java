@@ -121,7 +121,7 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
 
             // 调用微信接口
             UnifiedOrderResponse response = unifiedOrderService.doService(request, mockHeader);
-            if (response.getAppid().equals(instConfig.getAppId())
+            if (instConfig.getAppId().equals(response.getAppid())
                     && response.getMch_id().equals(instConfig.getMerchantId())
                     && "SUCCESS".equals(response.getResult_code())
                     && "SUCCESS".equals(response.getReturn_code())) {
@@ -129,8 +129,10 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
             } else {
                 throw new Exception(response.getReturn_msg());
             }
+        } catch (BizException e) {
+            throw e;
         } catch (Exception ex) {
-            logger.error("call weixin unifed order failed", ex);
+            logger.error("call weixin unifed order failed. PaymentId: " + payment.getPaymentId(), ex);
             throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
                     "paymentid:" + payment.getPaymentId() + "|" + ex.getLocalizedMessage(), ex);
         }
@@ -148,11 +150,11 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
             if ("true".equals(response.getSuccess()))
                 return response.getResult();
             else
-                return null;
+                throw new BizException(ErrorCode.FAIL, "not exist openId. PaymentId: " + payment.getPaymentId());
 
         } catch (IOException e) {
-            logger.error("call user service for open id failed.", e);
-            return null;
+            logger.error("call user service for open id failed. PaymentId: " + payment.getPaymentId(), e);
+            throw new BizException(ErrorCode.FAIL, "call user service for open id failed.", e);
         }
     }
 

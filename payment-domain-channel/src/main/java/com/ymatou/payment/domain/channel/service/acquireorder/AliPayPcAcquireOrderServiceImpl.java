@@ -162,7 +162,7 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
         }
 
         if (antiFishKey.isEmpty())
-            throw new BizException(ErrorCode.FAIL_QUERY_ANTI_FISHING_KEY, null);
+            throw new BizException(ErrorCode.QUERY_ANTI_FISHING_KEY_FAILED, null);
 
         return antiFishKey;
     }
@@ -194,7 +194,7 @@ public class AliPayPcAcquireOrderServiceImpl implements AcquireOrderService {
 
             } catch (Exception ex) {
                 logger.error("unrecognize ext param", ex);
-                throw new BizException(ErrorCode.EXT_MESSAGE_NOT_RECOGNIZE, extJson, ex);
+                throw new BizException(ErrorCode.INVALID_EXT_MESSAGE, extJson, ex);
             }
         }
 
