@@ -35,11 +35,11 @@ public class RefundCallbackRequest {
     /**
      * 扩展类型(10-正常; 20-无法原路退回)
      */
-    private int optType;
+    private Integer optType;
     /**
      * 订单号
      */
-    private long orderID;
+    private Long orderID;
     /**
      * 退款时间
      */

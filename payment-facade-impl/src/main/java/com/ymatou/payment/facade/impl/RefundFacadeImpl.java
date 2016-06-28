@@ -3,6 +3,7 @@
  */
 package com.ymatou.payment.facade.impl;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -92,6 +93,9 @@ public class RefundFacadeImpl implements RefundFacade {
     public FastRefundResponse fastRefund(FastRefundRequest req) {
         if (StringUtils.isBlank(req.getRefundNo()) && StringUtils.isBlank(req.getTraceId())) {
             throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "RefundNo and TraceId cannot be empty.");
+        }
+        if (req.getRefundAmt() == null || req.getRefundAmt().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "RefundAmt should be greater than 0.");
         }
 
         // query and verify payment
