@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import com.ymatou.payment.facade.RefundJobFacade;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.facade.model.ExecuteRefundRequest;
+import com.ymatou.payment.facade.model.ExecuteRefundResponse;
 
 /**
  * 
@@ -40,12 +41,15 @@ public class RefundJobResourceImpl implements RefundJobResource {
         HashMap<String, String> header = generateHttpHeader(servletRequest);
         request.setHeader(header);
 
-        int flag = refundJobFacade.executeRefund(request);
+        ExecuteRefundResponse response = refundJobFacade.executeRefund(request);
 
-        if (flag == RefundStatusEnum.COMPLETE_SUCCESS.getCode()) {
+        Integer refundResult = response.getRefundResult();
+        if (refundResult == null) {
+            return String.valueOf(response.getErrorCode());
+        } else if (refundResult == RefundStatusEnum.COMPLETE_SUCCESS.getCode()) {
             return "ok";
         } else {
-            return String.valueOf(flag);
+            return String.valueOf(response.getRefundResult());
         }
     }
 

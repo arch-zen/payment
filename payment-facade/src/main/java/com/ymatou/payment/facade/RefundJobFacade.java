@@ -4,6 +4,7 @@
 package com.ymatou.payment.facade;
 
 import com.ymatou.payment.facade.model.ExecuteRefundRequest;
+import com.ymatou.payment.facade.model.ExecuteRefundResponse;
 
 /**
  * 
@@ -17,5 +18,5 @@ public interface RefundJobFacade {
      * 
      * @param request
      */
-    public int executeRefund(ExecuteRefundRequest request);
+    public ExecuteRefundResponse executeRefund(ExecuteRefundRequest request);
 }
