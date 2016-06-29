@@ -9,7 +9,6 @@ import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.channel.InstitutionConfig;
@@ -42,9 +41,6 @@ public class WeixinRefundServiceImpl implements AcquireRefundService {
     public static final Logger logger = LoggerFactory.getLogger(WeixinRefundServiceImpl.class);
 
     @Autowired
-    private TaskExecutor taskExecutor;
-
-    @Autowired
     private InstitutionConfigManager configManager;
 
     @Autowired
@@ -61,50 +57,44 @@ public class WeixinRefundServiceImpl implements AcquireRefundService {
 
     @Override
     public void notifyRefund(RefundRequestPo refundRequest, Payment payment, HashMap<String, String> header) {
-        taskExecutor.execute(new Runnable() {
 
-            @Override
-            public void run() {
+        InstitutionConfig config = configManager.getConfig(PayTypeEnum.parse(refundRequest.getPayType()));
+        Date requestTime = new Date();
 
-                InstitutionConfig config = configManager.getConfig(PayTypeEnum.parse(refundRequest.getPayType()));
-                Date requestTime = new Date();
+        WxRefundRequest wxRefundRequest = generateRequest(refundRequest, payment, config, null);
+        try {
+            WxRefundResponse response = wxRefundService.doService(wxRefundRequest, header);
 
-                WxRefundRequest wxRefundRequest = generateRequest(refundRequest, payment, config, null);
-                try {
-                    WxRefundResponse response = wxRefundService.doService(wxRefundRequest, header);
+            // save RefundMiscRequestLog
+            RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
+            requestLog.setCorrelateId(refundRequest.getRefundBatchNo());
+            requestLog.setMethod("WeixinRefund");
+            requestLog.setRequestData(wxRefundRequest.getRequestData());
+            requestLog.setResponseData(response.getOriginalResponse());
+            requestLog.setRefundBatchNo(refundRequest.getRefundBatchNo());
+            requestLog.setRequestTime(requestTime);
+            requestLog.setResponseTime(new Date());
+            refundMiscRequestLogMapper.insertSelective(requestLog);
 
-                    // save RefundMiscRequestLog
-                    RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
-                    requestLog.setCorrelateId(refundRequest.getRefundBatchNo());
-                    requestLog.setMethod("WeixinRefund");
-                    requestLog.setRequestData(wxRefundRequest.getRequestData());
-                    requestLog.setResponseData(response.getOriginalResponse());
-                    requestLog.setRefundBatchNo(refundRequest.getRefundBatchNo());
-                    requestLog.setRequestTime(requestTime);
-                    requestLog.setResponseTime(new Date());
-                    refundMiscRequestLogMapper.insertSelective(requestLog);
+            // update RefundRequest
+            RefundStatusEnum refundStatus =
+                    isSuccess(response, config) ? RefundStatusEnum.COMMIT : RefundStatusEnum.REFUND_FAILED;
+            updateRefundRequestStatus(refundRequest, refundStatus);
 
-                    // update RefundRequest
-                    RefundStatusEnum refundStatus =
-                            isSuccess(response, config) ? RefundStatusEnum.COMMIT : RefundStatusEnum.REFUND_FAILED;
-                    updateRefundRequestStatus(refundRequest, refundStatus);
+        } catch (Exception e) {
+            logger.error("call WeiXin Refund fail. RefundBatchNo: " + refundRequest.getRefundBatchNo(), e);
 
-                } catch (Exception e) {
-                    logger.error("call WeiXin Refund fail", e);
+            RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
+            requestLog.setCorrelateId(refundRequest.getPaymentId());
+            requestLog.setMethod("WeiXinRefund");
+            requestLog.setRequestData(wxRefundRequest.getRequestData());
+            requestLog.setExceptionDetail(e.toString());
+            requestLog.setRequestTime(requestTime);
+            requestLog.setResponseTime(new Date());
+            refundMiscRequestLogMapper.insertSelective(requestLog);
 
-                    RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
-                    requestLog.setCorrelateId(refundRequest.getPaymentId());
-                    requestLog.setMethod("WeiXinRefund");
-                    requestLog.setRequestData(wxRefundRequest.getRequestData());
-                    requestLog.setExceptionDetail(e.toString());
-                    requestLog.setRequestTime(requestTime);
-                    requestLog.setResponseTime(new Date());
-                    refundMiscRequestLogMapper.insertSelective(requestLog);
-
-                    updateRefundRequestStatus(refundRequest, RefundStatusEnum.REFUND_FAILED);
-                }
-            }
-        });
+            updateRefundRequestStatus(refundRequest, RefundStatusEnum.REFUND_FAILED);
+        }
     }
 
     private boolean isSuccess(WxRefundResponse response, InstitutionConfig config) {

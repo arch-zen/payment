@@ -101,7 +101,7 @@ public class RefundJobResourceImplTest extends RestBaseTest {
         String respMsg = refundJobResource.executeRefund(request2, servletRequest);
         System.out.println(respMsg);
 
-        Assert.assertEquals("0", respMsg);
+        Assert.assertEquals("-1", respMsg);
 
         Thread.sleep(1000);
 
