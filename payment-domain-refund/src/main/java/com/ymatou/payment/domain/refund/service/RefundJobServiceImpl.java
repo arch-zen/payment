@@ -53,6 +53,8 @@ public class RefundJobServiceImpl implements RefundJobService {
 
     private static final Logger logger = LoggerFactory.getLogger(RefundJobServiceImpl.class);
 
+    private static final int REFUND_SUCCESS_OPT_TYPE = 10;
+
     @Autowired
     private AccountService accountService;
 
@@ -236,7 +238,7 @@ public class RefundJobServiceImpl implements RefundJobService {
         RefundCallbackRequest request = new RefundCallbackRequest();
         request.setActualRefundAmount(refundRequest.getRefundAmount());
         request.setAuditor(refundRequest.getApprovedUser());
-        request.setOptType(10);
+        request.setOptType(REFUND_SUCCESS_OPT_TYPE);
         request.setOrderID(Long.valueOf(refundRequest.getOrderId()));
         request.setPassAuditTime(refundRequest.getRefundTime());
         request.setRequiredRefundAmount(refundRequest.getRefundAmount());

@@ -31,6 +31,7 @@ import com.ymatou.payment.domain.refund.service.SysApproveRefundService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.RefundFacade;
+import com.ymatou.payment.facade.constants.AccountingStatusEnum;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.model.AcquireRefundDetail;
 import com.ymatou.payment.facade.model.AcquireRefundPlusRequest;
@@ -132,19 +133,21 @@ public class RefundFacadeImpl implements RefundFacade {
         RefundRequestPo refundRequest =
                 fastRefundService.saveRefundRequest(req.getRefundAmt(), payment, bussinessOrder, refundInfo);
 
-        // send trading message
-        for (String orderId : req.getOrderIdList()) {
-            fastRefundService.sendFastRefundTradingMessage(bussinessOrder.getUserId().toString(), orderId,
-                    req.getHeader());
-        }
+        if (!AccountingStatusEnum.SUCCESS.code().equals(refundRequest.getAccoutingStatus())) {
+            // send trading message
+            for (String orderId : req.getOrderIdList()) {
+                fastRefundService.sendFastRefundTradingMessage(bussinessOrder.getUserId().toString(), orderId,
+                        req.getHeader());
+            }
 
-        // 扣除账户码头余额
-        boolean accountingSuccess =
-                refundJobService.dedcutBalance(payment, bussinessOrder, refundRequest, req.getHeader());
+            // 扣除账户码头余额
+            boolean accountingSuccess =
+                    refundJobService.dedcutBalance(payment, bussinessOrder, refundRequest, req.getHeader());
 
-        // notify refund service
-        if (accountingSuccess) {
-            refundJobService.submitRefund(refundRequest, payment, req.getHeader());
+            // notify refund service
+            if (accountingSuccess) {
+                refundJobService.submitRefund(refundRequest, payment, req.getHeader());
+            }
         }
 
         FastRefundResponse response = new FastRefundResponse();
