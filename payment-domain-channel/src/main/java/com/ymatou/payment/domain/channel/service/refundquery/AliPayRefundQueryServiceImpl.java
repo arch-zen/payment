@@ -93,7 +93,7 @@ public class AliPayRefundQueryServiceImpl implements RefundQueryService {
                 }
             }
         } else {
-            if (!"REFUND_NOT_EXIST".equals(response.getErrorCode())) {
+            if ("REFUND_NOT_EXIST".equals(response.getErrorCode())) {
                 refundStatus = RefundStatusEnum.INIT;
             } else {
                 refundStatus = RefundStatusEnum.REFUND_FAILED;

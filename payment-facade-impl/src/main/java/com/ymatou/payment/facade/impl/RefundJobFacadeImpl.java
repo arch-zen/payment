@@ -19,6 +19,7 @@ import com.ymatou.payment.facade.constants.AccountingStatusEnum;
 import com.ymatou.payment.facade.constants.ApproveStatusEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.facade.model.ExecuteRefundRequest;
+import com.ymatou.payment.facade.model.ExecuteRefundResponse;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 
 /**
@@ -40,20 +41,23 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
     private PayService payService;
 
     @Override
-    public int executeRefund(ExecuteRefundRequest request) {
+    public ExecuteRefundResponse executeRefund(ExecuteRefundRequest request) {
         Integer refundId = request.getRefundId();
         HashMap<String, String> header = request.getHeader();
+        ExecuteRefundResponse response = new ExecuteRefundResponse();
 
         logger.info("Step 1: query refundRequest, payment, businessOrder. {}", refundId);
         RefundRequestPo refundRequest = refundJobService.getRefundRequestByRefundId(refundId);
         if (refundRequest == null // 退款申请不不存在或未审核
                 || refundRequest.getApproveStatus().equals(ApproveStatusEnum.NOT_APPROVED.getCode())) {
-            return RefundStatusEnum.INIT.getCode();
+            response.setRefundResult(RefundStatusEnum.INIT.getCode());
+            return response;
         }
         refundJobService.updateRetryCount(refundId); // 更新重试次数
 
         if (refundRequest.getSoftDeleteFlag()) {
-            return SOFT_DELETED;
+            response.setRefundResult(SOFT_DELETED);
+            return response;
         }
 
         Payment payment = payService.getPaymentByPaymentId(refundRequest.getPaymentId());
@@ -96,7 +100,8 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
             }
         }
 
-        return refundStatusFlag;
+        response.setRefundResult(refundStatusFlag);
+        return response;
     }
 
 }
