@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.dubbo.remoting.exchange.Request;
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.model.ThirdPartyPayment;
@@ -93,10 +94,15 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
 
                     // 通知发货服务
                     try {
-                        notifyPaymentService.doService(payment.getPaymentId(), thirdPartyPayment.getTraceId(),
-                                header);
+
+                        payService.executePayNotify(payment, header);
+
+                        // notifyPaymentService.doService(payment.getPaymentId(),
+                        // thirdPartyPayment.getTraceId(),
+                        // header);
+
                     } catch (Exception e) {
-                        logger.error("notify deliver service failed with paymentid :" + payment.getPaymentId(), e);
+                        logger.error("executePayNotify service failed with paymentid :" + payment.getPaymentId(), e);
                     }
 
                 } catch (Exception e) {

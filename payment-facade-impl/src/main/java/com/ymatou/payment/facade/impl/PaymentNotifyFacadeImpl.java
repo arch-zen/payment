@@ -119,10 +119,14 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
 
                 // 通知发货服务
                 try {
-                    notifyPaymentService.doService(payment.getPaymentId(), notifyMessage.getTraceId(),
-                            req.getMockHeader());
+
+                    payService.executePayNotify(payment, req.getMockHeader());
+
+                    // notifyPaymentService.doService(payment.getPaymentId(),
+                    // notifyMessage.getTraceId(),
+                    // req.getMockHeader());
                 } catch (Exception e) {
-                    logger.error("notify deliver service failed with paymentid :" + payment.getPaymentId(), e);
+                    logger.error("executePayNotify service failed with paymentid :" + payment.getPaymentId(), e);
                 }
             }
         }

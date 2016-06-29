@@ -15,7 +15,6 @@ import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.infrastructure.db.mapper.CompensateProcessInfoMapper;
 import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
 import com.ymatou.payment.infrastructure.db.model.BussinessOrderPo;
-import com.ymatou.payment.infrastructure.db.model.CompensateProcessInfoPo;
 import com.ymatou.payment.infrastructure.db.model.PaymentExample;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 import com.ymatou.payment.infrastructure.db.operate.PaymentOperate;
@@ -112,15 +111,16 @@ public class PaymentRepository {
         bussinessOrderRepository.updateOrderStatus(paymentPo.getBussinessOrderId(), paymentPo.getPayStatus());
 
         // 添加发货信息
-        CompensateProcessInfoPo compensateprocessinfoPo = new CompensateProcessInfoPo();
-        compensateprocessinfoPo.setAppId("1");// 固定值代表发货服务
-        compensateprocessinfoPo.setCorrelateId(paymentPo.getPaymentId());
-        compensateprocessinfoPo.setMethodName("DeliveryNotify");
-        compensateprocessinfoPo.setRequestUrl(integrationConfig.getYmtNotifyPaymentUrl());
-        compensateprocessinfoPo.setRequestData(
-                String.format("{\"PaymentId\":\"%s\",\"TraceId\":\"%s\"}", paymentPo.getPaymentId(), traceId));
+        // CompensateProcessInfoPo compensateprocessinfoPo = new CompensateProcessInfoPo();
+        // compensateprocessinfoPo.setAppId("1");// 固定值代表发货服务
+        // compensateprocessinfoPo.setCorrelateId(paymentPo.getPaymentId());
+        // compensateprocessinfoPo.setMethodName("DeliveryNotify");
+        // compensateprocessinfoPo.setRequestUrl(integrationConfig.getYmtNotifyPaymentUrl());
+        // compensateprocessinfoPo.setRequestData(
+        // String.format("{\"PaymentId\":\"%s\",\"TraceId\":\"%s\"}", paymentPo.getPaymentId(),
+        // traceId));
 
-        compensateProcessInfoMapper.insertSelective(compensateprocessinfoPo);
+        // compensateProcessInfoMapper.insertSelective(compensateprocessinfoPo);
     }
 
     /**
