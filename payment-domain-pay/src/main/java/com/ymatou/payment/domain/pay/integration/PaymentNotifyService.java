@@ -90,6 +90,7 @@ public class PaymentNotifyService {
         request.setPayTime(payment.getPayTime() == null ? new Date() : payment.getPayTime());
         request.setSignMethod("MD5");
         request.setTraceId(UUID.randomUUID().toString());
+        // request.setTraceId("43f231c6-caa5-4caf-86ed-3bf17f98121b");
         request.setInstPaymentId(payment.getInstitutionPaymentId());
         request.setInternalUserId(String.valueOf(bussinessOrder.getUserId()));
         request.setExternalUserId(filterAliInternalUsers(payment.getPayerId()));
@@ -112,7 +113,7 @@ public class PaymentNotifyService {
             case AliPayApp:
             case AliPayPc:
             case AliPayWap:
-                return "AliPay";
+                return "Alipay";
             case WeiXinApp:
             case WeiXinJSAPI:
                 return "Weixin";
@@ -144,6 +145,7 @@ public class PaymentNotifyService {
      */
     private String sign(PaymentCallbackRequest req) {
         HashMap<String, String> map = new HashMap<String, String>();
+        map.put("Version", "1");
         map.put("AppId", req.getAppId());
         map.put("BizCode", req.getBizCode());
         map.put("Currency", req.getCurrency());
@@ -158,6 +160,7 @@ public class PaymentNotifyService {
         map.put("ExternalUserId", req.getExternalUserId());
         map.put("PayChannel", req.getPayChannel());
         map.put("PayType", req.getPayType());
+        map.put("PaymentId", req.getPaymentId());
 
         String sign = signNotify(map);
 
@@ -176,8 +179,9 @@ public class PaymentNotifyService {
 
         try {
             String targetMessage = rawString + paymentConfig.getNotifySignSalt();
-            return MD5Util.encode(targetMessage).toUpperCase();
+            String sign = MD5Util.encode(targetMessage).toUpperCase();
 
+            return sign;
         } catch (Exception e) {
             throw new BizException(ErrorCode.FAIL, "notify md5 sign failed with rawString: " + rawString, e);
         }

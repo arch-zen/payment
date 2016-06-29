@@ -476,6 +476,20 @@ public class PaymentResourceImplTest extends RestBaseTest {
         assertEquals("验证Amount", payment.getPayPrice(), new Money(accountEntry.getAmount()));
     }
 
+    @Test
+    public void executePayNotifyTestValifySign() {
+        // String paymentId = "16062316304186777";
+        //
+        // ExecutePayNotifyReq executePayNotifyReq = new ExecutePayNotifyReq();
+        // executePayNotifyReq.setPaymentId(paymentId);
+        //
+        // MockHttpServletRequest servletRequestMock = new MockHttpServletRequest();
+        // String response = paymentResource.executePayNotify(executePayNotifyReq,
+        // servletRequestMock);
+        //
+        //
+        // assertEquals("验证response", "ok", response);
+    }
 
     /**
      * 构造请求报文
