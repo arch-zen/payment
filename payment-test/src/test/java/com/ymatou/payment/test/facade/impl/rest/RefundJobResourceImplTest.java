@@ -95,13 +95,12 @@ public class RefundJobResourceImplTest extends RestBaseTest {
         List<RefundRequestPo> refundRequestPos = refundRequestMapper.selectByExample(example);
         Integer refundId = refundRequestPos.get(0).getRefundId();
 
-        // 此时同步应答还没回来，从新提交了退款请求
         ExecuteRefundRequest request2 = new ExecuteRefundRequest();
         request2.setRefundId(refundId);
         String respMsg = refundJobResource.executeRefund(request2, servletRequest);
         System.out.println(respMsg);
 
-        Assert.assertEquals("0", respMsg);
+        Assert.assertEquals("-1", respMsg);
 
         Thread.sleep(1000);
 

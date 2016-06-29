@@ -10,7 +10,6 @@ import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.channel.InstitutionConfig;
@@ -43,9 +42,6 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
     private static final Logger logger = LoggerFactory.getLogger(AliPayRefundServiceImpl.class);
 
     @Autowired
-    private TaskExecutor taskExecutor;
-
-    @Autowired
     private InstitutionConfigManager configManager;
 
     @Autowired
@@ -66,50 +62,44 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
     @Override
     public void notifyRefund(RefundRequestPo refundRequest, Payment payment, HashMap<String, String> header) {
 
-        taskExecutor.execute(new Runnable() {
+        InstitutionConfig config = configManager.getConfig(PayTypeEnum.parse(refundRequest.getPayType()));
+        Date requestTime = new Date();
 
-            @Override
-            public void run() {
-                InstitutionConfig config = configManager.getConfig(PayTypeEnum.parse(refundRequest.getPayType()));
-                Date requestTime = new Date();
+        AliPayRefundRequest aliPayRefundRequest = generateRequest(refundRequest, payment, config, null);
+        try {
+            // submit third party refund
+            AliPayRefundResponse response = aliPayRefundService.doService(aliPayRefundRequest, header);
 
-                AliPayRefundRequest aliPayRefundRequest = generateRequest(refundRequest, payment, config, null);
-                try {
-                    // submit third party refund
-                    AliPayRefundResponse response = aliPayRefundService.doService(aliPayRefundRequest, header);
+            // save RefundMiscRequestLog
+            RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
+            requestLog.setCorrelateId(refundRequest.getRefundBatchNo());
+            requestLog.setMethod("AliRefund");
+            requestLog.setRequestData(aliPayRefundRequest.getRequestData());
+            requestLog.setResponseData(response.getOriginalResponse());
+            requestLog.setRefundBatchNo(refundRequest.getRefundBatchNo());
+            requestLog.setRequestTime(requestTime);
+            requestLog.setResponseTime(new Date());
+            refundMiscRequestLogMapper.insertSelective(requestLog);
 
-                    // save RefundMiscRequestLog
-                    RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
-                    requestLog.setCorrelateId(refundRequest.getRefundBatchNo());
-                    requestLog.setMethod("AliRefund");
-                    requestLog.setRequestData(aliPayRefundRequest.getRequestData());
-                    requestLog.setResponseData(response.getOriginalResponse());
-                    requestLog.setRefundBatchNo(refundRequest.getRefundBatchNo());
-                    requestLog.setRequestTime(requestTime);
-                    requestLog.setResponseTime(new Date());
-                    refundMiscRequestLogMapper.insertSelective(requestLog);
+            // update RefundRequest
+            RefundStatusEnum refundStatus =
+                    isSuccess(response) ? RefundStatusEnum.COMMIT : RefundStatusEnum.REFUND_FAILED;
+            updateRefundRequestStatus(refundRequest, refundStatus);
 
-                    // update RefundRequest
-                    RefundStatusEnum refundStatus =
-                            isSuccess(response) ? RefundStatusEnum.COMMIT : RefundStatusEnum.REFUND_FAILED;
-                    updateRefundRequestStatus(refundRequest, refundStatus);
+        } catch (Exception e) {
+            logger.error("call AliPay Refund fail. RefundBatchNo: " + refundRequest.getRefundBatchNo(), e);
 
-                } catch (Exception e) {
-                    logger.error("call AliPay Refund fail", e);
+            RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
+            requestLog.setCorrelateId(refundRequest.getPaymentId());
+            requestLog.setMethod("AliRefund");
+            requestLog.setRequestData(aliPayRefundRequest.getRequestData());
+            requestLog.setExceptionDetail(e.toString());
+            requestLog.setRequestTime(requestTime);
+            requestLog.setResponseTime(new Date());
+            refundMiscRequestLogMapper.insertSelective(requestLog);
 
-                    RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
-                    requestLog.setCorrelateId(refundRequest.getPaymentId());
-                    requestLog.setMethod("AliRefund");
-                    requestLog.setRequestData(aliPayRefundRequest.getRequestData());
-                    requestLog.setExceptionDetail(e.toString());
-                    requestLog.setRequestTime(requestTime);
-                    requestLog.setResponseTime(new Date());
-                    refundMiscRequestLogMapper.insertSelective(requestLog);
-
-                    updateRefundRequestStatus(refundRequest, RefundStatusEnum.REFUND_FAILED);
-                }
-            }
-        });
+            updateRefundRequestStatus(refundRequest, RefundStatusEnum.REFUND_FAILED);
+        }
     }
 
     private boolean isSuccess(AliPayRefundResponse response) {

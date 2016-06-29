@@ -3,9 +3,7 @@
  */
 package com.ymatou.payment.facade.model;
 
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
@@ -23,28 +21,28 @@ public class AliPayRefundNotifyRequest extends BaseRequest {
 
     private static final long serialVersionUID = 6547133957669831614L;
 
-    @NotNull
+    @NotNull(message = "notifyTime not be null")
     private String notifyTime;
 
-    @NotEmpty
+    @NotEmpty(message = "notifyType not be empty")
     private String notifyType;
 
-    @NotEmpty
+    @NotEmpty(message = "notifyId not be empty")
     private String notifyId;
 
-    @NotEmpty
+    @NotEmpty(message = "signType not be empty")
     private String signType;
 
-    @NotEmpty
+    @NotEmpty(message = "sign not be empty")
     private String sign;
 
-    @NotEmpty
+    @NotEmpty(message = "batchNo not be empty")
     private String batchNo;
 
-    @NotEmpty
+    @NotEmpty(message = "successNum not be empty")
     private String successNum;
 
-    @NotEmpty
+    @NotEmpty(message = "resultDetails not be empty")
     private String resultDetails;
 
     private String payType;

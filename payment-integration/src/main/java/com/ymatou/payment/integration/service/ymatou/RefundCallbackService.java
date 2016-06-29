@@ -40,10 +40,9 @@ public class RefundCallbackService implements InitializingBean {
     public boolean doService(RefundCallbackRequest request, boolean isNewSystem, HashMap<String, String> header)
             throws IOException {
         String url = getRequestUrl(isNewSystem, header);
-        String req = JSONObject.toJSONString(request);
         boolean isSuccess = HttpClientUtil.sendPostToGetStatus(url, JSONObject.toJSONString(request),
                 Constants.CONTENT_TYPE_JSON, header, httpClient);
-        logger.info("refund callback response status: {}", isSuccess);
+        logger.info("refund callback response isSuccess: {}", isSuccess);
 
         return isSuccess;
     }
