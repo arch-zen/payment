@@ -11,7 +11,7 @@ package com.ymatou.payment.facade.constants;
  */
 public enum AccountingStatusEnum {
 
-    SUCCESS(1), FAIL(0);
+    SUCCESS(1), FAIL(0), UNKNOW(3);
 
     private Integer code;
 

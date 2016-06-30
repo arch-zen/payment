@@ -5,7 +5,6 @@
  */
 package com.ymatou.payment.domain.pay.integration;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +20,7 @@ import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.AccountOperateTypeEnum;
 import com.ymatou.payment.facade.constants.AccountTypeEnum;
+import com.ymatou.payment.facade.constants.AccountingStatusEnum;
 import com.ymatou.payment.facade.constants.CurrencyTypeEnum;
 import com.ymatou.payment.infrastructure.db.mapper.AccountingLogMapper;
 import com.ymatou.payment.infrastructure.db.model.AccountingLogPo;
@@ -53,17 +53,39 @@ public class AccountingService {
      * @return
      */
     public boolean recharge(Payment payment, BussinessOrder bussinessOrder) {
+        AccountingStatusEnum result = rechargeInternal(payment, bussinessOrder);
+
+        // 如果调用资金服务异常，进行一次重试
+        if (result == AccountingStatusEnum.UNKNOW) {
+            result = rechargeInternal(payment, bussinessOrder);
+        }
+
+        return result == AccountingStatusEnum.SUCCESS;
+
+    }
+
+    /**
+     * 资金账户充值
+     * 
+     * @param payment
+     * @param bussinessOrder
+     * @return
+     */
+    public AccountingStatusEnum rechargeInternal(Payment payment, BussinessOrder bussinessOrder) {
         AccountingRequest request = generateRequest(payment, bussinessOrder);
 
         try {
             AccountingResponse response = accountService.accounting(request, null);
+            saveAccoutingLog(payment, bussinessOrder, response);
+
             if (isAccoutingSuccess(response)) {
-                saveAccoutingLog(payment, bussinessOrder, response);
-                return true;
+                return AccountingStatusEnum.SUCCESS;
+            } else if (AccountingCode_SYSTEMERROR.equals(response.getStatusCode())) {
+                return AccountingStatusEnum.UNKNOW;
             } else {
-                saveAccoutingLog(payment, bussinessOrder, response);
-                return false;
+                return AccountingStatusEnum.FAIL;
             }
+
         } catch (Exception e) {
             logger.error("accouting when pay notify error with paymentId:" + payment.getPaymentId(), e);
             AccountingResponse response = new AccountingResponse();
@@ -71,8 +93,9 @@ public class AccountingService {
             response.setMessage(e.getMessage());
 
             saveAccoutingLog(payment, bussinessOrder, response);
+
+            return AccountingStatusEnum.UNKNOW;
         }
-        return false;
     }
 
     /**

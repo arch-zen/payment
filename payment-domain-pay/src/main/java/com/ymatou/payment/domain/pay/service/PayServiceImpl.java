@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -202,6 +203,8 @@ public class PayServiceImpl implements PayService {
 
         // 执行充值操作
         if (payment.getNotifyStatus() == null) {
+            logger.info("step.1 pay notify execute accounting");
+
             if (!accountingService.recharge(payment, bussinessOrder)) {
                 logger.error("pay notify execute accounting failed:" + payment.getPaymentId());
                 throw new BizException(ErrorCode.PAYMENT_NOTIFY_ACCOUNTING_FAILED,
@@ -213,10 +216,19 @@ public class PayServiceImpl implements PayService {
 
         // 执行通知业务系统的操作
         if (payment.getNotifyStatus() == PaymentNotifyStatusEnum.ACCOUNTED) {
-            if (!paymentNotifyService.notifyBizSystem(payment, bussinessOrder, mockHeader)) {
-                logger.error("pay notify call inner system failed:" + payment.getPaymentId());
-                throw new BizException(ErrorCode.PAYMENT_NOTIFY_INNER_SYSTEM_FAILED,
-                        "pay notify call inner system failed:" + payment.getPaymentId());
+            logger.info("step.2 pay notify call inner system");
+
+
+            // 如果NotifyUrl为空表示业务系统不需要回调，此时可以直接把状态改成NOTIFIED
+            if (StringUtils.isEmpty(bussinessOrder.getNotifyUrl())) {
+                logger.info("execute pay notity succssess when notify url is empty with paymentid:{}",
+                        payment.getPaymentId());
+            } else {
+                if (!paymentNotifyService.notifyBizSystem(payment, bussinessOrder, mockHeader)) {
+                    logger.error("pay notify call inner system failed:" + payment.getPaymentId());
+                    throw new BizException(ErrorCode.PAYMENT_NOTIFY_INNER_SYSTEM_FAILED,
+                            "pay notify call inner system failed:" + payment.getPaymentId());
+                }
             }
             payment.setNotifyStatus(PaymentNotifyStatusEnum.NOTIFIED);
             paymentRepository.updatePaymentNotifyStatus(payment);
