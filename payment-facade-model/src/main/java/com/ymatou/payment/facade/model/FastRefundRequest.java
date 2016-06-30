@@ -25,10 +25,10 @@ public class FastRefundRequest extends BaseRequest {
 
     private static final long serialVersionUID = -7414443014183140909L;
 
-    @NotBlank
+    @NotBlank(message = "paymentId not be empty")
     private String paymentId;
 
-    @NotBlank
+    @NotBlank(message = "tradingId not be empty")
     private String tradingId;
 
     @Max(2)
@@ -38,7 +38,7 @@ public class FastRefundRequest extends BaseRequest {
     @NotEmpty
     private List<String> orderIdList;
 
-    @NotBlank
+    @NotBlank(message = "appId not be empty")
     private String appId;
 
     private String traceId;
