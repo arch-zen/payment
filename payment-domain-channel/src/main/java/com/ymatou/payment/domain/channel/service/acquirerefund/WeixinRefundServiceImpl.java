@@ -136,7 +136,7 @@ public class WeixinRefundServiceImpl implements AcquireRefundService {
         RefundRequestExample example = new RefundRequestExample();
         example.createCriteria().andRefundBatchNoEqualTo(refundRequest.getRefundBatchNo());
 
-        refundRequestMapper.updateByExampleWithBLOBs(record, example);
+        refundRequestMapper.updateByExampleSelective(record, example);
     }
 
 }

@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 
@@ -46,6 +47,7 @@ public class AcquireRefundPlusRequest extends BaseRequest {
     /**
      * 退款金额
      */
+    @NotNull(message = "refundAmt not valid")
     private BigDecimal refundAmt;
     /**
      * 交易类型
