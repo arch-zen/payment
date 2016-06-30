@@ -74,7 +74,7 @@ public class PaymentResourceImpl implements PaymentResource {
     @POST
     @Path("/{ExecutePayNotify:(?i:ExecutePayNotify)}")
     @Produces({"text/xml"})
-    public String executePayNotify(ExecutePayNotifyReq req, HttpServletRequest servletRequest) {
+    public String executePayNotify(ExecutePayNotifyReq req, @Context HttpServletRequest servletRequest) {
         req.setMockHeader(getMockHttpHeader(servletRequest));
         ExecutePayNotifyResp resp = paymentFacade.executePayNotify(req);
         if (resp.getErrorCode() == ErrorCode.PAYMENT_NOTIFY_ACCOUNTING_FAILED.getCode()
