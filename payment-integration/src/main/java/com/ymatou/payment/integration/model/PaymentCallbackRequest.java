@@ -14,7 +14,7 @@ import java.util.Date;
  */
 public class PaymentCallbackRequest {
 
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
     /**
      * 应用Id(2)
      */

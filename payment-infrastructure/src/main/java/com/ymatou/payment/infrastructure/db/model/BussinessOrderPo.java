@@ -645,7 +645,7 @@ public class BussinessOrderPo {
         sb.append(", orderStatus=").append(orderStatus);
         sb.append(", notifyStatus=").append(notifyStatus);
         sb.append(", notifyTime=").append(notifyTime);
-        sb.append(", dataVersion=").append(dataVersion);
+        // sb.append(", dataVersion=").append(dataVersion);
         sb.append("]");
         return sb.toString();
     }

@@ -477,7 +477,7 @@ public class PaymentPo {
         sb.append(", completedRefundAmt=").append(completedRefundAmt);
         sb.append(", retryCount=").append(retryCount);
         sb.append(", notifyStatus=").append(notifyStatus);
-        sb.append(", dataVersion=").append(dataVersion);
+        // sb.append(", dataVersion=").append(dataVersion);
         sb.append("]");
         return sb.toString();
     }

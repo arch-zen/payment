@@ -13,7 +13,7 @@ import java.util.Date;
  */
 public class AccountingItem {
 
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
     private String accountId;
     private int userId;

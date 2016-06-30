@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -42,7 +43,8 @@ public class Signature {
         try {
             for (Field f : fields) {
                 f.setAccessible(true); // 设置成员变量可访问
-                if (f.get(o) != null && f.get(o) != "") {
+                // if (f.get(o) != null && f.get(o) != "") {
+                if (f.get(o) != null && !StringUtils.isEmpty(f.get(o).toString())) {
                     list.add(f.getName() + "=" + f.get(o) + "&");
                 }
             }
@@ -75,7 +77,7 @@ public class Signature {
     public static String getSign(Map<String, Object> map, String key) throws NoSuchAlgorithmException {
         ArrayList<String> list = new ArrayList<String>();
         for (Map.Entry<String, Object> entry : map.entrySet()) {
-            if (entry.getValue() != "") {
+            if (entry.getValue() != null && !StringUtils.isEmpty(entry.getKey().toString())) {
                 list.add(entry.getKey() + "=" + entry.getValue() + "&");
             }
         }

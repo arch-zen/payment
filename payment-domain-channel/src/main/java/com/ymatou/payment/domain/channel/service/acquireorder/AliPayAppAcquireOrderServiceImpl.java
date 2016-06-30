@@ -104,7 +104,7 @@ public class AliPayAppAcquireOrderServiceImpl implements AcquireOrderService {
         reqDict.put("subject", payment.getBussinessOrder().getSubject());
         reqDict.put("body", payment.getBussinessOrder().getBody());
 
-        if (acquireOrderExt.getIsHangZhou() != null & acquireOrderExt.getIsHangZhou() == 1) {
+        if (acquireOrderExt.getIsHangZhou() != null && acquireOrderExt.getIsHangZhou() == 1) {
             reqDict.put("rn_check", "T");
         }
 

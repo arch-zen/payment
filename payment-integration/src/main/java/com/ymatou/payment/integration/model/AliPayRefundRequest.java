@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
  *
  */
 public class AliPayRefundRequest {
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
     /**
      * 接口名称

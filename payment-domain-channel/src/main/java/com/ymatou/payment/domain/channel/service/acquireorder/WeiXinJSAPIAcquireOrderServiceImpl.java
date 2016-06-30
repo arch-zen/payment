@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -194,7 +195,8 @@ public class WeiXinJSAPIAcquireOrderServiceImpl implements AcquireOrderService {
         try {
             for (Field f : fields) {
                 f.setAccessible(true); // 设置成员变量可访问
-                if (f.get(obj) != null && f.get(obj) != "") {
+                // if (f.get(obj) != null && f.get(obj) != "") {
+                if (f.get(obj) != null && !StringUtils.isEmpty(f.get(obj).toString())) {
                     map.put(signNameFormat(f.getName()), f.get(obj).toString());
                 }
             }
