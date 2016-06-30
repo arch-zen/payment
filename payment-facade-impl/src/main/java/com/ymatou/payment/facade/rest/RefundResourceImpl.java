@@ -120,7 +120,7 @@ public class RefundResourceImpl implements RefundResource {
 
     @POST
     @Path("/{Refund:(?i:Refund)}/{SysApproveRefund:(?i:SysApproveRefund)}")
-    @Produces({"text/html; charset=UTF-8"})
+    @Produces({"text/xml"})
     @Override
     public String sysApproveRefund(SysApproveRefundReq req, @Context HttpServletRequest servletRequest) {
         SysApproveRefundResp resp = refundFacade.sysApproveRefund(req);
