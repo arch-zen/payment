@@ -74,7 +74,7 @@ public class WeiXinRefundQueryServiceImpl implements RefundQueryService {
             saveRefundMiscRequestLog(refundRequest, requestTime, queryRefundRequest, null, e);
             refundStatus = RefundStatusEnum.REFUND_FAILED;
         }
-        logger.info("weixin refund query end. RefundStatus:{}", refundRequest.getRefundStatus());
+        logger.info("weixin refund query end. RefundStatus:{}", refundStatus);
         return refundStatus;
     }
 
@@ -127,7 +127,7 @@ public class WeiXinRefundQueryServiceImpl implements RefundQueryService {
 
         RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
         requestLog.setCorrelateId(refundRequest.getRefundBatchNo());
-        requestLog.setMethod("WeiXinRefund");
+        requestLog.setMethod("WeixinRefundQuery");
         requestLog.setRequestData(queryRefundRequest.getRequestData());
         requestLog.setRequestTime(requestTime);
         requestLog.setResponseTime(new Date());

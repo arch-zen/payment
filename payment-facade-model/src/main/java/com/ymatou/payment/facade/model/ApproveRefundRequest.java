@@ -6,6 +6,7 @@ package com.ymatou.payment.facade.model;
 import java.util.HashMap;
 import java.util.List;
 
+import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.ymatou.payment.facade.BaseRequest;
@@ -23,12 +24,12 @@ public class ApproveRefundRequest extends BaseRequest {
     /**
      * 退款单号
      */
-    @NotEmpty
+    @NotEmpty(message = "refundIds not be empty")
     private List<Integer> refundIds;
     /**
      * 审核人
      */
-    @NotEmpty
+    @NotBlank(message = "approveUser not be empty")
     private String approveUser;
     /**
      * http请求header(可不填)

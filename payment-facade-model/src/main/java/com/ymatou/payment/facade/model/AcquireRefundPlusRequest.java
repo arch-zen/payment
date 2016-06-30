@@ -11,6 +11,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotBlank;
 
 import com.ymatou.payment.facade.BaseRequest;
 
@@ -27,22 +28,26 @@ public class AcquireRefundPlusRequest extends BaseRequest {
     /**
      * 应用编号
      */
-    @Length(min = 1, max = 16, message = "appId not valid")
+    @Length(max = 16, message = "appId not valid")
+    @NotBlank(message = "appId not be empty")
     private String appId;
     /**
      * 订单号
      */
-    @Length(min = 1, max = 64, message = "orderId not valid")
+    @Length(max = 64, message = "orderId not valid")
+    @NotBlank(message = "orderId not be empty")
     private String orderId;
     /**
      * 交易号
      */
-    @Length(min = 1, max = 64, message = "tradeNo not valid")
+    @Length(max = 64, message = "tradeNo not valid")
+    @NotBlank(message = "tradeNo not be empty")
     private String tradeNo;
     /**
      * 退款申请号
      */
-    @Length(min = 1, max = 32, message = "refundNo not valid")
+    @Length(max = 32, message = "refundNo not valid")
+    @NotBlank(message = "refundNo not be empty")
     private String refundNo;
     /**
      * 退款金额

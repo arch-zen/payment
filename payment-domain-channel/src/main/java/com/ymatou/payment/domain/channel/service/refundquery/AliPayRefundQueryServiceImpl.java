@@ -72,7 +72,7 @@ public class AliPayRefundQueryServiceImpl implements RefundQueryService {
             refundStatus = RefundStatusEnum.REFUND_FAILED;
         }
 
-        logger.info("AliPay refund query end. RefundStatus:{}", refundRequest.getRefundStatus());
+        logger.info("AliPay refund query end. RefundStatus:{}", refundStatus);
         return refundStatus;
     }
 
@@ -153,7 +153,7 @@ public class AliPayRefundQueryServiceImpl implements RefundQueryService {
 
         RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
         requestLog.setCorrelateId(refundRequest.getRefundBatchNo());
-        requestLog.setMethod("WeiXinRefund");
+        requestLog.setMethod("AliRefundQuery");
         requestLog.setRequestData(queryRefundRequest.getRequestData());
         requestLog.setRequestTime(requestTime);
         requestLog.setResponseTime(new Date());
