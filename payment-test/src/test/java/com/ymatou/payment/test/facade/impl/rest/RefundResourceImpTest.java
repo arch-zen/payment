@@ -529,7 +529,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         request.setPaymentId(paymentPo.getPaymentId());
         request.setAppId(bussinessOrderPo.getAppId());
         request.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
-        request.setRefundNo(RandomStringUtils.randomAlphabetic(8));
+        request.setTraceId(RandomStringUtils.randomAlphabetic(8));
         request.setTradingId(bussinessOrderPo.getOrderId());
         request.setTradeType(1);
         // request.setRefundAmt(new BigDecimal(7.8));
@@ -541,7 +541,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         request2.setPaymentId(paymentPo.getPaymentId());
         request2.setAppId(bussinessOrderPo.getAppId());
         request2.setOrderIdList(Arrays.asList(new String[] {bussinessOrderPo.getBussinessOrderId()}));
-        request2.setTraceId(RandomStringUtils.randomAlphabetic(8));
+        request2.setRefundNo(RandomStringUtils.randomAlphabetic(8));
         request2.setTradingId(bussinessOrderPo.getOrderId());
         request2.setTradeType(1);
 

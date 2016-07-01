@@ -51,14 +51,10 @@ public class UserService implements InitializingBean {
         String url = new StringBuilder(128).append(integrationConfig.getYmtUserServiceUrl(header))
                 .append("?UserId=").append(userId).append("&RegSource=").append(reqSource).toString();
 
-        try {
-            String result = HttpClientUtil.sendGet(url, header, httpClient);
-            UserServiceResponse userServiceResponse = JSON.parseObject(result, UserServiceResponse.class);
-            return userServiceResponse;
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-            throw e;
-        }
+        String result = HttpClientUtil.sendGet(url, header, httpClient);
+
+        UserServiceResponse userServiceResponse = JSON.parseObject(result, UserServiceResponse.class);
+        return userServiceResponse;
     }
 
     @Override

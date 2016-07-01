@@ -52,10 +52,11 @@ public class AliPayRefundQueryService implements InitializingBean {
     public AliPayRefundQueryResponse doService(AliPayRefundQueryRequest request, HashMap<String, String> header)
             throws Exception {
         String url = integrationConfig.getAliPayBaseUrl(header);
+
         String result = HttpClientUtil.sendPost(url, generateRequest(request), header, httpClient);
+
         AliPayRefundQueryResponse response = generateResponse(result);
         response.setOriginalResponse(result);
-
         logger.info("refund query response: {}", JSONObject.toJSONString(response));
         return response;
     }

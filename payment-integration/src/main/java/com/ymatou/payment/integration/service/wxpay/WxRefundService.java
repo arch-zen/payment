@@ -68,23 +68,18 @@ public class WxRefundService {
     private IntegrationConfig integrationConfig;
 
     public WxRefundResponse doService(WxRefundRequest request, HashMap<String, String> header) throws Exception {
-        try {
-            // 根据mchId获取不同的加签盐值和httpClient(不同商户证书及密码不同)
-            String mchId = request.getMch_id();
-            String respXmlStr = HttpClientUtil.sendPost(integrationConfig.getWxRefundUrl(header),
-                    getPostDataXml(request), Constants.CONTENT_TYPE_XML, header, getHttpClient(mchId));
+        // 根据mchId获取不同的加签盐值和httpClient(不同商户证书及密码不同)
+        String mchId = request.getMch_id();
+        String respXmlStr = HttpClientUtil.sendPost(integrationConfig.getWxRefundUrl(header),
+                getPostDataXml(request), Constants.CONTENT_TYPE_XML, header, getHttpClient(mchId));
 
-            if (!StringUtils.isEmpty(respXmlStr) && respXmlStr.startsWith(Constants.WEIXIN_RESPONSE_BODY_START)) {
-                Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);
-                WxRefundResponse response = generateResponseData(respMap);
-                response.setOriginalResponse(respXmlStr);
-                return response;
-            }
-            return null;
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw e;
+        if (!StringUtils.isEmpty(respXmlStr) && respXmlStr.startsWith(Constants.WEIXIN_RESPONSE_BODY_START)) {
+            Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);
+            WxRefundResponse response = generateResponseData(respMap);
+            response.setOriginalResponse(respXmlStr);
+            return response;
         }
+        return null;
     }
 
     private WxRefundResponse generateResponseData(Map<String, Object> responseMap) {

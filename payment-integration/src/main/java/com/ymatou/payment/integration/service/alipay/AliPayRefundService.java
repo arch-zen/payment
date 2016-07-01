@@ -50,6 +50,7 @@ public class AliPayRefundService implements InitializingBean {
     public AliPayRefundResponse doService(AliPayRefundRequest request, HashMap<String, String> header)
             throws Exception {
         String url = integrationConfig.getAliPayBaseUrl(header);
+
         String result = HttpClientUtil.sendPost(url, generateRequest(request), header, httpClient);
 
         return generateResponse(result);

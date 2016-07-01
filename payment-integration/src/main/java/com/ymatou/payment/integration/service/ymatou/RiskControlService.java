@@ -40,14 +40,10 @@ public class RiskControlService implements InitializingBean {
     public boolean doService(RiskControlRequest request, HashMap<String, String> header) throws IOException {
         String url = integrationConfig.getYmtRiskControlUrl(header);
 
-        try {
-            String result = HttpClientUtil.sendPost(url, JSONObject.toJSONString(request), Constants.CONTENT_TYPE_JSON,
-                    header, httpClient);
-            return JSONObject.parseObject(result).getInteger("Code") == 200;
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-            throw e;
-        }
+        String result = HttpClientUtil.sendPost(url, JSONObject.toJSONString(request), Constants.CONTENT_TYPE_JSON,
+                header, httpClient);
+
+        return JSONObject.parseObject(result).getInteger("Code") == 200;
     }
 
     @Override

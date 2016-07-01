@@ -39,16 +39,21 @@ public class FastRefundServiceImpl implements FastRefundService {
     @Autowired
     private NotifyUserService notifyUserService;
 
-    public RefundRequestPo saveRefundRequest(BigDecimal refundAmt, Payment payment, BussinessOrder bussinessorder,
-            Refund refundInfo) {
-        // 根据RequestNo及TradeNo查找RefundRequest， 保证幂等
-        List<RefundRequestPo> refundRequests =
-                refundPository.getRefundReqestByTraceId(refundInfo.getTraceId());
+    public RefundRequestPo saveRefundRequest(boolean isJavaSystem, BigDecimal refundAmt, Payment payment,
+            BussinessOrder bussinessorder, Refund refundInfo) {
+        // 根据RequestNo或TradeNo查找RefundRequest， 保证幂等
+        List<RefundRequestPo> refundRequests = null;
+        if (isJavaSystem) {
+            refundRequests = refundPository.getRefundReqestByTraceId(refundInfo.getTraceId());
+        } else {
+            refundRequests = refundPository.getRefundRequestByTradeNo(refundInfo.getTradingId());
+        }
 
         if (refundRequests.size() == 0) { // 若不存在RefundRequest，则新增， 更新退款申请金额
             logger.info("Save RefundRequest.");
             setRefundAmt(refundAmt, refundInfo, payment); // 设置退款金额
             refundPository.saveFastRefundrequest(payment, bussinessorder, refundInfo);
+
             refundRequests = refundPository.getRefundReqestByTraceId(refundInfo.getTraceId());
         } else { // 已存在， 幂等， 返回成功
             logger.info("RefundRequest already exists. RefundBatchNo:{}",

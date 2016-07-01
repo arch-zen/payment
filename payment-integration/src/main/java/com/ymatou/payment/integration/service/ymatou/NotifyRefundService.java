@@ -53,6 +53,7 @@ public class NotifyRefundService implements InitializingBean {
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("PaymentId", paymentId));
         params.add(new BasicNameValuePair("TraceId", traceId));
+
         HttpClientUtil.sendPost(integrationConfig.getYmtNotifyRefundUrl(header),
                 params, header, httpClient);
     }

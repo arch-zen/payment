@@ -40,11 +40,6 @@ public class AccountingService {
     @Autowired
     private AccountService accountService;
 
-    public static final String ACCOUNTING_SUCCESS = "0"; // 成功
-    public static final String ACCOUNTING_IDEMPOTENTE = "4"; // 幂等
-    public static final String AccountingCode_SYSTEMERROR = "3"; // 系统异常
-
-
     /**
      * 资金账户充值
      * 
@@ -80,7 +75,7 @@ public class AccountingService {
 
             if (isAccoutingSuccess(response)) {
                 return AccountingStatusEnum.SUCCESS;
-            } else if (AccountingCode_SYSTEMERROR.equals(response.getStatusCode())) {
+            } else if (AccountService.AccountingCode_SYSTEMERROR.equals(response.getStatusCode())) {
                 return AccountingStatusEnum.UNKNOW;
             } else {
                 return AccountingStatusEnum.FAIL;
@@ -89,7 +84,7 @@ public class AccountingService {
         } catch (Exception e) {
             logger.error("accouting when pay notify error with paymentId:" + payment.getPaymentId(), e);
             AccountingResponse response = new AccountingResponse();
-            response.setStatusCode("3");
+            response.setStatusCode(AccountService.AccountingCode_SYSTEMERROR);
             response.setMessage(e.getMessage());
 
             saveAccoutingLog(payment, bussinessOrder, response);
@@ -152,8 +147,8 @@ public class AccountingService {
      * @return
      */
     private boolean isAccoutingSuccess(AccountingResponse response) {
-        return ACCOUNTING_SUCCESS.equals(response.getStatusCode())
-                || ACCOUNTING_IDEMPOTENTE.equals(response.getStatusCode());
+        return AccountService.ACCOUNTING_SUCCESS.equals(response.getStatusCode())
+                || AccountService.ACCOUNTING_IDEMPOTENTE.equals(response.getStatusCode());
     }
 
     /**

@@ -47,6 +47,7 @@ public class NotifyUserService implements InitializingBean {
         params.add(new BasicNameValuePair("BuyerId", request.getBuyerId()));
         params.add(new BasicNameValuePair("IsShangouOrder", String.valueOf(request.isIsShangouOrder())));
         params.add(new BasicNameValuePair("OrderId", request.getOrderId()));
+
         HttpClientUtil.sendPost(integrationConfig.getYmtNotifytradingeventUrl(header),
                 params, header, httpClient);
     }

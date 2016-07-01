@@ -23,10 +23,10 @@ import com.ymatou.payment.domain.channel.service.acquirerefund.RefundServiceFact
 import com.ymatou.payment.domain.channel.service.refundquery.RefundQueryServiceFactory;
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
-import com.ymatou.payment.domain.refund.constants.RefundConstants;
 import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.constants.AccountOperateTypeEnum;
 import com.ymatou.payment.facade.constants.AccountTypeEnum;
+import com.ymatou.payment.facade.constants.AccountingStatusEnum;
 import com.ymatou.payment.facade.constants.ApproveStatusEnum;
 import com.ymatou.payment.facade.constants.CurrencyTypeEnum;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
@@ -111,6 +111,17 @@ public class RefundJobServiceImpl implements RefundJobService {
     @Override
     public boolean dedcutBalance(Payment payment, BussinessOrder bussinessOrder, RefundRequestPo refundRequest,
             HashMap<String, String> header) {
+
+        AccountingStatusEnum accountingStatus = dedcutBalanceOnce(payment, bussinessOrder, refundRequest, header);
+        if (AccountingStatusEnum.UNKNOW.equals(accountingStatus)) { // 发送异常重试
+            accountingStatus = dedcutBalanceOnce(payment, bussinessOrder, refundRequest, header);
+        }
+
+        return accountingStatus.equals(AccountingStatusEnum.SUCCESS);
+    }
+
+    private AccountingStatusEnum dedcutBalanceOnce(Payment payment, BussinessOrder bussinessOrder,
+            RefundRequestPo refundRequest, HashMap<String, String> header) {
         AccountingRequest request = generateRequest(refundRequest, payment, bussinessOrder);
 
         try {
@@ -118,23 +129,31 @@ public class RefundJobServiceImpl implements RefundJobService {
             if (isAccoutingSuccess(response)) {
                 logger.info("accouting success. StatusCode:{}", response.getStatusCode());
                 saveAccoutingLog(payment, bussinessOrder, refundRequest, response);
-                return true;
+
+                return AccountingStatusEnum.SUCCESS;
             } else {
                 logger.info("accounting failed. StatusCode:{}, Message:{}", response.getStatusCode(),
                         response.getMessage());
                 saveAccoutingLog(payment, bussinessOrder, refundRequest, response);
-                return false;
+
+                if (AccountService.AccountingCode_SYSTEMERROR.equals(response.getStatusCode())) {
+                    return AccountingStatusEnum.UNKNOW;
+                } else {
+                    return AccountingStatusEnum.FAIL;
+                }
             }
         } catch (IOException e) {
             saveAccoutingLog(payment, bussinessOrder, refundRequest, e);
-            logger.info("accouting error.", e); // 扣款异常只影响是否提交第三方扣款， 不影响返回给交易的应答
+            logger.error("accouting error.", e); // 扣款异常只影响是否提交第三方扣款， 不影响返回给交易的应答
+
+            return AccountingStatusEnum.UNKNOW;
         }
-        return false;
+
     }
 
     private boolean isAccoutingSuccess(AccountingResponse response) {
-        return RefundConstants.ACCOUNTING_SUCCESS.equals(response.getStatusCode())
-                || RefundConstants.ACCOUNTING_IDEMPOTENTE.equals(response.getStatusCode());
+        return AccountService.ACCOUNTING_SUCCESS.equals(response.getStatusCode())
+                || AccountService.ACCOUNTING_IDEMPOTENTE.equals(response.getStatusCode());
     }
 
     /*
@@ -149,7 +168,7 @@ public class RefundJobServiceImpl implements RefundJobService {
         log.setStatus(0); // 成功为1，失败为0
         log.setUserId((long) bussinessOrder.getUserId().intValue());
         log.setBizNo(String.valueOf(refundRequest.getRefundId()));
-        log.setRespCode("3"); // 系统异常
+        log.setRespCode(AccountService.AccountingCode_SYSTEMERROR); // 系统异常
         log.setRespMsg(e.getMessage());
         log.setMemo("快速退款");
         accountingLogMapper.insertSelective(log);

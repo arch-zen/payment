@@ -68,17 +68,13 @@ public class SingleTradeQueryService implements InitializingBean {
     public SingleTradeQueryResponse doService(QuerySingleTradeRequest req, HashMap<String, String> header)
             throws Exception {
         String url = integrationConfig.getAliPayBaseUrl(header);
-        try {
-            String respXmlStr = HttpClientUtil.sendPost(url, getRequestBody(req), header, httpClient);
-            SingleTradeQueryResponse response = generateResponseData(respXmlStr);
 
-            logger.info("singleTradeQueryResponse: " + JSON.toJSONString(response));
-            response.setResponseOriginString(respXmlStr);
-            return response;
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw e;
-        }
+        String respXmlStr = HttpClientUtil.sendPost(url, getRequestBody(req), header, httpClient);
+        SingleTradeQueryResponse response = generateResponseData(respXmlStr);
+
+        logger.info("singleTradeQueryResponse: " + JSON.toJSONString(response));
+        response.setResponseOriginString(respXmlStr);
+        return response;
     }
 
     private List<NameValuePair> getRequestBody(QuerySingleTradeRequest req) {

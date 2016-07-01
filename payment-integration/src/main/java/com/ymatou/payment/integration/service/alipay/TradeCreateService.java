@@ -61,18 +61,12 @@ public class TradeCreateService implements InitializingBean {
     public CreateTradeResponse doService(CreateTradeRequest request, HashMap<String, String> header) throws Exception {
         String url = integrationConfig.getAliPayWapUrl(header);
 
-        try {
-            List<NameValuePair> requestEntity = generateRequest(request);
+        List<NameValuePair> requestEntity = generateRequest(request);
+        String respStr = HttpClientUtil.sendPost(url, requestEntity, header, httpClient);
 
-            String respStr = HttpClientUtil.sendPost(url, requestEntity, header, httpClient);
-
-            CreateTradeResponse response = generateResponse(respStr);
-            logger.info("trade create response: {}", JSONObject.toJSONString(response));
-            return response;
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw e;
-        }
+        CreateTradeResponse response = generateResponse(respStr);
+        logger.info("trade create response: {}", JSONObject.toJSONString(response));
+        return response;
     }
 
 
