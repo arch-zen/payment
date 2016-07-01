@@ -21,6 +21,7 @@ import com.ymatou.payment.domain.pay.repository.PaymentRepository;
 import com.ymatou.payment.domain.refund.DomainConfig;
 import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.constants.OrderStatusEnum;
+import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.facade.model.AcquireRefundDetail;
@@ -70,7 +71,7 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
 
                 // 根据bussinessorderid找到支付单Payment
                 Payment payment = paymentRepository.getPaymentCanRefund(bussinessOrder.getBussinessOrderId(),
-                        OrderStatusEnum.Paied.getIndex());
+                        PayStatusEnum.Paied.getIndex());
                 logger.info(payment.toString());
 
                 // 组装可退款交易信息
@@ -106,10 +107,9 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
 
         logger.info("generate RefundRequest list");
         for (TradeRefundDetail tradeRefundDetail : tradeRefundDetails) {
-            // 根据RequestId及TradeNo查找RefundRequest， 保证幂等
+            // TradeNo查找RefundRequest， 保证幂等
             List<RefundRequestPo> refundRequests =
-                    refundPository.getRefundReqestByTraceIdAndTradeNo(req.getRequestId(),
-                            tradeRefundDetail.getTradeNo());
+                    refundPository.getRefundRequestByTradeNo(tradeRefundDetail.getTradeNo());
 
             // 组装AcquireRefundDetail，可被退款的交易(接口的返回参数)
             AcquireRefundDetail acquireRefundDetail = new AcquireRefundDetail();

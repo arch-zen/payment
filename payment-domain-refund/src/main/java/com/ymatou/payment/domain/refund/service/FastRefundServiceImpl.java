@@ -43,14 +43,13 @@ public class FastRefundServiceImpl implements FastRefundService {
             Refund refundInfo) {
         // 根据RequestNo及TradeNo查找RefundRequest， 保证幂等
         List<RefundRequestPo> refundRequests =
-                refundPository.getRefundReqestByTraceIdAndTradeNo(refundInfo.getTraceId(), refundInfo.getTradingId());
+                refundPository.getRefundReqestByTraceId(refundInfo.getTraceId());
 
         if (refundRequests.size() == 0) { // 若不存在RefundRequest，则新增， 更新退款申请金额
             logger.info("Save RefundRequest.");
             setRefundAmt(refundAmt, refundInfo, payment); // 设置退款金额
             refundPository.saveFastRefundrequest(payment, bussinessorder, refundInfo);
-            refundRequests = refundPository.getRefundReqestByTraceIdAndTradeNo(refundInfo.getTraceId(),
-                    refundInfo.getTradingId());
+            refundRequests = refundPository.getRefundReqestByTraceId(refundInfo.getTraceId());
         } else { // 已存在， 幂等， 返回成功
             logger.info("RefundRequest already exists. RefundBatchNo:{}",
                     refundRequests.get(0).getRefundBatchNo());

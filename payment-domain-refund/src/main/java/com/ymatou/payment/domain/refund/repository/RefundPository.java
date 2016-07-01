@@ -106,9 +106,9 @@ public class RefundPository {
      * @param paymentId
      * @return
      */
-    public RefundRequestPo getRefundRequestByRefundNo(String refundNo) {
+    public RefundRequestPo getRefundRequestByRefundBatchNo(String refundBatchNo) {
         RefundRequestExample example = new RefundRequestExample();
-        example.createCriteria().andRefundBatchNoEqualTo(refundNo);
+        example.createCriteria().andRefundBatchNoEqualTo(refundBatchNo);
         List<RefundRequestPo> result = refundRequestMapper.selectByExample(example);
         if (result != null && result.size() > 0) {
             return result.get(0); // 有唯一约束
@@ -245,9 +245,9 @@ public class RefundPository {
         refundRequestMapper.updateByExampleSelective(refundRequestPo, example);
     }
 
-    public List<RefundRequestPo> getRefundReqestByTraceIdAndTradeNo(String traceId, String tradeNo) {
+    public List<RefundRequestPo> getRefundReqestByTraceId(String traceId) {
         RefundRequestExample example = new RefundRequestExample();
-        example.createCriteria().andTraceIdEqualTo(traceId).andTradeNoEqualTo(tradeNo);
+        example.createCriteria().andTraceIdEqualTo(traceId);
 
         return refundRequestMapper.selectByExample(example);
     }
@@ -272,5 +272,11 @@ public class RefundPository {
         example.createCriteria().andRefundIdEqualTo(refundId);
 
         refundRequestMapper.updateByExampleSelective(refundRequest, example);
+    }
+
+    public List<RefundRequestPo> getRefundRequestByTradeNo(String tradeNo) {
+        RefundRequestExample example = new RefundRequestExample();
+        example.createCriteria().andTradeNoEqualTo(tradeNo);
+        return refundRequestMapper.selectByExample(example);
     }
 }
