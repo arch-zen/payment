@@ -56,7 +56,8 @@ public class WeixinRefundServiceImpl implements AcquireRefundService {
     private RefundMiscRequestLogMapper refundMiscRequestLogMapper;
 
     @Override
-    public void notifyRefund(RefundRequestPo refundRequest, Payment payment, HashMap<String, String> header) {
+    public RefundStatusEnum notifyRefund(RefundRequestPo refundRequest, Payment payment,
+            HashMap<String, String> header) {
 
         InstitutionConfig config = configManager.getConfig(PayTypeEnum.parse(refundRequest.getPayType()));
         Date requestTime = new Date();
@@ -80,7 +81,7 @@ public class WeixinRefundServiceImpl implements AcquireRefundService {
             RefundStatusEnum refundStatus =
                     isSuccess(response, config) ? RefundStatusEnum.COMMIT : RefundStatusEnum.REFUND_FAILED;
             updateRefundRequestStatus(refundRequest, refundStatus);
-
+            return refundStatus;
         } catch (Exception e) {
             logger.error("call WeiXin Refund fail. RefundBatchNo: " + refundRequest.getRefundBatchNo(), e);
 
@@ -94,6 +95,7 @@ public class WeixinRefundServiceImpl implements AcquireRefundService {
             refundMiscRequestLogMapper.insertSelective(requestLog);
 
             updateRefundRequestStatus(refundRequest, RefundStatusEnum.REFUND_FAILED);
+            return RefundStatusEnum.REFUND_FAILED;
         }
     }
 

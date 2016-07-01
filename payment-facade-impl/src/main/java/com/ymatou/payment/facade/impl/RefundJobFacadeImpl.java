@@ -74,7 +74,8 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
 
             if (accountingSuccess) {
                 logger.info("Step 3: submit third party refund.");
-                refundJobService.submitRefund(refundRequest, payment, header);
+                RefundStatusEnum refundStatus = refundJobService.submitRefund(refundRequest, payment, header);
+                refundStatusFlag = refundStatus.getCode();
             }
 
         } else {// 查询退款结果
@@ -89,11 +90,11 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
             }
 
             if (RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) {
-                logger.info("Step 5: callback trading system.");
+                logger.info("Step 6: callback trading system.");
                 boolean isSuccess = refundJobService.callbackTradingSystem(refundRequest, payment, header);
 
                 if (isSuccess) {
-                    logger.info("Step 6: update refundrequest to completed suceess.");
+                    logger.info("Step 7: update refundrequest to completed suceess.");
                     refundJobService.updateRefundRequestToCompletedSuccess(refundRequest);
                     refundStatusFlag = RefundStatusEnum.COMPLETE_SUCCESS.getCode();
                 }

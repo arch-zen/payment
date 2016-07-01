@@ -62,7 +62,7 @@ public class FastRefundServiceImpl implements FastRefundService {
         // 判断，设置退款金额
         BigDecimal requestedRefundAmt =
                 payment.getRefundAmt() == null ? BigDecimal.ZERO : payment.getRefundAmt();
-        if (refundAmt == null || refundAmt.compareTo(BigDecimal.ZERO) <= 0) {
+        if (refundAmt == null) {
             if (requestedRefundAmt.compareTo(BigDecimal.ZERO) > 0) { // 未输入退款申请金额，默认全额退款
                 throw new BizException(ErrorCode.FAIL, "refund amt limit.");
             } else {

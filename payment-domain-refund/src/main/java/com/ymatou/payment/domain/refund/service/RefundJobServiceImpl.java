@@ -86,7 +86,8 @@ public class RefundJobServiceImpl implements RefundJobService {
     }
 
     @Override
-    public void submitRefund(RefundRequestPo refundRequest, Payment payment, HashMap<String, String> header) {
+    public RefundStatusEnum submitRefund(RefundRequestPo refundRequest, Payment payment,
+            HashMap<String, String> header) {
         String refundBatchNo = StringUtils.isBlank(refundRequest.getRefundBatchNo())
                 ? refundPository.generateRefundBatchNo() : refundRequest.getRefundBatchNo();
         refundRequest.setRefundBatchNo(refundBatchNo);
@@ -94,7 +95,7 @@ public class RefundJobServiceImpl implements RefundJobService {
 
         PayTypeEnum payType = payment.getPayType();
         AcquireRefundService refundService = refundServiceFactory.getInstanceByPayType(payType);
-        refundService.notifyRefund(refundRequest, payment, header);
+        return refundService.notifyRefund(refundRequest, payment, header);
     }
 
     @Override

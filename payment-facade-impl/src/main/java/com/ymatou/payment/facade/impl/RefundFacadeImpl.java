@@ -108,15 +108,11 @@ public class RefundFacadeImpl implements RefundFacade {
 
         // query and verify bussinessorder
         BussinessOrder bussinessOrder = payService.getBussinessOrderById(payment.getBussinessOrderId());
-        if (bussinessOrder == null) {
-            throw new BizException(ErrorCode.NOT_EXIST_BUSINESS_ORDER_ID, "businessOrderId not exist");
-        }
-        logger.info("BussinessOrder result: {}", bussinessOrder);
-
+        
         if (!req.getTradingId().equals(bussinessOrder.getOrderId())) {
             throw new BizException(ErrorCode.FAIL, "inconsistent paymentId and tradingId");
         }
-        if (payment.getPayStatus() != PayStatusEnum.Paied) {
+        if (PayStatusEnum.Init.equals(payment.getPayStatus())) {
             throw new BizException(ErrorCode.INVALID_PAYMENT_STATUS, "invalid payment status");
         }
 

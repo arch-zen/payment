@@ -46,7 +46,8 @@ public interface RefundJobService {
      * 
      * @param refundRequest
      */
-    public void submitRefund(RefundRequestPo refundRequest, Payment payment, HashMap<String, String> header);
+    public RefundStatusEnum submitRefund(RefundRequestPo refundRequest, Payment payment,
+            HashMap<String, String> header);
 
     /**
      * 查询第三方退款并做处理
