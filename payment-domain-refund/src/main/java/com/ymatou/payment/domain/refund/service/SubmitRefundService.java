@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.ymatou.payment.facade.model.AcquireRefundDetail;
 import com.ymatou.payment.facade.model.AcquireRefundRequest;
+import com.ymatou.payment.facade.model.TradeDetail;
 import com.ymatou.payment.facade.model.TradeRefundDetail;
 
 /**
@@ -16,6 +17,14 @@ import com.ymatou.payment.facade.model.TradeRefundDetail;
  * 
  */
 public interface SubmitRefundService {
+
+    /**
+     * 获取交易号， 判断交易号是否重复
+     * 
+     * @param tradeDetails
+     * @return
+     */
+    public List<String> generateTradeNos(List<TradeDetail> tradeDetails);
 
     /**
      * 获取可以退款的交易

@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import com.ymatou.payment.facade.BaseRequest;
 
@@ -23,19 +25,23 @@ public class AcquireRefundRequest extends BaseRequest {
     /**
      * 订单号
      */
+    @NotBlank(message = "orderId is empty")
     private String orderId;
     /**
      * 交易信息
      */
+    @NotEmpty(message = "tradeDetails is empty")
     private List<TradeDetail> tradeDetails;
     /**
      * 应用编号
      */
+    @NotBlank(message = "appId is empty")
     private String appId;
     /**
      * 跟踪Id
      */
     @Length(min = 1, max = 32, message = "traceid not valid")
+    @NotBlank(message = "traceId is empty")
     private String traceId;
     /**
      * 签名
