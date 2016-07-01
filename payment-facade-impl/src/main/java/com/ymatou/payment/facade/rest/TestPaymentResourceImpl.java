@@ -48,7 +48,7 @@ public class TestPaymentResourceImpl implements TestPaymentResource {
         buildBaseRequest(req);
 
         req.setPayType("10");
-        req.setPayPrice("0.01");
+        req.setPayPrice("0.02");
 
         AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
 
@@ -63,7 +63,7 @@ public class TestPaymentResourceImpl implements TestPaymentResource {
         buildBaseRequest(req);
 
         req.setPayType("11");
-        req.setPayPrice("0.01");
+        req.setPayPrice("0.02");
 
         AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
 
