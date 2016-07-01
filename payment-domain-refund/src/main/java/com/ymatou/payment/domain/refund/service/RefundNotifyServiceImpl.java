@@ -81,7 +81,7 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
             for (RefundMiscRequestLogWithBLOBs rmrl : list) {
                 // 重新查询退款结果
                 String refundBatchNo = rmrl.getRefundBatchNo();
-                RefundRequestPo refundRequest = refundPository.getRefundRequestByRefundNo(refundBatchNo);
+                RefundRequestPo refundRequest = refundPository.getRefundRequestByRefundBatchNo(refundBatchNo);
                 Payment payment = payService.getPaymentByPaymentId(refundRequest.getPaymentId());
 
                 RefundStatusEnum refundStatus =
@@ -104,7 +104,7 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
         List<RefundMiscRequestLogWithBLOBs> refundmiscrequestlogWithBLOBs = new ArrayList<>();
 
         // 根据refundBatchNo获取RefundRequest
-        RefundRequestPo refundrequest = refundPository.getRefundRequestByRefundNo(req.getBatchNo());
+        RefundRequestPo refundrequest = refundPository.getRefundRequestByRefundBatchNo(req.getBatchNo());
 
         if (refundrequest.getRefundStatus() == RefundStatusEnum.COMPLETE_SUCCESS.getCode()
                 || refundrequest.getRefundStatus() == RefundStatusEnum.RETURN_TRANSACTION.getCode()) { // 已退款成功的，忽略

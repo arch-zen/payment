@@ -135,20 +135,20 @@ public class RefundResourceImpTest extends RestBaseTest {
 
         Assert.assertEquals("ok", sysApproveRefund);
 
-        RefundRequestPo refundResult1 = refundPository.getRefundRequestByRefundNo(refund1.getRefundBatchNo());
+        RefundRequestPo refundResult1 = refundPository.getRefundRequestByRefundBatchNo(refund1.getRefundBatchNo());
 
         Assert.assertEquals(1, refundResult1.getApproveStatus().intValue());
         Assert.assertEquals("system", refundResult1.getApprovedUser());
         Assert.assertNotNull(refundResult1.getApprovedTime());
 
 
-        RefundRequestPo refundResult2 = refundPository.getRefundRequestByRefundNo(refund2.getRefundBatchNo());
+        RefundRequestPo refundResult2 = refundPository.getRefundRequestByRefundBatchNo(refund2.getRefundBatchNo());
 
         Assert.assertEquals(1, refundResult2.getApproveStatus().intValue());
         Assert.assertEquals("system", refundResult2.getApprovedUser());
         Assert.assertNotNull(refundResult2.getApprovedTime());
 
-        RefundRequestPo refundResult3 = refundPository.getRefundRequestByRefundNo(refund3.getRefundBatchNo());
+        RefundRequestPo refundResult3 = refundPository.getRefundRequestByRefundBatchNo(refund3.getRefundBatchNo());
 
         Assert.assertEquals(0, refundResult3.getApproveStatus().intValue());
         Assert.assertNull(refundResult3.getApprovedUser());
@@ -171,7 +171,7 @@ public class RefundResourceImpTest extends RestBaseTest {
 
         Assert.assertEquals("ok", sysApproveRefund);
 
-        RefundRequestPo refundResult1 = refundPository.getRefundRequestByRefundNo(refund1.getRefundBatchNo());
+        RefundRequestPo refundResult1 = refundPository.getRefundRequestByRefundBatchNo(refund1.getRefundBatchNo());
 
         Assert.assertEquals(0, refundResult1.getApproveStatus().intValue());
         Assert.assertNull(refundResult1.getApprovedUser());
@@ -184,7 +184,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         sysApproveRefund = refundResource.sysApproveRefund(req, null);
         Assert.assertEquals("ok", sysApproveRefund);
 
-        refundResult1 = refundPository.getRefundRequestByRefundNo(refund1.getRefundBatchNo());
+        refundResult1 = refundPository.getRefundRequestByRefundBatchNo(refund1.getRefundBatchNo());
         Assert.assertEquals(1, refundResult1.getApproveStatus().intValue());
         Assert.assertEquals("system", refundResult1.getApprovedUser());
         Assert.assertNotNull(refundResult1.getApprovedTime());
@@ -211,7 +211,7 @@ public class RefundResourceImpTest extends RestBaseTest {
 
         Assert.assertNotEquals("ok", sysApproveRefund);
 
-        RefundRequestPo refundResult1 = refundPository.getRefundRequestByRefundNo(refund1.getRefundBatchNo());
+        RefundRequestPo refundResult1 = refundPository.getRefundRequestByRefundBatchNo(refund1.getRefundBatchNo());
         Assert.assertEquals(0, refundResult1.getApproveStatus().intValue());
         Assert.assertNull(refundResult1.getApprovedUser());
         Assert.assertNull(refundResult1.getApprovedTime());
@@ -221,7 +221,7 @@ public class RefundResourceImpTest extends RestBaseTest {
         setRefundMaxNum(Calendar.getInstance().get(Calendar.HOUR_OF_DAY), 200);
         sysApproveRefund = refundResource.sysApproveRefund(req, null);
 
-        refundResult1 = refundPository.getRefundRequestByRefundNo(refund1.getRefundBatchNo());
+        refundResult1 = refundPository.getRefundRequestByRefundBatchNo(refund1.getRefundBatchNo());
         Assert.assertEquals(1, refundResult1.getApproveStatus().intValue());
         Assert.assertEquals("system", refundResult1.getApprovedUser());
         Assert.assertNotNull(refundResult1.getApprovedTime());

@@ -159,21 +159,8 @@ public class RefundFacadeImpl implements RefundFacade {
 
     @Override
     public AcquireRefundResponse submitRefund(AcquireRefundRequest req) {
-        if (StringUtils.isEmpty(req.getOrderId())) {
-            throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "order id is empty.");
-        }
-
-
-
-        // 获取退款的相关的交易信息
         List<TradeDetail> tradeDetails = req.getTradeDetails();
-        if (tradeDetails == null || tradeDetails.size() == 0)
-            throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "TradeDetail值不能为 null");
-
-        List<String> tradeNos = new ArrayList<>();
-        for (TradeDetail tradeDetail : tradeDetails) {
-            tradeNos.add(tradeDetail.getTradeNo());
-        }
+        List<String> tradeNos = submitRefundService.generateTradeNos(tradeDetails);
         List<TradeRefundDetail> tradeRefundDetails = submitRefundService.generateTradeRefundDetailList(tradeNos);
 
         // 筛选出可退款的交易信息

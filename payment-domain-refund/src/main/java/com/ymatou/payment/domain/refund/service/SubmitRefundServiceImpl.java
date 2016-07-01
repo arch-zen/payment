@@ -6,7 +6,9 @@ package com.ymatou.payment.domain.refund.service;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -20,7 +22,10 @@ import com.ymatou.payment.domain.pay.repository.BussinessOrderRepository;
 import com.ymatou.payment.domain.pay.repository.PaymentRepository;
 import com.ymatou.payment.domain.refund.DomainConfig;
 import com.ymatou.payment.domain.refund.repository.RefundPository;
+import com.ymatou.payment.facade.BizException;
+import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.OrderStatusEnum;
+import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.facade.model.AcquireRefundDetail;
@@ -70,7 +75,7 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
 
                 // 根据bussinessorderid找到支付单Payment
                 Payment payment = paymentRepository.getPaymentCanRefund(bussinessOrder.getBussinessOrderId(),
-                        OrderStatusEnum.Paied.getIndex());
+                        PayStatusEnum.Paied.getIndex());
                 logger.info(payment.toString());
 
                 // 组装可退款交易信息
@@ -106,10 +111,9 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
 
         logger.info("generate RefundRequest list");
         for (TradeRefundDetail tradeRefundDetail : tradeRefundDetails) {
-            // 根据RequestId及TradeNo查找RefundRequest， 保证幂等
+            // TradeNo查找RefundRequest， 保证幂等
             List<RefundRequestPo> refundRequests =
-                    refundPository.getRefundReqestByTraceIdAndTradeNo(req.getRequestId(),
-                            tradeRefundDetail.getTradeNo());
+                    refundPository.getRefundRequestByTradeNo(tradeRefundDetail.getTradeNo());
 
             // 组装AcquireRefundDetail，可被退款的交易(接口的返回参数)
             AcquireRefundDetail acquireRefundDetail = new AcquireRefundDetail();
@@ -148,5 +152,24 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
         refundPository.batchSaveRefundRequestAndUpdateRefundAmt(refundrequestWithBLOBs); // 插入RefundRequest
 
         return acquireRefundDetails;
+    }
+
+    @Override
+    public List<String> generateTradeNos(List<TradeDetail> tradeDetails) {
+        // 获取退款的相关的交易信息
+        if (tradeDetails == null || tradeDetails.size() == 0)
+            throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "TradeDetail值不能为 null");
+
+        List<String> tradeNos = new ArrayList<>();
+        Set<String> tradeNoSet = new HashSet<>();
+        for (TradeDetail tradeDetail : tradeDetails) {
+            tradeNos.add(tradeDetail.getTradeNo());
+            tradeNoSet.add(tradeDetail.getTradeNo());
+        }
+        if (tradeNos.size() != tradeNoSet.size()) {
+            throw new BizException(ErrorCode.FAIL, "duplicate trade");
+        }
+
+        return tradeNos;
     }
 }

@@ -61,9 +61,9 @@ public class AcquireRefundServiceImpl implements AcquireRefundService {
 
             // 根据BusinessOrderId找到支付单Payment
             Payment payment = paymentRepository.getPaymentCanPartRefund(bussinessOrder.getBussinessOrderId());
-            // 根据RequestNo及TradeNo查找RefundRequest， 保证幂等
+            // 根据RequestNo查找RefundRequest， 保证幂等
             List<RefundRequestPo> refundRequests =
-                    refundPository.getRefundReqestByTraceIdAndTradeNo(req.getRefundNo(), req.getTradeNo());
+                    refundPository.getRefundReqestByTraceId(req.getRefundNo());
 
             if (refundRequests.size() == 0) { // 若不存在RefundRequest，则新增
 
