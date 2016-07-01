@@ -18,6 +18,7 @@ import com.ymatou.payment.domain.pay.service.PayService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.PaymentFacade;
+import com.ymatou.payment.facade.constants.BizCodeEnum;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.PaymentNotifyStatusEnum;
@@ -97,8 +98,12 @@ public class PaymentFacadeImpl implements PaymentFacade {
         if (instConfig == null)
             throw new BizException(ErrorCode.INVALID_PAY_TYPE, req.getPayType());
 
-        BussinessOrder bussinessOrder = payService.getBussinessOrderByOrderId(req.getOrderId());
+        BizCodeEnum bizCodeEnum = BizCodeEnum.parse(req.getBizCode());
+        if (bizCodeEnum == null) {
+            throw new BizException(ErrorCode.ILLEGAL_ARGUMENT, "无效的BizCode:" + req.getBizCode());
+        }
 
+        BussinessOrder bussinessOrder = payService.getBussinessOrderByOrderId(req.getOrderId());
         if (bussinessOrder != null) {
             throw new BizException(ErrorCode.FAIL, "OrderId已经创建过支付单");
         }

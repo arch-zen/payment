@@ -309,6 +309,21 @@ public class PaymentResourceImplTest extends RestBaseTest {
     }
 
     @Test
+    public void executePayNotifyTest5() {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+        req.setBizCode(2);
+        req.setPayType("10");
+        req.setPayPrice("1.01");
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        assertEquals("验证返回码", 1000, res.getErrorCode());
+    }
+
+
+    @Test
     public void executePayNotifyTest2() {
         AcquireOrderReq req = new AcquireOrderReq();
         buildBaseRequest(req);
