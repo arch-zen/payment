@@ -81,6 +81,11 @@ public class PaymentCallbackRequest {
      */
     private String sign;
 
+    /**
+     * 接口版本
+     */
+    private Integer Version;
+
     public String getAppId() {
         return appId;
     }
@@ -213,5 +218,19 @@ public class PaymentCallbackRequest {
      */
     public void setSign(String sign) {
         this.sign = sign;
+    }
+
+    /**
+     * @return the version
+     */
+    public Integer getVersion() {
+        return Version;
+    }
+
+    /**
+     * @param version the version to set
+     */
+    public void setVersion(Integer version) {
+        Version = version;
     }
 }

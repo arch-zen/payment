@@ -81,6 +81,7 @@ public class PaymentNotifyService {
     private PaymentCallbackRequest buildRequest(Payment payment, BussinessOrder bussinessOrder) {
         PaymentCallbackRequest request = new PaymentCallbackRequest();
         request.setAppId("2");
+        request.setVersion(1);
         request.setBizCode(bussinessOrder.getBizCode().code().toString());
         request.setCurrency(payment.getPayCurrencyType());
         request.setMemo(bussinessOrder.getMemo());
@@ -145,7 +146,7 @@ public class PaymentNotifyService {
      */
     private String sign(PaymentCallbackRequest req) {
         HashMap<String, String> map = new HashMap<String, String>();
-        map.put("Version", "1");
+        map.put("Version", req.getVersion().toString());
         map.put("AppId", req.getAppId());
         map.put("BizCode", req.getBizCode());
         map.put("Currency", req.getCurrency());
