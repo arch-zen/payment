@@ -6,6 +6,7 @@ package com.ymatou.payment.domain.channel.service.acquirerefund;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,7 +117,7 @@ public class WeixinRefundServiceImpl implements AcquireRefundService {
         request.setAppid(config.getAppId());
         request.setMch_id(config.getMerchantId());
         request.setDevice_info("");
-        request.setNonce_str("");
+        request.setNonce_str(RandomStringUtils.randomAlphabetic(16));
         request.setOut_trade_no(refundRequest.getPaymentId());
         // request.setTransaction_id("");
         request.setOut_refund_no(refundRequest.getRefundBatchNo());

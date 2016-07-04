@@ -91,7 +91,7 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
             logger.error("call AliPay Refund fail. RefundBatchNo: " + refundRequest.getRefundBatchNo(), e);
 
             RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
-            requestLog.setCorrelateId(refundRequest.getPaymentId());
+            requestLog.setCorrelateId(refundRequest.getRefundBatchNo());
             requestLog.setMethod("AliRefund");
             requestLog.setRequestData(aliPayRefundRequest.getRequestData());
             requestLog.setExceptionDetail(e.toString());
