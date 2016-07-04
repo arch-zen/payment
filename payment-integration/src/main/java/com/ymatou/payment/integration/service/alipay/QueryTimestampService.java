@@ -62,17 +62,11 @@ public class QueryTimestampService implements InitializingBean {
         String url = new StringBuilder(100).append(integrationConfig.getAliPayBaseUrl(header))
                 .append("?service=").append(service).append("&partner=").append(partner).toString();
 
-        try {
-            String respXmlStr = HttpClientUtil.sendGet(url, header, httpClient);
-            QueryTimestampResponse response = generateResponseData(respXmlStr);
-            logger.info("queryTimestampResponse: " + JSON.toJSONString(response));
+        String respXmlStr = HttpClientUtil.sendGet(url, header, httpClient);
+        QueryTimestampResponse response = generateResponseData(respXmlStr);
+        logger.info("queryTimestampResponse: " + JSON.toJSONString(response));
 
-            return response;
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw e;
-        }
-
+        return response;
     }
 
     private QueryTimestampResponse generateResponseData(String respXmlStr) throws DocumentException {

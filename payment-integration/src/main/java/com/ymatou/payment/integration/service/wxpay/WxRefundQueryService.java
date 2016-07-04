@@ -64,22 +64,17 @@ public class WxRefundQueryService implements InitializingBean {
      */
     public QueryRefundResponse doService(QueryRefundRequest request, HashMap<String, String> header)
             throws Exception {
-        try {
-            // 根据mchId获取不同的加签盐值和httpClient(不同商户证书及密码不同)
-            String respXmlStr = HttpClientUtil.sendPost(integrationConfig.getWxRefundQueryUrl(header),
-                    getPostDataXml(request), Constants.CONTENT_TYPE_XML, header, httpClient);
+        // 根据mchId获取不同的加签盐值和httpClient(不同商户证书及密码不同)
+        String respXmlStr = HttpClientUtil.sendPost(integrationConfig.getWxRefundQueryUrl(header),
+                getPostDataXml(request), Constants.CONTENT_TYPE_XML, header, httpClient);
 
-            if (!StringUtils.isEmpty(respXmlStr) && respXmlStr.startsWith(Constants.WEIXIN_RESPONSE_BODY_START)) {
-                Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);
-                QueryRefundResponse response = generateResponseData(respMap);
-                response.setOriginalResponse(respXmlStr);
-                return response;
-            }
-            return null;
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw e;
+        if (!StringUtils.isEmpty(respXmlStr) && respXmlStr.startsWith(Constants.WEIXIN_RESPONSE_BODY_START)) {
+            Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);
+            QueryRefundResponse response = generateResponseData(respMap);
+            response.setOriginalResponse(respXmlStr);
+            return response;
         }
+        return null;
     }
 
     private QueryRefundResponse generateResponseData(Map<String, Object> responseMap) {

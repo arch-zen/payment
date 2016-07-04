@@ -46,4 +46,6 @@ public class AccountingResponse {
     public void setStatusCode(String statusCode) {
         this.statusCode = statusCode;
     }
+
+
 }

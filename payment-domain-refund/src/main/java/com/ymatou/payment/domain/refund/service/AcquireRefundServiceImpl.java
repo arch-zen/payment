@@ -58,13 +58,10 @@ public class AcquireRefundServiceImpl implements AcquireRefundService {
         BussinessOrder bussinessOrder = bussinessOrderRepository.getBussinessOrderCanRefund(
                 req.getTradeNo(), OrderStatusEnum.Paied.getIndex(), Date.valueOf(validDate));
         if (bussinessOrder != null) {
-
-            // 根据BusinessOrderId找到支付单Payment
             Payment payment = paymentRepository.getPaymentCanPartRefund(bussinessOrder.getBussinessOrderId());
-            // 根据RequestNo查找RefundRequest， 保证幂等
-            List<RefundRequestPo> refundRequests =
-                    refundPository.getRefundReqestByTraceId(req.getRefundNo());
 
+            // 根据RequestNo查找RefundRequest， 保证幂等
+            List<RefundRequestPo> refundRequests = refundPository.getRefundReqestByTraceId(req.getRefundNo());
             if (refundRequests.size() == 0) { // 若不存在RefundRequest，则新增
 
                 BigDecimal paymentRefundAmt = payment.getRefundAmt() == null ? BigDecimal.ZERO : payment.getRefundAmt();
@@ -84,8 +81,7 @@ public class AcquireRefundServiceImpl implements AcquireRefundService {
                     // refundrequest.setRefundBatchNo(refundPository.generateRefundBatchNo());
 
                     // 新增退款申请， 更新退款申请金额
-                    logger.info("Save RefundRequest and update RefundAmt. RefundBatchNo:{}",
-                            refundrequest.getRefundBatchNo());
+                    logger.info("Save RefundRequest and update RefundAmt. RefundNo:{}", refundrequest.getTraceId());
                     refundPository.saveRefundRequestAndUpdateRefundAmt(refundrequest, payment);
                     return true;
                 } else {
@@ -93,8 +89,7 @@ public class AcquireRefundServiceImpl implements AcquireRefundService {
                 }
 
             } else { // 已存在， 幂等， 返回成功
-                logger.info("RefundRequest already exists. RefundBatchNo:{}",
-                        refundRequests.get(0).getRefundBatchNo());
+                logger.info("RefundRequest already exists. RefundNo:{}", refundRequests.get(0).getTraceId());
                 return true;
             }
 

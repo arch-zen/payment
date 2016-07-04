@@ -62,20 +62,15 @@ public class OrderQueryService implements InitializingBean {
      */
     public QueryOrderResponse doService(QueryOrderRequest request, HashMap<String, String> header)
             throws Exception {
-        try {
-            String respXmlStr = HttpClientUtil.sendPost(integrationConfig.getWxOrderQueryUrl(header),
-                    getPostDataXml(request), Constants.CONTENT_TYPE_XML, header, httpClient);
-            if (!StringUtils.isEmpty(respXmlStr) && respXmlStr.startsWith(Constants.WEIXIN_RESPONSE_BODY_START)) {
-                Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);
-                QueryOrderResponse response = generateResponseData(respMap);
-                response.setResponseOriginString(respXmlStr); // 返回原始应答
-                return response;
-            }
-            return null;
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw e;
+        String respXmlStr = HttpClientUtil.sendPost(integrationConfig.getWxOrderQueryUrl(header),
+                getPostDataXml(request), Constants.CONTENT_TYPE_XML, header, httpClient);
+        if (!StringUtils.isEmpty(respXmlStr) && respXmlStr.startsWith(Constants.WEIXIN_RESPONSE_BODY_START)) {
+            Map<String, Object> respMap = XmlParser.getMapFromXML(respXmlStr);
+            QueryOrderResponse response = generateResponseData(respMap);
+            response.setResponseOriginString(respXmlStr); // 返回原始应答
+            return response;
         }
+        return null;
     }
 
     private String getPostDataXml(QueryOrderRequest request) {

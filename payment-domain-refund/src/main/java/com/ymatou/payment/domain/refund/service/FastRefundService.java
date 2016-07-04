@@ -22,14 +22,15 @@ public interface FastRefundService {
     /**
      * 退款申请，发货信息落地
      * 
+     * @param isJavaSystem
      * @param refundAmt
      * @param payment
      * @param bussinessorder
      * @param refundInfo
      * @return
      */
-    public RefundRequestPo saveRefundRequest(BigDecimal refundAmt, Payment payment, BussinessOrder bussinessorder,
-            Refund refundInfo);
+    public RefundRequestPo saveRefundRequest(boolean isJavaSystem, BigDecimal refundAmt, Payment payment,
+            BussinessOrder bussinessorder, Refund refundInfo);
 
     /**
      * 发送交易信息给用户

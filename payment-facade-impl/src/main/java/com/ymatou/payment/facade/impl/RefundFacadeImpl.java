@@ -108,15 +108,11 @@ public class RefundFacadeImpl implements RefundFacade {
 
         // query and verify bussinessorder
         BussinessOrder bussinessOrder = payService.getBussinessOrderById(payment.getBussinessOrderId());
-        if (bussinessOrder == null) {
-            throw new BizException(ErrorCode.NOT_EXIST_BUSINESS_ORDER_ID, "businessOrderId not exist");
-        }
-        logger.info("BussinessOrder result: {}", bussinessOrder);
 
         if (!req.getTradingId().equals(bussinessOrder.getOrderId())) {
             throw new BizException(ErrorCode.FAIL, "inconsistent paymentId and tradingId");
         }
-        if (payment.getPayStatus() != PayStatusEnum.Paied) {
+        if (PayStatusEnum.Init.equals(payment.getPayStatus())) {
             throw new BizException(ErrorCode.INVALID_PAYMENT_STATUS, "invalid payment status");
         }
 
@@ -128,10 +124,11 @@ public class RefundFacadeImpl implements RefundFacade {
         refundInfo.setPaymentId(req.getPaymentId());
         refundInfo.setTraceId(StringUtils.isBlank(req.getTraceId())
                 ? req.getRefundNo() : req.getTraceId()); // .net,java请求参数不同
+        boolean isJavaSystem = StringUtils.isBlank(req.getTraceId());
 
         // Save RefundRequest
-        RefundRequestPo refundRequest =
-                fastRefundService.saveRefundRequest(req.getRefundAmt(), payment, bussinessOrder, refundInfo);
+        RefundRequestPo refundRequest = fastRefundService.saveRefundRequest(isJavaSystem, req.getRefundAmt(),
+                payment, bussinessOrder, refundInfo);
 
         if (!AccountingStatusEnum.SUCCESS.code().equals(refundRequest.getAccoutingStatus())) {
             // send trading message
@@ -140,7 +137,7 @@ public class RefundFacadeImpl implements RefundFacade {
                         req.getHeader());
             }
 
-            // 扣除账户码头余额
+            // dedcut user balance
             boolean accountingSuccess =
                     refundJobService.dedcutBalance(payment, bussinessOrder, refundRequest, req.getHeader());
 

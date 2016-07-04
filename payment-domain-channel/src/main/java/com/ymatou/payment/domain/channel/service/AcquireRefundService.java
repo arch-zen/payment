@@ -6,6 +6,7 @@ package com.ymatou.payment.domain.channel.service;
 import java.util.HashMap;
 
 import com.ymatou.payment.domain.pay.model.Payment;
+import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 
 /**
@@ -16,5 +17,14 @@ import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
  */
 public interface AcquireRefundService {
 
-    public void notifyRefund(RefundRequestPo refundRequest, Payment payment, HashMap<String, String> header);
+    /**
+     * 提交第三方退款
+     * 
+     * @param refundRequest
+     * @param payment
+     * @param header
+     * @return
+     */
+    public RefundStatusEnum notifyRefund(RefundRequestPo refundRequest, Payment payment,
+            HashMap<String, String> header);
 }

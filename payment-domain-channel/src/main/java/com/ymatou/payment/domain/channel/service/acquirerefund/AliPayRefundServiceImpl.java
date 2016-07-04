@@ -60,7 +60,8 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
     private IntegrationConfig integrationConfig;
 
     @Override
-    public void notifyRefund(RefundRequestPo refundRequest, Payment payment, HashMap<String, String> header) {
+    public RefundStatusEnum notifyRefund(RefundRequestPo refundRequest, Payment payment,
+            HashMap<String, String> header) {
 
         InstitutionConfig config = configManager.getConfig(PayTypeEnum.parse(refundRequest.getPayType()));
         Date requestTime = new Date();
@@ -85,7 +86,7 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
             RefundStatusEnum refundStatus =
                     isSuccess(response) ? RefundStatusEnum.COMMIT : RefundStatusEnum.REFUND_FAILED;
             updateRefundRequestStatus(refundRequest, refundStatus);
-
+            return refundStatus;
         } catch (Exception e) {
             logger.error("call AliPay Refund fail. RefundBatchNo: " + refundRequest.getRefundBatchNo(), e);
 
@@ -99,6 +100,7 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
             refundMiscRequestLogMapper.insertSelective(requestLog);
 
             updateRefundRequestStatus(refundRequest, RefundStatusEnum.REFUND_FAILED);
+            return RefundStatusEnum.REFUND_FAILED;
         }
     }
 

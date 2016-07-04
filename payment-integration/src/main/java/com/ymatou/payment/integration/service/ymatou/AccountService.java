@@ -35,6 +35,9 @@ public class AccountService implements InitializingBean {
     private static Logger logger = LoggerFactory.getLogger(AccountService.class);
 
     private CloseableHttpClient httpClient;
+    public static final String ACCOUNTING_SUCCESS = "0"; // 成功
+    public static final String ACCOUNTING_IDEMPOTENTE = "4"; // 幂等
+    public static final String AccountingCode_SYSTEMERROR = "3"; // 系统异常
 
     @Autowired
     private IntegrationConfig integrationConfig;
@@ -42,15 +45,11 @@ public class AccountService implements InitializingBean {
     public AccountingResponse accounting(AccountingRequest request, HashMap<String, String> header) throws IOException {
         String url = integrationConfig.getYmtAccountingUrl(header);
 
-        try {
-            String result = HttpClientUtil.sendPost(url, JSONObject.toJSONString(request), Constants.CONTENT_TYPE_JSON,
-                    header, httpClient);
-            AccountingResponse response = JSON.parseObject(result, AccountingResponse.class);
-            return response;
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-            throw e;
-        }
+        String result = HttpClientUtil.sendPost(url, JSONObject.toJSONString(request), Constants.CONTENT_TYPE_JSON,
+                header, httpClient);
+
+        AccountingResponse response = JSON.parseObject(result, AccountingResponse.class);
+        return response;
     }
 
     @Override
