@@ -46,7 +46,8 @@ public class RefundJobResourceImpl implements RefundJobResource {
         Integer refundResult = response.getRefundResult();
         if (refundResult == null) {
             return String.valueOf(response.getErrorCode());
-        } else if (refundResult == RefundStatusEnum.COMPLETE_SUCCESS.getCode()) {
+        } else if (refundResult == RefundStatusEnum.COMPLETE_SUCCESS.getCode()
+                || refundResult == RefundStatusEnum.COMPLETE_FAILED.getCode()) {
             return "ok";
         } else {
             return String.valueOf(response.getRefundResult());

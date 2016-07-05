@@ -84,14 +84,17 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
                 RefundRequestPo refundRequest = refundPository.getRefundRequestByRefundBatchNo(refundBatchNo);
                 Payment payment = payService.getPaymentByPaymentId(refundRequest.getPaymentId());
 
-                RefundStatusEnum refundStatus =
-                        refundJobService.queryRefund(refundRequest, payment, req.getMockHeader());
-                refundJobService.updateRefundRequestAndPayment(refundRequest, payment, refundStatus);
-                if (RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) {
-                    boolean isSuccess =
-                            refundJobService.callbackTradingSystem(refundRequest, payment, req.getMockHeader());
-                    if (isSuccess) {
-                        refundJobService.updateRefundRequestToCompletedSuccess(refundRequest);
+                if (!RefundStatusEnum.COMPLETE_SUCCESS.equals(refundRequest.getRefundStatus())
+                        && !RefundStatusEnum.COMPLETE_FAILED.equals(refundRequest.getRefundStatus())) {
+                    RefundStatusEnum refundStatus =
+                            refundJobService.queryRefund(refundRequest, payment, req.getMockHeader());
+                    refundJobService.updateRefundRequestAndPayment(refundRequest, payment, refundStatus);
+                    if (RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) {
+                        boolean isSuccess =
+                                refundJobService.callbackTradingSystem(refundRequest, payment, req.getMockHeader());
+                        if (isSuccess) {
+                            refundJobService.updateRefundRequestToCompletedSuccess(refundRequest);
+                        }
                     }
                 }
             }

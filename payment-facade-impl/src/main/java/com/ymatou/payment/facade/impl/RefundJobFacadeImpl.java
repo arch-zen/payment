@@ -63,7 +63,10 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
         Payment payment = payService.getPaymentByPaymentId(refundRequest.getPaymentId());
         BussinessOrder bussinessOrder = payService.getBussinessOrderById(payment.getBussinessOrderId());
         int refundStatusFlag = refundRequest.getRefundStatus(); // 返回给定时调度器，告知当前退款申请的状态
-        if (refundRequest.getRefundStatus().equals(RefundStatusEnum.INIT.getCode())) {// 提交退款申请
+        if (refundRequest.getRefundStatus().equals(RefundStatusEnum.COMPLETE_FAILED.getCode())
+                || refundRequest.getRefundStatus().equals(RefundStatusEnum.COMPLETE_SUCCESS.getCode())) {// 直接返回
+            refundStatusFlag = refundRequest.getRefundStatus();
+        } else if (refundRequest.getRefundStatus().equals(RefundStatusEnum.INIT.getCode())) {// 提交退款申请
             boolean accountingSuccess = true;
 
             if (refundRequest.getApproveStatus().equals(ApproveStatusEnum.FAST_REFUND.getCode())
