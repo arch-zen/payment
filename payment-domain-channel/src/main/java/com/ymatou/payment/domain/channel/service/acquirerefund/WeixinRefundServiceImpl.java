@@ -63,50 +63,50 @@ public class WeixinRefundServiceImpl implements AcquireRefundService {
         InstitutionConfig config = configManager.getConfig(PayTypeEnum.parse(refundRequest.getPayType()));
         Date requestTime = new Date();
 
-        WxRefundRequest wxRefundRequest = generateRequest(refundRequest, payment, config, null);
+        WxRefundRequest wxRefundRequest = generateRequest(refundRequest, payment, config, null);// 组装退款请求
         try {
-            WxRefundResponse response = wxRefundService.doService(wxRefundRequest, header);
+            WxRefundResponse response = wxRefundService.doService(wxRefundRequest, header);// 提交微信退款申请
+            saveRefundMiscRequestLog(refundRequest, requestTime, wxRefundRequest, response, null);// 保存退款应答
+            RefundStatusEnum refundStatus = generateRefundStatus(response, config);
+            updateRefundRequestStatus(refundRequest, refundStatus);// 更新退款状态
 
-            // save RefundMiscRequestLog
-            RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
-            requestLog.setCorrelateId(refundRequest.getRefundBatchNo());
-            requestLog.setMethod("WeixinRefund");
-            requestLog.setRequestData(wxRefundRequest.getRequestData());
-            requestLog.setResponseData(response.getOriginalResponse());
-            requestLog.setRefundBatchNo(refundRequest.getRefundBatchNo());
-            requestLog.setRequestTime(requestTime);
-            requestLog.setResponseTime(new Date());
-            refundMiscRequestLogMapper.insertSelective(requestLog);
-
-            // update RefundRequest
-            RefundStatusEnum refundStatus =
-                    isSuccess(response, config) ? RefundStatusEnum.COMMIT : RefundStatusEnum.REFUND_FAILED;
-            updateRefundRequestStatus(refundRequest, refundStatus);
             return refundStatus;
         } catch (Exception e) {
             logger.error("call WeiXin Refund fail. RefundBatchNo: " + refundRequest.getRefundBatchNo(), e);
-
-            RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
-            requestLog.setCorrelateId(refundRequest.getPaymentId());
-            requestLog.setMethod("WeiXinRefund");
-            requestLog.setRequestData(wxRefundRequest.getRequestData());
-            requestLog.setExceptionDetail(e.toString());
-            requestLog.setRequestTime(requestTime);
-            requestLog.setResponseTime(new Date());
-            refundMiscRequestLogMapper.insertSelective(requestLog);
-
+            saveRefundMiscRequestLog(refundRequest, requestTime, wxRefundRequest, null, e);
             updateRefundRequestStatus(refundRequest, RefundStatusEnum.REFUND_FAILED);
+
             return RefundStatusEnum.REFUND_FAILED;
         }
     }
 
-    private boolean isSuccess(WxRefundResponse response, InstitutionConfig config) {
+    private void saveRefundMiscRequestLog(RefundRequestPo refundRequest, Date requestTime,
+            WxRefundRequest wxRefundRequest, WxRefundResponse response, Exception e) {
+
+        RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
+        requestLog.setCorrelateId(String.valueOf(refundRequest.getRefundId()));
+        requestLog.setMethod("WeiXinRefund");
+        requestLog.setRequestData(wxRefundRequest.getRequestData());
+        requestLog.setRequestTime(requestTime);
+        requestLog.setResponseTime(new Date());
+        if (e != null) {
+            requestLog.setIsException(true);
+            requestLog.setExceptionDetail(e.toString());
+        }
+        if (response != null) {
+            requestLog.setResponseData(response.getOriginalResponse());
+        }
+        requestLog.setRefundBatchNo(refundRequest.getRefundBatchNo());
+        refundMiscRequestLogMapper.insertSelective(requestLog);
+    }
+
+    private RefundStatusEnum generateRefundStatus(WxRefundResponse response, InstitutionConfig config) {
         if (!WeixinPayConstants.SUCCESS_FLAG.equals(response.getReturn_code())
                 || !WeixinPayConstants.SUCCESS_FLAG.equals(response.getResult_code())
                 || !config.getMerchantId().equalsIgnoreCase(response.getMch_id())) {
-            return false;
+            return RefundStatusEnum.REFUND_FAILED;
         } else {
-            return true;
+            return RefundStatusEnum.COMMIT;
         }
     }
 

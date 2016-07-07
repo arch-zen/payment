@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
+import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.domain.pay.model.Payment;
@@ -61,84 +62,69 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
     public void processRefundCallback(AliPayRefundNotifyRequest req) {
         // 验签
         Map<String, String> signMap = getRequestMap(req);
-        boolean signResult =
-                signatureService.validateSign(signMap, instConfigManager.getConfig(PayTypeEnum.parse(req.getPayType())),
-                        req.getMockHeader());
+        InstitutionConfig config = instConfigManager.getConfig(PayTypeEnum.parse(req.getPayType()));
+        HashMap<String, String> header = req.getMockHeader();
+        boolean signResult = signatureService.validateSign(signMap, config, header);
         if (!signResult) {
             throw new BizException("signdata is invalid");
         }
 
-        // 解析退款回调的应答
+        // 解析退款回调的应答， 生成退款回调日志
         List<RefundNotifyDetail> details = generateRefundNotifyDetail(req.getResultDetails());
-
-        // 生成退款回调日志
         List<RefundMiscRequestLogWithBLOBs> list = generateRefundmiscrequestlog(req, details, signMap);
 
-        if (list.size() > 0) {
+        if (list != null && list.size() > 0) {
             logger.info("save RefundMiscRequestLog begin.");
             refundPository.batchSaveRefundmiscrequestlog(list); // 保存退款回调日志
 
             for (RefundMiscRequestLogWithBLOBs rmrl : list) {
-                // 重新查询退款结果
                 String refundBatchNo = rmrl.getRefundBatchNo();
                 RefundRequestPo refundRequest = refundPository.getRefundRequestByRefundBatchNo(refundBatchNo);
                 Payment payment = payService.getPaymentByPaymentId(refundRequest.getPaymentId());
 
                 if (!RefundStatusEnum.COMPLETE_SUCCESS.equals(refundRequest.getRefundStatus())
                         && !RefundStatusEnum.COMPLETE_FAILED.equals(refundRequest.getRefundStatus())) {
-                    RefundStatusEnum refundStatus =
-                            refundJobService.queryRefund(refundRequest, payment, req.getMockHeader());
-                    refundJobService.updateRefundRequestAndPayment(refundRequest, payment, refundStatus);
+
+                    RefundStatusEnum refundStatus = refundJobService.queryRefund(refundRequest, payment, header);// 再次提交退款查询
+                    refundJobService.updateRefundRequestAndPayment(refundRequest, payment, refundStatus);// 更新退款状态
                     if (RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) {
-                        boolean isSuccess =
-                                refundJobService.callbackTradingSystem(refundRequest, payment, req.getMockHeader());
-                        if (isSuccess) {
+
+                        if (refundJobService.callbackTradingSystem(refundRequest, payment, header)) {// 通知交易
                             refundJobService.updateRefundRequestToCompletedSuccess(refundRequest);
                         }
                     }
                 }
             }
-
         }
     }
 
     private List<RefundMiscRequestLogWithBLOBs> generateRefundmiscrequestlog(AliPayRefundNotifyRequest req,
             List<RefundNotifyDetail> details, Map<String, String> signMap) {
-        List<RefundMiscRequestLogWithBLOBs> refundmiscrequestlogWithBLOBs = new ArrayList<>();
-
         // 根据refundBatchNo获取RefundRequest
         RefundRequestPo refundrequest = refundPository.getRefundRequestByRefundBatchNo(req.getBatchNo());
-
         if (refundrequest.getRefundStatus() == RefundStatusEnum.COMPLETE_SUCCESS.getCode()
-                || refundrequest.getRefundStatus() == RefundStatusEnum.RETURN_TRANSACTION.getCode()) { // 已退款成功的，忽略
-            logger.info("The refundRequest is success. RefundBatchNo[{}]", refundrequest.getRefundBatchNo());
-            return refundmiscrequestlogWithBLOBs;
+                || refundrequest.getRefundStatus() == RefundStatusEnum.RETURN_TRANSACTION.getCode()) {
+            logger.info("The refundRequest is success. RefundBatchNo:{}", refundrequest.getRefundBatchNo());
+            return null; // 已退款成功的，忽略
         }
 
+        List<RefundMiscRequestLogWithBLOBs> refundmiscrequestlogWithBLOBs = new ArrayList<>();
         for (RefundNotifyDetail detail : details) {
             // 第三方退款成功的， 并在RefundRequest找到记录的
             if (detail.getInstitutionPaymentId().equals(refundrequest.getInstPaymentId()) && detail.isSuccess()) {
 
-                logger.info("The refundRequest is thirdPart success. RefundBatchNo[{}]",
-                        refundrequest.getRefundBatchNo());
-                logger.info("generate RefundMiscRequestLog begin.");
+                logger.info("RefundRequest is thirdPart success. RefundBatchNo:{}", refundrequest.getRefundBatchNo());
                 RefundMiscRequestLogWithBLOBs rmrl = new RefundMiscRequestLogWithBLOBs();
+                rmrl.setCorrelateId(String.valueOf(refundrequest.getRefundId()));
                 rmrl.setRefundBatchNo(req.getBatchNo());
-                rmrl.setCorrelateId(req.getBatchNo());
                 rmrl.setIsException(false);
                 rmrl.setExceptionDetail("");
                 rmrl.setLogId(UUID.randomUUID().toString());
                 rmrl.setMethod("RefundNotify");
                 rmrl.setRequestData("");
-                rmrl.setResponseData(JSON.toJSONString(signMap)); // TODO
+                rmrl.setResponseData(JSON.toJSONString(signMap));
                 rmrl.setRequestTime(new Date());
-
-                if (StringUtils.isBlank(req.getNotifyTime()))
-                    rmrl.setResponseTime(new Date());
-                else
-                    rmrl.setResponseTime(parseDate(req.getNotifyTime()));
-
-
+                rmrl.setResponseTime(parseDate(req.getNotifyTime()));
                 refundmiscrequestlogWithBLOBs.add(rmrl); // 记录退款回调日志
             }
         }
@@ -146,15 +132,13 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
         return refundmiscrequestlogWithBLOBs;
     }
 
-    /**
-     * 将日期字符串转成日期格式
-     * 
-     * @param dateString
-     * @return
-     */
     private Date parseDate(String dateString) {
         try {
-            return DateUtils.parseDate(dateString, new String[] {"yyyy-MM-dd HH:mm:ss"});
+            if (StringUtils.isBlank(dateString)) {
+                return new Date();
+            } else {
+                return DateUtils.parseDate(dateString, new String[] {"yyyy-MM-dd HH:mm:ss"});
+            }
         } catch (ParseException e) {
             logger.error("pare date when process alipay notify with date string:" + dateString, e);
             return new Date();

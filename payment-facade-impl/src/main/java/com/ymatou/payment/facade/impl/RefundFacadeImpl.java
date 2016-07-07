@@ -137,11 +137,11 @@ public class RefundFacadeImpl implements RefundFacade {
             }
 
             // dedcut user balance
-            boolean accountingSuccess =
+            AccountingStatusEnum accountingStatus =
                     refundJobService.dedcutBalance(payment, bussinessOrder, refundRequest, req.getHeader());
 
             // notify refund service
-            if (accountingSuccess) {
+            if (AccountingStatusEnum.SUCCESS.equals(accountingStatus)) {
                 refundJobService.submitRefund(refundRequest, payment, req.getHeader());
             }
         }

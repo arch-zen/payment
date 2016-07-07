@@ -72,6 +72,11 @@ public class Payment extends PrintFriendliness {
      * 第三方支付者Id
      */
     private String payerId;
+
+    /**
+     * 第三方支付者Email
+     */
+    private String payerEmail;
     /**
      * 支付状态枚举
      */
@@ -316,5 +321,13 @@ public class Payment extends PrintFriendliness {
      */
     public void setRetryCount(Integer retryCount) {
         this.retryCount = retryCount;
+    }
+
+    public String getPayerEmail() {
+        return payerEmail;
+    }
+
+    public void setPayerEmail(String payerEmail) {
+        this.payerEmail = payerEmail;
     }
 }

@@ -3,6 +3,8 @@
  */
 package com.ymatou.payment.integration.model;
 
+import com.ymatou.payment.facade.constants.AccountingStatusEnum;
+
 /**
  * 资金出入账接口Response
  * 
@@ -10,6 +12,11 @@ package com.ymatou.payment.integration.model;
  *
  */
 public class AccountingResponse {
+    public static final String ACCOUNTING_SUCCESS = "0"; // 成功
+    public static final String ACCOUNTING_IDEMPOTENTE = "4"; // 幂等
+    public static final String AccountingCode_SYSTEMERROR = "3"; // 系统异常
+    public static final String BALANCE_LIMIT = "9002";
+
     private String exceptionId;
     private String message;
     private String stackTrace;
@@ -47,5 +54,28 @@ public class AccountingResponse {
         this.statusCode = statusCode;
     }
 
+    public AccountingStatusEnum getAccountingStatus() {
+        AccountingStatusEnum accountingStatus;
+        switch (statusCode) {
+            case ACCOUNTING_SUCCESS:
+            case ACCOUNTING_IDEMPOTENTE:
+                accountingStatus = AccountingStatusEnum.SUCCESS;
+                break;
+            case AccountingCode_SYSTEMERROR:
+                accountingStatus = AccountingStatusEnum.UNKNOW;
+                break;
+            default:
+                accountingStatus = AccountingStatusEnum.FAIL;
+                break;
+        }
+        return accountingStatus;
+    }
 
+    public int isAccoutingSuccess() {
+        if (ACCOUNTING_SUCCESS.equals(statusCode) || ACCOUNTING_IDEMPOTENTE.equals(statusCode)) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
 }

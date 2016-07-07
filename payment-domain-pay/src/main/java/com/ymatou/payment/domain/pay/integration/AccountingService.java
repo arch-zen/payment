@@ -68,29 +68,9 @@ public class AccountingService {
      */
     public AccountingStatusEnum rechargeInternal(Payment payment, BussinessOrder bussinessOrder) {
         AccountingRequest request = generateRequest(payment, bussinessOrder);
-
-        try {
-            AccountingResponse response = accountService.accounting(request, null);
-            saveAccoutingLog(payment, bussinessOrder, response);
-
-            if (isAccoutingSuccess(response)) {
-                return AccountingStatusEnum.SUCCESS;
-            } else if (AccountService.AccountingCode_SYSTEMERROR.equals(response.getStatusCode())) {
-                return AccountingStatusEnum.UNKNOW;
-            } else {
-                return AccountingStatusEnum.FAIL;
-            }
-
-        } catch (Exception e) {
-            logger.error("accouting when pay notify error with paymentId:" + payment.getPaymentId(), e);
-            AccountingResponse response = new AccountingResponse();
-            response.setStatusCode(AccountService.AccountingCode_SYSTEMERROR);
-            response.setMessage(e.getMessage());
-
-            saveAccoutingLog(payment, bussinessOrder, response);
-
-            return AccountingStatusEnum.UNKNOW;
-        }
+        AccountingResponse response = accountService.accounting(request, null);
+        saveAccoutingLog(payment, bussinessOrder, response);
+        return response.getAccountingStatus();
     }
 
     /**
@@ -130,7 +110,7 @@ public class AccountingService {
         log.setCreatedTime(new Date());
         log.setAccoutingAmt(payment.getPayPrice().getAmount());
         log.setAccountingType("Payment");
-        log.setStatus(isAccoutingSuccess(response) ? 1 : 0); // 成功为1，失败为0
+        log.setStatus(response.isAccoutingSuccess()); // 成功为1，失败为0
         log.setUserId((long) bussinessOrder.getUserId().intValue());
         log.setBizNo(payment.getPaymentId());
         log.setRespCode(response.getStatusCode());
@@ -138,17 +118,6 @@ public class AccountingService {
         log.setMemo(memo(bussinessOrder));
         accountingLogMapper.insertSelective(log);
 
-    }
-
-    /**
-     * 判断账务操作时
-     * 
-     * @param response
-     * @return
-     */
-    private boolean isAccoutingSuccess(AccountingResponse response) {
-        return AccountService.ACCOUNTING_SUCCESS.equals(response.getStatusCode())
-                || AccountService.ACCOUNTING_IDEMPOTENTE.equals(response.getStatusCode());
     }
 
     /**

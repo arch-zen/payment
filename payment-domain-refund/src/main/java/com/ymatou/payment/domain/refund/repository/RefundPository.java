@@ -20,7 +20,6 @@ import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.refund.model.Refund;
 import com.ymatou.payment.facade.constants.ApproveStatusEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
-import com.ymatou.payment.infrastructure.db.mapper.CompensateProcessInfoMapper;
 import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
 import com.ymatou.payment.infrastructure.db.mapper.RefundMiscRequestLogMapper;
 import com.ymatou.payment.infrastructure.db.mapper.RefundRequestMapper;
@@ -37,9 +36,6 @@ import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
  */
 @Component
 public class RefundPository {
-
-    @Autowired
-    private CompensateProcessInfoMapper compensateProcessInfoMapper;
 
     @Autowired
     private RefundRequestMapper refundRequestMapper;
@@ -278,5 +274,14 @@ public class RefundPository {
         RefundRequestExample example = new RefundRequestExample();
         example.createCriteria().andTradeNoEqualTo(tradeNo);
         return refundRequestMapper.selectByExample(example);
+    }
+
+    @Transactional
+    public void softDeleteRefundRequest(Integer refundId) {
+        RefundRequestPo record = new RefundRequestPo();
+        record.setSoftDeleteFlag(true);
+        RefundRequestExample example = new RefundRequestExample();
+        example.createCriteria().andRefundIdEqualTo(refundId);
+        refundRequestMapper.updateByExampleSelective(record, example);
     }
 }

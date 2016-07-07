@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
+import com.ymatou.payment.facade.constants.AccountingStatusEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 
@@ -17,6 +18,13 @@ import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
  *
  */
 public interface RefundJobService {
+
+    /**
+     * 校验退款单
+     * 
+     * @param refundRequest
+     */
+    public boolean isContinueExecute(RefundRequestPo refundRequest);
 
     /**
      * 更新重试次数
@@ -38,8 +46,8 @@ public interface RefundJobService {
      * 
      * @param refundRequest
      */
-    public boolean dedcutBalance(Payment payment, BussinessOrder bussinessOrder, RefundRequestPo refundRequest,
-            HashMap<String, String> header);
+    public AccountingStatusEnum dedcutBalance(Payment payment, BussinessOrder bussinessOrder,
+            RefundRequestPo refundRequest, HashMap<String, String> header);
 
     /**
      * 提交第三方退款

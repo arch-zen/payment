@@ -37,6 +37,11 @@ public class PaymentNotifyMessage {
     private String payerId;
 
     /**
+     * 第三方用户邮箱
+     */
+    private String payerEmail;
+
+    /**
      * 银行卡种类
      */
     private Integer cardType;
@@ -219,4 +224,13 @@ public class PaymentNotifyMessage {
     public void setTraceId(String traceId) {
         this.traceId = traceId;
     }
+
+    public String getPayerEmail() {
+        return payerEmail;
+    }
+
+    public void setPayerEmail(String payerEmail) {
+        this.payerEmail = payerEmail;
+    }
+
 }
