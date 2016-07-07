@@ -90,7 +90,7 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
 
                     logger.info("Step 7: update refundRequest to completed suceess.");
                     refundJobService.updateRefundRequestToCompletedSuccess(refundRequest);
-                    response.setRefundResult("ok");
+                    response.setRefundResult(String.valueOf(RefundStatusEnum.COMPLETE_SUCCESS.getCode()));
                 }
             }
         }

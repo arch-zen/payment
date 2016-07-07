@@ -82,8 +82,8 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
                 RefundRequestPo refundRequest = refundPository.getRefundRequestByRefundBatchNo(refundBatchNo);
                 Payment payment = payService.getPaymentByPaymentId(refundRequest.getPaymentId());
 
-                if (!RefundStatusEnum.COMPLETE_SUCCESS.equals(refundRequest.getRefundStatus())
-                        && !RefundStatusEnum.COMPLETE_FAILED.equals(refundRequest.getRefundStatus())) {
+                if (RefundStatusEnum.COMPLETE_SUCCESS.getCode() != refundRequest.getRefundStatus().intValue()
+                        && RefundStatusEnum.COMPLETE_FAILED.getCode() != refundRequest.getRefundStatus().intValue()) {
 
                     RefundStatusEnum refundStatus = refundJobService.queryRefund(refundRequest, payment, header);// 再次提交退款查询
                     refundJobService.updateRefundRequestAndPayment(refundRequest, payment, refundStatus);// 更新退款状态
