@@ -33,6 +33,7 @@ import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.test.AccountEntry;
+import com.ymatou.payment.test.AccountInfo;
 import com.ymatou.payment.test.RestBaseTest;
 
 
@@ -492,18 +493,98 @@ public class PaymentResourceImplTest extends RestBaseTest {
     }
 
     @Test
-    public void executePayNotifyTestValifySign() {
-        // String paymentId = "16062316304186777";
-        //
-        // ExecutePayNotifyReq executePayNotifyReq = new ExecutePayNotifyReq();
-        // executePayNotifyReq.setPaymentId(paymentId);
-        //
-        // MockHttpServletRequest servletRequestMock = new MockHttpServletRequest();
-        // String response = paymentResource.executePayNotify(executePayNotifyReq,
-        // servletRequestMock);
-        //
-        //
-        // assertEquals("验证response", "ok", response);
+    public void executePayNotifySellerMarginRechargeTest() {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+        req.setBizCode(4);
+        req.setPayType("10");
+        req.setPayPrice("1.01");
+        req.setNotifyUrl("http://mockforpay.iapi.ymatou.com/api/Trading/NotifyTradingEvent");
+        req.setOrderId(String.valueOf(new Date().getTime()).substring(4));
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        assertEquals("验证返回码", 0, res.getErrorCode());
+
+        BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
+        assertNotNull("验证商户订单", bo);
+
+        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertNotNull("验证支付单", payment);
+
+        PaymentPo paymentPo = new PaymentPo();
+        paymentPo.setPaymentId(payment.getPaymentId());
+        paymentPo.setPayStatus(1);
+
+        paymentMapper.updateByPrimaryKeySelective(paymentPo);
+
+        MockHttpServletRequest servletRequestMock = buildServletRequestWithMock();
+        servletRequestMock.addHeader("MockResult-Trading-Status", "OK");
+
+        ExecutePayNotifyReq executePayNotifyReq = new ExecutePayNotifyReq();
+        executePayNotifyReq.setPaymentId(payment.getPaymentId());
+        String response = paymentResource.executePayNotify(executePayNotifyReq, servletRequestMock);
+        assertEquals("验证执行结果", true, response.equals("ok"));
+
+
+        AccountEntry accountEntry = getAccountEntry(payment.getPaymentId());
+
+        assertEquals("验证BizCode", "100003", accountEntry.getBizCode());
+        assertEquals("验证Amount", payment.getPayPrice(), new Money(accountEntry.getAmount()));
+
+        AccountInfo accountInfo = getAccountInfo(accountEntry.getAccountId());
+        assertEquals("验证CurrencyType", 1001, accountInfo.getiCurrencyType());
+        assertEquals("验证AccountType", 11, accountInfo.getiAccountType());
+    }
+
+    /**
+     * 卖家余额充值
+     */
+    @Test
+    public void executePayNotifySellerRechargeTest() {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+        req.setBizCode(5);
+        req.setPayType("10");
+        req.setPayPrice("1.01");
+        req.setNotifyUrl("http://mockforpay.iapi.ymatou.com/api/Trading/NotifyTradingEvent");
+        req.setOrderId(String.valueOf(new Date().getTime()).substring(4));
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        assertEquals("验证返回码", 0, res.getErrorCode());
+
+        BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
+        assertNotNull("验证商户订单", bo);
+
+        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertNotNull("验证支付单", payment);
+
+        PaymentPo paymentPo = new PaymentPo();
+        paymentPo.setPaymentId(payment.getPaymentId());
+        paymentPo.setPayStatus(1);
+
+        paymentMapper.updateByPrimaryKeySelective(paymentPo);
+
+        MockHttpServletRequest servletRequestMock = buildServletRequestWithMock();
+        servletRequestMock.addHeader("MockResult-Trading-Status", "OK");
+
+        ExecutePayNotifyReq executePayNotifyReq = new ExecutePayNotifyReq();
+        executePayNotifyReq.setPaymentId(payment.getPaymentId());
+        String response = paymentResource.executePayNotify(executePayNotifyReq, servletRequestMock);
+        assertEquals("验证执行结果", true, response.equals("ok"));
+
+
+        AccountEntry accountEntry = getAccountEntry(payment.getPaymentId());
+
+        assertEquals("验证BizCode", "100003", accountEntry.getBizCode());
+        assertEquals("验证Amount", payment.getPayPrice(), new Money(accountEntry.getAmount()));
+
+        AccountInfo accountInfo = getAccountInfo(accountEntry.getAccountId());
+        assertEquals("验证CurrencyType", 1, accountInfo.getiCurrencyType());
+        assertEquals("验证AccountType", 1, accountInfo.getiAccountType());
     }
 
     /**
