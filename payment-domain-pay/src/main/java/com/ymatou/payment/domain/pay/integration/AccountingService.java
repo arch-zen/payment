@@ -21,6 +21,7 @@ import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.AccountOperateTypeEnum;
 import com.ymatou.payment.facade.constants.AccountTypeEnum;
 import com.ymatou.payment.facade.constants.AccountingStatusEnum;
+import com.ymatou.payment.facade.constants.BizCodeEnum;
 import com.ymatou.payment.facade.constants.CurrencyTypeEnum;
 import com.ymatou.payment.infrastructure.db.mapper.AccountingLogMapper;
 import com.ymatou.payment.infrastructure.db.model.AccountingLogPo;
@@ -84,10 +85,18 @@ public class AccountingService {
         List<AccountingItem> itemList = new ArrayList<>();
         AccountingItem item = new AccountingItem();
         item.setUserId(bussinessOrder.getUserId());
-        item.setCurrencyType(CurrencyTypeEnum.CNY.code());
         item.setAmount(payment.getPayPrice().getAmount().toString());
         item.setAccountOperateType(AccountOperateTypeEnum.Fundin.code());
-        item.setAccountType(AccountTypeEnum.RmbAccount.code());
+
+        // 卖家注册保证金充值 账户类型 ： 11
+        if (BizCodeEnum.SELLER_MARGIN_RECHARGE.equals(bussinessOrder.getBizCode())) {
+            item.setAccountType(AccountTypeEnum.RegisteredDepositRmbAccount.code());
+            item.setCurrencyType(CurrencyTypeEnum.CNYForRegister.code());
+        } else {
+            item.setAccountType(AccountTypeEnum.RmbAccount.code());
+            item.setCurrencyType(CurrencyTypeEnum.CNY.code());
+        }
+
         item.setAccountingDate(new Date());
         item.setBizCode(bizcode(bussinessOrder));
         item.setBizNo(payment.getPaymentId());

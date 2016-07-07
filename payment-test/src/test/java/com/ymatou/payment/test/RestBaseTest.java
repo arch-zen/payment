@@ -60,4 +60,14 @@ public class RestBaseTest extends BaseTest {
     protected AccountEntry getAccountEntry(String bizNo) {
         return sqlSession.selectOne("test-accountEntry.selectAccountEntry", bizNo);
     }
+
+    /**
+     * 获取到账户信息
+     * 
+     * @param accountId
+     * @return
+     */
+    protected AccountInfo getAccountInfo(String accountId) {
+        return sqlSession.selectOne("test-accountInfo.selectAccount", accountId);
+    }
 }

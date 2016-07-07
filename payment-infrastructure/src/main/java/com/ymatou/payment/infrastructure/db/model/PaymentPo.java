@@ -498,7 +498,7 @@ public class PaymentPo {
         sb.append(", retryCount=").append(retryCount);
         sb.append(", notifyStatus=").append(notifyStatus);
         sb.append(", payerEmail=").append(payerEmail);
-        sb.append(", dataVersion=").append(dataVersion);
+        // sb.append(", dataVersion=").append(dataVersion);
         sb.append("]");
         return sb.toString();
     }
