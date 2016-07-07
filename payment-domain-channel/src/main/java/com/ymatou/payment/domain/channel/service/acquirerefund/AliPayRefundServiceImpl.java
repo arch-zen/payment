@@ -66,53 +66,61 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
         InstitutionConfig config = configManager.getConfig(PayTypeEnum.parse(refundRequest.getPayType()));
         Date requestTime = new Date();
 
-        AliPayRefundRequest aliPayRefundRequest = generateRequest(refundRequest, payment, config, null);
+        AliPayRefundRequest aliPayRefundRequest = generateRequest(refundRequest, payment, config, null); // 组装退款请求
         try {
-            // submit third party refund
-            AliPayRefundResponse response = aliPayRefundService.doService(aliPayRefundRequest, header);
+            AliPayRefundResponse response = aliPayRefundService.doService(aliPayRefundRequest, header);// 提交支付宝退款申请
+            saveRefundMiscRequestLog(refundRequest, requestTime, aliPayRefundRequest, response, null);// 保存退款应答
+            RefundStatusEnum refundStatus = generateRefundStatus(response);
+            updateRefundRequestStatus(refundRequest, refundStatus);// 更新退款状态
 
-            // save RefundMiscRequestLog
-            RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
-            requestLog.setCorrelateId(refundRequest.getRefundBatchNo());
-            requestLog.setMethod("AliRefund");
-            requestLog.setRequestData(aliPayRefundRequest.getRequestData());
-            requestLog.setResponseData(response.getOriginalResponse());
-            requestLog.setRefundBatchNo(refundRequest.getRefundBatchNo());
-            requestLog.setRequestTime(requestTime);
-            requestLog.setResponseTime(new Date());
-            refundMiscRequestLogMapper.insertSelective(requestLog);
-
-            // update RefundRequest
-            RefundStatusEnum refundStatus =
-                    isSuccess(response) ? RefundStatusEnum.COMMIT : RefundStatusEnum.REFUND_FAILED;
-            updateRefundRequestStatus(refundRequest, refundStatus);
             return refundStatus;
         } catch (Exception e) {
             logger.error("call AliPay Refund fail. RefundBatchNo: " + refundRequest.getRefundBatchNo(), e);
 
-            RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
-            requestLog.setCorrelateId(refundRequest.getPaymentId());
-            requestLog.setMethod("AliRefund");
-            requestLog.setRequestData(aliPayRefundRequest.getRequestData());
-            requestLog.setExceptionDetail(e.toString());
-            requestLog.setRequestTime(requestTime);
-            requestLog.setResponseTime(new Date());
-            refundMiscRequestLogMapper.insertSelective(requestLog);
-
+            saveRefundMiscRequestLog(refundRequest, requestTime, aliPayRefundRequest, null, e);
             updateRefundRequestStatus(refundRequest, RefundStatusEnum.REFUND_FAILED);
+
             return RefundStatusEnum.REFUND_FAILED;
         }
     }
 
-    private boolean isSuccess(AliPayRefundResponse response) {
-        return AliPayConsts.REFUND_SYNC_STATU_P.equals(response.getIsSuccess())
-                || AliPayConsts.REFUND_SYNC_STATU_T.equals(response.getIsSuccess());
+    private void saveRefundMiscRequestLog(RefundRequestPo refundRequest, Date requestTime,
+            AliPayRefundRequest aliPayRefundRequest, AliPayRefundResponse response, Exception e) {
+
+        RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
+        requestLog.setCorrelateId(String.valueOf(refundRequest.getRefundId()));
+        requestLog.setMethod("AliRefund");
+        requestLog.setRequestData(aliPayRefundRequest.getRequestData());
+        requestLog.setRequestTime(requestTime);
+        requestLog.setResponseTime(new Date());
+        if (e != null) {
+            requestLog.setIsException(true);
+            requestLog.setExceptionDetail(e.toString());
+        }
+        if (response != null) {
+            requestLog.setResponseData(response.getOriginalResponse());
+        }
+        requestLog.setRefundBatchNo(refundRequest.getRefundBatchNo());
+        refundMiscRequestLogMapper.insertSelective(requestLog);
+    }
+
+    private RefundStatusEnum generateRefundStatus(AliPayRefundResponse response) {
+        if (AliPayConsts.REFUND_SYNC_STATU_P.equals(response.getIsSuccess())
+                || AliPayConsts.REFUND_SYNC_STATU_T.equals(response.getIsSuccess())) {
+            return RefundStatusEnum.COMMIT;
+        } else {
+            return RefundStatusEnum.REFUND_FAILED;
+        }
     }
 
     private AliPayRefundRequest generateRequest(RefundRequestPo refundRequest, Payment payment,
             InstitutionConfig config, HashMap<String, String> header) {
         String url = new StringBuilder().append(integrationConfig.getYmtPaymentBaseUrl(header))
                 .append("/RefundNotify/").append(payment.getPayType()).toString();
+        String detailData = new StringBuilder().append(refundRequest.getInstPaymentId()).append("^")
+                .append(refundRequest.getRefundAmount().setScale(2, BigDecimal.ROUND_HALF_UP)).append("^")
+                .append(AliPayConsts.REFUND_REASON).toString();
+
         AliPayRefundRequest request = new AliPayRefundRequest();
         request.setPartner(config.getMerchantId());
         request.setNotifyUrl(url);
@@ -121,13 +129,8 @@ public class AliPayRefundServiceImpl implements AcquireRefundService {
         request.setBatchNo(refundRequest.getRefundBatchNo());
         request.setRefundDate(new Date());
         request.setBatchNum("1");
-        String detailData = new StringBuilder().append(refundRequest.getInstPaymentId()).append("^")
-                .append(refundRequest.getRefundAmount().setScale(2, BigDecimal.ROUND_HALF_UP)).append("^") // TODO
-                .append(AliPayConsts.REFUND_REASON)
-                .toString();
         request.setDetailData(detailData);
         request.setUseFreezeAmount("N");
-
         String sign = signatureService.signMessage(request.mapForSign(), config, header);
         request.setSign(sign);
 

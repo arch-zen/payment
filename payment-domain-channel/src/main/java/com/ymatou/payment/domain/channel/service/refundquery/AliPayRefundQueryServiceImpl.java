@@ -57,14 +57,14 @@ public class AliPayRefundQueryServiceImpl implements RefundQueryService {
                 refundRequest.getRefundBatchNo());
 
         InstitutionConfig config = configManager.getConfig(payment.getPayType());
-        AliPayRefundQueryRequest request = generateRequest(refundRequest, payment, config, header);
         Date requestTime = new Date();
         RefundStatusEnum refundStatus = null;
 
+        AliPayRefundQueryRequest request = generateRequest(refundRequest, payment, config, header); // 组装退款查询申请
         try {
-            AliPayRefundQueryResponse response = aliPayRefundQueryService.doService(request, header);
-            saveRefundMiscRequestLog(refundRequest, requestTime, request, response, null);
-            refundStatus = calcRefundStatus(refundRequest, payment, response);
+            AliPayRefundQueryResponse response = aliPayRefundQueryService.doService(request, header);// 提交支付宝退款查询
+            saveRefundMiscRequestLog(refundRequest, requestTime, request, response, null);// 保存退款查询结果
+            refundStatus = calcRefundStatus(refundRequest, payment, response);// 计算退款状态
         } catch (Exception e) {
             logger.error("AliPay refund query error.", e);
 
@@ -103,66 +103,23 @@ public class AliPayRefundQueryServiceImpl implements RefundQueryService {
         return refundStatus;
     }
 
-    // private RefundStatusEnum calcRefundStatus(RefundRequestPo refundRequest, Payment payment,
-    // AliPayRefundQueryResponse response) {
-    // RefundStatusEnum refundStatus = null;
-    // if (AliPayConsts.REFUND_QUERY_STATU_T.equals(response.getIsSuccess())) { // 查询成功
-    // RefundDetailData resultDetailData = response.resolveResultDetails();
-    // if (resultDetailData == null) { // 无退款明细
-    // refundStatus = RefundStatusEnum.COMPLETE_FAILED;
-    // } else if (resultDetailData.isRefundOk() != null) {
-    // if (!refundRequest.getInstPaymentId().equalsIgnoreCase(resultDetailData.getInstPaymentId()))
-    // {
-    // refundStatus = RefundStatusEnum.COMPLETE_FAILED;
-    // } else if (resultDetailData.isRefundOk()) {
-    // if (resultDetailData.getRefundAmount().equals(refundRequest.getRefundAmount())) {
-    // refundStatus = RefundStatusEnum.COMPLETE_FAILED;
-    // }
-    // refundStatus = RefundStatusEnum.THIRDPART_REFUND_SUCCESS;
-    // } else {
-    // refundStatus = RefundStatusEnum.REFUND_FAILED;
-    // }
-    // } else {
-    // switch (resultDetailData.getChargeRefundStatus()) {
-    // case FAILED:
-    // case NA:
-    // refundStatus = RefundStatusEnum.COMPLETE_FAILED;
-    // break;
-    // case SUCCESS:
-    // refundStatus = RefundStatusEnum.THIRDPART_REFUND_SUCCESS;
-    // break;
-    // case PROCESSING:
-    // default:
-    // refundStatus = RefundStatusEnum.WAIT_THIRDPART_REFUND;
-    // break;
-    // }
-    // }
-    // } else {
-    // if (!"REFUND_NOT_EXIST".equals(response.getErrorCode())) {
-    // refundStatus = RefundStatusEnum.INIT;
-    // } else {
-    // refundStatus = RefundStatusEnum.REFUND_FAILED;
-    // }
-    // }
-    //
-    // return refundStatus;
-    // }
-
     private void saveRefundMiscRequestLog(RefundRequestPo refundRequest, Date requestTime,
             AliPayRefundQueryRequest queryRefundRequest, AliPayRefundQueryResponse response, Exception e) {
 
         RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
-        requestLog.setCorrelateId(refundRequest.getRefundBatchNo());
+        requestLog.setCorrelateId(String.valueOf(refundRequest.getRefundId()));
         requestLog.setMethod("AliRefundQuery");
         requestLog.setRequestData(queryRefundRequest.getRequestData());
         requestLog.setRequestTime(requestTime);
         requestLog.setResponseTime(new Date());
         if (e != null) {
+            requestLog.setIsException(true);
             requestLog.setExceptionDetail(e.toString());
         }
         if (response != null) {
             requestLog.setResponseData(response.getOriginalResponse());
         }
+        requestLog.setRefundBatchNo(refundRequest.getRefundBatchNo());
         refundMiscRequestLogMapper.insertSelective(requestLog);
     }
 

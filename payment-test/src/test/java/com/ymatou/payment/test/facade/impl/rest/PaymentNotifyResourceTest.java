@@ -58,7 +58,7 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
         String paymentId = "21916168000593994";
         String payType = "10";
         String reqBody =
-                "discount=0.00&payment_type=1&subject=yeyingcao%E7%9A%84%E8%AE%A2%E5%8D%95&trade_no=2016051921001004250269230618&buyer_email=yeyingcao88%40163.com&gmt_create=2016-05-19+12%3A56%3A41&notify_type=trade_status_sync&quantity=1&out_trade_no=21916168000593994&seller_id=2088701734809577&notify_time=2016-05-19+12%3A56%3A47&trade_status=TRADE_SUCCESS&is_total_fee_adjust=N&total_fee=387.00&gmt_payment=2016-05-19+12%3A56%3A47&seller_email=ap.ymt%40ymatou.com&price=387.00&buyer_id=2088002495313254&notify_id=39a92c986d7097b332939697525f793hxi&use_coupon=N&sign_type=MD5&sign=c40ed3acbe82c45cfabf70b0157e6ccf";
+                "discount=0.00&payment_type=1&subject=yeyingcao%E7%9A%84%E8%AE%A2%E5%8D%95&trade_no=2016051921001004250269230618&buyer_email=yeyingcao88%40163.com&buyer_id=test&gmt_create=2016-05-19+12%3A56%3A41&notify_type=trade_status_sync&quantity=1&out_trade_no=21916168000593994&seller_id=2088701734809577&notify_time=2016-05-19+12%3A56%3A47&trade_status=TRADE_SUCCESS&is_total_fee_adjust=N&total_fee=387.00&gmt_payment=2016-05-19+12%3A56%3A47&seller_email=ap.ymt%40ymatou.com&price=387.00&buyer_id=2088002495313254&notify_id=39a92c986d7097b332939697525f793hxi&use_coupon=N&sign_type=MD5&sign=c40ed3acbe82c45cfabf70b0157e6ccf";
 
         // 删除旧数据
         AlipayNotifyLogExample example = new AlipayNotifyLogExample();
@@ -73,6 +73,30 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
         List<AlipayNotifyLogPo> poList = alipaynotifylogMapper.selectByExample(example);
 
         assertEquals("验证报文插入表中", 1, poList.size());
+    }
+
+    @Test
+    public void testNotifySuccess() throws UnsupportedEncodingException {
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        servletRequest.setRequestURI("/notify/13");
+
+        // 产线的数据，由于没有支付单号，验签通过报文记录，但是支付单号找不到
+        String paymentId = "16070714424896160";
+        String payType = "13";
+        String requestBody =
+                "discount=0.00&payment_type=1&subject=zhangyingnan%E7%9A%84%E8%AE%A2%E5%8D%95&trade_no=2016070721001004850256239538&buyer_email=324708852%40qq.com&gmt_create=2016-07-07+14%3A43%3A00&notify_type=trade_status_sync&quantity=1&out_trade_no=16070714424896160&seller_id=2088701734809577&notify_time=2016-07-07+14%3A43%3A01&body=zhangyingnan%E7%9A%84%E8%AE%A2%E5%8D%95&trade_status=TRADE_SUCCESS&is_total_fee_adjust=N&total_fee=288.00&gmt_payment=2016-07-07+14%3A43%3A01&seller_email=ap.ymt%40ymatou.com&price=288.00&buyer_id=2088402149701853&notify_id=5656ed605b03486d8ad4c269d93dc51mk6&use_coupon=N&sign_type=RSA&sign=EK2fWwFvK28oQnyVtCPUOsigaRcTpRiWI%2BCVZYfnUCrIQgLG3WPh%2BEcpVm6YpCwXwo%2FLUnA22qh470hN%2F9rA2lwPoGUGvTT2uXPpedp0DFpG0HOgl31cSD%2F5a07afPHx%2FmHi5KhxB%2B5L4PBPZV8VSPQ%2BkQNBnjiimiLfstTmzbg%3D";
+
+        // 删除旧数据
+        AlipayNotifyLogExample example = new AlipayNotifyLogExample();
+        example.createCriteria().andBizNoEqualTo(paymentId);
+        alipaynotifylogMapper.deleteByExample(example);
+
+        servletRequest.setContent(requestBody.getBytes("utf-8"));
+        String response = paymentNotifyResource.notify(payType, servletRequest);
+
+        assertEquals("验证返回值", "success", response);
+
     }
 
     @Test

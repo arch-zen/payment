@@ -249,7 +249,7 @@ public class HttpClientUtil {
             logger.info("response message: {}; StatusLine: {}", result, statusLine);
             // 退款回调交易， .net:HttpStatus=200视为成功; java:HttpStatus=200, code=200视为成功
             if (HttpStatus.SC_OK == statusLine.getStatusCode()) {
-                if (StringUtils.isBlank(result)) {
+                if (StringUtils.isBlank(result) || result.indexOf("code") < 0) {
                     isSuccess = true;
                 } else {
                     Integer code = (Integer) JSONObject.parseObject(result).get("code");

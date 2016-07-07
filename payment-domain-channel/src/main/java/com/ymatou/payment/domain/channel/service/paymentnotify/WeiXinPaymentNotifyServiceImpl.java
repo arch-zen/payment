@@ -88,7 +88,8 @@ public class WeiXinPaymentNotifyServiceImpl implements PaymentNotifyService {
                 || StringUtils.isBlank(outTradeNo) || !mchId.equals(instConfig.getMerchantId())
                 || totalFee.doubleValue() < 0.00001) {
             logger.error("weixin payment notify error. paymentid: {}", outTradeNo);
-            throw new BizException(ErrorCode.PAYMENT_NOTIFY_VERIFY_FAILED, "weixin notify with paymentid: " + outTradeNo);
+            throw new BizException(ErrorCode.PAYMENT_NOTIFY_VERIFY_FAILED,
+                    "weixin notify with paymentid: " + outTradeNo);
         }
 
 
@@ -96,6 +97,7 @@ public class WeiXinPaymentNotifyServiceImpl implements PaymentNotifyService {
         PaymentNotifyMessage paymentNotifyMessage = new PaymentNotifyMessage();
         paymentNotifyMessage.setTraceId(UUID.randomUUID().toString());
         paymentNotifyMessage.setPayerId(map.get("openid"));
+        paymentNotifyMessage.setPayerEmail("");
         paymentNotifyMessage.setActualPayCurrency(map.get("fee_type"));
         paymentNotifyMessage.setActualPayPrice(totalFee);
         paymentNotifyMessage.setInstitutionPaymentId(map.get("transaction_id"));

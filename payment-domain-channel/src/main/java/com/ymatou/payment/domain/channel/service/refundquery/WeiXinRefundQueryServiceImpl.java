@@ -54,20 +54,18 @@ public class WeiXinRefundQueryServiceImpl implements RefundQueryService {
     @Override
     public RefundStatusEnum queryRefund(RefundRequestPo refundRequest, Payment payment,
             HashMap<String, String> header) {
-
         logger.info("weixin refund query begin. PaymentId:{}, RefundNo:{}", refundRequest.getPaymentId(),
                 refundRequest.getRefundBatchNo());
 
         InstitutionConfig config = configManager.getConfig(payment.getPayType());
-        QueryRefundRequest queryRefundRequest = generateRequest(refundRequest, payment, config, header);
         Date requestTime = new Date();
         RefundStatusEnum refundStatus = null;
 
+        QueryRefundRequest queryRefundRequest = generateRequest(refundRequest, payment, config, header);// 组装退款请求
         try {
-            QueryRefundResponse response = wxRefundQueryService.doService(queryRefundRequest, header);
-
-            saveRefundMiscRequestLog(refundRequest, requestTime, queryRefundRequest, response, null);
-            refundStatus = calcRefundStatus(refundRequest, response);
+            QueryRefundResponse response = wxRefundQueryService.doService(queryRefundRequest, header);// 提交微信退款查询
+            saveRefundMiscRequestLog(refundRequest, requestTime, queryRefundRequest, response, null);// 保存退款查询应答
+            refundStatus = calcRefundStatus(refundRequest, response);// 计算退款状态
         } catch (Exception e) {
             logger.error("weixin refund query error.", e);
 
@@ -126,17 +124,19 @@ public class WeiXinRefundQueryServiceImpl implements RefundQueryService {
             QueryRefundRequest queryRefundRequest, QueryRefundResponse response, Exception e) {
 
         RefundMiscRequestLogWithBLOBs requestLog = new RefundMiscRequestLogWithBLOBs();
-        requestLog.setCorrelateId(refundRequest.getRefundBatchNo());
+        requestLog.setCorrelateId(String.valueOf(refundRequest.getRefundId()));
         requestLog.setMethod("WeixinRefundQuery");
         requestLog.setRequestData(queryRefundRequest.getRequestData());
         requestLog.setRequestTime(requestTime);
         requestLog.setResponseTime(new Date());
         if (e != null) {
+            requestLog.setIsException(true);
             requestLog.setExceptionDetail(e.toString());
         }
         if (response != null) {
             requestLog.setResponseData(response.getOriginalResponse());
         }
+        requestLog.setRefundBatchNo(refundRequest.getRefundBatchNo());
         refundMiscRequestLogMapper.insertSelective(requestLog);
     }
 

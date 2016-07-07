@@ -84,8 +84,8 @@ public class AliPayPaymentNotifyServiceImpl implements PaymentNotifyService {
 
         PaymentNotifyMessage paymentNotifyMessage = new PaymentNotifyMessage();
         paymentNotifyMessage.setTraceId(UUID.randomUUID().toString());
-        paymentNotifyMessage.setPayerId(
-                StringUtils.isBlank(map.get("buyer_email")) ? map.get("buyer_id") : map.get("buyer_email"));
+        paymentNotifyMessage.setPayerId(map.get("buyer_id"));
+        paymentNotifyMessage.setPayerEmail(map.get("buyer_email"));
         paymentNotifyMessage.setActualPayCurrency(
                 StringUtils.isBlank(map.get("currency")) ? "CNY" : map.get("currency"));
         paymentNotifyMessage.setActualPayPrice(new BigDecimal(map.get("total_fee")));

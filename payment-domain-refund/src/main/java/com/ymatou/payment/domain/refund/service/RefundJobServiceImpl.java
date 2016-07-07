@@ -74,6 +74,26 @@ public class RefundJobServiceImpl implements RefundJobService {
     private RefundCallbackService refundCallbackService;
 
     @Override
+    public boolean isContinueExecute(RefundRequestPo refundRequest) {
+        // refundRequest=null;approveStatus=0;refundStatus=4,5,6,-2;softDelete;不再执行退款
+        boolean isContinue = false;
+        if (refundRequest == null) {
+            logger.info("RefundRequest not exist.");
+        } else if (refundRequest.getApproveStatus().equals(ApproveStatusEnum.NOT_APPROVED.getCode())
+                || refundRequest.getSoftDeleteFlag()) {
+            logger.info("RefundRequest can not be excuted. ApproveStatus:{}, SoftDeleteFlag:{}",
+                    refundRequest.getApproveStatus(), refundRequest.getSoftDeleteFlag());
+        } else if (refundRequest.getRefundStatus().equals(RefundStatusEnum.COMPLETE_FAILED.getCode())
+                || refundRequest.getRefundStatus().compareTo((RefundStatusEnum.COMPLETE_SUCCESS.getCode())) >= 0) {
+            logger.info("RefundRequest completed. RefundStatus: {}", refundRequest.getRefundStatus());
+        } else {
+            isContinue = true;
+        }
+
+        return isContinue;
+    }
+
+    @Override
     public void updateRetryCount(Integer refundId) {
         refundPository.updateRetryCount(refundId);
     }
@@ -81,7 +101,7 @@ public class RefundJobServiceImpl implements RefundJobService {
     @Override
     public RefundRequestPo getRefundRequestByRefundId(Integer refundId) {
         RefundRequestPo refundRequest = refundPository.getRefundRequestByRefundId(refundId);
-        logger.info("the refund will be excuting. {}", JSONObject.toJSONString(refundRequest));
+        logger.info("the refund will be excuted. {}", JSONObject.toJSONString(refundRequest));
         return refundRequest;
     }
 
@@ -101,96 +121,51 @@ public class RefundJobServiceImpl implements RefundJobService {
     @Override
     public RefundStatusEnum queryRefund(RefundRequestPo refundRequest, Payment payment,
             HashMap<String, String> header) {
-        RefundQueryService refundQueryService =
-                refundQueryServiceFactory.getInstanceByPayType(payment.getPayType());
+        RefundQueryService refundQueryService = refundQueryServiceFactory.getInstanceByPayType(payment.getPayType());
         RefundStatusEnum refundStatus = refundQueryService.queryRefund(refundRequest, payment, header);
 
         return refundStatus;
     }
 
     @Override
-    public boolean dedcutBalance(Payment payment, BussinessOrder bussinessOrder, RefundRequestPo refundRequest,
-            HashMap<String, String> header) {
-
-        AccountingStatusEnum accountingStatus = dedcutBalanceOnce(payment, bussinessOrder, refundRequest, header);
-        if (AccountingStatusEnum.UNKNOW.equals(accountingStatus)) { // 发送异常重试
-            accountingStatus = dedcutBalanceOnce(payment, bussinessOrder, refundRequest, header);
+    public AccountingStatusEnum dedcutBalance(Payment payment, BussinessOrder bussinessOrder,
+            RefundRequestPo refundRequest, HashMap<String, String> header) {
+        AccountingResponse accountingResponse = dedcutBalanceOnce(payment, bussinessOrder, refundRequest, header);
+        if (AccountingStatusEnum.UNKNOW.equals(accountingResponse.getAccountingStatus())) { // 发送异常重试
+            accountingResponse = dedcutBalanceOnce(payment, bussinessOrder, refundRequest, header);
         }
 
-        return accountingStatus.equals(AccountingStatusEnum.SUCCESS);
+        if (AccountingResponse.BALANCE_LIMIT.equals(accountingResponse.getStatusCode())) {
+            logger.error("dedcut user balance failed, stop refund. RefundId: {}", refundRequest.getRefundId());
+            refundPository.softDeleteRefundRequest(refundRequest.getRefundId()); // 逻辑删除refundRequest
+        }
+
+        return accountingResponse.getAccountingStatus();
     }
 
-    private AccountingStatusEnum dedcutBalanceOnce(Payment payment, BussinessOrder bussinessOrder,
+    private AccountingResponse dedcutBalanceOnce(Payment payment, BussinessOrder bussinessOrder,
             RefundRequestPo refundRequest, HashMap<String, String> header) {
         AccountingRequest request = generateRequest(refundRequest, payment, bussinessOrder);
+        AccountingResponse response = accountService.accounting(request, header);
+        saveAccoutingLog(bussinessOrder, refundRequest, response);
+        logger.info("accounting result. StatusCode:{}, Message:{}", response.getStatusCode(),
+                response.getMessage());
 
-        try {
-            AccountingResponse response = accountService.accounting(request, header);
-            if (isAccoutingSuccess(response)) {
-                logger.info("accouting success. StatusCode:{}", response.getStatusCode());
-                saveAccoutingLog(payment, bussinessOrder, refundRequest, response);
-
-                return AccountingStatusEnum.SUCCESS;
-            } else {
-                logger.info("accounting failed. StatusCode:{}, Message:{}", response.getStatusCode(),
-                        response.getMessage());
-                saveAccoutingLog(payment, bussinessOrder, refundRequest, response);
-
-                if (AccountService.AccountingCode_SYSTEMERROR.equals(response.getStatusCode())) {
-                    return AccountingStatusEnum.UNKNOW;
-                } else {
-                    return AccountingStatusEnum.FAIL;
-                }
-            }
-        } catch (IOException e) {
-            saveAccoutingLog(payment, bussinessOrder, refundRequest, e);
-            logger.error("accouting error.", e); // 扣款异常只影响是否提交第三方扣款， 不影响返回给交易的应答
-
-            return AccountingStatusEnum.UNKNOW;
-        }
-
+        return response;
     }
 
-    private boolean isAccoutingSuccess(AccountingResponse response) {
-        return AccountService.ACCOUNTING_SUCCESS.equals(response.getStatusCode())
-                || AccountService.ACCOUNTING_IDEMPOTENTE.equals(response.getStatusCode());
-    }
-
-    /*
-     * 保存账务操作记录， 更新RefundRequest的AccoutingStatus
-     */
-    private void saveAccoutingLog(Payment payment, BussinessOrder bussinessOrder, RefundRequestPo refundRequest,
-            IOException e) {
-        AccountingLogPo log = new AccountingLogPo();
-        log.setCreatedTime(new Date());
-        log.setAccoutingAmt(refundRequest.getRefundAmount());
-        log.setAccountingType("Refund");
-        log.setStatus(0); // 成功为1，失败为0
-        log.setUserId((long) bussinessOrder.getUserId().intValue());
-        log.setBizNo(String.valueOf(refundRequest.getRefundId()));
-        log.setRespCode(AccountService.AccountingCode_SYSTEMERROR); // 系统异常
-        log.setRespMsg(e.getMessage());
-        log.setMemo("快速退款");
-        accountingLogMapper.insertSelective(log);
-
-        refundPository.updateRefundRequestAccoutingStatus(refundRequest.getRefundId(), log.getStatus());
-    }
-
-    /*
-     * 保存账务操作记录， 更新RefundRequest的AccoutingStatus
-     */
-    private void saveAccoutingLog(Payment payment, BussinessOrder bussinessOrder, RefundRequestPo refundRequest,
+    private void saveAccoutingLog(BussinessOrder bussinessOrder, RefundRequestPo refundRequest,
             AccountingResponse response) {
         AccountingLogPo log = new AccountingLogPo();
         log.setCreatedTime(new Date());
         log.setAccoutingAmt(refundRequest.getRefundAmount());
         log.setAccountingType("Refund");
-        log.setStatus(isAccoutingSuccess(response) ? 1 : 0); // 成功为1，失败为0
         log.setUserId((long) bussinessOrder.getUserId().intValue());
         log.setBizNo(String.valueOf(refundRequest.getRefundId()));
+        log.setMemo("快速退款");
         log.setRespCode(response.getStatusCode());
         log.setRespMsg(response.getMessage());
-        log.setMemo("快速退款");
+        log.setStatus(response.isAccoutingSuccess()); // 成功为1，失败为0
         accountingLogMapper.insertSelective(log);
 
         refundPository.updateRefundRequestAccoutingStatus(refundRequest.getRefundId(), log.getStatus());
@@ -221,32 +196,25 @@ public class RefundJobServiceImpl implements RefundJobService {
     public void updateRefundRequestAndPayment(RefundRequestPo refundRequest, Payment payment,
             RefundStatusEnum refundStatus) {
         RefundRequestPo refundRequestPo = new RefundRequestPo();
-        refundRequestPo.setRefundTime(new Date());
         PaymentPo paymentPo = new PaymentPo();
+
+        refundRequestPo.setRefundTime(new Date());
         paymentPo.setPaymentId(payment.getPaymentId());
         if (RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) {
             refundRequestPo.setRefundBatchNo(refundRequest.getRefundBatchNo());
             refundRequestPo.setRefundStatus(refundStatus.getCode());
-            int retryCount = refundRequestPo.getRetryCount() == null ? 1 : refundRequestPo.getRetryCount() + 1;
-            refundRequestPo.setRetryCount(retryCount);
             BigDecimal refundAmt = payment.getCompletedRefundAmt() == null ? refundRequest.getRefundAmount()
                     : refundRequest.getRefundAmount().add(payment.getCompletedRefundAmt());
-
             paymentPo.setPayStatus(PayStatusEnum.Refunded.getIndex());
             paymentPo.setCompletedRefundAmt(refundAmt); // 更新退款完成金额
         } else if (RefundStatusEnum.COMPLETE_FAILED.equals(refundStatus)) {
             refundRequestPo.setRefundBatchNo(refundRequest.getRefundBatchNo());
             refundRequestPo.setRefundStatus(refundStatus.getCode());
-            int retryCount = refundRequestPo.getRetryCount() == null ? 1 : refundRequestPo.getRetryCount() + 1;
-            refundRequestPo.setRetryCount(retryCount);
-
             BigDecimal refundAmt = payment.getRefundAmt().subtract(refundRequest.getRefundAmount());
             paymentPo.setRefundAmt(refundAmt); // 更新退款申请金额
         } else {
             refundRequestPo.setRefundBatchNo(refundRequest.getRefundBatchNo());
             refundRequestPo.setRefundStatus(refundStatus.getCode());
-            int retryCount = refundRequestPo.getRetryCount() == null ? 1 : refundRequestPo.getRetryCount() + 1;
-            refundRequestPo.setRetryCount(retryCount);
         }
 
         refundPository.updateRefundRequestAndPayment(refundRequestPo, paymentPo);
@@ -271,14 +239,12 @@ public class RefundJobServiceImpl implements RefundJobService {
             request.setRequestNo(refundRequest.getTraceId());
         }
 
-        boolean isSuccess = false;
         try {
-            isSuccess = refundCallbackService.doService(request, isNewSystem, header);
+            return refundCallbackService.doService(request, isNewSystem, header);
         } catch (IOException e) {
             logger.error("refund notify to trade service failed on {}", refundRequest.getRefundBatchNo());
+            return false;
         }
-
-        return isSuccess;
     }
 
     @Override

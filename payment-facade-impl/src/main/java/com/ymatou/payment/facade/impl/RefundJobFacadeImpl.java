@@ -32,8 +32,6 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
 
     private static final Logger logger = LoggerFactory.getLogger(RefundJobFacadeImpl.class);
 
-    private static final int SOFT_DELETED = -3;
-
     @Autowired
     private RefundJobService refundJobService;
 
@@ -46,62 +44,57 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
         HashMap<String, String> header = request.getHeader();
         ExecuteRefundResponse response = new ExecuteRefundResponse();
 
+        // 查询、校验RefundRequest
         logger.info("Step 1: query refundRequest, payment, businessOrder. {}", refundId);
         RefundRequestPo refundRequest = refundJobService.getRefundRequestByRefundId(refundId);
-        if (refundRequest == null // 退款申请不不存在或未审核
-                || refundRequest.getApproveStatus().equals(ApproveStatusEnum.NOT_APPROVED.getCode())) {
-            response.setRefundResult(RefundStatusEnum.INIT.getCode());
-            return response;
-        }
-        refundJobService.updateRetryCount(refundId); // 更新重试次数
-
-        if (refundRequest.getSoftDeleteFlag()) {
-            response.setRefundResult(SOFT_DELETED);
+        boolean isContinue = refundJobService.isContinueExecute(refundRequest);
+        if (!isContinue) {
+            response.setRefundResult("ok");
             return response;
         }
 
         Payment payment = payService.getPaymentByPaymentId(refundRequest.getPaymentId());
         BussinessOrder bussinessOrder = payService.getBussinessOrderById(payment.getBussinessOrderId());
-        int refundStatusFlag = refundRequest.getRefundStatus(); // 返回给定时调度器，告知当前退款申请的状态
-        if (refundRequest.getRefundStatus().equals(RefundStatusEnum.INIT.getCode())) {// 提交退款申请
-            boolean accountingSuccess = true;
+        refundJobService.updateRetryCount(refundId); // 更新重试次数
 
+        RefundStatusEnum refundStatus = RefundStatusEnum.withCode(refundRequest.getRefundStatus());
+        if (refundStatus.equals(RefundStatusEnum.INIT)) {// 提交第三方退款申请
+            AccountingStatusEnum accountingStatus = AccountingStatusEnum.SUCCESS;
             if (refundRequest.getApproveStatus().equals(ApproveStatusEnum.FAST_REFUND.getCode())
                     && !AccountingStatusEnum.SUCCESS.code().equals(refundRequest.getAccoutingStatus())) {
                 logger.info("Step 2: dedcut user balance.");
-                accountingSuccess = refundJobService.dedcutBalance(payment, bussinessOrder, refundRequest, header);
+                accountingStatus = refundJobService.dedcutBalance(payment, bussinessOrder, refundRequest, header);
             }
 
-            if (accountingSuccess) {
+            if (AccountingStatusEnum.SUCCESS.equals(accountingStatus)) {// 扣除码头余额成功/非快速退款
                 logger.info("Step 3: submit third party refund.");
-                RefundStatusEnum refundStatus = refundJobService.submitRefund(refundRequest, payment, header);
-                refundStatusFlag = refundStatus.getCode();
+                refundStatus = refundJobService.submitRefund(refundRequest, payment, header);
+                response.setRefundResult(String.valueOf(refundStatus.getCode()));
+            } else {
+                response.setRefundResult(String.valueOf(refundStatus.getCode()));
             }
 
-        } else {// 查询退款结果
-            RefundStatusEnum refundStatus = RefundStatusEnum.withCode(refundRequest.getRefundStatus());
+        } else {// 提交第三方退款查询
             if (!RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) {
                 logger.info("Step 4: submit third party refund query.");
                 refundStatus = refundJobService.queryRefund(refundRequest, payment, header);
-                refundStatusFlag = refundStatus.getCode();
+                response.setRefundResult(String.valueOf(refundStatus.getCode()));
 
-                logger.info("Step 5: update refund status, refund amount and retry count.");
+                logger.info("Step 5: update refund status, refund amount");
                 refundJobService.updateRefundRequestAndPayment(refundRequest, payment, refundStatus);
             }
 
             if (RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) {
                 logger.info("Step 6: callback trading system.");
-                boolean isSuccess = refundJobService.callbackTradingSystem(refundRequest, payment, header);
+                if (refundJobService.callbackTradingSystem(refundRequest, payment, header)) {
 
-                if (isSuccess) {
-                    logger.info("Step 7: update refundrequest to completed suceess.");
+                    logger.info("Step 7: update refundRequest to completed suceess.");
                     refundJobService.updateRefundRequestToCompletedSuccess(refundRequest);
-                    refundStatusFlag = RefundStatusEnum.COMPLETE_SUCCESS.getCode();
+                    response.setRefundResult("ok");
                 }
             }
         }
 
-        response.setRefundResult(refundStatusFlag);
         return response;
     }
 

@@ -14,13 +14,13 @@ public class ExecuteRefundResponse extends BaseResponse {
 
     private static final long serialVersionUID = 3753674889862363798L;
 
-    public Integer refundResult;
+    public String refundResult;
 
-    public Integer getRefundResult() {
+    public String getRefundResult() {
         return refundResult;
     }
 
-    public void setRefundResult(Integer refundResult) {
+    public void setRefundResult(String refundResult) {
         this.refundResult = refundResult;
     }
 }

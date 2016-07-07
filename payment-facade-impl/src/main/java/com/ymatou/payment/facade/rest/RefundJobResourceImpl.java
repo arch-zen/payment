@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.facade.RefundJobFacade;
-import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.facade.model.ExecuteRefundRequest;
 import com.ymatou.payment.facade.model.ExecuteRefundResponse;
 
@@ -42,12 +41,9 @@ public class RefundJobResourceImpl implements RefundJobResource {
         request.setHeader(header);
 
         ExecuteRefundResponse response = refundJobFacade.executeRefund(request);
-
-        Integer refundResult = response.getRefundResult();
+        String refundResult = response.getRefundResult();
         if (refundResult == null) {
             return String.valueOf(response.getErrorCode());
-        } else if (refundResult == RefundStatusEnum.COMPLETE_SUCCESS.getCode()) {
-            return "ok";
         } else {
             return String.valueOf(response.getRefundResult());
         }

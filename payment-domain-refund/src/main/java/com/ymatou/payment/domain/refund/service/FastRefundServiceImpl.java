@@ -56,8 +56,7 @@ public class FastRefundServiceImpl implements FastRefundService {
 
             refundRequests = refundPository.getRefundReqestByTraceId(refundInfo.getTraceId());
         } else { // 已存在， 幂等， 返回成功
-            logger.info("RefundRequest already exists. RefundBatchNo:{}",
-                    refundRequests.get(0).getRefundBatchNo());
+            logger.info("RefundRequest already exists. RefundBatchNo:{}", refundRequests.get(0).getRefundBatchNo());
         }
 
         return refundRequests.get(0);
@@ -93,6 +92,7 @@ public class FastRefundServiceImpl implements FastRefundService {
             logger.info("async send trading message");
             notifyUserService.sendTradingMessage(request, header);
         } catch (Exception e) {
+            logger.info("notify user trading message failed.", e);
             // 异步通知，发完通知就行
         }
     }

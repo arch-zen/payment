@@ -3,7 +3,6 @@
  */
 package com.ymatou.payment.integration.service.ymatou;
 
-import java.io.IOException;
 import java.util.HashMap;
 
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -32,24 +31,29 @@ import com.ymatou.payment.integration.model.AccountingResponse;
 @Component
 public class AccountService implements InitializingBean {
 
-    private static Logger logger = LoggerFactory.getLogger(AccountService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AccountService.class);
 
     private CloseableHttpClient httpClient;
-    public static final String ACCOUNTING_SUCCESS = "0"; // 成功
-    public static final String ACCOUNTING_IDEMPOTENTE = "4"; // 幂等
-    public static final String AccountingCode_SYSTEMERROR = "3"; // 系统异常
 
     @Autowired
     private IntegrationConfig integrationConfig;
 
-    public AccountingResponse accounting(AccountingRequest request, HashMap<String, String> header) throws IOException {
-        String url = integrationConfig.getYmtAccountingUrl(header);
+    public AccountingResponse accounting(AccountingRequest request, HashMap<String, String> header) {
+        try {
+            String url = integrationConfig.getYmtAccountingUrl(header);
+            String result = HttpClientUtil.sendPost(url, JSONObject.toJSONString(request), Constants.CONTENT_TYPE_JSON,
+                    header, httpClient);
+            AccountingResponse response = JSON.parseObject(result, AccountingResponse.class);
 
-        String result = HttpClientUtil.sendPost(url, JSONObject.toJSONString(request), Constants.CONTENT_TYPE_JSON,
-                header, httpClient);
+            return response;
+        } catch (Exception e) {
+            AccountingResponse response = new AccountingResponse();
+            response.setStatusCode(AccountingResponse.AccountingCode_SYSTEMERROR);
+            response.setMessage(e.getMessage());
+            logger.error("accouting error. RefundId:" + request.getAccountingItems().get(0).getBizNo(), e);
 
-        AccountingResponse response = JSON.parseObject(result, AccountingResponse.class);
-        return response;
+            return response;
+        }
     }
 
     @Override

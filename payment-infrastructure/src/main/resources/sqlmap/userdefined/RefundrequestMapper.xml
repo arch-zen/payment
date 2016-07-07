@@ -41,8 +41,7 @@
 		from (
 			select row_number() over(order by CreatedTime desc) as rownumber, <include refid="Base_Column_List"/>
 			from RefundRequest 
-			where SoftDeleteFlag = 0 
-				and ApproveStatus = ${approveStatus} 
+			where ApproveStatus = ${approveStatus} 
 				<if test="orderId != null">
 					and OrderId = #{orderId, jdbcType=VARCHAR}
 				</if>
