@@ -110,6 +110,9 @@
 	<dubbo:protocol name="rest" server="servlet" port="8091"
 		extension="com.ymatou.payment.infrastructure.serialize.JacksonConfig" />
 
+	<dubbo:service interface="com.ymatou.payment.facade.PaymentFacade"
+		ref="paymentFacade" protocol="dubbo" />
+
 	<dubbo:service interface="com.ymatou.payment.facade.RefundFacade"
 		ref="refundFacade" protocol="dubbo" />
 	
