@@ -66,7 +66,7 @@ public class AliPayRefundQueryServiceImpl implements RefundQueryService {
             saveRefundMiscRequestLog(refundRequest, requestTime, request, response, null);// 保存退款查询结果
             refundStatus = calcRefundStatus(refundRequest, payment, response);// 计算退款状态
         } catch (Exception e) {
-            logger.error("AliPay refund query error.", e);
+            logger.warn("AliPay refund query error.RefundNo:{}, ex:{}", refundRequest.getRefundBatchNo(), e);
 
             saveRefundMiscRequestLog(refundRequest, requestTime, request, null, e);
             refundStatus = RefundStatusEnum.REFUND_FAILED;

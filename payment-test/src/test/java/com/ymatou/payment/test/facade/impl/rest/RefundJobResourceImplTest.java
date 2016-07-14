@@ -176,7 +176,7 @@ public class RefundJobResourceImplTest extends RestBaseTest {
         request2.setRefundId(refundId);
         String respMsg = refundJobResource.executeRefund(request2, servletRequest);
         Thread.sleep(1000);
-        Assert.assertEquals("ok", respMsg);
+        Assert.assertEquals("4", respMsg);
     }
 
     private HashMap<String, Object> generatePayment() {
