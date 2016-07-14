@@ -30,7 +30,7 @@ public class RefundFacadeImplTest {
     private RefundFacade refundFacade;
 
     @Test
-    public void test() {
+    public void checkRefundableTest() {
         TradeRefundableRequest request = new TradeRefundableRequest();
         request.setTradeNos(Arrays.asList(new String[] {"1111111111"}));
         TradeRefundableResponse response = refundFacade.checkRefundable(request);

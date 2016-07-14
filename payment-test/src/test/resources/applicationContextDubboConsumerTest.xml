@@ -53,4 +53,7 @@
  
     <!-- 生成远程服务代理，可以和本地bean一样使用demoFacade -->
     <dubbo:reference id="refundFacadeClient" interface="com.ymatou.payment.facade.RefundFacade" check="false"/>
+    
+    <!-- 生成远程服务代理，可以和本地bean一样使用demoFacade -->
+    <dubbo:reference id="paymentFacadeClient" interface="com.ymatou.payment.facade.PaymentFacade" check="false"/>
 </beans>
