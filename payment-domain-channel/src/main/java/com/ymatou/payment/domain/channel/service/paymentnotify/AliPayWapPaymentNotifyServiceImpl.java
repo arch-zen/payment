@@ -100,13 +100,12 @@ public class AliPayWapPaymentNotifyServiceImpl implements PaymentNotifyService {
             try {
                 Document document = DocumentHelper.parseText(notifyData);
                 Element root = document.getRootElement();
-                String buyerEmail = root.elementText("buyer_email");
                 String currency = root.elementText("currency");
                 String gmtPayment = root.elementText("gmt_payment");
 
                 paymentNotifyMessage.setTraceId(UUID.randomUUID().toString());
-                paymentNotifyMessage.setPayerId(map.get("buyer_id"));
-                paymentNotifyMessage.setPayerEmail(map.get("buyer_email"));
+                paymentNotifyMessage.setPayerId(root.elementText("buyer_id"));
+                paymentNotifyMessage.setPayerEmail(root.elementText("buyer_email"));
                 paymentNotifyMessage.setActualPayCurrency(StringUtils.isBlank(currency) ? "CNY" : currency);
                 paymentNotifyMessage.setActualPayPrice(new BigDecimal(root.elementText("total_fee")));
                 paymentNotifyMessage.setInstitutionPaymentId(root.elementText("trade_no"));

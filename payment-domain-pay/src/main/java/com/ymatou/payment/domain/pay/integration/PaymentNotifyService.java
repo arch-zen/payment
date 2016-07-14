@@ -5,7 +5,6 @@
  */
 package com.ymatou.payment.domain.pay.integration;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,7 +93,8 @@ public class PaymentNotifyService {
         // request.setTraceId("43f231c6-caa5-4caf-86ed-3bf17f98121b");
         request.setInstPaymentId(payment.getInstitutionPaymentId());
         request.setInternalUserId(String.valueOf(bussinessOrder.getUserId()));
-        request.setExternalUserId(filterAliInternalUsers(payment.getPayerId()));
+        String payerId = StringUtils.isBlank(payment.getPayerEmail()) ? payment.getPayerId() : payment.getPayerEmail();
+        request.setExternalUserId(filterAliInternalUsers(payerId));
         request.setPayChannel(convertPayChannel(payment.getPayType()));
         request.setPayType(bussinessOrder.getPayType());
         request.setSign(sign(request));

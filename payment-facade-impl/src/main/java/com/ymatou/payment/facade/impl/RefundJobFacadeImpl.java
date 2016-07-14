@@ -58,6 +58,7 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
         refundJobService.updateRetryCount(refundId); // 更新重试次数
 
         RefundStatusEnum refundStatus = RefundStatusEnum.withCode(refundRequest.getRefundStatus());
+        response.setRefundResult(String.valueOf(refundStatus.getCode()));
         if (refundStatus.equals(RefundStatusEnum.INIT)) {// 提交第三方退款申请
             AccountingStatusEnum accountingStatus = AccountingStatusEnum.SUCCESS;
             if (refundRequest.getApproveStatus().equals(ApproveStatusEnum.FAST_REFUND.getCode())
@@ -69,8 +70,6 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
             if (AccountingStatusEnum.SUCCESS.equals(accountingStatus)) {// 扣除码头余额成功/非快速退款
                 logger.info("Step 3: submit third party refund.");
                 refundStatus = refundJobService.submitRefund(refundRequest, payment, header);
-                response.setRefundResult(String.valueOf(refundStatus.getCode()));
-            } else {
                 response.setRefundResult(String.valueOf(refundStatus.getCode()));
             }
 
@@ -90,7 +89,7 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
 
                     logger.info("Step 7: update refundRequest to completed suceess.");
                     refundJobService.updateRefundRequestToCompletedSuccess(refundRequest);
-                    response.setRefundResult("ok");
+                    response.setRefundResult(String.valueOf(RefundStatusEnum.COMPLETE_SUCCESS.getCode()));
                 }
             }
         }
