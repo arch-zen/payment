@@ -134,6 +134,7 @@ public class AliPayWapAcquireOrderServiceImpl implements AcquireOrderService {
         String sign = signForTradeCreate(request, instConfig, mockHeader); // 签名
         request.setSign(sign);
 
+
         try {
             CreateTradeResponse response = tradeCreateService.doService(request, mockHeader);
             if (StringUtils.isBlank(response.getRequestToken())) {
@@ -142,8 +143,9 @@ public class AliPayWapAcquireOrderServiceImpl implements AcquireOrderService {
             }
             return response.getRequestToken(); // 获取RequestToken
         } catch (Exception e) {
-            logger.error("call alipay tradeCreateDirect fail", e);
-            throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED, "call alipay tradeCreateDirect fail", e);
+            logger.error("call alipay tradeCreateDirect fail, paymentId:" + payment.getPaymentId(), e);
+            throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
+                    "call alipay tradeCreateDirect fail, paymentId:" + payment.getPaymentId(), e);
         }
     }
 

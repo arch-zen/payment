@@ -97,8 +97,9 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
             payment.setBussinessOrder(bussinessOrder);
 
 
-            // 如果支付单的状态 已经成功则直接返回成功
-            if (payment.getPayStatus() == PayStatusEnum.Paied) {
+            // 如果支付单的状态 已经成功 或者 已经退款 则直接返回成功
+            // 部分退款成功是，支付宝会继续回调此接口，如果发现支付单已经退款不做任何的处理
+            if (payment.getPayStatus() == PayStatusEnum.Paied || payment.getPayStatus() == PayStatusEnum.Refunded) {
                 response.setResult(notifyService.buildResponse(notifyMessage, payment, req.getNotifyType()));
                 response.setSuccess(true);
                 return response;
