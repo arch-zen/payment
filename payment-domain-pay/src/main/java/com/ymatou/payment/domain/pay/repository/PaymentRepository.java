@@ -109,18 +109,6 @@ public class PaymentRepository {
 
         // 更新商户订单
         bussinessOrderRepository.updateOrderStatus(paymentPo.getBussinessOrderId(), paymentPo.getPayStatus());
-
-        // 添加发货信息
-        // CompensateProcessInfoPo compensateprocessinfoPo = new CompensateProcessInfoPo();
-        // compensateprocessinfoPo.setAppId("1");// 固定值代表发货服务
-        // compensateprocessinfoPo.setCorrelateId(paymentPo.getPaymentId());
-        // compensateprocessinfoPo.setMethodName("DeliveryNotify");
-        // compensateprocessinfoPo.setRequestUrl(integrationConfig.getYmtNotifyPaymentUrl());
-        // compensateprocessinfoPo.setRequestData(
-        // String.format("{\"PaymentId\":\"%s\",\"TraceId\":\"%s\"}", paymentPo.getPaymentId(),
-        // traceId));
-
-        // compensateProcessInfoMapper.insertSelective(compensateprocessinfoPo);
     }
 
     /**
@@ -130,13 +118,6 @@ public class PaymentRepository {
      * @return
      */
     private String genPaymentId(BussinessOrderPo bo) {
-        /**
-         * 建议 YYmmDDhhMMss + 一个数据库自增长ID的后5位（不足5位，前面补0）
-         */
-
-        // long timestamp = new Date().getTime();
-        // String paymentId = String.format("%d%04d", timestamp, new Random().nextInt(10000));
-
         long paymentSuffixId = paymentOperate.genPaymentSuffixId();
         String prefix = StringUtil.getDateFormatString("yyMMddHHmmss");
         String suffix = String.format("%05d", paymentSuffixId);
