@@ -50,7 +50,7 @@ public class AccountService implements InitializingBean {
             AccountingResponse response = new AccountingResponse();
             response.setStatusCode(AccountingResponse.AccountingCode_SYSTEMERROR);
             response.setMessage(e.getMessage());
-            logger.error("accouting error. RefundId:" + request.getAccountingItems().get(0).getBizNo(), e);
+            logger.error("accouting error. BizNo:" + request.getAccountingItems().get(0).getBizNo(), e);
 
             return response;
         }
