@@ -1,6 +1,7 @@
 package com.ymatou.payment.test.integration.service.wxpay;
 
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.Random;
 
 import org.junit.Assert;
@@ -8,8 +9,10 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ymatou.payment.integration.common.Signature;
+import com.ymatou.payment.integration.model.AliPayRefundQueryResponse.RefundDetailData;
 import com.ymatou.payment.integration.model.QueryRefundRequest;
 import com.ymatou.payment.integration.model.QueryRefundResponse;
+import com.ymatou.payment.integration.model.RefundOrderData;
 import com.ymatou.payment.integration.service.wxpay.WxRefundQueryService;
 import com.ymatou.payment.test.RestBaseTest;
 
@@ -38,6 +41,34 @@ public class RefundQueryServiceTest extends RestBaseTest {
         QueryRefundResponse response = refundQueryService.doService(request, header);
         Assert.assertNotNull(response);
         Assert.assertEquals("REFUNDNOTEXIST", response.getErr_code());
+    }
+
+    @Test
+    public void testMutiRefund() throws Exception {
+        String refundNo = "201607250000425035";
+        String refundNo1 = "201607250000425036";
+        QueryRefundRequest request = new QueryRefundRequest();
+        request.setAppid("wxf51a439c0416f182");
+        request.setMch_id("1234079001");
+        request.setDevice_info("WEB");
+        request.setNonce_str("weixin" + String.valueOf(new Random().nextInt(10)));
+        request.setOut_refund_no(refundNo);
+
+        // 加签
+        String sign = Signature.getSign(request, "c5781df6b8f149adca6094cdac4ac684");
+        request.setSign(sign);
+
+        HashMap<String, String> header = new HashMap<>();
+        QueryRefundResponse response = refundQueryService.doService(request, header);
+        Assert.assertNotNull(response);
+        Assert.assertNotNull(response.getRefundOrderDataList());
+
+        Optional<RefundOrderData> refundOrderData = response.getRefundOrderDataList().stream()
+                .filter(refund -> refund.getOutRefundNo().equals(refundNo))
+                .findFirst();
+
+        Assert.assertEquals(true, refundOrderData.isPresent());
+        Assert.assertEquals(7500, refundOrderData.get().getRefundFee());
     }
 
     @Test

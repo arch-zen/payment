@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="test-RefundRequest">
+	<resultMap id="BaseResultMap" type="com.ymatou.payment.infrastructure.db.model.RefundRequestPo" >
+	    <id column="PaymentId" property="paymentId" jdbcType="VARCHAR" />
+	    <result column="TradeNo" property="tradeNo" jdbcType="VARCHAR" />
+	    <result column="OrderId" property="orderId" jdbcType="VARCHAR" />
+	    <result column="TraceId" property="traceId" jdbcType="VARCHAR" />
+	    <result column="AppId" property="appId" jdbcType="VARCHAR" />
+	    <result column="PayType" property="payType" jdbcType="VARCHAR" />
+	    <result column="RefundAmount" property="refundAmount" jdbcType="DECIMAL" />
+	    <result column="CurrencyType" property="currencyType" jdbcType="VARCHAR" />
+	    <result column="ApproveStatus" property="approveStatus" jdbcType="INTEGER" />
+	    <result column="ApprovedTime" property="approvedTime" jdbcType="TIMESTAMP" />
+	    <result column="SoftDeleteFlag" property="softDeleteFlag" jdbcType="BIT" />
+	    <result column="CreatedTime" property="createdTime" jdbcType="TIMESTAMP" />
+	    <result column="ApprovedUser" property="approvedUser" jdbcType="VARCHAR" />
+	    <result column="RefundStatus" property="refundStatus" jdbcType="INTEGER" />
+	    <result column="RefundTime" property="refundTime" jdbcType="TIMESTAMP" />
+	    <result column="RefundBatchNo" property="refundBatchNo" jdbcType="VARCHAR" />
+	    <result column="InstPaymentId" property="instPaymentId" jdbcType="VARCHAR" />
+	    <result column="TradeType" property="tradeType" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<select id="selectOneRefundRequest" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		<![CDATA[
+		select top 1 * from RefundRequest where CreatedTime < '2016-07-10' and AppId = 'TradingJ' and RefundStatus = #{refundStatus} order by CreatedTime desc
+		]]>
+	</select>
+</mapper>

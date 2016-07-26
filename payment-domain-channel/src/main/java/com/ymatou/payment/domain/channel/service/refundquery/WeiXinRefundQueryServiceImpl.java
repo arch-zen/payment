@@ -5,6 +5,7 @@ package com.ymatou.payment.domain.channel.service.refundquery;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Optional;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -67,7 +68,7 @@ public class WeiXinRefundQueryServiceImpl implements RefundQueryService {
             saveRefundMiscRequestLog(refundRequest, requestTime, queryRefundRequest, response, null);// 保存退款查询应答
             refundStatus = calcRefundStatus(refundRequest, response);// 计算退款状态
         } catch (Exception e) {
-            logger.error("weixin refund query error.", e);
+            logger.error("weixin refund query error, refundBatchNo:" + refundRequest.getRefundBatchNo(), e);
 
             saveRefundMiscRequestLog(refundRequest, requestTime, queryRefundRequest, null, e);
             refundStatus = RefundStatusEnum.REFUND_FAILED;
@@ -84,16 +85,38 @@ public class WeiXinRefundQueryServiceImpl implements RefundQueryService {
      * @return
      */
     private RefundStatusEnum calcRefundStatus(RefundRequestPo refundRequest, QueryRefundResponse response) {
+        /*
+         * 以下报文表示查询微信失败，此时直接返回PO中退款单的状态，不做更改
+         * <xml>
+         * <return_code><![CDATA[FAIL]]></return_code>
+         * <return_msg><![CDATA[System Error]]></return_msg>
+         * </xml>
+         */
+        if ("FAIL".equals(response.getReturn_code()) && "System Error".equals(response.getReturn_msg())) {
+            return RefundStatusEnum.withCode(refundRequest.getRefundStatus().intValue());
+        }
 
         if ("FAIL".equals(response.getResult_code()) && "REFUNDNOTEXIST".equals(response.getErr_code())) {
             return RefundStatusEnum.INIT;
         }
 
-        RefundOrderData refundDetail = response.getRefundOrderDataList().get(0);
+        // 从退款单列表找出对应的退款批次号
+        Optional<RefundOrderData> refundOrderData = response.getRefundOrderDataList().stream()
+                .filter(refund -> refund.getOutRefundNo().equals(refundRequest.getRefundBatchNo()))
+                .findFirst();
+        if (refundOrderData.isPresent() == false) {
+            logger.error("weixin refund query not find refundbatchNo:" + refundRequest.getRefundBatchNo());
+            return RefundStatusEnum.COMPLETE_FAILED;
+        }
+
+        // 校验退款信息
+        RefundOrderData refundDetail = refundOrderData.get();
         if (!refundRequest.getPaymentId().equals(response.getOut_trade_no())
                 || !refundRequest.getRefundBatchNo().equals(refundDetail.getOutRefundNo())
                 || new Money(refundRequest.getRefundAmount()).getCent() != refundDetail.getRefundFee()
                 || StringUtils.isBlank(refundDetail.getRefundStatus())) {
+            logger.error(
+                    "weixin refund query find complete failed with refundbatchNo:" + refundRequest.getRefundBatchNo());
             return RefundStatusEnum.COMPLETE_FAILED;
         }
 

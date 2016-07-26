@@ -17,6 +17,13 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.ymatou.payment.facade.constants.RefundStatusEnum;
+import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
+
+/**
+ * @author wangxudong 2016年7月26日 下午3:44:30
+ *
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/applicationContextRestTest.xml"})
 public class RestBaseTest extends BaseTest {
@@ -69,5 +76,16 @@ public class RestBaseTest extends BaseTest {
      */
     protected AccountInfo getAccountInfo(String accountId) {
         return sqlSession.selectOne("test-accountInfo.selectAccount", accountId);
+    }
+
+
+    /**
+     * 根据退款单状态随机获取一个退款单
+     * 
+     * @param refundStatusEnum
+     * @return
+     */
+    protected RefundRequestPo getRefundRequestBy(RefundStatusEnum refundStatusEnum) {
+        return sqlSession.selectOne("test-RefundRequest.selectOneRefundRequest", refundStatusEnum.getCode());
     }
 }
