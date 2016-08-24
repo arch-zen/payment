@@ -228,7 +228,10 @@ public class RefundJobServiceImpl implements RefundJobService {
         request.setAuditor(refundRequest.getApprovedUser());
         request.setOptType(REFUND_SUCCESS_OPT_TYPE);
         request.setOrderID(Long.valueOf(refundRequest.getOrderId()));
-        request.setPassAuditTime(refundRequest.getRefundTime());
+
+        // 避免出现NULL的现象
+        request.setPassAuditTime(refundRequest.getRefundTime() == null ? new Date() : refundRequest.getRefundTime());
+
         request.setRequiredRefundAmount(refundRequest.getRefundAmount());
         request.setThirdPartyName(PayTypeEnum.getThirdPartyName(payment.getPayType()));
         request.setThirdPartyTradingNo(refundRequest.getInstPaymentId());

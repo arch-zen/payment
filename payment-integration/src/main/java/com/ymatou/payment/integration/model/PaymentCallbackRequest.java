@@ -67,6 +67,11 @@ public class PaymentCallbackRequest {
      * 用户外部标识
      */
     private String externalUserId;
+    /*
+     * 第三方用户标识（支付宝 28开头）
+     */
+    private String externalPayerId;
+
     /**
      * 支付渠道(Weixin、Alipay)
      */
@@ -232,5 +237,19 @@ public class PaymentCallbackRequest {
      */
     public void setVersion(Integer version) {
         Version = version;
+    }
+
+    /**
+     * @return the externalPayerId
+     */
+    public String getExternalPayerId() {
+        return externalPayerId;
+    }
+
+    /**
+     * @param externalPayerId the externalPayerId to set
+     */
+    public void setExternalPayerId(String externalPayerId) {
+        this.externalPayerId = externalPayerId;
     }
 }

@@ -96,6 +96,24 @@ public class WeiXinRefundQueryServiceImpl implements RefundQueryService {
             return RefundStatusEnum.withCode(refundRequest.getRefundStatus().intValue());
         }
 
+        /*
+         * 以下报文表示查询微信失败，此时直接返回PO中退款单的状态，不做更改
+         * <xml>
+         * <appid> <![CDATA[wxf51a439c0416f182]]> </appid>
+         * <err_code> <![CDATA[SYSTEMERROR]]> </err_code>
+         * <err_code_des> <![CDATA[SystemError]]> </err_code_des>
+         * <mch_id> <![CDATA[1234079001]]> </mch_id>
+         * <nonce_str> <![CDATA[jYUgGjUiheAmPHpd]]> </nonce_str>
+         * <result_code> <![CDATA[FAIL]]> </result_code>
+         * <return_code> <![CDATA[SUCCESS]]> </return_code>
+         * <return_msg> <![CDATA[OK]]> </return_msg>
+         * <sign> <![CDATA[814C5FE997BF52000F162CB0885F802B]]> </sign>
+         * </xml>
+         */
+        if ("SYSTEMERROR".equals(response.getErr_code())) {
+            return RefundStatusEnum.withCode(refundRequest.getRefundStatus().intValue());
+        }
+
         if ("FAIL".equals(response.getResult_code()) && "REFUNDNOTEXIST".equals(response.getErr_code())) {
             return RefundStatusEnum.INIT;
         }

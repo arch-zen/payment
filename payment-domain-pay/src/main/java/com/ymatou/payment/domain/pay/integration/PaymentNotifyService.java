@@ -93,12 +93,15 @@ public class PaymentNotifyService {
         // request.setTraceId("43f231c6-caa5-4caf-86ed-3bf17f98121b");
         request.setInstPaymentId(payment.getInstitutionPaymentId());
         request.setInternalUserId(String.valueOf(bussinessOrder.getUserId()));
+
         String payerId = StringUtils.isBlank(payment.getPayerEmail()) ? payment.getPayerId() : payment.getPayerEmail();
         request.setExternalUserId(filterAliInternalUsers(payerId));
+
+        // 此字段专门为数据科学部使用，作为风控关键要素
+        request.setExternalPayerId(payment.getPayerId());
         request.setPayChannel(convertPayChannel(payment.getPayType()));
         request.setPayType(bussinessOrder.getPayType());
         request.setSign(sign(request));
-
 
         return request;
     }
@@ -159,6 +162,7 @@ public class PaymentNotifyService {
         map.put("InstPaymentId", req.getInstPaymentId());
         map.put("InternalUserId", req.getInternalUserId());
         map.put("ExternalUserId", req.getExternalUserId());
+        // map.put("ExternalPayerId ", req.getExternalPayerId());// 此字段专门为数据科学部使用，作为风控关键要素，不做签名
         map.put("PayChannel", req.getPayChannel());
         map.put("PayType", req.getPayType());
         map.put("PaymentId", req.getPaymentId());
