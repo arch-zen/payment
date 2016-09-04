@@ -16,5 +16,9 @@ public class DemoTest {
 
         Integer integer = 1;
         assertEquals("Null operator", true, null != integer);
+
+        String haha = null;
+
+        System.out.println(haha + "tony");
     }
 }

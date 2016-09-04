@@ -36,6 +36,7 @@
 		<property name="locations">
 			<list>
 				<value>institutionConfig.xml</value>
+                <value>app.properties</value>
 			</list>
 		</property>
 	</bean>
@@ -50,7 +51,6 @@
 		<property name="locations">
 			<list>
 				<value>classpath:db.properties</value>
-				<value>classpath:dubbo.properties</value>
 			</list>
 		</property>
 	</bean>
@@ -79,8 +79,8 @@
 
 	<bean id="performanceMonitorAdvice"
 		class="com.ymatou.performancemonitorclient.PerformanceMonitorAdvice">
-		<property name="appId" value="payment.ymatou.com"></property>
-		<property name="serverUrl" value="http://172.16.100.13:8089/api/perfmon"></property>
+		<property name="appId" value="${appId}"></property>
+		<property name="serverUrl" value="${perfmonapi.url}"></property>
 	</bean>
 
 	<aop:config>
@@ -100,14 +100,14 @@
 
 
 	<!-- 提供方应用信息，用于计算依赖关系 -->
-	<dubbo:application name="payment.ymatou.com" />
+	<dubbo:application name="${appId}" />
 
 	<dubbo:registry address="zookeeper://${dubbo.zoo}" />
 
 	<!-- 用dubbo协议在20880端口暴露服务 -->
-	<dubbo:protocol name="dubbo" port="30880" serialization="kryo" />
+	<dubbo:protocol name="dubbo" port="${dubbo.port}" serialization="kryo" />
 
-	<dubbo:protocol name="rest" server="servlet" port="8093"
+	<dubbo:protocol name="rest" server="servlet" port="${rest.port}"
 		extension="com.ymatou.payment.infrastructure.serialize.JacksonConfig" />
 
 	<dubbo:service

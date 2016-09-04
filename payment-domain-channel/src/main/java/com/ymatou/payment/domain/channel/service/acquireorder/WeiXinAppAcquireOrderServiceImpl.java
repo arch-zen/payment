@@ -121,10 +121,12 @@ public class WeiXinAppAcquireOrderServiceImpl implements AcquireOrderService {
                     && "SUCCESS".equals(response.getReturn_code())) {
                 return response.getPrepay_id();
             } else {
-                throw new Exception(response.getReturn_msg());
+                throw new Exception(
+                        payment.getPaymentId() + " get weiXinPrepayId fail|" + response.getReturn_msg() + "|"
+                                + response.getErr_code_des());
             }
         } catch (Exception ex) {
-            logger.error("call weixin unifed order failed", ex);
+            logger.error("call weixin unifed order failed, paymentId:" + payment.getPaymentId(), ex);
             throw new BizException(ErrorCode.SERVER_SIDE_ACQUIRE_ORDER_FAILED,
                     "paymentid:" + payment.getPaymentId() + "|" + ex.getMessage(),
                     ex);

@@ -118,6 +118,27 @@ public class WeiXinRefundQueryServiceImpl implements RefundQueryService {
             return RefundStatusEnum.INIT;
         }
 
+        /**
+         * 以下报文表示用户已经和微信支付解绑，直接返回永久失败
+         * <xml>
+         * <return_code><![CDATA[SUCCESS]]></return_code>
+         * <return_msg><![CDATA[OK]]></return_msg>
+         * <appid><![CDATA[wxf51a439c0416f182]]></appid>
+         * <mch_id><![CDATA[1234079001]]></mch_id>
+         * <nonce_str><![CDATA[6Jfr9yz7AQeL3Tr3]]></nonce_str>
+         * <sign><![CDATA[4292534ECC3F2D59C24691C57CF910AC]]></sign>
+         * <result_code><![CDATA[FAIL]]></result_code>
+         * <err_code><![CDATA[USER_ACCOUNT_ABNORMAL]]></err_code>
+         * <err_code_des><![CDATA[用户账户异常或已注销]]></err_code_des>
+         * </xml>
+         * 
+         */
+        if ("USER_ACCOUNT_ABNORMAL".equals(response.getErr_code())) {
+            logger.error("{}, weixin refund query not find refundbatchNo:{}", response.getErr_code(),
+                    refundRequest.getRefundBatchNo());
+            return RefundStatusEnum.COMPLETE_FAILED;
+        }
+
         // 从退款单列表找出对应的退款批次号
         Optional<RefundOrderData> refundOrderData = response.getRefundOrderDataList().stream()
                 .filter(refund -> refund.getOutRefundNo().equals(refundRequest.getRefundBatchNo()))

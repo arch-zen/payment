@@ -97,7 +97,7 @@ public class TestPaymentResourceImpl implements TestPaymentResource {
         req.setExt("{\"SHOWMODE\":\"2\",\"PAYMETHOD\":\"2\", \"IsHangZhou\":0}");
         req.setUserId(12345L);
         req.setUserIp("127.0.0.1");
-        // req.setBankId("CMB");
+        req.setBankId("ICBCB2C");
     }
 
     /**

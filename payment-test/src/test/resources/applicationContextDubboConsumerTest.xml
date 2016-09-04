@@ -30,7 +30,7 @@
           class="com.baidu.disconf.client.addons.properties.ReloadablePropertiesFactoryBean">
         <property name="locations">
             <list>
-                <value>dubbo.properties</value>
+                <value>app.properties</value>
             </list>
         </property>
     </bean>
@@ -47,7 +47,7 @@
     
     
     <!-- 提供方应用信息，用于计算依赖关系 -->
-    <dubbo:application name="payment"  />
+    <dubbo:application name="${appId}"  />
  
     <dubbo:registry address="zookeeper://${dubbo.zoo}" />
  
