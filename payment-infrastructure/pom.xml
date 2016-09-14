@@ -167,12 +167,27 @@
 			<artifactId>httpasyncclient</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>com.alibaba</groupId>
-		    <artifactId>fastjson</artifactId>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>commons-beanutils</groupId>
-		    <artifactId>commons-beanutils</artifactId>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
 		</dependency>
+
+		<!-- 消息总线 -->
+		<dependency>
+			<groupId>com.ymatou.messagebus</groupId>
+			<artifactId>messagebus-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.ymatou.messagebus</groupId>
+			<artifactId>messagebus-facade</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.ymatou.messagebus</groupId>
+			<artifactId>messagebus-facade-model</artifactId>
+		</dependency>
+
 	</dependencies>
 </project>

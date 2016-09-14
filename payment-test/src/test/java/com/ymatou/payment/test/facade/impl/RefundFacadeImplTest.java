@@ -13,6 +13,9 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.ymatou.messagebus.client.Message;
+import com.ymatou.messagebus.client.MessageBusClient;
+import com.ymatou.messagebus.client.MessageBusException;
 import com.ymatou.payment.facade.RefundFacade;
 import com.ymatou.payment.facade.model.TradeRefundableRequest;
 import com.ymatou.payment.facade.model.TradeRefundableResponse;
@@ -29,11 +32,24 @@ public class RefundFacadeImplTest {
     @Resource(name = "refundFacadeClient")
     private RefundFacade refundFacade;
 
+    @Resource
+    private MessageBusClient messageBusClient;
+
     @Test
     public void checkRefundableTest() {
         TradeRefundableRequest request = new TradeRefundableRequest();
         request.setTradeNos(Arrays.asList(new String[] {"1111111111"}));
         TradeRefundableResponse response = refundFacade.checkRefundable(request);
         Assert.assertEquals(true, response.getIsSuccess());
+    }
+
+    @Test
+    public void messageBusClientTest() throws MessageBusException {
+        Message req = new Message();
+        req.setAppId("payment");
+        req.setCode("refund_notify");
+        req.setMessageId("payment-000001");
+        req.setBody("messagebody");
+        messageBusClient.sendMessasge(req);
     }
 }

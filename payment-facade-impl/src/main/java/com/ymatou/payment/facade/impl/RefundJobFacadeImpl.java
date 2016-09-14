@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.ymatou.messagebus.client.Message;
+import com.ymatou.messagebus.client.MessageBusClient;
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.service.PayService;
@@ -20,6 +22,7 @@ import com.ymatou.payment.facade.constants.ApproveStatusEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.facade.model.ExecuteRefundRequest;
 import com.ymatou.payment.facade.model.ExecuteRefundResponse;
+import com.ymatou.payment.facade.model.RefundSuccessNotifyReq;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 
 /**
@@ -37,6 +40,9 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
 
     @Autowired
     private PayService payService;
+
+    @Autowired
+    private MessageBusClient messageBusClient;
 
     @Override
     public ExecuteRefundResponse executeRefund(ExecuteRefundRequest request) {
@@ -91,10 +97,38 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
                     refundJobService.updateRefundRequestToCompletedSuccess(refundRequest);
                     response.setRefundResult(String.valueOf(RefundStatusEnum.COMPLETE_SUCCESS.getCode()));
                 }
+
+
+                logger.info("Step 8: call message bus when payment refund success.");
+                sendRefundNotifyMessage(refundRequest, payment);
             }
         }
 
         return response;
+    }
+
+    /**
+     * 发送退款通知到总线
+     * 
+     * @param refundRequestPo
+     * @param payment
+     */
+    private void sendRefundNotifyMessage(RefundRequestPo refundRequestPo, Payment payment) {
+        RefundSuccessNotifyReq refundSuccessNotifyReq = new RefundSuccessNotifyReq();
+        refundSuccessNotifyReq.setRefundId(refundRequestPo.getRefundId());
+        refundSuccessNotifyReq.setRefundAmount(refundRequestPo.getRefundAmount());
+        refundSuccessNotifyReq.setPaymentId(payment.getPaymentId());
+        refundSuccessNotifyReq.setInstPaymentId(payment.getInstitutionPaymentId());
+        refundSuccessNotifyReq.setOrderId(refundRequestPo.getOrderId());
+
+        Message message =
+                new Message("payment", "refund_notify", String.valueOf(refundRequestPo.getRefundId()),
+                        refundSuccessNotifyReq);
+        try {
+            messageBusClient.sendMessasge(message);
+        } catch (Exception e) {
+            logger.error("call messagebus faild when send refundId:" + refundRequestPo.getRefundId(), e);
+        }
     }
 
 }

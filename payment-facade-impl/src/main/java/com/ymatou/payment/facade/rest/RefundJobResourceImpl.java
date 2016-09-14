@@ -12,12 +12,15 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.facade.RefundJobFacade;
 import com.ymatou.payment.facade.model.ExecuteRefundRequest;
 import com.ymatou.payment.facade.model.ExecuteRefundResponse;
+import com.ymatou.payment.facade.model.RefundSuccessNotifyReq;
 
 /**
  * 
@@ -29,6 +32,8 @@ import com.ymatou.payment.facade.model.ExecuteRefundResponse;
 @Consumes({"application/json; charset=UTF-8"})
 // @Produces({"text/html; charset=UTF-8"})
 public class RefundJobResourceImpl implements RefundJobResource {
+
+    private static Logger logger = LoggerFactory.getLogger(RefundJobResourceImpl.class);
 
     @Autowired
     private RefundJobFacade refundJobFacade;
@@ -64,5 +69,20 @@ public class RefundJobResourceImpl implements RefundJobResource {
             header.put(headerName, servletRequest.getHeader(headerName));
         }
         return header;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.ymatou.payment.facade.rest.RefundJobResource#refundSuccessNotify(com.ymatou.payment.
+     * facade.model.RefundSuccessNotifyReq)
+     */
+    @POST
+    @Path("/{Refund:(?i:Refund)}/{RefundSuccessNotify:(?i:RefundSuccessNotify)}")
+    @Override
+    public String refundSuccessNotify(RefundSuccessNotifyReq req) {
+        logger.info("receive refund success notify from messagebus, req:{}", req);
+
+        return "ok";
     }
 }

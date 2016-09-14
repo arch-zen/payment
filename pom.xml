@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.ymatou.payment</groupId>
@@ -53,14 +54,14 @@
 		<el-api.version>2.2</el-api.version>
 		<errorreporter.version>1.0.1</errorreporter.version>
 		<performance.monitor.client.version>1.0.5</performance.monitor.client.version>
-		
+
 		<thoughtworks.xstream.version>1.4.7</thoughtworks.xstream.version>
 		<dom4j.version>1.6.1</dom4j.version>
 		<httpasyncclient.version>4.1.1</httpasyncclient.version>
 		<junit-toolbox.version>1.5</junit-toolbox.version>
 		<fastjson.version>1.2.11</fastjson.version>
 		<beanutils.version>1.9.2</beanutils.version>
-		
+
 		<!-- self version -->
 		<payment.version>1.0.0</payment.version>
 
@@ -68,6 +69,8 @@
 		<!--开发联调，API还未稳定，需要频繁发布时，版本号变更为1.0.0.SNAPSHOT。 -->
 		<!--API最终确定后，版本号修改为“1.0.0YyyyMmDd”并release。客户端最终必须都是使用release版。 -->
 		<payment-facade.version>1.0.0.20160701</payment-facade.version>
+
+		<messagebus.version>1.0.2</messagebus.version>
 
 	</properties>
 	<dependencyManagement>
@@ -346,16 +349,34 @@
 				<version>${junit-toolbox.version}</version>
 			</dependency>
 			<dependency>
-			    <groupId>com.alibaba</groupId>
-			    <artifactId>fastjson</artifactId>
-			    <version>${fastjson.version}</version>
+				<groupId>com.alibaba</groupId>
+				<artifactId>fastjson</artifactId>
+				<version>${fastjson.version}</version>
 			</dependency>
-			
+
 			<dependency>
-			    <groupId>commons-beanutils</groupId>
-			    <artifactId>commons-beanutils</artifactId>
-			    <version>${beanutils.version}</version>
+				<groupId>commons-beanutils</groupId>
+				<artifactId>commons-beanutils</artifactId>
+				<version>${beanutils.version}</version>
 			</dependency>
+
+			<!-- 消息总线 -->
+			<dependency>
+				<groupId>com.ymatou.messagebus</groupId>
+				<artifactId>messagebus-client</artifactId>
+				<version>${messagebus.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.ymatou.messagebus</groupId>
+				<artifactId>messagebus-facade</artifactId>
+				<version>${messagebus.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.ymatou.messagebus</groupId>
+				<artifactId>messagebus-facade-model</artifactId>
+				<version>${messagebus.version}</version>
+			</dependency>
+
 
 			<!-- self -->
 			<dependency>
@@ -446,8 +467,8 @@
 		<module>payment-domain-refund</module>
 		<module>payment-integration</module>
 		<module>payment-facade-model</module>
-    <module>payment-web-notify</module>
-  </modules>
+		<module>payment-web-notify</module>
+	</modules>
 
 	<distributionManagement>
 		<repository>

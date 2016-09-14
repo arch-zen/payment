@@ -36,7 +36,7 @@
 		<property name="locations">
 			<list>
 				<value>institutionConfig.xml</value>
-                <value>app.properties</value>
+				<value>app.properties</value>
 			</list>
 		</property>
 	</bean>
@@ -91,6 +91,7 @@
 						|| execution(* com.ymatou.payment.infrastructure.db.query.*Query.*(..))
 						|| execution(* com.ymatou.payment..*Repository.*(..))
 						|| execution(* com.ymatou.payment.integration.service..*(..))
+						|| execution(* com.ymatou.messagebus.client.MessageBusClient.*(..))
 						" />
 	</aop:config>
 
@@ -102,10 +103,11 @@
 	<!-- 提供方应用信息，用于计算依赖关系 -->
 	<dubbo:application name="${appId}" />
 
-	<dubbo:registry address="zookeeper://${dubbo.zoo}" />
+	<dubbo:registry address="zookeeper://${dubbo.zoo}" timeout="30000"/>
 
 	<!-- 用dubbo协议在20880端口暴露服务 -->
-	<dubbo:protocol name="dubbo" port="${dubbo.port}" serialization="kryo" />
+	<dubbo:protocol name="dubbo" port="${dubbo.port}"
+		serialization="kryo" />
 
 	<dubbo:protocol name="rest" server="servlet" port="${rest.port}"
 		extension="com.ymatou.payment.infrastructure.serialize.JacksonConfig" />
@@ -115,13 +117,13 @@
 
 	<dubbo:service interface="com.ymatou.payment.facade.RefundFacade"
 		ref="refundFacade" protocol="dubbo" />
-	
+
 	<dubbo:service interface="com.ymatou.payment.facade.rest.PaymentResource"
 		ref="paymentResource" protocol="rest" />
 
 	<dubbo:service interface="com.ymatou.payment.facade.rest.RefundResource"
 		ref="refundResource" protocol="rest" />
-		
+
 	<dubbo:service interface="com.ymatou.payment.facade.rest.RefundNotifyResource"
 		ref="refundNotifyResource" protocol="rest" />
 
@@ -130,13 +132,23 @@
 
 	<dubbo:service interface="com.ymatou.payment.facade.rest.SystemResource"
 		ref="systemResource" protocol="rest" />
-	
+
 	<dubbo:service interface="com.ymatou.payment.facade.rest.PaymentNotifyResource"
-		ref="paymentNotifyResource" protocol="rest" />	
-		
+		ref="paymentNotifyResource" protocol="rest" />
+
 	<dubbo:service interface="com.ymatou.payment.facade.rest.RefundJobResource"
-		ref="refundJobResource" protocol="rest" />	
-		
+		ref="refundJobResource" protocol="rest" />
+
 	<dubbo:service interface="com.ymatou.payment.facade.rest.TestPaymentResource"
-		ref="testPaymentResource" protocol="rest" />	
+		ref="testPaymentResource" protocol="rest" />
+
+	<!-- 消息总线API生成远程服务代理 -->
+	<dubbo:reference id="publishMessageClient"
+		interface="com.ymatou.messagebus.facade.PublishMessageFacade" retries="1" timeout="10000" />
+		
+	<!-- 消息总线客户端 -->
+	<bean id="messageBusClient" class="com.ymatou.messagebus.client.MessageBusClient">
+	    <property name="messageDbPath" value="/data/messagebus" />
+	</bean>	
+		
 </beans>

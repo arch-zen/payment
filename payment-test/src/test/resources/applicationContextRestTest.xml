@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
@@ -18,8 +16,8 @@
         http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
 	<context:annotation-config />
-	
-	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
 
 	<aop:aspectj-autoproxy />
 
@@ -34,15 +32,30 @@
 		init-method="init" destroy-method="destroy">
 	</bean>
 
+	<bean id="propertiesDisconf"
+		class="com.baidu.disconf.client.addons.properties.ReloadablePropertiesFactoryBean">
+		<property name="locations">
+			<list>
+				<value>app.properties</value>
+			</list>
+		</property>
+	</bean>
+
+
 	<bean id="propertyPlaceholderConfigurer"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="propertiesArray">
+			<list>
+				<ref bean="propertiesDisconf" />
+			</list>
+		</property>
 		<property name="locations">
 			<list>
 				<value>classpath:db.properties</value>
 			</list>
 		</property>
 	</bean>
-	
+
 	<bean id="taskExecutor"
 		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 		<!-- 核心线程数，默认为1 -->
@@ -65,5 +78,41 @@
 		</property>
 	</bean>
 
+	<bean id="performanceMonitorAdvice"
+		class="com.ymatou.performancemonitorclient.PerformanceMonitorAdvice">
+		<property name="appId" value="${appId}"></property>
+		<property name="serverUrl" value="${perfmonapi.url}"></property>
+	</bean>
+
+	<aop:config>
+		<aop:advisor advice-ref="performanceMonitorAdvice"
+			pointcut="execution(* com.ymatou.payment.facade.*Facade.*(..))
+						|| execution(* com.ymatou.payment.facade.rest.*Resource.*(..))
+						|| execution(* com.ymatou.payment.infrastructure.db.mapper.*Mapper.*(..))
+						|| execution(* com.ymatou.payment.infrastructure.db.query.*Query.*(..))
+						|| execution(* com.ymatou.payment..*Repository.*(..))
+						|| execution(* com.ymatou.payment.integration.service..*(..))
+						|| execution(* com.ymatou.messagebus.client.MessageBusClient.*(..))
+						|| execution(* com.ymatou.messagebus.facade.PublishMessageFacade.*(..))
+						" />
+	</aop:config>
+
 	<import resource="classpath:spring/persistence.xml" />
+
+	<!-- 提供方应用信息，用于计算依赖关系 -->
+	<dubbo:application name="${appId}" />
+
+	<dubbo:registry address="zookeeper://${dubbo.zoo}"
+		timeout="30000" />
+
+	<!-- 消息总线API生成远程服务代理 -->
+	<dubbo:reference id="publishMessageClient"
+		interface="com.ymatou.messagebus.facade.PublishMessageFacade" retries="1"
+		timeout="10000" />
+
+	<!-- 消息总线客户端 -->
+	<bean id="messageBusClient" class="com.ymatou.messagebus.client.MessageBusClient">
+		<property name="messageDbPath" value="/data/messagebus/payment" />
+	</bean>
+
 </beans>
