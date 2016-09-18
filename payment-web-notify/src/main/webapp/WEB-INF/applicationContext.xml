@@ -128,6 +128,6 @@
 
 	<!-- 消息总线客户端 -->
 	<bean id="messageBusClient" class="com.ymatou.messagebus.client.MessageBusClient">
-		<property name="messageDbPath" value="/data/messagebus/payment" />
+		<property name="messageDbPath" value="/data/messagebus/paymentNotify" />
 	</bean>
 </beans>
