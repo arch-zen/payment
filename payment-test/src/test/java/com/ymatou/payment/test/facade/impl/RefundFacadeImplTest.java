@@ -9,9 +9,6 @@ import javax.annotation.Resource;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.ymatou.messagebus.client.Message;
 import com.ymatou.messagebus.client.MessageBusClient;
@@ -19,15 +16,14 @@ import com.ymatou.messagebus.client.MessageBusException;
 import com.ymatou.payment.facade.RefundFacade;
 import com.ymatou.payment.facade.model.TradeRefundableRequest;
 import com.ymatou.payment.facade.model.TradeRefundableResponse;
+import com.ymatou.payment.test.RestBaseTest;
 
 /**
  * 
  * @author qianmin 2016年6月22日 下午6:18:33
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/applicationContextDubboConsumerTest.xml"})
-public class RefundFacadeImplTest {
+public class RefundFacadeImplTest extends RestBaseTest {
 
     @Resource(name = "refundFacadeClient")
     private RefundFacade refundFacade;
@@ -50,6 +46,6 @@ public class RefundFacadeImplTest {
         req.setCode("refund_notify");
         req.setMessageId("payment-000001");
         req.setBody("messagebody");
-        messageBusClient.sendMessasge(req);
+        messageBusClient.sendMessage(req);
     }
 }

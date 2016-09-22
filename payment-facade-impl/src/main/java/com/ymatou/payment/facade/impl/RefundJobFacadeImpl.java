@@ -125,7 +125,7 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
                 new Message("payment", "refund_notify", String.valueOf(refundRequestPo.getRefundId()),
                         refundSuccessNotifyReq);
         try {
-            messageBusClient.sendMessasge(message);
+            messageBusClient.sendMessage(message);
         } catch (Exception e) {
             logger.error("call messagebus faild when send refundId:" + refundRequestPo.getRefundId(), e);
         }

@@ -70,7 +70,7 @@
 		<!--API最终确定后，版本号修改为“1.0.0YyyyMmDd”并release。客户端最终必须都是使用release版。 -->
 		<payment-facade.version>1.0.0.20160701</payment-facade.version>
 
-		<messagebus.version>1.0.4</messagebus.version>
+		<messagebus.version>1.0.5</messagebus.version>
 
 	</properties>
 	<dependencyManagement>

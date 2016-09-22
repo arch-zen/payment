@@ -10,21 +10,17 @@ import static org.junit.Assert.assertEquals;
 import javax.annotation.Resource;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.ymatou.payment.facade.PaymentFacade;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
+import com.ymatou.payment.test.RestBaseTest;
 
 /**
  * @author wangxudong 2016年7月14日 下午2:07:30
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/applicationContextDubboConsumerTest.xml"})
-public class PaymentFacadeImplTest {
+public class PaymentFacadeImplTest extends RestBaseTest {
     @Resource(name = "paymentFacadeClient")
     private PaymentFacade paymentFacade;
 

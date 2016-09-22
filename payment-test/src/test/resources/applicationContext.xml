@@ -105,6 +105,15 @@
 	<dubbo:registry address="zookeeper://${dubbo.zoo}"
 		timeout="30000" />
 
+
+	<!-- 生成远程服务代理，可以和本地bean一样使用demoFacade -->
+	<dubbo:reference id="refundFacadeClient"
+		interface="com.ymatou.payment.facade.RefundFacade" check="false" />
+
+	<!-- 生成远程服务代理，可以和本地bean一样使用demoFacade -->
+	<dubbo:reference id="paymentFacadeClient"
+		interface="com.ymatou.payment.facade.PaymentFacade" check="false" />
+
 	<!-- 消息总线API生成远程服务代理 -->
 	<dubbo:reference id="publishMessageClient"
 		interface="com.ymatou.messagebus.facade.PublishMessageFacade" retries="1"
@@ -114,5 +123,7 @@
 	<bean id="messageBusClient" class="com.ymatou.messagebus.client.MessageBusClient">
 		<property name="messageDbPath" value="/data/messagebus/payment" />
 	</bean>
+	
+	
 
 </beans>

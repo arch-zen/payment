@@ -8,8 +8,6 @@ package com.ymatou.payment.test;
 import java.util.HashMap;
 import java.util.UUID;
 
-import javax.annotation.Resource;
-
 import org.apache.ibatis.session.SqlSession;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +23,7 @@ import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/applicationContextRestTest.xml"})
+@ContextConfiguration(locations = {"/applicationContext.xml"})
 public class RestBaseTest extends BaseTest {
 
     @Autowired
