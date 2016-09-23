@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ymatou.payment.integration.common.Signature;
-import com.ymatou.payment.integration.model.AliPayRefundQueryResponse.RefundDetailData;
 import com.ymatou.payment.integration.model.QueryRefundRequest;
 import com.ymatou.payment.integration.model.QueryRefundResponse;
 import com.ymatou.payment.integration.model.RefundOrderData;
@@ -46,7 +45,6 @@ public class RefundQueryServiceTest extends RestBaseTest {
     @Test
     public void testMutiRefund() throws Exception {
         String refundNo = "201607250000425035";
-        String refundNo1 = "201607250000425036";
         QueryRefundRequest request = new QueryRefundRequest();
         request.setAppid("wxf51a439c0416f182");
         request.setMch_id("1234079001");

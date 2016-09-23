@@ -8,7 +8,6 @@ package com.ymatou.payment.test.domain.channel.service;
 import static org.junit.Assert.assertEquals;
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,9 +18,7 @@ import org.junit.Test;
 
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.service.SignatureService;
-import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
-import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.test.RestBaseTest;
 
@@ -142,26 +139,6 @@ public class SignatureServiceImplTest extends RestBaseTest {
                 signatureService.validateSign(notifyMap, instConfigManager.getConfig(PayTypeEnum.parse(payType)), null);
 
         assertEquals("验证MD5签名", true, signResult);
-    }
-
-    @Test
-    public void testMoney() {
-        Payment payment = new Payment();
-        payment.setPayPrice(new Money(136.20));
-
-        double testmoney = 1.10;
-
-        // for (int i = 0; i < 1000; i++) {
-        // testmoney += 1 * 0.01;
-        //
-        // int weixinPrice = (int) (testmoney * 100);
-        // Money actPrice = new Money(testmoney);
-        //
-        // assertEquals("验证金额", actPrice.getCent(), weixinPrice);
-        // }
-        // int weixinPrice = (int) (payment.getPayPrice().getCent());
-
-
     }
 
     /**
@@ -308,7 +285,7 @@ public class SignatureServiceImplTest extends RestBaseTest {
         map.put("Memo", null);
         map.put("SignMethod", "MD5");
 
-        String assertSign = "D41B451F9E8DC3969F83A6BC8A02739D";
+        // String assertSign = "D41B451F9E8DC3969F83A6BC8A02739D";
         // String sign = signatureService.signNotify(map);
 
         // assertEquals("验证MD5签名", assertSign, sign);

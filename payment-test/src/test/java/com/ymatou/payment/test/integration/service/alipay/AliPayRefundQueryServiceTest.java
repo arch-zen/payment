@@ -3,7 +3,6 @@
  */
 package com.ymatou.payment.test.integration.service.alipay;
 
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 import org.junit.Assert;
@@ -25,8 +24,6 @@ import com.ymatou.payment.test.RestBaseTest;
  *
  */
 public class AliPayRefundQueryServiceTest extends RestBaseTest {
-
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
     @Autowired
     private AliPayRefundQueryService refundQueryService;

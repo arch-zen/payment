@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.dubbo.remoting.exchange.Request;
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.model.ThirdPartyPayment;
@@ -22,7 +21,6 @@ import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.CheckStatusEnum;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.infrastructure.Money;
-import com.ymatou.payment.integration.service.ymatou.NotifyPaymentService;
 
 /**
  * 
@@ -45,9 +43,6 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
 
     @Autowired
     private PayService payService;
-
-    @Autowired
-    private NotifyPaymentService notifyPaymentService;
 
     @Override
     public void doCheck(ThirdPartyPayment thirdPartyPayment, String paymentId, boolean finalCheck,

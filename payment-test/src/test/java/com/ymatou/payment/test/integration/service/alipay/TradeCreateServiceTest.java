@@ -3,6 +3,8 @@
  */
 package com.ymatou.payment.test.integration.service.alipay;
 
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -35,5 +37,7 @@ public class TradeCreateServiceTest extends RestBaseTest {
                 "<direct_trade_create_req><subject>你好</subject><out_trade_no>13514606200642938</out_trade_no><total_fee>10.00</total_fee><seller_account_name>ap.ymt@ymatou.com</seller_account_name><notify_url>http://localhost:12345/notify/11</notify_url><out_user>20124373</out_user><call_back_url>http://localhost:12345/callback/11</call_back_url></direct_trade_create_req>");
 
         CreateTradeResponse response = tradeCreateService.doService(request, null);
+
+        assertNotNull(response);
     }
 }

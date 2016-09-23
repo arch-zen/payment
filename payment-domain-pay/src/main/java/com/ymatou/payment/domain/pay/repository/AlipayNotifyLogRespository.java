@@ -3,8 +3,6 @@
  */
 package com.ymatou.payment.domain.pay.repository;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +19,6 @@ import com.ymatou.payment.infrastructure.db.model.AlipayNotifyLogPo;
 @Component
 public class AlipayNotifyLogRespository {
 
-    private static final Logger logger = LoggerFactory.getLogger(AlipayNotifyLogRespository.class);
 
     @Autowired
     private AlipayNotifyLogMapper alipayNotifyLogMapper;

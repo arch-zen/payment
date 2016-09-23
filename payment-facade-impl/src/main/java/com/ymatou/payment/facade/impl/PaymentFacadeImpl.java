@@ -21,12 +21,10 @@ import com.ymatou.payment.facade.PaymentFacade;
 import com.ymatou.payment.facade.constants.BizCodeEnum;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
-import com.ymatou.payment.facade.constants.PaymentNotifyStatusEnum;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
 import com.ymatou.payment.facade.model.ExecutePayNotifyReq;
 import com.ymatou.payment.facade.model.ExecutePayNotifyResp;
-import com.ymatou.payment.facade.rest.PaymentResourceImpl;
 
 /**
  * 支付接口实现

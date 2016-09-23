@@ -31,8 +31,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -57,8 +55,6 @@ import com.ymatou.payment.integration.model.WxRefundResponse;
  */
 @Component
 public class WxRefundService {
-
-    private static Logger logger = LoggerFactory.getLogger(WxRefundQueryService.class);
 
     private CloseableHttpClient jsapiHttpClient;
     private CloseableHttpClient appHttpClient;

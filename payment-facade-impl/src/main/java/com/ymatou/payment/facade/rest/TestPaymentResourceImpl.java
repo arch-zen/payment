@@ -18,8 +18,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.facade.model.AcquireOrderReq;
@@ -35,7 +33,6 @@ import com.ymatou.payment.facade.model.AcquireOrderResp;
 @Produces(MediaType.TEXT_HTML)
 public class TestPaymentResourceImpl implements TestPaymentResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(SystemResourceImpl.class);
 
     @Resource
     private PaymentResource paymentResource;

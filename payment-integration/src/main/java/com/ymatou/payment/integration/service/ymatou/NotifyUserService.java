@@ -14,8 +14,6 @@ import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.nio.reactor.ConnectingIOReactor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,7 +32,6 @@ import com.ymatou.payment.integration.model.NotifyUserRequest;
 @Component
 public class NotifyUserService implements InitializingBean {
 
-    private static Logger logger = LoggerFactory.getLogger(NotifyUserService.class);
 
     private CloseableHttpAsyncClient httpClient;
 

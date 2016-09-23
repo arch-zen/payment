@@ -5,7 +5,6 @@ import java.util.HashMap;
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
-import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 
 /**
  * 支付服务接口

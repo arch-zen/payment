@@ -17,8 +17,6 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -41,8 +39,6 @@ import com.ymatou.payment.integration.model.UnifiedOrderResponse;
  */
 @Component
 public class UnifiedOrderService implements InitializingBean {
-
-    private static Logger logger = LoggerFactory.getLogger(UnifiedOrderService.class);
 
     private CloseableHttpClient httpClient;
 

@@ -22,6 +22,7 @@ import com.ymatou.payment.infrastructure.util.StringUtil;
  */
 public class StringUtilTest {
 
+    @SuppressWarnings("deprecation")
     @Test
     public void testGetDateFormatString() {
         String format1 = "yyyyMMddHHmmss";

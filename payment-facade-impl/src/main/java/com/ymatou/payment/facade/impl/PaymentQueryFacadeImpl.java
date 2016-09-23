@@ -7,12 +7,9 @@ package com.ymatou.payment.facade.impl;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.pay.service.PayService;
-import com.ymatou.payment.domain.pay.service.PaymentCheckServiceImpl;
 import com.ymatou.payment.facade.PaymentQueryFacade;
 import com.ymatou.payment.facade.model.QueryOrderIdResp;
 
@@ -25,7 +22,6 @@ import com.ymatou.payment.facade.model.QueryOrderIdResp;
 @Component("paymentQueryFacade")
 public class PaymentQueryFacadeImpl implements PaymentQueryFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(PaymentCheckServiceImpl.class);
 
     @Resource
     private PayService payService;

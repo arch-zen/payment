@@ -161,7 +161,7 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
 
         String response = paymentNotifyResource.notify(payType, servletRequest);
 
-        // assertEquals("验证返回值", "success", response);
+        assertEquals("验证返回值", "success", response);
     }
 
     @Test
@@ -237,13 +237,6 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
         List<AlipayNotifyLogPo> poList = alipaynotifylogMapper.selectByExample(example);
 
         assertEquals("验证报文插入表中", 1, poList.size());
-    }
-
-    private Map<String, String> buildWeiXinNotifyMap() {
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("appid", "wxf51a439c0416f182");
-
-        return map;
     }
 
     private String buildMockQueryString(String originString, String payType) throws UnsupportedEncodingException {

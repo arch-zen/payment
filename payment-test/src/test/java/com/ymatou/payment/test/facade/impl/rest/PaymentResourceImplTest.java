@@ -281,6 +281,8 @@ public class PaymentResourceImplTest extends RestBaseTest {
     public void gmtTimeTest() {
         String gmt_payment = "2016-05-27 20:27:08";
         Date date = DateUtils.parseDate(gmt_payment, new String[] {"yyyy-MM-dd HH:mm:ss"});
+
+        System.out.println(date.toString());
     }
 
     @Test

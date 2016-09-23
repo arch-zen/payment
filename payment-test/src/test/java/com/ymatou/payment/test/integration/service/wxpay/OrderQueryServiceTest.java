@@ -43,9 +43,12 @@ public class OrderQueryServiceTest extends RestBaseTest {
         orderQueryRequest.setNonce_str("95f71d8d84a641209e9345788cab5c58");
         orderQueryRequest.setOut_trade_no("21935472000015038");
         orderQueryRequest.setTransaction_id("");
-        @SuppressWarnings("unchecked")
+
+
 
         InstitutionConfig institutionConfig = institutionConfigManager.getConfig(PayTypeEnum.parse("15"));
+
+        @SuppressWarnings("unchecked")
         String sign = signatureService.signMessage(new ObjectMapper().convertValue(orderQueryRequest, HashMap.class),
                 institutionConfig, null); // 加签
         orderQueryRequest.setSign(sign);
