@@ -46,7 +46,7 @@ public class InstitutionConfigManager implements IDisconfUpdate, InitializingBea
     /**
      * 读写锁
      */
-    private ReadWriteLock myLock = new ReentrantReadWriteLock();;
+    private ReadWriteLock myLock = new ReentrantReadWriteLock();
 
     private static final Logger logger = LoggerFactory.getLogger(InstitutionConfigManager.class);
 
