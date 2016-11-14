@@ -30,4 +30,12 @@ public interface TestPaymentResource {
      * @return
      */
     Response aliwap(HttpServletRequest servletRequest);
+
+    /**
+     * 一网通 DEMO
+     * 
+     * @param servletRequest
+     * @return
+     */
+    String cmbpay(HttpServletRequest servletRequest);
 }

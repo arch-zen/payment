@@ -67,6 +67,21 @@ public class TestPaymentResourceImpl implements TestPaymentResource {
         return Response.status(Status.FOUND).header("location", res.getResult()).build();
     }
 
+    @Override
+    @GET
+    @Path("/cmbpay")
+    public String cmbpay(@Context HttpServletRequest servletRequest) {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+
+        req.setPayType("20");
+        req.setPayPrice("0.01");
+
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        return res.getResult();
+    }
+
     /**
      * 构造请求报文
      * 

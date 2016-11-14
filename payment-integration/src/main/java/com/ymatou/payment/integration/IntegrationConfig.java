@@ -44,6 +44,7 @@ public class IntegrationConfig {
     private String cmbPublicKeyQueryUrl; // 一网通公钥查询
     private String cmbQuerySingleOrderUrl; // 一网通单笔订单查询
     private String cmbDoRefundUrl;// 一网通退款
+    private String cmbPayUrl; // 一网通支付
 
     private String openMock;
     private String aliPayBaseUrlMock; // 支付宝网关url(mock)
@@ -64,6 +65,7 @@ public class IntegrationConfig {
     private String cmbPublicKeyQueryUrlMock; // 一网通公钥查询（mock）
     private String cmbQuerySingleOrderUrlMock; // 一网通单笔订单查询（mock）
     private String cmbDoRefundUrlMock;// 一网通退款(mock)
+    private String cmbPayUrlMock; // 一网通支付
 
 
     public String getYmtTriggerOrderRefundUrl(HashMap<String, String> header) {
@@ -639,6 +641,44 @@ public class IntegrationConfig {
             return getCmbDoRefundUrlMock();
         } else {
             return getCmbDoRefundUrl();
+        }
+    }
+
+    /**
+     * @return the cmbPayUrl
+     */
+    @DisconfFileItem(name = "cmb.pay.url")
+    public String getCmbPayUrl() {
+        return cmbPayUrl;
+    }
+
+    /**
+     * @param cmbPayUrl the cmbPayUrl to set
+     */
+    public void setCmbPayUrl(String cmbPayUrl) {
+        this.cmbPayUrl = cmbPayUrl;
+    }
+
+    /**
+     * @return the cmbPayUrlMock
+     */
+    @DisconfFileItem(name = "cmb.pay.url.mock")
+    public String getCmbPayUrlMock() {
+        return cmbPayUrlMock;
+    }
+
+    /**
+     * @param cmbPayUrlMock the cmbPayUrlMock to set
+     */
+    public void setCmbPayUrlMock(String cmbPayUrlMock) {
+        this.cmbPayUrlMock = cmbPayUrlMock;
+    }
+
+    public String getCmbPayUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getCmbPayUrlMock();
+        } else {
+            return getCmbPayUrl();
         }
     }
 }

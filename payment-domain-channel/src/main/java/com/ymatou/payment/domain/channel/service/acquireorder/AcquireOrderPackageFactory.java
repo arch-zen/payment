@@ -38,6 +38,9 @@ public class AcquireOrderPackageFactory {
     @Resource
     private WeiXinJSAPIAcquireOrderServiceImpl weiXinJSAPIAcquireOrderServiceImpl;
 
+    @Resource
+    private CmbAcquireOrderServiceImpl cmbAcquireOrderServiceImpl;
+
     /**
      * 获取到收单解析器
      * 
@@ -56,6 +59,8 @@ public class AcquireOrderPackageFactory {
                 return weiXinJSAPIAcquireOrderServiceImpl;
             case WeiXinApp:
                 return weiXinAppAcquireOrderServiceImpl;
+            case CmbApp:
+                return cmbAcquireOrderServiceImpl;
             default:
                 throw new BizException(ErrorCode.INVALID_PAY_TYPE, payType.getCode());
 
