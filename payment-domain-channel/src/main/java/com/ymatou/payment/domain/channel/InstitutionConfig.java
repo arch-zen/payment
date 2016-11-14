@@ -73,6 +73,12 @@ public class InstitutionConfig {
     private String md5Key;
 
     /**
+     * 分行号
+     */
+    @XmlAttribute(name = "branchNo")
+    private String branchNo;
+
+    /**
      * MD5Key连接字符
      */
     @XmlAttribute(name = "md5KeyConnector")
@@ -216,6 +222,20 @@ public class InstitutionConfig {
      */
     public void setMd5KeyConnector(String md5KeyConnector) {
         this.md5KeyConnector = md5KeyConnector;
+    }
+
+    /**
+     * @return the branchNo
+     */
+    public final String getBranchNo() {
+        return branchNo;
+    }
+
+    /**
+     * @param branchNo the branchNo to set
+     */
+    public final void setBranchNo(String branchNo) {
+        this.branchNo = branchNo;
     }
 
 

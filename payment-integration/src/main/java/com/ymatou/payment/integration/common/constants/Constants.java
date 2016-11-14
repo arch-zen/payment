@@ -19,6 +19,8 @@ public class Constants {
     public static final String WEIXIN_RESPONSE_BODY_START = "<xml>";
     public static final String CONTENT_TYPE_XML = "text/xml";
     public static final String CONTENT_TYPE_JSON = "application/json";
+    public static final String CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
+
 
     public static final Integer SUCCESS_CODE = 200;
 }

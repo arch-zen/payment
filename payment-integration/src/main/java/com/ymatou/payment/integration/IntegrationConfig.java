@@ -41,6 +41,9 @@ public class IntegrationConfig {
     private String ymtRiskControlUrl; // 风控urk
     private String ymtTriggerOrderRefundUrl; // 交易系统接收退款回调的url
     private String ymtTriggerOrderRefundUrlJava; // 交易系统接收退款回调的url(Java)
+    private String cmbPublicKeyQueryUrl; // 一网通公钥查询
+    private String cmbQuerySingleOrderUrl; // 一网通单笔订单查询
+    private String cmbDoRefundUrl;// 一网通退款
 
     private String openMock;
     private String aliPayBaseUrlMock; // 支付宝网关url(mock)
@@ -58,6 +61,9 @@ public class IntegrationConfig {
     private String ymtRiskControlUrlMock; // 风控urk(mock)
     private String ymtTriggerOrderRefundUrlMock; // 交易系统接收退款回调的url(mock)
     private String ymtTriggerOrderRefundUrlJavaMock; // 交易系统接收退款回调的url(Java mock)
+    private String cmbPublicKeyQueryUrlMock; // 一网通公钥查询（mock）
+    private String cmbQuerySingleOrderUrlMock; // 一网通单笔订单查询（mock）
+    private String cmbDoRefundUrlMock;// 一网通退款(mock)
 
 
     public String getYmtTriggerOrderRefundUrl(HashMap<String, String> header) {
@@ -518,6 +524,121 @@ public class IntegrationConfig {
             return getYmtTriggerOrderRefundUrlJavaMock();
         } else {
             return getYmtTriggerOrderRefundUrlJava();
+        }
+    }
+
+    /**
+     * @return the cmbPublicKeyQueryUrl
+     */
+    @DisconfFileItem(name = "cmb.publickeyquery.url")
+    public String getCmbPublicKeyQueryUrl() {
+        return cmbPublicKeyQueryUrl;
+    }
+
+    /**
+     * @param cmbPublicKeyQueryUrl the cmbPublicKeyQueryUrl to set
+     */
+    public void setCmbPublicKeyQueryUrl(String cmbPublicKeyQueryUrl) {
+        this.cmbPublicKeyQueryUrl = cmbPublicKeyQueryUrl;
+    }
+
+
+    /**
+     * @return the cmbPublicKeyQueryUrlMock
+     */
+    @DisconfFileItem(name = "cmb.publickeyquery.url.mock")
+    public String getCmbPublicKeyQueryUrlMock() {
+        return cmbPublicKeyQueryUrlMock;
+    }
+
+    /**
+     * @param cmbPublicKeyQueryUrlMock the cmbPublicKeyQueryUrlMock to set
+     */
+    public void setCmbPublicKeyQueryUrlMock(String cmbPublicKeyQueryUrlMock) {
+        this.cmbPublicKeyQueryUrlMock = cmbPublicKeyQueryUrlMock;
+    }
+
+    public String getCmbPublicKeyQueryUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getCmbPublicKeyQueryUrlMock();
+        } else {
+            return getCmbPublicKeyQueryUrl();
+        }
+    }
+
+    /**
+     * @return the cmbQuerySingleOrderUrl
+     */
+    @DisconfFileItem(name = "cmb.querysingleorder.url")
+    public String getCmbQuerySingleOrderUrl() {
+        return cmbQuerySingleOrderUrl;
+    }
+
+    /**
+     * @param cmbQuerySingleOrderUrl the cmbQuerySingleOrderUrl to set
+     */
+    public void setCmbQuerySingleOrderUrl(String cmbQuerySingleOrderUrl) {
+        this.cmbQuerySingleOrderUrl = cmbQuerySingleOrderUrl;
+    }
+
+    /**
+     * @return the cmbQuerySingleOrderUrlMock
+     */
+    @DisconfFileItem(name = "cmb.querysingleorder.url.mock")
+    public String getCmbQuerySingleOrderUrlMock() {
+        return cmbQuerySingleOrderUrlMock;
+    }
+
+    /**
+     * @param cmbQuerySingleOrderUrlMock the cmbQuerySingleOrderUrlMock to set
+     */
+    public void setCmbQuerySingleOrderUrlMock(String cmbQuerySingleOrderUrlMock) {
+        this.cmbQuerySingleOrderUrlMock = cmbQuerySingleOrderUrlMock;
+    }
+
+    public String getCmbQuerySingleOrderUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getCmbQuerySingleOrderUrlMock();
+        } else {
+            return getCmbQuerySingleOrderUrl();
+        }
+    }
+
+    /**
+     * @return the cmbDoRefundUrl
+     */
+    @DisconfFileItem(name = "cmb.dorefund.url")
+    public final String getCmbDoRefundUrl() {
+        return cmbDoRefundUrl;
+    }
+
+    /**
+     * @param cmbDoRefundUrl the cmbDoRefundUrl to set
+     */
+    public final void setCmbDoRefundUrl(String cmbDoRefundUrl) {
+        this.cmbDoRefundUrl = cmbDoRefundUrl;
+    }
+
+    /**
+     * @return the cmbDoRefundUrlMock
+     */
+    @DisconfFileItem(name = "cmb.dorefund.url.mock")
+    public final String getCmbDoRefundUrlMock() {
+        return cmbDoRefundUrlMock;
+    }
+
+    /**
+     * @param cmbDoRefundUrlMock the cmbDoRefundUrlMock to set
+     */
+    public final void setCmbDoRefundUrlMock(String cmbDoRefundUrlMock) {
+        this.cmbDoRefundUrlMock = cmbDoRefundUrlMock;
+    }
+
+    public String getCmbDoRefundUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getCmbDoRefundUrlMock();
+        } else {
+            return getCmbDoRefundUrl();
         }
     }
 }
