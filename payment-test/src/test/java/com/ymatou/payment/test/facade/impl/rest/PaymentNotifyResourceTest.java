@@ -165,6 +165,32 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
     }
 
     @Test
+    public void testAliPayWAPNotifyMock() throws UnsupportedEncodingException {
+        String payType = "11";
+        String reqRawBody =
+                "service=alipay.wap.trade.create.direct&sign=88bce74fba687b7aa93362755716dd00&v=1.0&sec_id=MD5&notify_data=%3Cnotify%3E%3Cbuyer_email%3EBrReOe3xtnqs%40foxmail.com%3C%2Fbuyer_email%3E%3Cbuyer_id%3E20880625760664%3C%2Fbuyer_id%3E%3Cgmt_create%3E2016-11-14+14%3A13%3A45%3C%2Fgmt_create%3E%3Cgmt_payment%3E2016-11-14+14%3A13%3A46%3C%2Fgmt_payment%3E%3Cis_total_fee_adjust%3EN%3C%2Fis_total_fee_adjust%3E%3Cnotify_id%3E1454764198882179%3C%2Fnotify_id%3E%3Cnotify_time%3E2016-11-14+14%3A13%3A47%3C%2Fnotify_time%3E%3Cnotify_type%3Etrade_status_sync%3C%2Fnotify_type%3E%3Cout_trade_no%3E16111414141511934%3C%2Fout_trade_no%3E%3Cpayment_type%3E1%3C%2Fpayment_type%3E%3Cprice%3E2%3C%2Fprice%3E%3Cquantity%3E1%3C%2Fquantity%3E%3Cseller_email%3Eap.ymt%40ymatou.com%3C%2Fseller_email%3E%3Cseller_id%3E2088701734809577%3C%2Fseller_id%3E%3Csubject%3E%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%95%86%E5%93%81TBa7uzCeZV%3C%2Fsubject%3E%3Ctotal_fee%3E2%3C%2Ftotal_fee%3E%3Ctrade_no%3Ed7eee7f5-2235-4b56-9033-9bc2e31d5383%3C%2Ftrade_no%3E%3Ctrade_status%3ETRADE_SUCCESS%3C%2Ftrade_status%3E%3Cuse_coupon%3EN%3C%2Fuse_coupon%3E%3C%2Fnotify%3E";
+        String paymentId = "16111414141511934";
+
+        // 删除旧数据
+        AlipayNotifyLogExample example = new AlipayNotifyLogExample();
+        example.createCriteria().andBizNoEqualTo(paymentId);
+        alipaynotifylogMapper.deleteByExample(example);
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        servletRequest.setRequestURI("/notify/" + payType);
+        servletRequest.addHeader("mock", "1");
+        servletRequest.setContent(reqRawBody.getBytes("utf-8"));
+
+        String response = paymentNotifyResource.notify(payType, servletRequest);
+
+        assertEquals("验证返回值", "success", response);
+
+        List<AlipayNotifyLogPo> poList = alipaynotifylogMapper.selectByExample(example);
+
+        assertEquals("验证报文插入表中", 1, poList.size());
+    }
+
+    @Test
     public void testAliPayAppNotify() throws UnsupportedEncodingException {
         String payType = "13";
         String paymentId = "20160522162738564000000000075707";
