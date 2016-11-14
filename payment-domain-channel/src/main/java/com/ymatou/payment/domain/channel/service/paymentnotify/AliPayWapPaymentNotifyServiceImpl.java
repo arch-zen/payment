@@ -81,6 +81,13 @@ public class AliPayWapPaymentNotifyServiceImpl implements PaymentNotifyService {
             throw new BizException(ErrorCode.SIGN_NOT_MATCH, "paymentId:" + map.get("out_trade_no"));
         }
 
+        // 验证商户号
+        // 防止黑客利用其它商户号的数据伪造支付成功报文
+        if (!instConfig.getMerchantId().equals(map.get("seller_id"))) {
+            throw new BizException(ErrorCode.INVALID_MERCHANT_ID,
+                    "paymentId:" + map.get("out_trade_no") + ",seller_id:" + map.get("seller_id"));
+        }
+
         // 从报文中获取到有效信息
         PaymentNotifyMessage paymentNotifyMessage = new PaymentNotifyMessage();
         if (PaymentNotifyType.Client.equals(notifyRequest.getNotifyType())) { // 同步回调

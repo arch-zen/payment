@@ -239,6 +239,31 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
         assertEquals("验证报文插入表中", 1, poList.size());
     }
 
+    @Test
+    public void testWeiXinAppNotifyWithWrongMerchantId() throws UnsupportedEncodingException {
+        String payType = "14"; // should be 15, 14 and 15 has different merchantid
+        String paymentId = "20160522151452525000000000077470";
+        String reqBody =
+                "<xml><appid><![CDATA[wxf51a439c0416f182]]></appid><bank_type><![CDATA[CFT]]></bank_type><cash_fee><![CDATA[6900]]></cash_fee><fee_type><![CDATA[CNY]]></fee_type><is_subscribe><![CDATA[N]]></is_subscribe><mch_id><![CDATA[1234079001]]></mch_id><nonce_str><![CDATA[c798daa9864046d7a109a2fba0a2b668]]></nonce_str><openid><![CDATA[oASzYjl-imWblI9UAcnNn3f6Yp_8]]></openid><out_trade_no><![CDATA[20160522151452525000000000077470]]></out_trade_no><result_code><![CDATA[SUCCESS]]></result_code><return_code><![CDATA[SUCCESS]]></return_code><sign><![CDATA[96D6CF7EA4C25ACC6F751E50682E33A1]]></sign><time_end><![CDATA[20160522151457]]></time_end><total_fee>6900</total_fee><trade_type><![CDATA[APP]]></trade_type><transaction_id><![CDATA[4010052001201605226158055804]]></transaction_id></xml>";
+
+        // 删除旧数据
+        AlipayNotifyLogExample example = new AlipayNotifyLogExample();
+        example.createCriteria().andBizNoEqualTo(paymentId);
+        alipaynotifylogMapper.deleteByExample(example);
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        servletRequest.setRequestURI("/notify/" + payType);
+
+        servletRequest.setContent(reqBody.getBytes("utf-8"));
+        String response = paymentNotifyResource.notify(payType, servletRequest);
+
+        assertEquals("验证返回值", "failed", response);
+
+        List<AlipayNotifyLogPo> poList = alipaynotifylogMapper.selectByExample(example);
+
+        assertEquals("验证报文插入表中", 0, poList.size());
+    }
+
     private String buildMockQueryString(String originString, String payType) throws UnsupportedEncodingException {
         InstitutionConfig instConfig = institutionConfigManager.getConfig(PayTypeEnum.parse(payType));
         Map<String, String> map = HttpUtil.parseQueryStringToMap(originString);
