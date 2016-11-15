@@ -103,6 +103,52 @@ public class PaymentNotifyResourceImpl implements PaymentNotifyResource {
         }
     }
 
+    @Override
+    @POST
+    @Path("{cmbPayNotify:(?i:cmbPayNotify)}")
+    public Response cmbPayNotify(@Context HttpServletRequest servletRequest) {
+        try {
+            PaymentNotifyReq notifyReq = new PaymentNotifyReq();
+            notifyReq.setPayType("20"); // 招行一网通渠道号
+            notifyReq.setNotifyType(PaymentNotifyType.Server);
+            notifyReq.setRawString(getHttpBody(servletRequest));
+            notifyReq.setMockHeader(getMockHttpHeader(servletRequest));
+
+            PaymentNotifyResp notifyResp = paymentNotifyFacade.notify(notifyReq);
+            if (notifyResp.getIsSuccess()) {
+                return Response.ok("success", "text/plain").build();
+            } else {
+                return Response.serverError().build();
+            }
+        } catch (Exception e) {
+            logger.error("process pay notify failed with paytype:20", e);
+            return Response.serverError().build();
+        }
+    }
+
+    @Override
+    @POST
+    @Path("{cmbPayNotify:(?i:cmbPayNotify)}")
+    public Response cmbSignNotify(@Context HttpServletRequest servletRequest) {
+        try {
+            PaymentNotifyReq notifyReq = new PaymentNotifyReq();
+            notifyReq.setPayType("20"); // 招行一网通渠道号
+            notifyReq.setNotifyType(PaymentNotifyType.Server);
+            notifyReq.setRawString(getHttpBody(servletRequest));
+            notifyReq.setMockHeader(getMockHttpHeader(servletRequest));
+
+            PaymentNotifyResp notifyResp = paymentNotifyFacade.notify(notifyReq);
+            if (notifyResp.getIsSuccess()) {
+                return Response.ok("success", "text/plain").build();
+            } else {
+                return Response.serverError().build();
+            }
+        } catch (Exception e) {
+            logger.error("process sign notify failed with paytype:20", e);
+            return Response.serverError().build();
+        }
+    }
+
     /**
      * 获取请求中的HttpMockHeader
      * 

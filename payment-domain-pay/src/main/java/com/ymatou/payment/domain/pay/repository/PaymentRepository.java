@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.infrastructure.db.mapper.CompensateProcessInfoMapper;
 import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
 import com.ymatou.payment.infrastructure.db.model.BussinessOrderPo;
@@ -88,8 +89,14 @@ public class PaymentRepository {
         // 商户订单落地
         bussinessOrderRepository.insert(bussinessOrder);
 
-        // 支付单落地
-        payment.setPaymentId(genPaymentId(bussinessOrder));
+        // 支付单落地 招行的支付单号必须10位
+        if (PayTypeEnum.CmbApp.getCode().equals(bussinessOrder.getPayType())) {
+            payment.setPaymentId(genCmbPaymentId(bussinessOrder));
+        } else {
+            payment.setPaymentId(genPaymentId(bussinessOrder));
+        }
+
+
         int rows = paymentMapper.insertSelective(payment);
 
         return rows;
@@ -124,6 +131,25 @@ public class PaymentRepository {
         String paymentId = prefix + StringUtils.right(suffix, 5);
 
         logger.debug("genPaymentId:" + paymentId);
+
+        return paymentId;
+    }
+
+    /**
+     * 生成招行支付单号
+     * 10位数字，由商户生成，一天内不能重复
+     * 订单日期+订单号唯一定位一笔订单
+     * 
+     * @param bo
+     * @return
+     */
+    private String genCmbPaymentId(BussinessOrderPo bo) {
+        long paymentSuffixId = paymentOperate.genPaymentSuffixId();
+        String prefix = StringUtil.getDateFormatString("yy");
+        String suffix = String.format("%08d", paymentSuffixId);
+        String paymentId = prefix + StringUtils.right(suffix, 8);
+
+        logger.debug("genCmbPaymentId:" + paymentId);
 
         return paymentId;
     }

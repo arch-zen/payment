@@ -74,6 +74,8 @@ public enum PayTypeEnum {
             case AliPayWap:
             case AliPayApp:
                 return "Alipay";
+            case CmbApp:
+                return "CmbPay";
             default:
                 return "Weixin";
         }
@@ -85,6 +87,8 @@ public enum PayTypeEnum {
             case AliPayWap:
             case AliPayApp:
                 return ChannelTypeEnum.AliPay;
+            case CmbApp:
+                return ChannelTypeEnum.CmbPay;
             default:
                 return ChannelTypeEnum.WeiXinPay;
         }
@@ -94,6 +98,8 @@ public enum PayTypeEnum {
         if (payType.equals(PayTypeEnum.AliPayApp.getCode()) || payType.equals(PayTypeEnum.AliPayPc.getCode())
                 || payType.equals(PayTypeEnum.AliPayWap.getCode())) {
             return ChannelTypeEnum.AliPay;
+        } else if (payType.equals(PayTypeEnum.CmbApp.getCode())) {
+            return ChannelTypeEnum.CmbPay;
         } else {
             return ChannelTypeEnum.WeiXinPay;
         }

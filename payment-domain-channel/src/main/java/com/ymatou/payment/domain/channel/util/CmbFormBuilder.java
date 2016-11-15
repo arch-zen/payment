@@ -36,7 +36,7 @@ public class CmbFormBuilder {
     /**
      * Input
      */
-    private final static String inputFormat = "<input name=\"jsonRequestData\" type=\"hidden\" value=\"%s\" />";
+    private final static String inputFormat = "<input name=\"jsonRequestData\" type=\"hidden\" value=\'%s\' />";
 
     public static String buildForm(CmbPayRequest req, String url) {
         try {

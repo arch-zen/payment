@@ -11,7 +11,7 @@ package com.ymatou.payment.facade.constants;
  */
 public enum ChannelTypeEnum {
 
-    WeiXinPay("2"), AliPay("1");
+    WeiXinPay("2"), AliPay("1"), CmbPay("3");
 
     private ChannelTypeEnum(String code) {
         this.code = code;

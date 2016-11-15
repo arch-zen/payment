@@ -90,7 +90,7 @@ public class CmbAcquireOrderServiceImpl implements AcquireOrderService {
         payRequest.getReqData().setAmount(String.format("%.2f", payment.getPayPrice().getAmount().doubleValue()));
         payRequest.getReqData().setBranchNo(instConfig.getBranchNo());
         payRequest.getReqData().setDate(payment.getBussinessOrder().getOrderTime().substring(0, 8));
-        payRequest.getReqData().setMerchantNo(instConfig.getBranchNo());
+        payRequest.getReqData().setMerchantNo(instConfig.getMerchantId());
         payRequest.getReqData().setOrderNo(payment.getPaymentId());
         payRequest.getReqData().setPayNoticePara("Pay");
         payRequest.getReqData().setSignNoticePara("Sign");

@@ -32,6 +32,9 @@ public class PaymentNotifyMessageResolverFactory {
     @Resource
     private AliPayWapPaymentNotifyServiceImpl aliPayWapPaymentNotifyServiceImpl;
 
+    @Resource
+    private CmbPaymentNotifyServiceImpl cmbPaymentNotifyServiceImpl;
+
     /**
      * 获取到支付回调解析器
      * 
@@ -50,6 +53,8 @@ public class PaymentNotifyMessageResolverFactory {
                 return weiXinPaymentNotifyServiceImpl;
             case WeiXinApp:
                 return weiXinPaymentNotifyServiceImpl;
+            case CmbApp:
+                return cmbPaymentNotifyServiceImpl;
             default:
                 throw new BizException(ErrorCode.INVALID_PAY_TYPE, payType);
         }
