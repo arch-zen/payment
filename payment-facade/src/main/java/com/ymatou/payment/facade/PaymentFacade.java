@@ -4,6 +4,8 @@ import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
 import com.ymatou.payment.facade.model.ExecutePayNotifyReq;
 import com.ymatou.payment.facade.model.ExecutePayNotifyResp;
+import com.ymatou.payment.facade.model.SyncCmbPublicKeyReq;
+import com.ymatou.payment.facade.model.SyncCmbPublicKeyResp;
 
 /**
  * 支付接口
@@ -29,4 +31,12 @@ public interface PaymentFacade {
      * @return
      */
     ExecutePayNotifyResp executePayNotify(ExecutePayNotifyReq req);
+
+    /**
+     * 同步招行一网通公钥
+     * 
+     * @param req
+     * @return
+     */
+    SyncCmbPublicKeyResp syncCmbPublicKey(SyncCmbPublicKeyReq req);
 }

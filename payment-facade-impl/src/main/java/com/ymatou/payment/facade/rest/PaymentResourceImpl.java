@@ -23,6 +23,8 @@ import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
 import com.ymatou.payment.facade.model.ExecutePayNotifyReq;
 import com.ymatou.payment.facade.model.ExecutePayNotifyResp;
+import com.ymatou.payment.facade.model.SyncCmbPublicKeyReq;
+import com.ymatou.payment.facade.model.SyncCmbPublicKeyResp;
 
 /**
  * 支付REST接口实现
@@ -82,6 +84,20 @@ public class PaymentResourceImpl implements PaymentResource {
         }
 
         return "ok";
+    }
+
+    @Override
+    @POST
+    @Path("/{SyncCmbPublicKey:(?i:SyncCmbPublicKey)}")
+    @Produces({"text/xml"})
+    public String syncCmbPublicKeyReq(SyncCmbPublicKeyReq req, HttpServletRequest servletRequest) {
+        req.setMockHeader(getMockHttpHeader(servletRequest));
+        SyncCmbPublicKeyResp resp = paymentFacade.syncCmbPublicKey(req);
+        if (resp.getIsSuccess()) {
+            return "ok";
+        } else {
+            return "failed-" + resp.getErrorCode() + "|" + resp.getErrorMessage();
+        }
     }
 
     /**

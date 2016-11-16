@@ -56,6 +56,8 @@ public enum ErrorCode {
 
     PAYMENT_NOTIFY_INNER_SYSTEM_FAILED(4004, "支付成功通知内部系统失败"),
 
+    QUERY_CMB_PUBLIC_KEY_FAILED(4005, "获取招行一网通公钥失败"),
+
     // 验证失败4500
     PAYMENT_NOTIFY_VERIFY_FAILED(4501, "支付回调验证失败"),
 

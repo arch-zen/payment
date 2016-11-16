@@ -24,7 +24,9 @@ import com.ymatou.payment.facade.constants.OrderStatusEnum;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PaymentNotifyStatusEnum;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
+import com.ymatou.payment.infrastructure.db.mapper.CmbPublicKeyMapper;
 import com.ymatou.payment.infrastructure.db.model.BussinessOrderPo;
+import com.ymatou.payment.infrastructure.db.model.CmbPublicKeyPo;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 import com.ymatou.payment.infrastructure.util.StringUtil;
 
@@ -44,6 +46,9 @@ public class PayServiceImpl implements PayService {
 
     @Resource
     private PaymentNotifyService paymentNotifyService;
+
+    @Resource
+    private CmbPublicKeyMapper cmbPublicKeyMapper;
 
     /*
      * (non-Javadoc)
@@ -233,6 +238,18 @@ public class PayServiceImpl implements PayService {
             payment.setNotifyStatus(PaymentNotifyStatusEnum.NOTIFIED);
             paymentRepository.updatePaymentNotifyStatus(payment);
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.ymatou.payment.domain.pay.service.PayService#syncCmbPublicKey()
+     */
+    @Override
+    public void saveCmbPublicKey(String publicKey) {
+        CmbPublicKeyPo cmbPublicKeyPo = new CmbPublicKeyPo();
+        cmbPublicKeyPo.setPublicKey(publicKey);
+        cmbPublicKeyMapper.insertSelective(cmbPublicKeyPo);
     }
 
 }

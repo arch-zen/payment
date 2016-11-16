@@ -32,6 +32,15 @@ public class CmbPublicKeyQueryResponse extends CmbDTO {
         this.rspData = rspData;
     }
 
+    /**
+     * 构建错误消息
+     * 
+     * @return
+     */
+    public String buildErrorMessage() {
+        return String.format("%s|%s", rspData.getRspCode(), rspData.getRspMsg());
+    }
+
 
     /*
      * (non-Javadoc)

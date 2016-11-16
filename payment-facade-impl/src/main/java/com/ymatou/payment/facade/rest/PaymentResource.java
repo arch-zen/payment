@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
 import com.ymatou.payment.facade.model.ExecutePayNotifyReq;
+import com.ymatou.payment.facade.model.SyncCmbPublicKeyReq;
 
 /**
  * 支付REST接口
@@ -31,4 +32,13 @@ public interface PaymentResource {
      * @return
      */
     String executePayNotify(ExecutePayNotifyReq req, HttpServletRequest servletRequest);
+
+    /**
+     * 同步招行一网通公钥
+     * 
+     * @param req
+     * @param servletRequest
+     * @return
+     */
+    String syncCmbPublicKeyReq(SyncCmbPublicKeyReq req, HttpServletRequest servletRequest);
 }

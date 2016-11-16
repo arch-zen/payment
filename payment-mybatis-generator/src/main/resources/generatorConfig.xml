@@ -79,6 +79,14 @@
 		<table tableName="PP_PaymentParam" domainObjectName="PaymentParam">
 			<property name="useActualColumnNames" value="true"/>
 		</table>
+		
+		<table tableName="PP_CmbPublicKey" domainObjectName="CmbPublicKey">
+			<property name="useActualColumnNames" value="true"/>
+		</table>
+		
+		<table tableName="PP_CmbAggrement" domainObjectName="CmbAggrement">
+			<property name="useActualColumnNames" value="true"/>
+		</table>
 	</context>
 
 </generatorConfiguration>

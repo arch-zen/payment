@@ -25,6 +25,13 @@ import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
 import com.ymatou.payment.facade.model.ExecutePayNotifyReq;
 import com.ymatou.payment.facade.model.ExecutePayNotifyResp;
+import com.ymatou.payment.facade.model.SyncCmbPublicKeyReq;
+import com.ymatou.payment.facade.model.SyncCmbPublicKeyResp;
+import com.ymatou.payment.infrastructure.db.model.CmbPublicKeyPo;
+import com.ymatou.payment.integration.common.CmbSignature;
+import com.ymatou.payment.integration.model.CmbPublicKeyQueryRequest;
+import com.ymatou.payment.integration.model.CmbPublicKeyQueryResponse;
+import com.ymatou.payment.integration.service.cmb.PublicKeyQueryService;
 
 /**
  * 支付接口实现
@@ -45,6 +52,9 @@ public class PaymentFacadeImpl implements PaymentFacade {
 
     @Resource
     private InstitutionConfigManager instConfigManager;
+
+    @Resource
+    private PublicKeyQueryService publicKeyQueryService;
 
     /*
      * (non-Javadoc)
@@ -135,6 +145,36 @@ public class PaymentFacadeImpl implements PaymentFacade {
 
         payService.executePayNotify(payment, req.getMockHeader());
 
+
+        return resp;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.ymatou.payment.facade.PaymentFacade#syncCmbPublicKey(com.ymatou.payment.facade.model.
+     * SyncCmbPublicKeyReq)
+     */
+    @Override
+    public SyncCmbPublicKeyResp syncCmbPublicKey(SyncCmbPublicKeyReq req) {
+        InstitutionConfig config = instConfigManager.getConfig(PayTypeEnum.CmbApp);
+
+        CmbPublicKeyQueryRequest reqPubKey = new CmbPublicKeyQueryRequest();
+        reqPubKey.getReqData().setBranchNo(config.getBranchNo());
+        reqPubKey.getReqData().setMerchantNo(config.getMerchantId());
+
+        String sign = CmbSignature.shaSign(config.getMd5Key(), reqPubKey.buildSignString());
+        reqPubKey.setSign(sign);
+
+        CmbPublicKeyQueryResponse response = publicKeyQueryService.doService(reqPubKey, req.getMockHeader());
+        if (response.getRspData().getRspCode().equals("SUC0000")) {
+            payService.saveCmbPublicKey(response.getRspData().getFbPubKey());
+        } else {
+            throw new BizException(ErrorCode.QUERY_CMB_PUBLIC_KEY_FAILED, response.buildErrorMessage());
+        }
+        SyncCmbPublicKeyResp resp = new SyncCmbPublicKeyResp();
+        resp.setSuccess(true);
 
         return resp;
     }

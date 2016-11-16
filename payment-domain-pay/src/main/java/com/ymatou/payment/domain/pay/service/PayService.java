@@ -68,4 +68,9 @@ public interface PayService {
      * @param payment
      */
     void executePayNotify(Payment payment, HashMap<String, String> mockHeader);
+
+    /**
+     * 保存工行公钥
+     */
+    void saveCmbPublicKey(String publicKey);
 }

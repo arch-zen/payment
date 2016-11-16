@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.common.HttpClientUtil;
 import com.ymatou.payment.integration.common.constants.Constants;
@@ -46,15 +47,17 @@ public class PublicKeyQueryService implements InitializingBean {
     @Autowired
     private IntegrationConfig integrationConfig;
 
-    public CmbPublicKeyQueryResponse doService(CmbPublicKeyQueryRequest request, HashMap<String, String> header)
-            throws Exception {
-        String url = integrationConfig.getCmbPublicKeyQueryUrl(header);
-        List<NameValuePair> body = getRequestBody(request);
-        String resp = HttpClientUtil.sendPost(url, body, header, httpClient);
+    public CmbPublicKeyQueryResponse doService(CmbPublicKeyQueryRequest request, HashMap<String, String> header) {
+        try {
+            String url = integrationConfig.getCmbPublicKeyQueryUrl(header);
+            List<NameValuePair> body = getRequestBody(request);
+            String resp = HttpClientUtil.sendPost(url, body, header, httpClient);
 
-        CmbPublicKeyQueryResponse response = JSON.parseObject(resp, CmbPublicKeyQueryResponse.class);
-
-        return response;
+            CmbPublicKeyQueryResponse response = JSON.parseObject(resp, CmbPublicKeyQueryResponse.class);
+            return response;
+        } catch (Exception exception) {
+            throw new BizException("query cmb public key faild.", exception);
+        }
     }
 
     private List<NameValuePair> getRequestBody(CmbPublicKeyQueryRequest req) {
