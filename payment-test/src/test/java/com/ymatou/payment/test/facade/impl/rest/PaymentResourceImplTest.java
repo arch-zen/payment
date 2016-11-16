@@ -620,6 +620,7 @@ public class PaymentResourceImplTest extends RestBaseTest {
         req.setBankId("CMB");
     }
 
+
     /**
      * 构造日期字符串
      * 

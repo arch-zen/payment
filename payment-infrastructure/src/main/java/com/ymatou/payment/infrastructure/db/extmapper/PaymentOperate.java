@@ -3,7 +3,7 @@
  *
  * All rights reserved.
  */
-package com.ymatou.payment.infrastructure.db.operate;
+package com.ymatou.payment.infrastructure.db.extmapper;
 
 public interface PaymentOperate {
     /**

@@ -13,12 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
+import com.ymatou.payment.infrastructure.db.extmapper.PaymentOperate;
 import com.ymatou.payment.infrastructure.db.mapper.CompensateProcessInfoMapper;
 import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
 import com.ymatou.payment.infrastructure.db.model.BussinessOrderPo;
 import com.ymatou.payment.infrastructure.db.model.PaymentExample;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
-import com.ymatou.payment.infrastructure.db.operate.PaymentOperate;
 import com.ymatou.payment.infrastructure.util.StringUtil;
 import com.ymatou.payment.integration.IntegrationConfig;
 

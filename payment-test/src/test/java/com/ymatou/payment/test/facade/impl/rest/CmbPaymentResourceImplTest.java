@@ -24,8 +24,11 @@ import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.service.PayService;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
+import com.ymatou.payment.facade.model.SyncCmbPublicKeyReq;
 import com.ymatou.payment.facade.rest.PaymentResource;
+import com.ymatou.payment.infrastructure.db.extmapper.CmbPublicKeyExtMapper;
 import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
+import com.ymatou.payment.infrastructure.db.model.CmbPublicKeyPo;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.test.RestBaseTest;
 
@@ -47,6 +50,9 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
 
     @Resource
     private PaymentMapper paymentMapper;
+
+    @Resource
+    private CmbPublicKeyExtMapper cmbPublicKeyExtMapper;
 
     @Resource
     private SqlSession sqlSession;
@@ -93,6 +99,21 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         assertEquals("验证BizCode", req.getBizCode(), bo.getBizCode().code());
         assertEquals("验证OrderStatus", new Integer(0), bo.getOrderStatus());
         assertEquals("验证NotifyStatus", new Integer(0), bo.getNotifyStatus());
+    }
+
+
+    @Test
+    public void testSyncCmbPublicKeyReq() {
+        SyncCmbPublicKeyReq syncCmbPublicKeyReq = new SyncCmbPublicKeyReq();
+
+        String resp = paymentResource.syncCmbPublicKeyReq(syncCmbPublicKeyReq, buildServletRequestWithMock());
+
+        assertEquals("ok", resp);
+
+        CmbPublicKeyPo cmbPublicKeyPo = cmbPublicKeyExtMapper.selectLatestOne();
+
+        assertNotNull(cmbPublicKeyPo);
+        assertEquals(true, Math.abs(System.currentTimeMillis() - cmbPublicKeyPo.getCreatedTime().getTime()) < 2000);
     }
 
     /**

@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
-import com.ymatou.payment.infrastructure.db.operate.PaymentOperate;
+import com.ymatou.payment.infrastructure.db.extmapper.PaymentOperate;
 import com.ymatou.payment.infrastructure.util.StringUtil;
 import com.ymatou.payment.test.RestBaseTest;
 

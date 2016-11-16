@@ -27,7 +27,6 @@ import com.ymatou.payment.facade.model.ExecutePayNotifyReq;
 import com.ymatou.payment.facade.model.ExecutePayNotifyResp;
 import com.ymatou.payment.facade.model.SyncCmbPublicKeyReq;
 import com.ymatou.payment.facade.model.SyncCmbPublicKeyResp;
-import com.ymatou.payment.infrastructure.db.model.CmbPublicKeyPo;
 import com.ymatou.payment.integration.common.CmbSignature;
 import com.ymatou.payment.integration.model.CmbPublicKeyQueryRequest;
 import com.ymatou.payment.integration.model.CmbPublicKeyQueryResponse;
