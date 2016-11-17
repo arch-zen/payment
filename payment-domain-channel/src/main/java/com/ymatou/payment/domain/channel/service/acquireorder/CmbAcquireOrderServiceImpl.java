@@ -19,7 +19,9 @@ import com.ymatou.payment.domain.channel.model.AcquireOrderPackageResp;
 import com.ymatou.payment.domain.channel.service.AcquireOrderService;
 import com.ymatou.payment.domain.channel.util.CmbFormBuilder;
 import com.ymatou.payment.domain.pay.model.Payment;
+import com.ymatou.payment.domain.pay.repository.CmbAggrementRepository;
 import com.ymatou.payment.facade.constants.AcquireOrderResultTypeEnum;
+import com.ymatou.payment.infrastructure.db.model.CmbAggrementPo;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.common.CmbSignature;
 import com.ymatou.payment.integration.model.CmbPayRequest;
@@ -40,13 +42,19 @@ public class CmbAcquireOrderServiceImpl implements AcquireOrderService {
     @Resource
     private IntegrationConfig integrationConfig;
 
+    @Resource
+    private CmbAggrementRepository cmbAggrementRepository;
+
     @Override
     public AcquireOrderPackageResp acquireOrderPackage(Payment payment, HashMap<String, String> mockHeader) {
         // 获取第三方机构配置
         InstitutionConfig instConfig = instConfigManager.getConfig(payment.getPayType());
 
+        // 签约记录
+        CmbAggrementPo aggrement = cmbAggrementRepository.signAggrement(payment.getBussinessOrder().getUserId());
+
         // 构建支付请求
-        CmbPayRequest payRequest = buildPayReq(payment, instConfig);
+        CmbPayRequest payRequest = buildPayReq(payment, instConfig, aggrement);
 
         // 签名
         String sign = CmbSignature.shaSign(instConfig.getMd5Key(), payRequest.buildSignString());
@@ -70,7 +78,7 @@ public class CmbAcquireOrderServiceImpl implements AcquireOrderService {
      * @param instConfig
      * @return
      */
-    private CmbPayRequest buildPayReq(Payment payment, InstitutionConfig instConfig) {
+    private CmbPayRequest buildPayReq(Payment payment, InstitutionConfig instConfig, CmbAggrementPo aggrement) {
         CmbPayRequest payRequest = new CmbPayRequest();
 
         payRequest.getReqData()
@@ -83,10 +91,9 @@ public class CmbAcquireOrderServiceImpl implements AcquireOrderService {
                         payment.getPayType().getCode()));
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hhmmssSSS");
-        payRequest.getReqData().setAgrNo("10");
-        payRequest.getReqData().setMerchantSerialNo("10" + simpleDateFormat.format(new Date())); // 协议号
-                                                                                                 // +
-                                                                                                 // 时间戳
+        payRequest.getReqData().setAgrNo(aggrement.getAggId().toString());
+        payRequest.getReqData()
+                .setMerchantSerialNo(aggrement.getAggId().toString() + simpleDateFormat.format(new Date())); // 协议号+时间戳
         payRequest.getReqData().setAmount(String.format("%.2f", payment.getPayPrice().getAmount().doubleValue()));
         payRequest.getReqData().setBranchNo(instConfig.getBranchNo());
         payRequest.getReqData().setDate(payment.getBussinessOrder().getOrderTime().substring(0, 8));

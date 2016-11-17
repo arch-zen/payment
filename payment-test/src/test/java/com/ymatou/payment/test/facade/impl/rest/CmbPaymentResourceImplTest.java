@@ -7,6 +7,7 @@ package com.ymatou.payment.test.facade.impl.rest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -21,13 +22,17 @@ import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
+import com.ymatou.payment.domain.pay.repository.CmbAggrementRepository;
 import com.ymatou.payment.domain.pay.service.PayService;
+import com.ymatou.payment.facade.constants.CmbAggrementStatusEnum;
+import com.ymatou.payment.facade.constants.CmbCancelTypeEnum;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
 import com.ymatou.payment.facade.model.SyncCmbPublicKeyReq;
 import com.ymatou.payment.facade.rest.PaymentResource;
 import com.ymatou.payment.infrastructure.db.extmapper.CmbPublicKeyExtMapper;
 import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
+import com.ymatou.payment.infrastructure.db.model.CmbAggrementPo;
 import com.ymatou.payment.infrastructure.db.model.CmbPublicKeyPo;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.test.RestBaseTest;
@@ -55,15 +60,24 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
     private CmbPublicKeyExtMapper cmbPublicKeyExtMapper;
 
     @Resource
+    private CmbAggrementRepository cmbAggrementRepository;
+
+    @Resource
     private SqlSession sqlSession;
 
     @Test
-    public void testAcquireOrder() {
+    public void testCmbAcquireOrder() {
         AcquireOrderReq req = new AcquireOrderReq();
         buildBaseRequest(req);
-
-        req.setPayType("20");
         req.setPayPrice("1.01");
+
+        long userId = req.getUserId();
+        // 删除用户的签约记录
+        cmbAggrementRepository.deleteByUserId(userId);
+
+        // 确认记录已经删除
+        CmbAggrementPo findInitAggrement = cmbAggrementRepository.findInitAggrement(userId);
+        assertNull(findInitAggrement);
 
         MockHttpServletRequest servletRequest = new MockHttpServletRequest();
         AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
@@ -99,6 +113,14 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         assertEquals("验证BizCode", req.getBizCode(), bo.getBizCode().code());
         assertEquals("验证OrderStatus", new Integer(0), bo.getOrderStatus());
         assertEquals("验证NotifyStatus", new Integer(0), bo.getNotifyStatus());
+
+        CmbAggrementPo newAggrement = cmbAggrementRepository.findInitAggrement(userId);
+        assertNotNull(newAggrement);
+
+        assertEquals(CmbAggrementStatusEnum.INIT.code(), newAggrement.getAggStatus());
+        assertEquals(CmbCancelTypeEnum.NOCANCEL.code(), newAggrement.getCancelType());
+        assertEquals(userId, newAggrement.getUserId().longValue());
+        assertEquals(true, newAggrement.getAggId() > 0);
     }
 
 
@@ -134,7 +156,7 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         req.setOrderId(getDateFormatString("yyyyMMddHHmmssSSS"));
         req.setOrderTime(getDateFormatString("yyyyMMddHHmmss"));
         req.setPayPrice("0.01");
-        req.setPayType("10");
+        req.setPayType("20");
         req.setProductName("测试商品");
         req.setProductDesc("商品描述");
         req.setProductUrl("www.ymatou.com");
