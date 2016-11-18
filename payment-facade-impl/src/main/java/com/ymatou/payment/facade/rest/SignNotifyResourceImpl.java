@@ -12,15 +12,12 @@ import java.util.HashMap;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,100 +25,44 @@ import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
-import com.ymatou.payment.facade.PaymentNotifyFacade;
-import com.ymatou.payment.facade.constants.PaymentNotifyType;
-import com.ymatou.payment.facade.model.PaymentNotifyReq;
-import com.ymatou.payment.facade.model.PaymentNotifyResp;
+import com.ymatou.payment.facade.SignNotifyFacade;
+import com.ymatou.payment.facade.model.SignNotifyReq;
+import com.ymatou.payment.facade.model.SignNotifyResp;
 
 /**
- * 支付回调接口实现
+ * 签约通知
  * 
- * @author wangxudong 2016年5月17日 下午8:20:36
+ * @author wangxudong 2016年11月18日 下午8:22:46
  *
  */
-@Component("paymentNotifyResource")
+@Component("signNotifyResource")
 @Path("/")
 @Produces(MediaType.TEXT_HTML)
-public class PaymentNotifyResourceImpl implements PaymentNotifyResource {
+public class SignNotifyResourceImpl implements SignNotifyResource {
 
-    private static Logger logger = LoggerFactory.getLogger(PaymentNotifyResourceImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(SignNotifyResourceImpl.class);
 
-    /**
-     * 支付接口
-     */
     @Resource
-    private PaymentNotifyFacade paymentNotifyFacade;
-
-    @Override
-    @GET
-    @Path("{callback:(?i:callback)}/{payType}")
-    public Response callback(@PathParam("payType") String payType, @Context HttpServletRequest servletRequest) {
-        Response response;
-        try {
-            PaymentNotifyReq notifyReq = new PaymentNotifyReq();
-            notifyReq.setPayType(payType);
-            notifyReq.setNotifyType(PaymentNotifyType.Client);
-            notifyReq.setRawString(servletRequest.getQueryString());
-            notifyReq.setMockHeader(getMockHttpHeader(servletRequest));
-
-            PaymentNotifyResp notifyResp = paymentNotifyFacade.notify(notifyReq);
-            if (notifyResp.getIsSuccess()) {
-                String url = notifyResp.getResult();
-                response = Response.status(Status.FOUND).header("location", url).build();
-            } else {
-                logger.error("process callback failed with paytype: " + payType + "|" + notifyResp.getErrorMessage());
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            }
-        } catch (Exception e) {
-            logger.error("process callback failed with paytype: " + payType, e);
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-        }
-
-        return response;
-    }
+    private SignNotifyFacade signNotifyFacade;
 
     @Override
     @POST
-    @Path("{notify:(?i:notify)}/{payType}")
-    public String notify(@PathParam("payType") String payType, @Context HttpServletRequest servletRequest) {
+    @Path("{cmbSignNotify:(?i:cmbSignNotify)}")
+    public Response cmbSignNotify(@Context HttpServletRequest servletRequest) {
         try {
-            PaymentNotifyReq notifyReq = new PaymentNotifyReq();
-            notifyReq.setPayType(payType);
-            notifyReq.setNotifyType(PaymentNotifyType.Server);
-            notifyReq.setRawString(getHttpBody(servletRequest));
-            notifyReq.setMockHeader(getMockHttpHeader(servletRequest));
-
-            PaymentNotifyResp notifyResp = paymentNotifyFacade.notify(notifyReq);
-            if (notifyResp.getIsSuccess()) {
-                return notifyResp.getResult();
-            } else {
-                return "failed";
-            }
-        } catch (Exception e) {
-            logger.error("process notify failed with paytype: " + payType, e);
-            return "failed";
-        }
-    }
-
-    @Override
-    @POST
-    @Path("{cmbPayNotify:(?i:cmbPayNotify)}")
-    public Response cmbPayNotify(@Context HttpServletRequest servletRequest) {
-        try {
-            PaymentNotifyReq notifyReq = new PaymentNotifyReq();
+            SignNotifyReq notifyReq = new SignNotifyReq();
             notifyReq.setPayType("20"); // 招行一网通渠道号
-            notifyReq.setNotifyType(PaymentNotifyType.Server);
             notifyReq.setRawString(getHttpBody(servletRequest));
             notifyReq.setMockHeader(getMockHttpHeader(servletRequest));
 
-            PaymentNotifyResp notifyResp = paymentNotifyFacade.notify(notifyReq);
+            SignNotifyResp notifyResp = signNotifyFacade.signNotify(notifyReq);
             if (notifyResp.getIsSuccess()) {
                 return Response.ok("success", "text/plain").build();
             } else {
                 return Response.serverError().build();
             }
         } catch (Exception e) {
-            logger.error("process pay notify failed with paytype:20", e);
+            logger.error("process sign notify failed with paytype:20", e);
             return Response.serverError().build();
         }
     }

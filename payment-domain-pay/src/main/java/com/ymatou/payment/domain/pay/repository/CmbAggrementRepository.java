@@ -72,6 +72,24 @@ public class CmbAggrementRepository {
     }
 
     /**
+     * 根据协议号获取协议信息
+     * 
+     * @param aggId
+     * @return
+     */
+    public CmbAggrementPo getByAggId(long aggId) {
+        CmbAggrementExample cmbAggrementExample = new CmbAggrementExample();
+        cmbAggrementExample.createCriteria().andAggIdEqualTo(aggId);
+
+        List<CmbAggrementPo> aggList = cmbAggrementMapper.selectByExample(cmbAggrementExample);
+        if (aggList == null || aggList.size() == 0) {
+            return null;
+        } else {
+            return aggList.get(0);
+        }
+    }
+
+    /**
      * 删除用户的签约记录
      * 
      * @param userId
@@ -81,6 +99,15 @@ public class CmbAggrementRepository {
         cmbAggrementExample.createCriteria().andUserIdEqualTo(userId);
 
         cmbAggrementMapper.deleteByExample(cmbAggrementExample);
+    }
+
+    /**
+     * 更新用户签约记录
+     * 
+     * @param cmbAggrementPo
+     */
+    public void update(CmbAggrementPo cmbAggrementPo) {
+        cmbAggrementMapper.updateByPrimaryKeySelective(cmbAggrementPo);
     }
 
     /**

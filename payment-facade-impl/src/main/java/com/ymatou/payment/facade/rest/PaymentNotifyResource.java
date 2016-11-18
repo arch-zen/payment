@@ -42,12 +42,4 @@ public interface PaymentNotifyResource {
      * @return
      */
     Response cmbPayNotify(HttpServletRequest servletRequest);
-
-    /**
-     * 招行一网通 签约回调
-     * 
-     * @param servletRequest
-     * @return
-     */
-    Response cmbSignNotify(HttpServletRequest servletRequest);
 }
