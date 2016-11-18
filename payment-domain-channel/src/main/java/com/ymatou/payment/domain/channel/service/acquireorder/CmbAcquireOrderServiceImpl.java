@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.channel.InstitutionConfig;
@@ -82,13 +83,15 @@ public class CmbAcquireOrderServiceImpl implements AcquireOrderService {
         CmbPayRequest payRequest = new CmbPayRequest();
 
         payRequest.getReqData()
-                .setPayNoticeUrl(String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(),
-                        payment.getPayType().getCode()));
-        payRequest.getReqData().setReturnUrl(String.format("%s/callback/%s", integrationConfig.getYmtPaymentBaseUrl(),
-                payment.getPayType().getCode()));
+                .setPayNoticeUrl(String.format("%s/cmbPayNotify", integrationConfig.getYmtCmbPaymentBaseUrl()));
         payRequest.getReqData()
-                .setSignNoticeUrl(String.format("%s/cmbsign", integrationConfig.getYmtPaymentBaseUrl(),
-                        payment.getPayType().getCode()));
+                .setSignNoticeUrl(String.format("%s/cmbSignNotify", integrationConfig.getYmtCmbPaymentBaseUrl()));
+
+        if (StringUtils.isEmpty(payment.getBussinessOrder().getCallbackUrl())) {
+            payRequest.getReqData().setReturnUrl("http://YMTCMBPAY");
+        } else {
+            payRequest.getReqData().setReturnUrl(payment.getBussinessOrder().getCallbackUrl());
+        }
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hhmmssSSS");
         payRequest.getReqData().setAgrNo(aggrement.getAggId().toString());

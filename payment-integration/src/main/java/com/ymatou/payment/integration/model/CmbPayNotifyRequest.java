@@ -41,7 +41,7 @@ public class CmbPayNotifyRequest extends CmbDTO {
         this.noticeData = noticeData;
     }
 
-    private PayNoticeData noticeData;
+    private PayNoticeData noticeData = new PayNoticeData();
 
 
     public class PayNoticeData {

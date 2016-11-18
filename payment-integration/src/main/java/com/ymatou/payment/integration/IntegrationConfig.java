@@ -45,6 +45,7 @@ public class IntegrationConfig {
     private String cmbQuerySingleOrderUrl; // 一网通单笔订单查询
     private String cmbDoRefundUrl;// 一网通退款
     private String cmbPayUrl; // 一网通支付
+    private String ymtCmbPaymentBaseUrl; // 洋码头一网通通知支付url基路径
 
     private String openMock;
     private String aliPayBaseUrlMock; // 支付宝网关url(mock)
@@ -66,6 +67,7 @@ public class IntegrationConfig {
     private String cmbQuerySingleOrderUrlMock; // 一网通单笔订单查询（mock）
     private String cmbDoRefundUrlMock;// 一网通退款(mock)
     private String cmbPayUrlMock; // 一网通支付
+    private String ymtCmbPaymentBaseUrlMock; // 洋码头一网通通知支付url基路径
 
 
     public String getYmtTriggerOrderRefundUrl(HashMap<String, String> header) {
@@ -680,5 +682,35 @@ public class IntegrationConfig {
         } else {
             return getCmbPayUrl();
         }
+    }
+
+    /**
+     * @return the ymtCmbPaymentBaseUrl
+     */
+    @DisconfFileItem(name = "ymt.cmbpayment.baseurl")
+    public String getYmtCmbPaymentBaseUrl() {
+        return ymtCmbPaymentBaseUrl;
+    }
+
+    /**
+     * @param ymtCmbPaymentBaseUrl the ymtCmbPaymentBaseUrl to set
+     */
+    public void setYmtCmbPaymentBaseUrl(String ymtCmbPaymentBaseUrl) {
+        this.ymtCmbPaymentBaseUrl = ymtCmbPaymentBaseUrl;
+    }
+
+    /**
+     * @return the ymtCmbPaymentBaseUrlMock
+     */
+    @DisconfFileItem(name = "ymt.cmbpayment.baseurl.mock")
+    public String getYmtCmbPaymentBaseUrlMock() {
+        return ymtCmbPaymentBaseUrlMock;
+    }
+
+    /**
+     * @param ymtCmbPaymentBaseUrlMock the ymtCmbPaymentBaseUrlMock to set
+     */
+    public void setYmtCmbPaymentBaseUrlMock(String ymtCmbPaymentBaseUrlMock) {
+        this.ymtCmbPaymentBaseUrlMock = ymtCmbPaymentBaseUrlMock;
     }
 }

@@ -128,7 +128,7 @@ public class PaymentNotifyResourceImpl implements PaymentNotifyResource {
 
     @Override
     @POST
-    @Path("{cmbPayNotify:(?i:cmbPayNotify)}")
+    @Path("{cmbSignNotify:(?i:cmbSignNotify)}")
     public Response cmbSignNotify(@Context HttpServletRequest servletRequest) {
         try {
             PaymentNotifyReq notifyReq = new PaymentNotifyReq();

@@ -93,6 +93,11 @@ public class Payment extends PrintFriendliness {
      * 完成退款金额
      */
     private BigDecimal completedRefundAmt;
+
+    /**
+     * 第三方优惠金额
+     */
+    private Money discountAmt;
     /**
      * 对账状态
      */
@@ -280,6 +285,7 @@ public class Payment extends PrintFriendliness {
         model.setRefundAmt(po.getRefundAmt());
         model.setCompletedRefundAmt(po.getCompletedRefundAmt());
         model.setRetryCount(po.getRetryCount());
+        model.setDiscountAmt(parseToMoney(po.getDiscountAmt()));
 
         if (po.getNotifyStatus() != null)
             model.setNotifyStatus(PaymentNotifyStatusEnum.parse(po.getNotifyStatus()));
@@ -329,5 +335,19 @@ public class Payment extends PrintFriendliness {
 
     public void setPayerEmail(String payerEmail) {
         this.payerEmail = payerEmail;
+    }
+
+    /**
+     * @return the discountAmt
+     */
+    public Money getDiscountAmt() {
+        return discountAmt;
+    }
+
+    /**
+     * @param discountAmt the discountAmt to set
+     */
+    public void setDiscountAmt(Money discountAmt) {
+        this.discountAmt = discountAmt;
     }
 }

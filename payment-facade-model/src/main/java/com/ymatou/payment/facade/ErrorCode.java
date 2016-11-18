@@ -30,6 +30,12 @@ public enum ErrorCode {
 
     INVALID_SIGN_TYPE(3105, "签名方式错误"),
 
+    INVALID_MERCHANT_ID(3106, "无效的商户号"),
+
+    NOT_EXIST_CMB_PUBLIC_KEY(3017, "招行一网通公钥不存在"),
+
+
+
     // 数据不一致 3300
     INCONSISTENT_PAYMENTID_AND_TRADINGID(3301, "支付单号和交易号不一致"),
 

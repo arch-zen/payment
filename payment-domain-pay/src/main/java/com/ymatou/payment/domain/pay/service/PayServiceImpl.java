@@ -181,6 +181,7 @@ public class PayServiceImpl implements PayService {
         paymentPo.setCheckStatus(payment.getCheckStatus());
         paymentPo.setPayerId(payment.getPayerId());
         paymentPo.setPayerEmail(payment.getPayerEmail());
+        paymentPo.setDiscountAmt(payment.getDiscountAmt().getAmount());
 
         paymentRepository.setPaymentOrderPaid(paymentPo, traceId);
     }

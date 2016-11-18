@@ -22,7 +22,7 @@ public class PaymentNotifyMessage {
     private String institutionPaymentId;
 
     /**
-     * 实际支付金额
+     * 实际支付金额(支付订单金额)
      */
     private BigDecimal actualPayPrice;
 
@@ -30,6 +30,11 @@ public class PaymentNotifyMessage {
      * 实际支付币种
      */
     private String actualPayCurrency;
+
+    /**
+     * 优惠金额
+     */
+    private BigDecimal discountAmt;
 
     /**
      * 第三方用户标识
@@ -231,6 +236,20 @@ public class PaymentNotifyMessage {
 
     public void setPayerEmail(String payerEmail) {
         this.payerEmail = payerEmail;
+    }
+
+    /**
+     * @return the discountAmt
+     */
+    public BigDecimal getDiscountAmt() {
+        return discountAmt;
+    }
+
+    /**
+     * @param discountAmt the discountAmt to set
+     */
+    public void setDiscountAmt(BigDecimal discountAmt) {
+        this.discountAmt = discountAmt;
     }
 
 }

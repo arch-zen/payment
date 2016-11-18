@@ -154,6 +154,14 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
         payment.setPayerId(notifyMessage.getPayerId());
         payment.setPayerEmail(notifyMessage.getPayerEmail());
         payment.setExchangeRate(1.0); // 没有接支付宝国际，默认汇率为1
+
+        if (notifyMessage.getDiscountAmt() != null) {
+            payment.setDiscountAmt(new Money(notifyMessage.getDiscountAmt()));
+        } else {
+            payment.setDiscountAmt(new Money(0));
+        }
+
+
         payService.setPaymentOrderPaid(payment, notifyMessage.getTraceId());
     }
 }
