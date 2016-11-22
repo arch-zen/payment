@@ -43,7 +43,7 @@ public class CmbDoRefundRequest extends CmbDTO {
                 "amount=%s&branchNo=%s&date=%s&dateTime=%s&encrypType=%s&merchantNo=%s&operatorNo=%s&orderNo=%s&pwd=%s&refundSerialNo=%s",
                 reqData.getAmount(), reqData.getBranchNo(), reqData.getDate(),
                 reqData.getDateTime(), reqData.getEncrypType(), reqData.getMerchantNo(), reqData.getOperatorNo(),
-                reqData.getOrderNo(), reqData.getPwd(), reqData.refundSerialNo);
+                reqData.getOrderNo(), reqData.getPwd(), reqData.refundSerialNo).replace("null", "");
     }
 
     public class DoRefundReqData {

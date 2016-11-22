@@ -214,4 +214,14 @@ public class SignatureServiceImpl implements SignatureService {
                     e);
         }
     }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.ymatou.payment.domain.channel.service.SignatureService#getMd5MockKey()
+     */
+    @Override
+    public String getMd5MockKey() {
+        return mockMd5key;
+    }
 }

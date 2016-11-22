@@ -87,6 +87,7 @@ public class PaymentNotifyService {
         request.setTradingId(bussinessOrder.getOrderId());
         request.setPaymentId(payment.getPaymentId());
         request.setPayPrice(payment.getPayPrice().toString());
+        request.setDiscountAmt(payment.getDiscountAmt().toString()); // 第三方优惠金额
         request.setPayTime(payment.getPayTime() == null ? new Date() : payment.getPayTime());
         request.setSignMethod("MD5");
         request.setTraceId(UUID.randomUUID().toString());

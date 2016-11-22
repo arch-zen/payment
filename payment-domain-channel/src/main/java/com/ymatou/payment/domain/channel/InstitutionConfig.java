@@ -85,6 +85,18 @@ public class InstitutionConfig {
     private String md5KeyConnector;
 
     /**
+     * 商户结账系统的操作员号（目前只有招行使用）
+     */
+    @XmlAttribute(name = "operatorNo")
+    private String operatorNo;
+
+    /**
+     * 操作员登录密码（目前只有招行使用）
+     */
+    @XmlAttribute(name = "operatorPwd")
+    private String operatorPwd;
+
+    /**
      * @return the payType
      */
     public String getPayType() {
@@ -236,6 +248,34 @@ public class InstitutionConfig {
      */
     public final void setBranchNo(String branchNo) {
         this.branchNo = branchNo;
+    }
+
+    /**
+     * @return the operatorNo
+     */
+    public String getOperatorNo() {
+        return operatorNo;
+    }
+
+    /**
+     * @param operatorNo the operatorNo to set
+     */
+    public void setOperatorNo(String operatorNo) {
+        this.operatorNo = operatorNo;
+    }
+
+    /**
+     * @return the operatorPwd
+     */
+    public String getOperatorPwd() {
+        return operatorPwd;
+    }
+
+    /**
+     * @param operatorPwd the operatorPwd to set
+     */
+    public void setOperatorPwd(String operatorPwd) {
+        this.operatorPwd = operatorPwd;
     }
 
 

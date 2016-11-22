@@ -25,6 +25,9 @@ public class RefundQueryServiceFactory {
     @Autowired
     private WeiXinRefundQueryServiceImpl weiXinRefundQueryServiceImpl;
 
+    @Autowired
+    private CmbRefundQueryServiceImpl cmbRefundQueryServiceImpl;
+
     public RefundQueryService getInstanceByType(String payType) {
         return getInstanceByPayType(PayTypeEnum.parse(payType));
     }
@@ -42,6 +45,8 @@ public class RefundQueryServiceFactory {
                 return weiXinRefundQueryServiceImpl;
             case WeiXinApp:
                 return weiXinRefundQueryServiceImpl;
+            case CmbApp:
+                return cmbRefundQueryServiceImpl;
             default:
                 throw new BizException(ErrorCode.INVALID_PAY_TYPE, payType.getCode());
 

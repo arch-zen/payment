@@ -22,14 +22,13 @@ public class CmbQuerySingleOrderRequest extends CmbDTO {
             return String.format("bankSerialNo=%s&branchNo=%s&dateTime=%s&merchantNo=%s&type=%s",
                     reqData.getBankSerialNo(),
                     reqData.getBranchNo(),
-                    reqData.getDateTime(), reqData.getMerchantNo(), reqData.getType());
+                    reqData.getDateTime(), reqData.getMerchantNo(), reqData.getType()).replace("null", "");
         } else {
             return String.format(
-                    "bankSerialNo=%s&branchNo=%s&date=%s&dateTime=%s&merchantNo=%s&operatorNo=%s&orderNo=%s&type=%s",
-                    reqData.getBankSerialNo(),
+                    "branchNo=%s&date=%s&dateTime=%s&merchantNo=%s&orderNo=%s&type=%s",
                     reqData.getBranchNo(), reqData.getDate(),
-                    reqData.getDateTime(), reqData.getMerchantNo(), reqData.getOperatorNo(), reqData.getOrderNo(),
-                    reqData.getType());
+                    reqData.getDateTime(), reqData.getMerchantNo(), reqData.getOrderNo(),
+                    reqData.getType()).replace("null", "");
         }
     }
 
@@ -79,7 +78,7 @@ public class CmbQuerySingleOrderRequest extends CmbDTO {
          * A：按银行订单流水号查询
          * B：按商户订单日期和订单号查询；
          */
-        private String type = "A";
+        private String type = "B";
 
         /**
          * 银行订单流水号

@@ -41,9 +41,12 @@ import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
+import com.ymatou.payment.facade.model.CheckPaymentRequset;
 import com.ymatou.payment.facade.model.SyncCmbPublicKeyReq;
+import com.ymatou.payment.facade.rest.CheckPaymentResource;
 import com.ymatou.payment.facade.rest.PaymentNotifyResource;
 import com.ymatou.payment.facade.rest.PaymentResource;
+import com.ymatou.payment.facade.rest.SignNotifyResource;
 import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.infrastructure.db.extmapper.CmbPublicKeyExtMapper;
 import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
@@ -53,6 +56,8 @@ import com.ymatou.payment.infrastructure.security.RSAUtil;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.model.CmbPayNotifyRequest;
 import com.ymatou.payment.integration.model.CmbPayNotifyRequest.PayNoticeData;
+import com.ymatou.payment.integration.model.CmbSignNotifyRequest;
+import com.ymatou.payment.integration.model.CmbSignNotifyRequest.SignNoticeData;
 import com.ymatou.payment.test.RestBaseTest;
 
 /**
@@ -67,6 +72,12 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
 
     @Resource
     private PaymentNotifyResource paymentNotifyResource;
+
+    @Resource
+    private CheckPaymentResource checkPaymentResource;
+
+    @Resource
+    private SignNotifyResource signNotifyResource;
 
     @Resource
     private PayService payService;
@@ -391,6 +402,168 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
     }
 
     @Test
+    public void testSignNotify() throws UnsupportedEncodingException, InvalidKeyException, NoSuchAlgorithmException,
+            InvalidKeySpecException, SignatureException {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+        req.setPayPrice("1.01");
+
+        long userId = req.getUserId();
+        // 删除用户的签约记录
+        cmbAggrementRepository.deleteByUserId(userId);
+
+        // 确认记录已经删除
+        CmbAggrementPo findInitAggrement = cmbAggrementRepository.findInitAggrement(userId);
+        assertNull(findInitAggrement);
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        assertEquals("验证返回码", 0, res.getErrorCode());
+        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
+        assertEquals("验证ResultType", "Form", res.getResultType());
+
+        BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
+        assertNotNull("验证商户订单", bo);
+
+        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertNotNull("验证支付单", payment);
+
+        CmbAggrementPo aggrementPo = cmbAggrementRepository.findInitAggrement(userId);
+        assertNotNull("验证签约记录", aggrementPo);
+
+        // 构建回调请求
+        servletRequest = new MockHttpServletRequest();
+        servletRequest.addHeader("mock", "1");
+        servletRequest.setRequestURI("/cmbPayNotify");
+
+        // 获取到第三方机构配置
+        InstitutionConfig institutionConfig = institutionConfigManager.getConfig(PayTypeEnum.CmbApp);
+
+        // 构建签约通知
+        CmbSignNotifyRequest cmbSignNotifyRequest = new CmbSignNotifyRequest();
+        SignNoticeData signNoticeData = cmbSignNotifyRequest.getNoticeData();
+        signNoticeData.setRspCode("SUC0000");
+        signNoticeData.setRspMsg("签约成功");
+        signNoticeData.setNoticeSerialNo(UUID.randomUUID().toString());
+        signNoticeData.setUserID(String.valueOf(bo.getUserId()));
+        signNoticeData.setAgrNo(String.valueOf(aggrementPo.getAggId()));
+        signNoticeData.setBranchNo(institutionConfig.getBranchNo());
+        signNoticeData.setMerchantNo(institutionConfig.getMerchantId());
+        signNoticeData.setNoPwdPay("N");
+
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        String dateTime = simpleDateFormat.format(new Date());
+        signNoticeData.setDateTime(dateTime);
+        signNoticeData.setUserPidHash(dateTime);
+        signNoticeData.setUserPidType("1");
+
+        // 签名
+        String sign = RSAUtil.sign(cmbSignNotifyRequest.buildSignString(), mockYmtPrivateKey);
+        cmbSignNotifyRequest.setSign(sign);
+        cmbSignNotifyRequest.setSignType("RSA");
+
+        // 构建请求报文
+        String jsonRequestData = URLEncoder.encode(JSON.toJSONString(cmbSignNotifyRequest), "UTF-8");
+        String requestBody = String.format("jsonRequestData=%s", jsonRequestData);
+        servletRequest.setContent(requestBody.getBytes("utf-8"));
+
+        Response cmbSignNotify = signNotifyResource.cmbSignNotify(servletRequest);
+        assertEquals(200, cmbSignNotify.getStatus());
+
+        // 验证更新后的协议
+        CmbAggrementPo aggrement = cmbAggrementRepository.getByAggId(aggrementPo.getAggId());
+        assertNotNull("验证更新后的协议", aggrement);
+        assertEquals(CmbAggrementStatusEnum.SIGN.code(), aggrement.getAggStatus());
+        assertEquals(dateTime, aggrement.getSignDateTime());
+        assertEquals(signNoticeData.getRspCode(), aggrement.getRespCode());
+        assertEquals(signNoticeData.getRspMsg(), aggrement.getRespMessage());
+        assertEquals(signNoticeData.getNoticeSerialNo(), aggrement.getBankSerialNo());
+        assertEquals(signNoticeData.getUserPidType(), aggrement.getUserPidType());
+        assertEquals(signNoticeData.getUserPidHash(), aggrement.getUserPidHash());
+        assertEquals(signNoticeData.getNoPwdPay(), aggrement.getNoPwdPay());
+    }
+
+    @Test
+    public void testSignNotifyWithWrongSign()
+            throws UnsupportedEncodingException, InvalidKeyException, NoSuchAlgorithmException,
+            InvalidKeySpecException, SignatureException {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+        req.setPayPrice("1.01");
+
+        long userId = req.getUserId();
+        // 删除用户的签约记录
+        cmbAggrementRepository.deleteByUserId(userId);
+
+        // 确认记录已经删除
+        CmbAggrementPo findInitAggrement = cmbAggrementRepository.findInitAggrement(userId);
+        assertNull(findInitAggrement);
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        assertEquals("验证返回码", 0, res.getErrorCode());
+        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
+        assertEquals("验证ResultType", "Form", res.getResultType());
+
+        BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
+        assertNotNull("验证商户订单", bo);
+
+        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertNotNull("验证支付单", payment);
+
+        CmbAggrementPo aggrementPo = cmbAggrementRepository.findInitAggrement(userId);
+        assertNotNull("验证签约记录", aggrementPo);
+
+        // 构建回调请求
+        servletRequest = new MockHttpServletRequest();
+        servletRequest.addHeader("mock", "1");
+        servletRequest.setRequestURI("/cmbPayNotify");
+
+        // 获取到第三方机构配置
+        InstitutionConfig institutionConfig = institutionConfigManager.getConfig(PayTypeEnum.CmbApp);
+
+        // 构建签约通知
+        CmbSignNotifyRequest cmbSignNotifyRequest = new CmbSignNotifyRequest();
+        SignNoticeData signNoticeData = cmbSignNotifyRequest.getNoticeData();
+        signNoticeData.setRspCode("SUC0000");
+        signNoticeData.setRspMsg("签约成功");
+        signNoticeData.setNoticeSerialNo(UUID.randomUUID().toString());
+        signNoticeData.setUserID(String.valueOf(bo.getUserId()));
+        signNoticeData.setAgrNo(String.valueOf(aggrementPo.getAggId()));
+        signNoticeData.setBranchNo(institutionConfig.getBranchNo());
+        signNoticeData.setMerchantNo(institutionConfig.getMerchantId());
+        signNoticeData.setNoPwdPay("N");
+
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        String dateTime = simpleDateFormat.format(new Date());
+        signNoticeData.setDateTime(dateTime);
+        signNoticeData.setUserPidHash(dateTime);
+        signNoticeData.setUserPidType("1");
+
+        // 签名
+        String sign = RSAUtil.sign(cmbSignNotifyRequest.buildSignString(), mockYmtPrivateKey);
+        cmbSignNotifyRequest.setSign(sign + "error sign");
+        cmbSignNotifyRequest.setSignType("RSA");
+
+        // 构建请求报文
+        String jsonRequestData = URLEncoder.encode(JSON.toJSONString(cmbSignNotifyRequest), "UTF-8");
+        String requestBody = String.format("jsonRequestData=%s", jsonRequestData);
+        servletRequest.setContent(requestBody.getBytes("utf-8"));
+
+        Response cmbSignNotify = signNotifyResource.cmbSignNotify(servletRequest);
+        assertEquals(500, cmbSignNotify.getStatus());
+
+        // 验证更新后的协议
+        CmbAggrementPo aggrement = cmbAggrementRepository.getByAggId(aggrementPo.getAggId());
+        assertNotNull("验证更新后的协议", aggrement);
+        assertEquals(CmbAggrementStatusEnum.INIT.code(), aggrement.getAggStatus());
+    }
+
+    @Test
     public void testSyncCmbPublicKeyReq() {
         SyncCmbPublicKeyReq syncCmbPublicKeyReq = new SyncCmbPublicKeyReq();
 
@@ -402,6 +575,200 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
 
         assertNotNull(cmbPublicKeyPo);
         assertEquals(true, Math.abs(System.currentTimeMillis() - cmbPublicKeyPo.getCreatedTime().getTime()) < 2000);
+    }
+
+
+    @Test
+    public void testCheckPayment()
+            throws UnsupportedEncodingException, InvalidKeyException, NoSuchAlgorithmException,
+            InvalidKeySpecException, SignatureException {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+        req.setPayPrice("1.01");
+
+        long userId = req.getUserId();
+        // 删除用户的签约记录
+        cmbAggrementRepository.deleteByUserId(userId);
+
+        // 确认记录已经删除
+        CmbAggrementPo findInitAggrement = cmbAggrementRepository.findInitAggrement(userId);
+        assertNull(findInitAggrement);
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        assertEquals("验证返回码", 0, res.getErrorCode());
+        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
+        assertEquals("验证ResultType", "Form", res.getResultType());
+
+        BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
+        assertNotNull("验证商户订单", bo);
+
+        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertNotNull(payment);
+
+
+        // 构建回调请求
+        servletRequest = new MockHttpServletRequest();
+        servletRequest.addHeader("mock", "1");
+        servletRequest.setRequestURI("/cmbPayNotify");
+
+        // 获取到第三方机构配置
+        InstitutionConfig institutionConfig = institutionConfigManager.getConfig(PayTypeEnum.CmbApp);
+
+        CmbPayNotifyRequest cmbPayNotifyRequest = new CmbPayNotifyRequest();
+        PayNoticeData noticeData = cmbPayNotifyRequest.getNoticeData();
+        noticeData.setAmount(req.getPayPrice());
+        noticeData.setNoticeUrl("noticeurl");
+        noticeData.setHttpMethod("POST");
+        noticeData.setBranchNo(institutionConfig.getBranchNo());
+        noticeData.setMerchantNo(institutionConfig.getMerchantId());
+        noticeData.setNoticeType("BKPAYRTN");
+        noticeData.setNoticeSerialNo(UUID.randomUUID().toString());
+        noticeData.setDate("20160624");
+        noticeData.setOrderNo(payment.getPaymentId());
+        noticeData.setBankDate("20160624");
+        noticeData.setBankSerialNo(UUID.randomUUID().toString());
+        noticeData.setDiscountFlag("N");
+        noticeData.setMerchantPara("Pay");
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        String dateTime = simpleDateFormat.format(new Date());
+        noticeData.setDateTime(dateTime);
+
+        // 签名
+        String sign = RSAUtil.sign(cmbPayNotifyRequest.buildSignString(), mockYmtPrivateKey);
+        cmbPayNotifyRequest.setSign(sign);
+        cmbPayNotifyRequest.setSignType("RSA");
+
+        // 构建请求报文
+        String jsonRequestData = URLEncoder.encode(JSON.toJSONString(cmbPayNotifyRequest), "UTF-8");
+        String requestBody = String.format("jsonRequestData=%s", jsonRequestData);
+        servletRequest.setContent(requestBody.getBytes("utf-8"));
+
+        Response cmbPayNotify = paymentNotifyResource.cmbPayNotify(servletRequest);
+        assertEquals(200, cmbPayNotify.getStatus());
+
+        // 验证支付单的状态
+        payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertNotNull(payment);
+        assertEquals(noticeData.getBankSerialNo(), payment.getInstitutionPaymentId());
+        assertEquals(noticeData.getOrderNo(), payment.getPaymentId());
+        assertEquals(noticeData.getAmount(), payment.getActualPayPrice().toString());
+        assertEquals(noticeData.getDateTime(), simpleDateFormat.format(payment.getPayTime()));
+        assertEquals(new Money(0), payment.getDiscountAmt());
+        assertEquals(PayStatusEnum.Paied, payment.getPayStatus());
+
+        // 发起对账请求
+        CheckPaymentRequset checkPaymentRequset = new CheckPaymentRequset();
+        checkPaymentRequset.setPaymentId(payment.getPaymentId());
+        checkPaymentRequset.setFinalCheck(true);
+        checkPaymentRequset.setPayType("20");
+
+        MockHttpServletRequest servletRequest1 = new MockHttpServletRequest();
+        servletRequest1.addHeader("mock", "1");
+        checkPaymentResource.checkPayment(checkPaymentRequset, servletRequest1);
+
+        Payment paymentCheck = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertNotNull(payment);
+        assertEquals(1, paymentCheck.getCheckStatus().intValue());
+    }
+
+    @Test
+    public void testCheckPaymentWhenThirdNotPay()
+            throws UnsupportedEncodingException, InvalidKeyException, NoSuchAlgorithmException,
+            InvalidKeySpecException, SignatureException {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+        req.setPayPrice("1.01");
+
+        long userId = req.getUserId();
+        // 删除用户的签约记录
+        cmbAggrementRepository.deleteByUserId(userId);
+
+        // 确认记录已经删除
+        CmbAggrementPo findInitAggrement = cmbAggrementRepository.findInitAggrement(userId);
+        assertNull(findInitAggrement);
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        assertEquals("验证返回码", 0, res.getErrorCode());
+        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
+        assertEquals("验证ResultType", "Form", res.getResultType());
+
+        BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
+        assertNotNull("验证商户订单", bo);
+
+        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertNotNull(payment);
+
+
+        // 构建回调请求
+        servletRequest = new MockHttpServletRequest();
+        servletRequest.addHeader("mock", "1");
+        servletRequest.setRequestURI("/cmbPayNotify");
+
+        // 获取到第三方机构配置
+        InstitutionConfig institutionConfig = institutionConfigManager.getConfig(PayTypeEnum.CmbApp);
+
+        CmbPayNotifyRequest cmbPayNotifyRequest = new CmbPayNotifyRequest();
+        PayNoticeData noticeData = cmbPayNotifyRequest.getNoticeData();
+        noticeData.setAmount(req.getPayPrice());
+        noticeData.setNoticeUrl("noticeurl");
+        noticeData.setHttpMethod("POST");
+        noticeData.setBranchNo(institutionConfig.getBranchNo());
+        noticeData.setMerchantNo(institutionConfig.getMerchantId());
+        noticeData.setNoticeType("BKPAYRTN");
+        noticeData.setNoticeSerialNo(UUID.randomUUID().toString());
+        noticeData.setDate("20160624");
+        noticeData.setOrderNo(payment.getPaymentId());
+        noticeData.setBankDate("20160624");
+        noticeData.setBankSerialNo(UUID.randomUUID().toString());
+        noticeData.setDiscountFlag("N");
+        noticeData.setMerchantPara("Pay");
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        String dateTime = simpleDateFormat.format(new Date());
+        noticeData.setDateTime(dateTime);
+
+        // 签名
+        String sign = RSAUtil.sign(cmbPayNotifyRequest.buildSignString(), mockYmtPrivateKey);
+        cmbPayNotifyRequest.setSign(sign);
+        cmbPayNotifyRequest.setSignType("RSA");
+
+        // 构建请求报文
+        String jsonRequestData = URLEncoder.encode(JSON.toJSONString(cmbPayNotifyRequest), "UTF-8");
+        String requestBody = String.format("jsonRequestData=%s", jsonRequestData);
+        servletRequest.setContent(requestBody.getBytes("utf-8"));
+
+        Response cmbPayNotify = paymentNotifyResource.cmbPayNotify(servletRequest);
+        assertEquals(200, cmbPayNotify.getStatus());
+
+        // 验证支付单的状态
+        payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertNotNull(payment);
+        assertEquals(noticeData.getBankSerialNo(), payment.getInstitutionPaymentId());
+        assertEquals(noticeData.getOrderNo(), payment.getPaymentId());
+        assertEquals(noticeData.getAmount(), payment.getActualPayPrice().toString());
+        assertEquals(noticeData.getDateTime(), simpleDateFormat.format(payment.getPayTime()));
+        assertEquals(new Money(0), payment.getDiscountAmt());
+        assertEquals(PayStatusEnum.Paied, payment.getPayStatus());
+
+        // 发起对账请求
+        CheckPaymentRequset checkPaymentRequset = new CheckPaymentRequset();
+        checkPaymentRequset.setPaymentId(payment.getPaymentId());
+        checkPaymentRequset.setFinalCheck(true);
+        checkPaymentRequset.setPayType("20");
+
+        MockHttpServletRequest servletRequest1 = new MockHttpServletRequest();
+        servletRequest1.addHeader("mock", "1");
+        servletRequest1.addHeader("MockResult-Cmb-rspCode", "ERROR");
+        checkPaymentResource.checkPayment(checkPaymentRequset, servletRequest1);
+
+        Payment paymentCheck = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertNotNull(payment);
+        assertEquals(-20, paymentCheck.getCheckStatus().intValue());
     }
 
     /**

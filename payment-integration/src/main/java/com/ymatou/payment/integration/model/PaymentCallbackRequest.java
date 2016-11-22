@@ -87,6 +87,11 @@ public class PaymentCallbackRequest {
     private String sign;
 
     /**
+     * 第三方优惠金额
+     */
+    private String discountAmt;
+
+    /**
      * 接口版本
      */
     private Integer Version;
@@ -251,5 +256,19 @@ public class PaymentCallbackRequest {
      */
     public void setExternalPayerId(String externalPayerId) {
         this.externalPayerId = externalPayerId;
+    }
+
+    /**
+     * @return the discountAmt
+     */
+    public String getDiscountAmt() {
+        return discountAmt;
+    }
+
+    /**
+     * @param discountAmt the discountAmt to set
+     */
+    public void setDiscountAmt(String discountAmt) {
+        this.discountAmt = discountAmt;
     }
 }

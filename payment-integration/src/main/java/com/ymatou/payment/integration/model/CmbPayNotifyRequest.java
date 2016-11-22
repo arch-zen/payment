@@ -23,7 +23,7 @@ public class CmbPayNotifyRequest extends CmbDTO {
                 noticeData.getHttpMethod(),
                 noticeData.getMerchantNo(), noticeData.getMerchantPara(), noticeData.getNoticeSerialNo(),
                 noticeData.getNoticeType(),
-                noticeData.getNoticeUrl(), noticeData.getOrderNo());
+                noticeData.getNoticeUrl(), noticeData.getOrderNo()).replace("null", "");
     }
 
     /**

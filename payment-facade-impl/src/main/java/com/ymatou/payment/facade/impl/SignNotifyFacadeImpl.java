@@ -10,8 +10,10 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ymatou.payment.domain.channel.InstitutionConfig;
@@ -38,6 +40,7 @@ import com.ymatou.payment.integration.model.CmbSignNotifyRequest.SignNoticeData;
  * @author wangxudong 2016年11月18日 下午8:18:58
  *
  */
+@Component("signNotifyFacade")
 public class SignNotifyFacadeImpl implements SignNotifyFacade {
 
     private static Logger logger = LoggerFactory.getLogger(SignNotifyFacadeImpl.class);
@@ -88,7 +91,7 @@ public class SignNotifyFacadeImpl implements SignNotifyFacade {
 
         CmbAggrementPo aggrementPo = cmbAggrementRepository.getByAggId(Long.parseLong(signNoticeData.getAgrNo()));
         if (aggrementPo == null) {
-            throw new BizException(String.format("aggid:% not exist.", signNoticeData.getAgrNo()));
+            throw new BizException(String.format("aggid:% not exist when sign notify.", signNoticeData.getAgrNo()));
         }
 
         if (CmbAggrementStatusEnum.INIT.code().equals(Integer.valueOf(aggrementPo.getAggStatus()))) {
@@ -100,6 +103,7 @@ public class SignNotifyFacadeImpl implements SignNotifyFacade {
             aggrementPo.setBankSerialNo(signNoticeData.getNoticeSerialNo());
             aggrementPo.setNoPwdPay(signNoticeData.getNoPwdPay());
             aggrementPo.setRespCode(signNoticeData.getRspCode());
+            aggrementPo.setRespMessage(StringUtils.left(signNoticeData.getRspMsg(), 200));
             aggrementPo.setSignDateTime(signNoticeData.getDateTime());
             aggrementPo.setUserPidHash(signNoticeData.getUserPidHash());
             aggrementPo.setUserPidType(signNoticeData.getUserPidType());

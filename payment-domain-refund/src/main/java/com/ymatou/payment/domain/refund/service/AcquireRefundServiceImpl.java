@@ -65,7 +65,10 @@ public class AcquireRefundServiceImpl implements AcquireRefundService {
             if (refundRequests.size() == 0) { // 若不存在RefundRequest，则新增
 
                 BigDecimal paymentRefundAmt = payment.getRefundAmt() == null ? BigDecimal.ZERO : payment.getRefundAmt();
-                if (payment.getPayPrice().compareTo(new Money(req.getRefundAmt().add(paymentRefundAmt))) >= 0) {// 申请金额小于支付金额
+
+                // 申请金额小于实际支付金额（用户实际付款）
+                // 存在第三方机构贴钱促销的情况，所以如果订单支付现金 100，第三方补贴 10，则最多只能退90
+                if (payment.getActualPayPrice().compareTo(new Money(req.getRefundAmt().add(paymentRefundAmt))) >= 0) {
                     RefundRequestPo refundrequest = new RefundRequestPo();
                     refundrequest.setPaymentId(payment.getPaymentId());
                     refundrequest.setInstPaymentId(payment.getInstitutionPaymentId());

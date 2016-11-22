@@ -39,4 +39,11 @@ public interface SignatureService {
      */
     boolean validateSign(Map<String, String> signMapData, InstitutionConfig instConfig,
             HashMap<String, String> mockHeader);
+
+    /**
+     * 获取到Mock的Md5Key
+     * 
+     * @return
+     */
+    String getMd5MockKey();
 }

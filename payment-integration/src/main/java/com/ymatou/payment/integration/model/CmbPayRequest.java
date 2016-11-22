@@ -131,6 +131,11 @@ public class CmbPayRequest extends CmbDTO {
         private String signNoticePara;
 
         /**
+         * 用户Id
+         */
+        private String userID;
+
+        /**
          * @return the dateTime
          */
         public String getDateTime() {
@@ -324,6 +329,20 @@ public class CmbPayRequest extends CmbDTO {
          */
         public void setSignNoticePara(String signNoticePara) {
             this.signNoticePara = signNoticePara;
+        }
+
+        /**
+         * @return the userID
+         */
+        public String getUserID() {
+            return userID;
+        }
+
+        /**
+         * @param userID the userID to set
+         */
+        public void setUserID(String userID) {
+            this.userID = userID;
         }
 
 

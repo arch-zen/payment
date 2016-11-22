@@ -99,11 +99,12 @@ public class CmbAcquireOrderServiceImpl implements AcquireOrderService {
                 .setMerchantSerialNo(aggrement.getAggId().toString() + simpleDateFormat.format(new Date())); // 协议号+时间戳
         payRequest.getReqData().setAmount(String.format("%.2f", payment.getPayPrice().getAmount().doubleValue()));
         payRequest.getReqData().setBranchNo(instConfig.getBranchNo());
-        payRequest.getReqData().setDate(payment.getBussinessOrder().getOrderTime().substring(0, 8));
+        payRequest.getReqData().setDate(payment.getBussinessOrder().getOrderTime().substring(0, 8)); // 需要和退款的Date保持一致
         payRequest.getReqData().setMerchantNo(instConfig.getMerchantId());
         payRequest.getReqData().setOrderNo(payment.getPaymentId());
         payRequest.getReqData().setPayNoticePara("Pay");
         payRequest.getReqData().setSignNoticePara("Sign");
+        payRequest.getReqData().setUserID(String.valueOf(payment.getBussinessOrder().getUserId()));
 
         return payRequest;
     }

@@ -54,6 +54,7 @@ public class CheckPaymentFacadeImpl implements CheckPaymentFacade {
 
         payment.setActualPayCurrency(paymentQueryResp.getActualPayCurrency());
         payment.setActualPayPrice(paymentQueryResp.getActualPayPrice());
+        payment.setDiscountAmount(paymentQueryResp.getDiscountAmount());
         payment.setBankId(paymentQueryResp.getBankId());
         payment.setCardType(paymentQueryResp.getCardType());
         payment.setInstitutionPaymentId(paymentQueryResp.getInstitutionPaymentId());

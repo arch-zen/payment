@@ -70,10 +70,10 @@ public class FastRefundServiceImpl implements FastRefundService {
             if (requestedRefundAmt.compareTo(BigDecimal.ZERO) > 0) { // 未输入退款申请金额，默认全额退款
                 throw new BizException(ErrorCode.FAIL, "refund amt limit.");
             } else {
-                refundInfo.setRefundAmt(payment.getPayPrice().getAmount());
+                refundInfo.setRefundAmt(payment.getActualPayPrice().getAmount()); // 必须用实际退款金额
             }
         } else {
-            if (requestedRefundAmt.add(refundAmt).compareTo(payment.getPayPrice().getAmount()) > 0) {
+            if (requestedRefundAmt.add(refundAmt).compareTo(payment.getActualPayPrice().getAmount()) > 0) {// 必须用实际退款金额
                 throw new BizException(ErrorCode.FAIL, "refund amt limit.");
             } else {
                 refundInfo.setRefundAmt(refundAmt);

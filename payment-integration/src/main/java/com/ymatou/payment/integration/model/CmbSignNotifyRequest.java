@@ -21,7 +21,7 @@ public class CmbSignNotifyRequest extends CmbDTO {
                 noticeData.getMerchantNo(), noticeData.getNoPwdPay(), noticeData.getNoticePara(),
                 noticeData.getNoticeSerialNo(),
                 noticeData.getNoticeType(), noticeData.getNoticeUrl(), noticeData.getRspCode(), noticeData.getRspMsg(),
-                noticeData.getUserID(), noticeData.getUserPidHash(), noticeData.getUserPidType());
+                noticeData.getUserID(), noticeData.getUserPidHash(), noticeData.getUserPidType()).replace("null", "");
     }
 
     /**

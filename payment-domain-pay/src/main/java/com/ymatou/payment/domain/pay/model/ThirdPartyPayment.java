@@ -6,6 +6,8 @@ package com.ymatou.payment.domain.pay.model;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import com.ymatou.payment.infrastructure.Money;
+
 /**
  * 
  * @author qianmin 2016年5月20日 下午3:04:23
@@ -14,6 +16,9 @@ import java.util.Date;
 public class ThirdPartyPayment {
     private String paymentId;
     private String institutionPaymentId;
+    /**
+     * 实际支付金额 = 订单金额 - 优惠金额
+     */
     private BigDecimal actualPayPrice;
     private String actualPayCurrency;
     private String payerId;
@@ -23,6 +28,10 @@ public class ThirdPartyPayment {
     private Date payTime;
     private int payStatus;
     private String traceId;
+    /**
+     * 优惠金额
+     */
+    private Money discountAmount;
 
     public String getPaymentId() {
         return paymentId;
@@ -110,5 +119,19 @@ public class ThirdPartyPayment {
 
     public void setTraceId(String traceId) {
         this.traceId = traceId;
+    }
+
+    /**
+     * @return the discountAmount
+     */
+    public Money getDiscountAmount() {
+        return discountAmount;
+    }
+
+    /**
+     * @param discountAmount the discountAmount to set
+     */
+    public void setDiscountAmount(Money discountAmount) {
+        this.discountAmount = discountAmount;
     }
 }

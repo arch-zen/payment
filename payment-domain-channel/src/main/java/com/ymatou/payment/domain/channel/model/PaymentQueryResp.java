@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import com.ymatou.payment.facade.constants.PayStatusEnum;
+import com.ymatou.payment.infrastructure.Money;
 
 /**
  * 第三方交易查询结果
@@ -17,6 +18,9 @@ import com.ymatou.payment.facade.constants.PayStatusEnum;
 public class PaymentQueryResp {
     private String paymentId;
     private String institutionPaymentId;
+    /**
+     * 实际支付金额 = 订单金额 - 优惠金额
+     */
     private BigDecimal ActualPayPrice;
     private String ActualPayCurrency;
     private String PayerId;
@@ -26,6 +30,10 @@ public class PaymentQueryResp {
     private Date PayTime;
     private PayStatusEnum PayStatus;
     private String TraceId;
+    /**
+     * 优惠金额
+     */
+    private Money discountAmount;
 
     public String getPaymentId() {
         return paymentId;
@@ -113,5 +121,19 @@ public class PaymentQueryResp {
 
     public void setTraceId(String traceId) {
         TraceId = traceId;
+    }
+
+    /**
+     * @return the discountAmount
+     */
+    public Money getDiscountAmount() {
+        return discountAmount;
+    }
+
+    /**
+     * @param discountAmount the discountAmount to set
+     */
+    public void setDiscountAmount(Money discountAmount) {
+        this.discountAmount = discountAmount;
     }
 }

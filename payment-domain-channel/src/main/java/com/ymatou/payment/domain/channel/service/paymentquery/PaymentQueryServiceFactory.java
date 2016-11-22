@@ -25,6 +25,9 @@ public class PaymentQueryServiceFactory {
     @Autowired
     private WeiXinPaymentQueryServiceImpl weiXinPaymentQueryServiceImpl;
 
+    @Autowired
+    private CmbPaymentQueryServiceImpl cmbPaymentQueryServiceImpl;
+
     public PaymentQueryService getInstanceByPayType(String payType) {
 
         switch (PayTypeEnum.parse(payType)) {
@@ -38,6 +41,8 @@ public class PaymentQueryServiceFactory {
                 return weiXinPaymentQueryServiceImpl;
             case WeiXinApp:
                 return weiXinPaymentQueryServiceImpl;
+            case CmbApp:
+                return cmbPaymentQueryServiceImpl;
             default:
                 throw new BizException(ErrorCode.INVALID_PAY_TYPE, payType);
 

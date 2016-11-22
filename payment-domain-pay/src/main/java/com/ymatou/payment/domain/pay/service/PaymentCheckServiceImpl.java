@@ -79,6 +79,7 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
                     payment.setPayStatus(PayStatusEnum.parse(thirdPartyPayment.getPayStatus()));
                     payment.setActualPayPrice(new Money(thirdPartyPayment.getActualPayPrice()));
                     payment.setActualPayCurrencyType(thirdPartyPayment.getActualPayCurrency());
+                    payment.setDiscountAmt(thirdPartyPayment.getDiscountAmount());
                     payment.setBankId(thirdPartyPayment.getBankId());
                     payment.setCardType(thirdPartyPayment.getCardType());
                     payment.setPayTime(thirdPartyPayment.getPayTime());
