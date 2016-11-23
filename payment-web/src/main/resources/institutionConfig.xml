@@ -22,6 +22,6 @@
 		instName="Weixin" md5Key="c5781df6b8f149adca6094cdac4ac684" appId="wxf51a439c0416f182"
 		md5KeyConnector="&amp;key=" />
 	<!--cmb App-->	
-	<config payType="20" merchantId="000157" branchNo="0021" signType="SHA" md5Key="Ymatou2016123456"
+	<config payType="50" merchantId="000157" branchNo="0021" signType="SHA" md5Key="Ymatou2016123456"
 		instName="Cmb" md5KeyConnector="&amp;" operatorNo="9999" operatorPwd="000157" />
 </institutionConfigCollection>

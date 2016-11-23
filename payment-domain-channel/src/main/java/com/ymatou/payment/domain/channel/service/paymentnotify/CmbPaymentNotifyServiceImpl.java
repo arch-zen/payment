@@ -31,6 +31,7 @@ import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.PaymentNotifyType;
 import com.ymatou.payment.facade.model.PaymentNotifyReq;
+import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.infrastructure.util.HttpUtil;
 import com.ymatou.payment.integration.common.CmbSignature;
 import com.ymatou.payment.integration.model.CmbPayNotifyRequest;
@@ -90,7 +91,6 @@ public class CmbPaymentNotifyServiceImpl implements PaymentNotifyService {
         paymentNotifyMessage.setPayerId("");
         paymentNotifyMessage.setPayerEmail("");
         paymentNotifyMessage.setActualPayCurrency("CNY");
-        paymentNotifyMessage.setActualPayPrice(new BigDecimal(noticeData.getAmount()));
         paymentNotifyMessage.setInstitutionPaymentId(noticeData.getBankSerialNo());
         paymentNotifyMessage.setPaymentId(noticeData.getOrderNo());
 
@@ -106,9 +106,13 @@ public class CmbPaymentNotifyServiceImpl implements PaymentNotifyService {
 
         // 如果有优惠金额则记录下来
         if ("Y".equals(noticeData.getDiscountFlag())) {
-            paymentNotifyMessage.setDiscountAmt(new BigDecimal(noticeData.getDiscountAmount()));
+            paymentNotifyMessage.setDiscountAmt(new Money(noticeData.getDiscountAmount()));
+        } else {
+            paymentNotifyMessage.setDiscountAmt(new Money(0));
         }
 
+        Money actualPayPrice = new Money(noticeData.getAmount()).subtract(paymentNotifyMessage.getDiscountAmt());
+        paymentNotifyMessage.setActualPayPrice(actualPayPrice);
         paymentNotifyMessage.setPayStatus(PayStatusEnum.Paied);
 
         return paymentNotifyMessage;

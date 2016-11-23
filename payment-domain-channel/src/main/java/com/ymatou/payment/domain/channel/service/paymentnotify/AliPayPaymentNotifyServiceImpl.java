@@ -35,6 +35,7 @@ import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.PaymentNotifyType;
 import com.ymatou.payment.facade.model.PaymentNotifyReq;
+import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.infrastructure.util.HttpUtil;
 import com.ymatou.payment.infrastructure.util.StringUtil;
 
@@ -88,7 +89,7 @@ public class AliPayPaymentNotifyServiceImpl implements PaymentNotifyService {
         paymentNotifyMessage.setPayerEmail(map.get("buyer_email"));
         paymentNotifyMessage.setActualPayCurrency(
                 StringUtils.isBlank(map.get("currency")) ? "CNY" : map.get("currency"));
-        paymentNotifyMessage.setActualPayPrice(new BigDecimal(map.get("total_fee")));
+        paymentNotifyMessage.setActualPayPrice(new Money(map.get("total_fee")));
         paymentNotifyMessage.setInstitutionPaymentId(map.get("trade_no"));
         paymentNotifyMessage.setPaymentId(map.get("out_trade_no"));
         paymentNotifyMessage
@@ -139,7 +140,7 @@ public class AliPayPaymentNotifyServiceImpl implements PaymentNotifyService {
         sbUrl.append(queryStringFormat("Memo", bussinessOrder.getMemo()));
         sbUrl.append(queryStringFormat("TradingId", bussinessOrder.getOrderId()));
         sbUrl.append(queryStringFormat("PaymentId", notifyMessage.getPaymentId()));
-        sbUrl.append(queryStringFormat("PayPrice", notifyMessage.getActualPayPrice().setScale(2).toString()));
+        sbUrl.append(queryStringFormat("PayPrice", notifyMessage.getActualPayPrice().toString()));
         sbUrl.append(queryStringFormat("PayTime",
                 StringUtil.getDateFormatString("yyyyMMddHHmmss", notifyMessage.getPayTime())));
         sbUrl.append(queryStringFormat("TraceId", notifyMessage.getTraceId()));

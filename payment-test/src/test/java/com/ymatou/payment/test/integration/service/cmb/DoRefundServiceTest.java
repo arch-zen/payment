@@ -7,6 +7,8 @@ package com.ymatou.payment.test.integration.service.cmb;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
+
 import javax.annotation.Resource;
 
 import org.junit.Test;
@@ -56,7 +58,7 @@ public class DoRefundServiceTest extends RestBaseTest {
         String sign = CmbSignature.shaSign(config.getMd5Key(), req.buildSignString());
         req.setSign(sign);
 
-        CmbDoRefundResponse response = doRefundService.doService(req, buildMockHeader());
+        CmbDoRefundResponse response = doRefundService.doService(req, null);
 
         assertNotNull(response.getRspData());
         assertEquals("MSS3804", response.getRspData().getRspCode());
@@ -80,7 +82,10 @@ public class DoRefundServiceTest extends RestBaseTest {
         String sign = CmbSignature.shaSign(config.getMd5Key() + "make sign error", req.buildSignString());
         req.setSign(sign);
 
-        CmbDoRefundResponse response = doRefundService.doService(req, buildMockHeader());
+        HashMap<String, String> mockHeader = buildMockHeader();
+        mockHeader.put("MockResult-Cmb-rspCode", "MSS3411");
+        CmbDoRefundResponse response = doRefundService.doService(req, mockHeader);
+
 
         assertNotNull(response.getRspData());
         assertEquals("MSS3411", response.getRspData().getRspCode());
@@ -104,7 +109,7 @@ public class DoRefundServiceTest extends RestBaseTest {
         String sign = CmbSignature.shaSign(config.getMd5Key(), req.buildSignString());
         req.setSign(sign);
 
-        CmbDoRefundResponse response = doRefundService.doService(req, buildMockHeader());
+        CmbDoRefundResponse response = doRefundService.doService(req, null);
 
         assertNotNull(response.getRspData());
         assertEquals("MSS3111", response.getRspData().getRspCode());

@@ -28,7 +28,7 @@ public enum PayTypeEnum {
 
     WeiXinApp("15"),
 
-    CmbApp("20");
+    CmbApp("50");
 
     private String code;
 
@@ -61,7 +61,7 @@ public enum PayTypeEnum {
                 return WeiXinJSAPI;
             case "15":
                 return WeiXinApp;
-            case "20":
+            case "50":
                 return CmbApp;
             default:
                 throw new BizException(ErrorCode.INVALID_PAY_TYPE, code);

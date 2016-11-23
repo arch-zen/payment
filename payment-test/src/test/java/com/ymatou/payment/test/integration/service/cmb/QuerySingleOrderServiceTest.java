@@ -42,6 +42,7 @@ public class QuerySingleOrderServiceTest extends RestBaseTest {
     public void testDoService() throws Exception {
         InstitutionConfig config = instConfigManager.getConfig(PayTypeEnum.CmbApp);
         CmbQuerySingleOrderRequest req = new CmbQuerySingleOrderRequest();
+        req.getReqData().setType("A");
         req.getReqData().setBranchNo(config.getBranchNo());
         req.getReqData().setMerchantNo(config.getMerchantId());
         req.getReqData().setBankSerialNo("16250327200000000020");
@@ -49,7 +50,7 @@ public class QuerySingleOrderServiceTest extends RestBaseTest {
         String sign = CmbSignature.shaSign(config.getMd5Key(), req.buildSignString());
         req.setSign(sign);
 
-        CmbQuerySingleOrderResponse response = querySingleOrderService.doService(req, buildMockHeader());
+        CmbQuerySingleOrderResponse response = querySingleOrderService.doService(req, null);
 
         assertNotNull(response.getRspData());
         assertEquals("MSS3803", response.getRspData().getRspCode());
@@ -66,7 +67,7 @@ public class QuerySingleOrderServiceTest extends RestBaseTest {
         String sign = CmbSignature.shaSign(config.getMd5Key() + "make sign error", req.buildSignString());
         req.setSign(sign);
 
-        CmbQuerySingleOrderResponse response = querySingleOrderService.doService(req, buildMockHeader());
+        CmbQuerySingleOrderResponse response = querySingleOrderService.doService(req, null);
 
         assertNotNull(response.getRspData());
         assertEquals("MSS3411", response.getRspData().getRspCode());

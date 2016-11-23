@@ -32,6 +32,7 @@ import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.PaymentNotifyType;
 import com.ymatou.payment.facade.model.PaymentNotifyReq;
+import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.infrastructure.util.MapUtil;
 
 /**
@@ -99,7 +100,7 @@ public class WeiXinPaymentNotifyServiceImpl implements PaymentNotifyService {
         paymentNotifyMessage.setPayerId(map.get("openid"));
         paymentNotifyMessage.setPayerEmail("");
         paymentNotifyMessage.setActualPayCurrency(map.get("fee_type"));
-        paymentNotifyMessage.setActualPayPrice(totalFee);
+        paymentNotifyMessage.setActualPayPrice(new Money(totalFee));
         paymentNotifyMessage.setInstitutionPaymentId(map.get("transaction_id"));
         paymentNotifyMessage.setPaymentId(map.get("out_trade_no"));
         paymentNotifyMessage.setPayTime(parseDate(map.get("time_end")));

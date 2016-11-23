@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import com.ymatou.payment.facade.constants.PayStatusEnum;
+import com.ymatou.payment.infrastructure.Money;
 
 public class PaymentNotifyMessage {
     /**
@@ -24,7 +25,7 @@ public class PaymentNotifyMessage {
     /**
      * 实际支付金额(支付订单金额)
      */
-    private BigDecimal actualPayPrice;
+    private Money actualPayPrice;
 
     /**
      * 实际支付币种
@@ -34,7 +35,7 @@ public class PaymentNotifyMessage {
     /**
      * 优惠金额
      */
-    private BigDecimal discountAmt;
+    private Money discountAmt;
 
     /**
      * 第三方用户标识
@@ -107,14 +108,14 @@ public class PaymentNotifyMessage {
     /**
      * @return the actualPayPrice
      */
-    public BigDecimal getActualPayPrice() {
+    public Money getActualPayPrice() {
         return actualPayPrice;
     }
 
     /**
      * @param actualPayPrice the actualPayPrice to set
      */
-    public void setActualPayPrice(BigDecimal actualPayPrice) {
+    public void setActualPayPrice(Money actualPayPrice) {
         this.actualPayPrice = actualPayPrice;
     }
 
@@ -241,14 +242,18 @@ public class PaymentNotifyMessage {
     /**
      * @return the discountAmt
      */
-    public BigDecimal getDiscountAmt() {
-        return discountAmt;
+    public Money getDiscountAmt() {
+        if (discountAmt == null) {
+            return new Money(0);
+        } else {
+            return discountAmt;
+        }
     }
 
     /**
      * @param discountAmt the discountAmt to set
      */
-    public void setDiscountAmt(BigDecimal discountAmt) {
+    public void setDiscountAmt(Money discountAmt) {
         this.discountAmt = discountAmt;
     }
 

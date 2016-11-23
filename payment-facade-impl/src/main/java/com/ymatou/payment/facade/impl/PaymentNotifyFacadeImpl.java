@@ -68,6 +68,9 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
     public PaymentNotifyResp notify(PaymentNotifyReq req) {
         // STEP.1 获取到第三方机构配置
         InstitutionConfig instConfig = institutionConfigManager.getConfig(PayTypeEnum.parse(req.getPayType()));
+        if (instConfig == null) {
+            throw new BizException(ErrorCode.INVALID_PAY_TYPE, "payType:" + req.getPayType());
+        }
 
         // STEP.2 解析并验证报文
         PaymentNotifyService notifyService = notityMessageResolverFactory.getInstance(req.getPayType());
@@ -90,7 +93,7 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
                         String.format("can not find paymentid %s", notifyMessage.getPaymentId()));
 
             // 校验商户订单
-            BussinessOrder bussinessOrder = payService.getBussinessOrderById(payment.getBussinessOrderId());
+            BussinessOrder bussinessOrder = payment.getBussinessOrder();
             if (bussinessOrder == null)
                 throw new BizException(ErrorCode.NOT_EXIST_BUSINESS_ORDER_ID,
                         String.format("can not find order %s", payment.getBussinessOrderId()));
@@ -108,8 +111,11 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
             // 如果是服务端回调
             if (req.getNotifyType() == PaymentNotifyType.Server) {
 
+                // 订单金额 = 实际支付金额 + 优惠金额
+                Money orderPrice = notifyMessage.getActualPayPrice().add(notifyMessage.getDiscountAmt());
+
                 // 验证实际支付金额和支付金额是否一致
-                if (!payment.getPayPrice().equals(new Money(notifyMessage.getActualPayPrice()))) {
+                if (!payment.getPayPrice().equals(orderPrice)) {
                     logger.error("inconsistent payPrice and actualPayPrice. PaymentId: {}", payment.getPaymentId());
                     throw new BizException(ErrorCode.INCONSISTENT_PAYPRICE_AND_ACTUALPAYPRICE,
                             "paymentid: " + payment.getPaymentId());
@@ -146,7 +152,7 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
     private void setPaymentOrderPaid(Payment payment, PaymentNotifyMessage notifyMessage) {
         payment.setInstitutionPaymentId(notifyMessage.getInstitutionPaymentId());
         payment.setPayStatus(PayStatusEnum.Paied);
-        payment.setActualPayPrice(new Money(notifyMessage.getActualPayPrice()));
+        payment.setActualPayPrice(notifyMessage.getActualPayPrice());
         payment.setActualPayCurrencyType(notifyMessage.getActualPayCurrency());
         payment.setBankId(notifyMessage.getBankId());
         payment.setCardType(notifyMessage.getCardType());
@@ -154,13 +160,7 @@ public class PaymentNotifyFacadeImpl implements PaymentNotifyFacade {
         payment.setPayerId(notifyMessage.getPayerId());
         payment.setPayerEmail(notifyMessage.getPayerEmail());
         payment.setExchangeRate(1.0); // 没有接支付宝国际，默认汇率为1
-
-        if (notifyMessage.getDiscountAmt() != null) {
-            payment.setDiscountAmt(new Money(notifyMessage.getDiscountAmt()));
-        } else {
-            payment.setDiscountAmt(new Money(0));
-        }
-
+        payment.setDiscountAmt(notifyMessage.getDiscountAmt());
 
         payService.setPaymentOrderPaid(payment, notifyMessage.getTraceId());
     }

@@ -57,7 +57,10 @@ public class PayServiceImpl implements PayService {
      */
     @Override
     public Payment getPaymentByPaymentId(String paymentId) {
-        return paymentRepository.getByPaymentId(paymentId);
+        Payment payment = paymentRepository.getByPaymentId(paymentId);
+        payment.setBussinessOrder(getBussinessOrderById(payment.getBussinessOrderId()));
+
+        return payment;
     }
 
     /*
@@ -199,7 +202,7 @@ public class PayServiceImpl implements PayService {
             return;
         }
 
-        BussinessOrder bussinessOrder = getBussinessOrderById(payment.getBussinessOrderId());
+        BussinessOrder bussinessOrder = payment.getBussinessOrder();
         if (bussinessOrder == null) {
             logger.error("execute pay notify found payment[{}] has not bussiness order", payment.getPaymentId());
             throw new BizException(ErrorCode.NOT_EXIST_BUSINESS_ORDER_ID, "paymentId:" + payment.getPaymentId());

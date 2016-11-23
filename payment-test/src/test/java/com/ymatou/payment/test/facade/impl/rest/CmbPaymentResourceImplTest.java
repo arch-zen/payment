@@ -18,12 +18,15 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -35,23 +38,31 @@ import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.repository.CmbAggrementRepository;
 import com.ymatou.payment.domain.pay.service.PayService;
+import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.constants.CmbAggrementStatusEnum;
 import com.ymatou.payment.facade.constants.CmbCancelTypeEnum;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
+import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
 import com.ymatou.payment.facade.model.CheckPaymentRequset;
+import com.ymatou.payment.facade.model.ExecuteRefundRequest;
+import com.ymatou.payment.facade.model.FastRefundRequest;
+import com.ymatou.payment.facade.model.FastRefundResponse;
 import com.ymatou.payment.facade.model.SyncCmbPublicKeyReq;
 import com.ymatou.payment.facade.rest.CheckPaymentResource;
 import com.ymatou.payment.facade.rest.PaymentNotifyResource;
 import com.ymatou.payment.facade.rest.PaymentResource;
+import com.ymatou.payment.facade.rest.RefundJobResource;
+import com.ymatou.payment.facade.rest.RefundResource;
 import com.ymatou.payment.facade.rest.SignNotifyResource;
 import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.infrastructure.db.extmapper.CmbPublicKeyExtMapper;
 import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
 import com.ymatou.payment.infrastructure.db.model.CmbAggrementPo;
 import com.ymatou.payment.infrastructure.db.model.CmbPublicKeyPo;
+import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 import com.ymatou.payment.infrastructure.security.RSAUtil;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.model.CmbPayNotifyRequest;
@@ -77,6 +88,12 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
     private CheckPaymentResource checkPaymentResource;
 
     @Resource
+    private RefundJobResource refundJobResource;
+
+    @Resource
+    private RefundResource refundResource;
+
+    @Resource
     private SignNotifyResource signNotifyResource;
 
     @Resource
@@ -96,6 +113,9 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
 
     @Resource
     private CmbAggrementRepository cmbAggrementRepository;
+
+    @Resource
+    private RefundPository refundPository;
 
     @Resource
     private SqlSession sqlSession;
@@ -241,7 +261,7 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         assertNotNull(payment);
         assertEquals(noticeData.getBankSerialNo(), payment.getInstitutionPaymentId());
         assertEquals(noticeData.getOrderNo(), payment.getPaymentId());
-        assertEquals(noticeData.getAmount(), payment.getActualPayPrice().toString());
+        assertEquals(noticeData.getAmount(), payment.getActualPayPrice().add(payment.getDiscountAmt()).toString());
         assertEquals(noticeData.getDateTime(), simpleDateFormat.format(payment.getPayTime()));
         assertEquals(noticeData.getDiscountAmount(), payment.getDiscountAmt().toString());
         assertEquals(PayStatusEnum.Paied, payment.getPayStatus());
@@ -663,7 +683,7 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         CheckPaymentRequset checkPaymentRequset = new CheckPaymentRequset();
         checkPaymentRequset.setPaymentId(payment.getPaymentId());
         checkPaymentRequset.setFinalCheck(true);
-        checkPaymentRequset.setPayType("20");
+        checkPaymentRequset.setPayType(PayTypeEnum.CmbApp.getCode());
 
         MockHttpServletRequest servletRequest1 = new MockHttpServletRequest();
         servletRequest1.addHeader("mock", "1");
@@ -759,7 +779,7 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         CheckPaymentRequset checkPaymentRequset = new CheckPaymentRequset();
         checkPaymentRequset.setPaymentId(payment.getPaymentId());
         checkPaymentRequset.setFinalCheck(true);
-        checkPaymentRequset.setPayType("20");
+        checkPaymentRequset.setPayType(PayTypeEnum.CmbApp.getCode());
 
         MockHttpServletRequest servletRequest1 = new MockHttpServletRequest();
         servletRequest1.addHeader("mock", "1");
@@ -770,6 +790,138 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         assertNotNull(payment);
         assertEquals(-20, paymentCheck.getCheckStatus().intValue());
     }
+
+    @Test
+    public void testDoRefundFast()
+            throws UnsupportedEncodingException, InvalidKeyException, NoSuchAlgorithmException,
+            InvalidKeySpecException, SignatureException {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+        req.setPayPrice("1.01");
+
+        long userId = req.getUserId();
+        // 删除用户的签约记录
+        cmbAggrementRepository.deleteByUserId(userId);
+
+        // 确认记录已经删除
+        CmbAggrementPo findInitAggrement = cmbAggrementRepository.findInitAggrement(userId);
+        assertNull(findInitAggrement);
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        assertEquals("验证返回码", 0, res.getErrorCode());
+        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
+        assertEquals("验证ResultType", "Form", res.getResultType());
+
+        BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
+        assertNotNull("验证商户订单", bo);
+
+        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertNotNull(payment);
+
+
+        // 构建回调请求
+        servletRequest = new MockHttpServletRequest();
+        servletRequest.addHeader("mock", "1");
+        servletRequest.setRequestURI("/cmbPayNotify");
+
+        // 获取到第三方机构配置
+        InstitutionConfig institutionConfig = institutionConfigManager.getConfig(PayTypeEnum.CmbApp);
+
+        Money discontAmount = new Money(0.01);
+        CmbPayNotifyRequest cmbPayNotifyRequest = new CmbPayNotifyRequest();
+        PayNoticeData noticeData = cmbPayNotifyRequest.getNoticeData();
+        noticeData.setAmount(req.getPayPrice());
+        noticeData.setNoticeUrl("noticeurl");
+        noticeData.setHttpMethod("POST");
+        noticeData.setBranchNo(institutionConfig.getBranchNo());
+        noticeData.setMerchantNo(institutionConfig.getMerchantId());
+        noticeData.setNoticeType("BKPAYRTN");
+        noticeData.setNoticeSerialNo(UUID.randomUUID().toString());
+        noticeData.setDate("20160624");
+        noticeData.setOrderNo(payment.getPaymentId());
+        noticeData.setBankDate("20160624");
+        noticeData.setBankSerialNo(UUID.randomUUID().toString());
+        noticeData.setDiscountFlag("Y");
+        noticeData.setMerchantPara("Pay");
+        noticeData.setDiscountAmount(discontAmount.toString());
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        String dateTime = simpleDateFormat.format(new Date());
+        noticeData.setDateTime(dateTime);
+
+        // 签名
+        String sign = RSAUtil.sign(cmbPayNotifyRequest.buildSignString(), mockYmtPrivateKey);
+        cmbPayNotifyRequest.setSign(sign);
+        cmbPayNotifyRequest.setSignType("RSA");
+
+        // 构建请求报文
+        String jsonRequestData = URLEncoder.encode(JSON.toJSONString(cmbPayNotifyRequest), "UTF-8");
+        String requestBody = String.format("jsonRequestData=%s", jsonRequestData);
+        servletRequest.setContent(requestBody.getBytes("utf-8"));
+
+        Response cmbPayNotify = paymentNotifyResource.cmbPayNotify(servletRequest);
+        assertEquals(200, cmbPayNotify.getStatus());
+
+        // 验证支付单的状态
+        payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertNotNull(payment);
+        assertEquals(noticeData.getBankSerialNo(), payment.getInstitutionPaymentId());
+        assertEquals(noticeData.getOrderNo(), payment.getPaymentId());
+        assertEquals(noticeData.getAmount(), payment.getActualPayPrice().add(discontAmount).toString());
+        assertEquals(noticeData.getDateTime(), simpleDateFormat.format(payment.getPayTime()));
+        assertEquals(discontAmount, payment.getDiscountAmt());
+        assertEquals(payment.getPayPrice().subtract(discontAmount), payment.getActualPayPrice());
+        assertEquals(PayStatusEnum.Paied, payment.getPayStatus());
+
+        // 构建快速退款
+        FastRefundRequest fastRefundRequest = new FastRefundRequest();
+        fastRefundRequest.setAppId("100001");
+        fastRefundRequest.setPaymentId(payment.getPaymentId());
+        fastRefundRequest.setTradingId(bo.getOrderId());
+        fastRefundRequest.setTradeType(1);
+
+        ArrayList<String> a = new ArrayList<String>();
+        a.add("12345678");
+        fastRefundRequest.setOrderIdList(a);
+        fastRefundRequest.setTraceId(StringUtils.left(UUID.randomUUID().toString(), 32));
+
+        FastRefundResponse resp = refundResource.fastRefund(fastRefundRequest, servletRequest);
+        assertEquals(0, resp.getErrorCode());
+
+        List<RefundRequestPo> refundRequestPos =
+                refundPository.getRefundReqestByTraceId(fastRefundRequest.getTraceId());
+        assertEquals(1, refundRequestPos.size());
+        assertEquals(RefundStatusEnum.THIRDPART_REFUND_SUCCESS.getCode(),
+                refundRequestPos.get(0).getRefundStatus().intValue());
+
+        // 构建执行退款
+        ExecuteRefundRequest executeRefundRequest = new ExecuteRefundRequest();
+        executeRefundRequest.setRefundId(refundRequestPos.get(0).getRefundId());
+        executeRefundRequest.setRequestId(UUID.randomUUID().toString());
+
+        String executeRefund = refundJobResource.executeRefund(executeRefundRequest, servletRequest);
+        assertEquals("4", executeRefund);
+
+        refundRequestPos =
+                refundPository.getRefundReqestByTraceId(fastRefundRequest.getTraceId());
+        assertEquals(1, refundRequestPos.size());
+        assertEquals(RefundStatusEnum.COMPLETE_SUCCESS.getCode(),
+                refundRequestPos.get(0).getRefundStatus().intValue());
+
+        // 验证退款金额 == 实际支付金额
+        payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertEquals(payment.getRefundAmt(), payment.getActualPayPrice().getAmount());
+
+
+        // 再次执行退款，返回ok
+        executeRefund = refundJobResource.executeRefund(executeRefundRequest, servletRequest);
+        assertEquals("ok", executeRefund);
+
+        System.out.println(payment.getPaymentId());
+    }
+
 
     /**
      * 构造请求报文
@@ -789,7 +941,7 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         req.setOrderId(getDateFormatString("yyyyMMddHHmmssSSS"));
         req.setOrderTime(getDateFormatString("yyyyMMddHHmmss"));
         req.setPayPrice("0.01");
-        req.setPayType("20");
+        req.setPayType("50");
         req.setProductName("测试商品");
         req.setProductDesc("商品描述");
         req.setProductUrl("www.ymatou.com");

@@ -110,7 +110,7 @@ public class RefundFacadeImpl implements RefundFacade {
         }
 
         // query and verify businessOrder
-        BussinessOrder bussinessOrder = payService.getBussinessOrderById(payment.getBussinessOrderId());
+        BussinessOrder bussinessOrder = payment.getBussinessOrder();
         if (!req.getTradingId().equals(bussinessOrder.getOrderId())) {
             throw new BizException(ErrorCode.FAIL, "inconsistent paymentId and tradingId");
         }

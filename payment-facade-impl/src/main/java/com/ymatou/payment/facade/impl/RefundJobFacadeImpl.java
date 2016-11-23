@@ -60,7 +60,7 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
         }
 
         Payment payment = payService.getPaymentByPaymentId(refundRequest.getPaymentId());
-        BussinessOrder bussinessOrder = payService.getBussinessOrderById(payment.getBussinessOrderId());
+        BussinessOrder bussinessOrder = payment.getBussinessOrder();
         refundJobService.updateRetryCount(refundId); // 更新重试次数
 
         RefundStatusEnum refundStatus = RefundStatusEnum.withCode(refundRequest.getRefundStatus());

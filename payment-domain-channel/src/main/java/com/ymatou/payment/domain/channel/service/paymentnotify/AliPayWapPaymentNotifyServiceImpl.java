@@ -38,6 +38,7 @@ import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.PaymentNotifyType;
 import com.ymatou.payment.facade.model.PaymentNotifyReq;
+import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.infrastructure.util.HttpUtil;
 
 /**
@@ -87,7 +88,7 @@ public class AliPayWapPaymentNotifyServiceImpl implements PaymentNotifyService {
             paymentNotifyMessage.setTraceId(UUID.randomUUID().toString());
             paymentNotifyMessage.setPayerId("");
             paymentNotifyMessage.setActualPayCurrency("CNY");
-            paymentNotifyMessage.setActualPayPrice(new BigDecimal("0.00"));
+            paymentNotifyMessage.setActualPayPrice(new Money(0));
             paymentNotifyMessage.setInstitutionPaymentId(map.get("trade_no"));
             paymentNotifyMessage.setPaymentId(map.get("out_trade_no"));
             paymentNotifyMessage.setPayTime(new Date());
@@ -107,7 +108,7 @@ public class AliPayWapPaymentNotifyServiceImpl implements PaymentNotifyService {
                 paymentNotifyMessage.setPayerId(root.elementText("buyer_id"));
                 paymentNotifyMessage.setPayerEmail(root.elementText("buyer_email"));
                 paymentNotifyMessage.setActualPayCurrency(StringUtils.isBlank(currency) ? "CNY" : currency);
-                paymentNotifyMessage.setActualPayPrice(new BigDecimal(root.elementText("total_fee")));
+                paymentNotifyMessage.setActualPayPrice(new Money(root.elementText("total_fee")));
                 paymentNotifyMessage.setInstitutionPaymentId(root.elementText("trade_no"));
                 paymentNotifyMessage.setPaymentId(root.elementText("out_trade_no"));
                 paymentNotifyMessage

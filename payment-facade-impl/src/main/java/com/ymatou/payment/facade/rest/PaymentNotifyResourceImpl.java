@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.PaymentNotifyFacade;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.PaymentNotifyType;
 import com.ymatou.payment.facade.model.PaymentNotifyReq;
 import com.ymatou.payment.facade.model.PaymentNotifyResp;
@@ -109,7 +110,7 @@ public class PaymentNotifyResourceImpl implements PaymentNotifyResource {
     public Response cmbPayNotify(@Context HttpServletRequest servletRequest) {
         try {
             PaymentNotifyReq notifyReq = new PaymentNotifyReq();
-            notifyReq.setPayType("20"); // 招行一网通渠道号
+            notifyReq.setPayType(PayTypeEnum.CmbApp.getCode()); // 招行一网通渠道号
             notifyReq.setNotifyType(PaymentNotifyType.Server);
             notifyReq.setRawString(getHttpBody(servletRequest));
             notifyReq.setMockHeader(getMockHttpHeader(servletRequest));
