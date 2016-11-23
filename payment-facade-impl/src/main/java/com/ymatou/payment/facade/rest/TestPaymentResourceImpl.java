@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.springframework.stereotype.Component;
 
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
 import com.ymatou.payment.facade.model.AcquireOrderResp;
 
@@ -74,7 +75,7 @@ public class TestPaymentResourceImpl implements TestPaymentResource {
         AcquireOrderReq req = new AcquireOrderReq();
         buildBaseRequest(req);
 
-        req.setPayType("20");
+        req.setPayType(PayTypeEnum.CmbApp.getCode());
         req.setPayPrice("0.01");
 
         AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);

@@ -19,12 +19,12 @@ public class CmbPayRequest extends CmbDTO {
     @Override
     public String buildSignString() {
         return String.format(
-                "agrNo=%s&amount=%s&branchNo=%s&date=%s&dateTime=%s&expireTimeSpan=%s&merchantNo=%s&merchantSerialNo=%s&orderNo=%s&payNoticePara=%s&payNoticeUrl=%s&returnUrl=%s&signNoticePara=%s&signNoticeUrl=%s",
+                "agrNo=%s&amount=%s&branchNo=%s&date=%s&dateTime=%s&expireTimeSpan=%s&merchantNo=%s&merchantSerialNo=%s&orderNo=%s&payNoticePara=%s&payNoticeUrl=%s&returnUrl=%s&signNoticePara=%s&signNoticeUrl=%s&userID=%s",
                 reqData.getAgrNo(), reqData.getAmount(), reqData.getBranchNo(), reqData.getDate(),
                 reqData.getDateTime(),
                 reqData.getExpireTimeSpan(), reqData.getMerchantNo(), reqData.getMerchantSerialNo(),
                 reqData.getOrderNo(), reqData.getPayNoticePara(), reqData.getPayNoticeUrl(), reqData.getReturnUrl(),
-                reqData.getSignNoticePara(), reqData.getSignNoticeUrl());
+                reqData.getSignNoticePara(), reqData.getSignNoticeUrl(), reqData.getUserID());
     }
 
     private PayReqData reqData = new PayReqData();
