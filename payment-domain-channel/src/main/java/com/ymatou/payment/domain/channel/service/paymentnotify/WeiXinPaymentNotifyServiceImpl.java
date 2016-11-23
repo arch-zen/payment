@@ -77,6 +77,13 @@ public class WeiXinPaymentNotifyServiceImpl implements PaymentNotifyService {
             throw new BizException(ErrorCode.SIGN_NOT_MATCH, "paymentId:" + map.get("out_trade_no"));
         }
 
+        // 验证商户号
+        // 防止黑客利用其它商户号的数据伪造支付成功报文
+        if (!instConfig.getMerchantId().equals(map.get("mch_id"))) {
+            throw new BizException(ErrorCode.INVALID_MERCHANT_ID,
+                    "paymentId:" + map.get("out_trade_no") + ",mch_id:" + map.get("mch_id"));
+        }
+
         // 根据返回报文判断支付是否成功
         String resultCode = map.get("result_code");
         String returnCode = map.get("return_code");

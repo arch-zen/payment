@@ -78,7 +78,7 @@ public class AliPayWapPaymentNotifyServiceImpl implements PaymentNotifyService {
                 institutionConfigManager.getConfig(PayTypeEnum.parse(notifyRequest.getPayType()));
         boolean isSignValidate = signatureService.validateSign(map, instConfig, notifyRequest.getMockHeader());
         if (!isSignValidate) {
-            throw new BizException(ErrorCode.SIGN_NOT_MATCH, "paymentId:" + map.get("out_trade_no"));
+            throw new BizException(ErrorCode.SIGN_NOT_MATCH, "notify_data:" + map.get("notify_data"));
         }
 
         // 从报文中获取到有效信息
@@ -102,6 +102,14 @@ public class AliPayWapPaymentNotifyServiceImpl implements PaymentNotifyService {
                 Element root = document.getRootElement();
                 String currency = root.elementText("currency");
                 String gmtPayment = root.elementText("gmt_payment");
+
+                // 验证商户号
+                // 防止黑客利用其它商户号的数据伪造支付成功报文
+                if (!instConfig.getMerchantId().equals(root.elementText("seller_id"))) {
+                    throw new BizException(ErrorCode.INVALID_MERCHANT_ID,
+                            "paymentId:" + root.elementText("out_trade_no") +
+                                    ",seller_id:" + root.elementText("seller_id"));
+                }
 
                 paymentNotifyMessage.setTraceId(UUID.randomUUID().toString());
                 paymentNotifyMessage.setPayerId(root.elementText("buyer_id"));
