@@ -5,7 +5,6 @@
  */
 package com.ymatou.payment.domain.channel.model;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import com.ymatou.payment.facade.constants.PayStatusEnum;
