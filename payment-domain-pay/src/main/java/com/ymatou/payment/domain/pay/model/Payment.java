@@ -341,7 +341,11 @@ public class Payment extends PrintFriendliness {
      * @return the discountAmt
      */
     public Money getDiscountAmt() {
-        return discountAmt;
+        if (discountAmt == null) {
+            return new Money(0);
+        } else {
+            return discountAmt;
+        }
     }
 
     /**

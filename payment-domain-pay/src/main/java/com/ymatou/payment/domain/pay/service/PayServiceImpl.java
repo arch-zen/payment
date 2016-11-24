@@ -58,8 +58,9 @@ public class PayServiceImpl implements PayService {
     @Override
     public Payment getPaymentByPaymentId(String paymentId) {
         Payment payment = paymentRepository.getByPaymentId(paymentId);
-        payment.setBussinessOrder(getBussinessOrderById(payment.getBussinessOrderId()));
-
+        if (payment != null) {
+            payment.setBussinessOrder(getBussinessOrderById(payment.getBussinessOrderId()));
+        }
         return payment;
     }
 

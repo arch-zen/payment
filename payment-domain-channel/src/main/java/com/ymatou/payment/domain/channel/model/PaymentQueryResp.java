@@ -127,7 +127,11 @@ public class PaymentQueryResp {
      * @return the discountAmount
      */
     public Money getDiscountAmount() {
-        return discountAmount;
+        if (discountAmount == null) {
+            return new Money(0);
+        } else {
+            return discountAmount;
+        }
     }
 
     /**
