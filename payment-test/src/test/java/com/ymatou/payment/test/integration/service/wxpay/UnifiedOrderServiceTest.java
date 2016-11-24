@@ -83,4 +83,38 @@ public class UnifiedOrderServiceTest extends RestBaseTest {
         Assert.assertNotNull("appid不存在", response.getReturn_msg());
         Assert.assertNull(response.getPrepay_id());
     }
+
+    /**
+     * 微信扫码支付
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testDoServiceNativeSuceess() throws Exception {
+        UnifiedOrderRequest request = new UnifiedOrderRequest();
+
+        request.setAppid("wxa06ebe9f39751792");
+        request.setMch_id("1278350701");
+        request.setDevice_info("WEB");
+        request.setNonce_str("weixin" + String.valueOf(new Random().nextInt(10)));
+        request.setBody("Ipad mini 16G");
+        request.setOut_trade_no("test2018" + System.currentTimeMillis());
+        request.setTotal_fee(888);
+        request.setSpbill_create_ip("192.168.1.1");
+        request.setNotify_url("www.qq.com");
+        request.setTrade_type("NATIVE");
+        request.setOpenid("oR5W7juAmJ9bseh99BFlpWOhISbk");
+        String sign = Signature.getSign(request, "es839gnc8451lp0s943n568xzskjgdbv");
+
+
+        request.setSign(sign);
+
+        UnifiedOrderResponse response = unifiedOrderService.doService(request, new HashMap<String, String>());
+        Assert.assertNotNull(response);
+        Assert.assertNotNull(response.getCode_url());
+        Assert.assertEquals(WxReturnCodeEnum.SUCCESS.toString(), response.getReturn_code());
+        Assert.assertNotNull(response.getPrepay_id());
+
+        System.out.println(response.getCode_url());
+    }
 }

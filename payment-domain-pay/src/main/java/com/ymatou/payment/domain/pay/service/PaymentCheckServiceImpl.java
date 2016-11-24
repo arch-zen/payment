@@ -14,7 +14,6 @@ import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.model.ThirdPartyPayment;
 import com.ymatou.payment.domain.pay.repository.AlipayNotifyLogRespository;
-import com.ymatou.payment.domain.pay.repository.BussinessOrderRepository;
 import com.ymatou.payment.domain.pay.repository.PaymentRepository;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
@@ -37,9 +36,6 @@ public class PaymentCheckServiceImpl implements PaymentCheckService {
 
     @Autowired
     private PaymentRepository paymentRepository;
-
-    @Autowired
-    private BussinessOrderRepository bussinessOrderRepository;
 
     @Autowired
     private PayService payService;
