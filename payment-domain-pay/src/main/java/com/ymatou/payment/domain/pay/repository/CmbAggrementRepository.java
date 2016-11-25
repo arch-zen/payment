@@ -72,6 +72,25 @@ public class CmbAggrementRepository {
     }
 
     /**
+     * 获取到用户签约状态的协议记录
+     * 
+     * @param userId
+     * @return
+     */
+    public CmbAggrementPo findSignAggrement(long userId) {
+        CmbAggrementExample cmbAggrementExample = new CmbAggrementExample();
+        cmbAggrementExample.createCriteria().andUserIdEqualTo(userId)
+                .andAggStatusEqualTo(CmbAggrementStatusEnum.SIGN.code());
+
+        List<CmbAggrementPo> aggList = cmbAggrementMapper.selectByExample(cmbAggrementExample);
+        if (aggList == null || aggList.size() == 0) {
+            return null;
+        } else {
+            return aggList.get(0);
+        }
+    }
+
+    /**
      * 根据协议号获取协议信息
      * 
      * @param aggId

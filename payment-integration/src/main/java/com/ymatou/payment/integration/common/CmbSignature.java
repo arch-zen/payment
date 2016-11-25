@@ -11,11 +11,19 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ymatou.payment.facade.BizException;
 
 /**
@@ -74,6 +82,53 @@ public class CmbSignature {
             logger.error("shaSigin failed,with:" + signString, e);
             throw new BizException("shaSigin failed,with:" + signString, e);
         }
+    }
+
+    /**
+     * 构建签名字符串
+     * 
+     * @param rawString
+     * @param dataName
+     * @return
+     */
+    public static String buildSignString(String rawString, String dataName) {
+        StringBuffer buffer = new StringBuffer();
+
+        JSONObject jsonObject = JSONObject.parseObject(rawString);
+        JSONObject dataObject = jsonObject.getJSONObject(dataName);
+        List<String> keyList = sortParams(dataObject);
+        for (String key : keyList) {
+            buffer.append(key).append("=").append(dataObject.get(key)).append("&");
+        }
+
+        String signString = buffer.toString();
+        return StringUtils.left(signString, signString.length() - 1);
+    }
+
+    /**
+     * 对参数排序
+     */
+    public static List<String> sortParams(JSONObject json) {
+        List<String> list = new ArrayList<String>();
+        Set<String> keySet = json.keySet();
+
+        for (String key : keySet) {
+            list.add(key);
+        }
+        Collections.sort(list, new Comparator<String>() {
+            public int compare(String o1, String o2) {
+                String[] temp = {o1.toLowerCase(), o2.toLowerCase()};
+                Arrays.sort(temp);
+                if (o1.equalsIgnoreCase(temp[0])) {
+                    return -1;
+                } else if (temp[0].equalsIgnoreCase(temp[1])) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            }
+        });
+        return list;
     }
 
     /**

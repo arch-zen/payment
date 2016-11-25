@@ -57,17 +57,14 @@ public class CmbPaymentNotifyServiceImpl implements PaymentNotifyService {
             throw new BizException(ErrorCode.FAIL, "parse form data when receive cmb payment notify.", e);
         }
 
-        CmbPayNotifyRequest cmbPayNotifyRequest = null;
-        if (PaymentNotifyType.Server.equals(notifyRequest.getNotifyType())) {
-            String reqData = map.get("jsonRequestData");
-            cmbPayNotifyRequest = JSONObject.parseObject(reqData, CmbPayNotifyRequest.class);
-        }
+        String reqData = map.get("jsonRequestData");
+        CmbPayNotifyRequest cmbPayNotifyRequest = JSONObject.parseObject(reqData, CmbPayNotifyRequest.class);
 
-        // 获取公钥
+        // 获取公钥 & 签名字符串 & 签名
         String pubKey = cmbPublicKeyRepository.getPublicKey(notifyRequest.getMockHeader());
-        // 验签
-        boolean isSignValidate = CmbSignature.isValidSignature(cmbPayNotifyRequest.buildSignString(),
-                cmbPayNotifyRequest.getSign(), pubKey);
+        String signString = CmbSignature.buildSignString(reqData, "noticeData");
+        String sign = cmbPayNotifyRequest.getSign();
+        boolean isSignValidate = CmbSignature.isValidSignature(signString, sign, pubKey);
         if (!isSignValidate) {
             throw new BizException(ErrorCode.SIGN_NOT_MATCH,
                     "paymentId:" + cmbPayNotifyRequest.getNoticeData().getOrderNo());

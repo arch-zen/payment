@@ -8,6 +8,9 @@ package com.ymatou.payment.integration.model;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.alibaba.fastjson.JSONObject;
+import com.ymatou.payment.integration.common.CmbSignature;
+
 /**
  * 取消协议请求报文
  * 
@@ -18,9 +21,7 @@ public class CmbAggrementCancelRequest extends CmbDTO {
 
     @Override
     public String buildSignString() {
-        return String.format("agrNo=%s&branchNo=%s&dateTime=%s&merchantNo=%s&merchantSerialNo=%s&txCode=%s",
-                reqData.getAgrNo(), reqData.getBranchNo(), reqData.getDateTime(), reqData.getMerchantNo(),
-                reqData.getMerchantSerialNo(), reqData.getTxCode()).replace("null", "");
+        return CmbSignature.buildSignString(JSONObject.toJSONString(this), "reqData");
     }
 
     /**

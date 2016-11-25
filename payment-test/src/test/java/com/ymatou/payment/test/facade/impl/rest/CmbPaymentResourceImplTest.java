@@ -65,6 +65,7 @@ import com.ymatou.payment.infrastructure.db.model.CmbPublicKeyPo;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 import com.ymatou.payment.infrastructure.security.RSAUtil;
 import com.ymatou.payment.integration.IntegrationConfig;
+import com.ymatou.payment.integration.common.CmbSignature;
 import com.ymatou.payment.integration.model.CmbPayNotifyRequest;
 import com.ymatou.payment.integration.model.CmbPayNotifyRequest.PayNoticeData;
 import com.ymatou.payment.integration.model.CmbSignNotifyRequest;
@@ -133,26 +134,11 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         buildBaseRequest(req);
         req.setPayPrice("1.01");
 
-        long userId = req.getUserId();
-        // 删除用户的签约记录
-        cmbAggrementRepository.deleteByUserId(userId);
-
-        // 确认记录已经删除
-        CmbAggrementPo findInitAggrement = cmbAggrementRepository.findInitAggrement(userId);
-        assertNull(findInitAggrement);
-
-        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
-        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
-
-        assertEquals("验证返回码", 0, res.getErrorCode());
-        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
-        assertEquals("验证ResultType", "Form", res.getResultType());
+        @SuppressWarnings("unused")
+        MockHttpServletRequest servletRequest = payAndBaseAssert(req);
 
         BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
         assertNotNull("验证商户订单", bo);
-
-        System.out.println(bo.getOrderId());
-        System.out.println(bo.getBussinessOrderId());
 
         assertEquals("验证PayType", req.getPayType(), bo.getPayType());
         assertEquals("验证OrderPrice", new BigDecimal(req.getPayPrice()).doubleValue(), bo.getOrderPrice().doubleValue(),
@@ -176,6 +162,7 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         assertEquals("验证OrderStatus", new Integer(0), bo.getOrderStatus());
         assertEquals("验证NotifyStatus", new Integer(0), bo.getNotifyStatus());
 
+        long userId = req.getUserId();
         CmbAggrementPo newAggrement = cmbAggrementRepository.findInitAggrement(userId);
         assertNotNull(newAggrement);
 
@@ -185,13 +172,7 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         assertEquals(true, newAggrement.getAggId() > 0);
     }
 
-    @Test
-    public void testNotify() throws UnsupportedEncodingException, InvalidKeyException, NoSuchAlgorithmException,
-            InvalidKeySpecException, SignatureException {
-        AcquireOrderReq req = new AcquireOrderReq();
-        buildBaseRequest(req);
-        req.setPayPrice("1.01");
-
+    private MockHttpServletRequest payAndBaseAssert(AcquireOrderReq req) {
         long userId = req.getUserId();
         // 删除用户的签约记录
         cmbAggrementRepository.deleteByUserId(userId);
@@ -206,6 +187,18 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         assertEquals("验证返回码", 0, res.getErrorCode());
         assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
         assertEquals("验证ResultType", "Form", res.getResultType());
+
+        return servletRequest;
+    }
+
+    @Test
+    public void testNotify() throws UnsupportedEncodingException, InvalidKeyException, NoSuchAlgorithmException,
+            InvalidKeySpecException, SignatureException {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+        req.setPayPrice("1.01");
+
+        MockHttpServletRequest servletRequest = payAndBaseAssert(req);
 
         BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
         assertNotNull("验证商户订单", bo);
@@ -276,20 +269,7 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         buildBaseRequest(req);
         req.setPayPrice("1.01");
 
-        long userId = req.getUserId();
-        // 删除用户的签约记录
-        cmbAggrementRepository.deleteByUserId(userId);
-
-        // 确认记录已经删除
-        CmbAggrementPo findInitAggrement = cmbAggrementRepository.findInitAggrement(userId);
-        assertNull(findInitAggrement);
-
-        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
-        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
-
-        assertEquals("验证返回码", 0, res.getErrorCode());
-        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
-        assertEquals("验证ResultType", "Form", res.getResultType());
+        MockHttpServletRequest servletRequest = payAndBaseAssert(req);
 
         BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
         assertNotNull("验证商户订单", bo);
@@ -358,20 +338,7 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         buildBaseRequest(req);
         req.setPayPrice("1.01");
 
-        long userId = req.getUserId();
-        // 删除用户的签约记录
-        cmbAggrementRepository.deleteByUserId(userId);
-
-        // 确认记录已经删除
-        CmbAggrementPo findInitAggrement = cmbAggrementRepository.findInitAggrement(userId);
-        assertNull(findInitAggrement);
-
-        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
-        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
-
-        assertEquals("验证返回码", 0, res.getErrorCode());
-        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
-        assertEquals("验证ResultType", "Form", res.getResultType());
+        MockHttpServletRequest servletRequest = payAndBaseAssert(req);
 
         BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
         assertNotNull("验证商户订单", bo);
@@ -428,20 +395,7 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         buildBaseRequest(req);
         req.setPayPrice("1.01");
 
-        long userId = req.getUserId();
-        // 删除用户的签约记录
-        cmbAggrementRepository.deleteByUserId(userId);
-
-        // 确认记录已经删除
-        CmbAggrementPo findInitAggrement = cmbAggrementRepository.findInitAggrement(userId);
-        assertNull(findInitAggrement);
-
-        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
-        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
-
-        assertEquals("验证返回码", 0, res.getErrorCode());
-        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
-        assertEquals("验证ResultType", "Form", res.getResultType());
+        MockHttpServletRequest servletRequest = payAndBaseAssert(req);
 
         BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
         assertNotNull("验证商户订单", bo);
@@ -449,7 +403,7 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
         assertNotNull("验证支付单", payment);
 
-        CmbAggrementPo aggrementPo = cmbAggrementRepository.findInitAggrement(userId);
+        CmbAggrementPo aggrementPo = cmbAggrementRepository.findInitAggrement(req.getUserId());
         assertNotNull("验证签约记录", aggrementPo);
 
         // 构建回调请求
@@ -480,7 +434,9 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         signNoticeData.setUserPidType("1");
 
         // 签名
-        String sign = RSAUtil.sign(cmbSignNotifyRequest.buildSignString(), mockYmtPrivateKey);
+        String rawString = JSON.toJSONString(cmbSignNotifyRequest);
+        String signString = CmbSignature.buildSignString(rawString, "noticeData");
+        String sign = RSAUtil.sign(signString, mockYmtPrivateKey);
         cmbSignNotifyRequest.setSign(sign);
         cmbSignNotifyRequest.setSignType("RSA");
 
@@ -503,6 +459,17 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         assertEquals(signNoticeData.getUserPidType(), aggrement.getUserPidType());
         assertEquals(signNoticeData.getUserPidHash(), aggrement.getUserPidHash());
         assertEquals(signNoticeData.getNoPwdPay(), aggrement.getNoPwdPay());
+
+        // 同个用户再下一单，验证不会生成新的协议
+        req.setOrderId(getDateFormatString("yyyyMMddHHmmssSSS"));
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        assertEquals("验证返回码", 0, res.getErrorCode());
+        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
+        assertEquals("验证ResultType", "Form", res.getResultType());
+
+        CmbAggrementPo findInitAggrement2 = cmbAggrementRepository.findInitAggrement(req.getUserId());
+        assertNull(findInitAggrement2);
     }
 
     @Test
@@ -513,20 +480,7 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         buildBaseRequest(req);
         req.setPayPrice("1.01");
 
-        long userId = req.getUserId();
-        // 删除用户的签约记录
-        cmbAggrementRepository.deleteByUserId(userId);
-
-        // 确认记录已经删除
-        CmbAggrementPo findInitAggrement = cmbAggrementRepository.findInitAggrement(userId);
-        assertNull(findInitAggrement);
-
-        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
-        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
-
-        assertEquals("验证返回码", 0, res.getErrorCode());
-        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
-        assertEquals("验证ResultType", "Form", res.getResultType());
+        MockHttpServletRequest servletRequest = payAndBaseAssert(req);
 
         BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
         assertNotNull("验证商户订单", bo);
@@ -534,7 +488,7 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
         assertNotNull("验证支付单", payment);
 
-        CmbAggrementPo aggrementPo = cmbAggrementRepository.findInitAggrement(userId);
+        CmbAggrementPo aggrementPo = cmbAggrementRepository.findInitAggrement(req.getUserId());
         assertNotNull("验证签约记录", aggrementPo);
 
         // 构建回调请求
@@ -606,20 +560,7 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         buildBaseRequest(req);
         req.setPayPrice("1.01");
 
-        long userId = req.getUserId();
-        // 删除用户的签约记录
-        cmbAggrementRepository.deleteByUserId(userId);
-
-        // 确认记录已经删除
-        CmbAggrementPo findInitAggrement = cmbAggrementRepository.findInitAggrement(userId);
-        assertNull(findInitAggrement);
-
-        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
-        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
-
-        assertEquals("验证返回码", 0, res.getErrorCode());
-        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
-        assertEquals("验证ResultType", "Form", res.getResultType());
+        MockHttpServletRequest servletRequest = payAndBaseAssert(req);
 
         BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
         assertNotNull("验证商户订单", bo);
@@ -702,20 +643,7 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         buildBaseRequest(req);
         req.setPayPrice("1.01");
 
-        long userId = req.getUserId();
-        // 删除用户的签约记录
-        cmbAggrementRepository.deleteByUserId(userId);
-
-        // 确认记录已经删除
-        CmbAggrementPo findInitAggrement = cmbAggrementRepository.findInitAggrement(userId);
-        assertNull(findInitAggrement);
-
-        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
-        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
-
-        assertEquals("验证返回码", 0, res.getErrorCode());
-        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
-        assertEquals("验证ResultType", "Form", res.getResultType());
+        MockHttpServletRequest servletRequest = payAndBaseAssert(req);
 
         BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
         assertNotNull("验证商户订单", bo);
@@ -799,20 +727,7 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         buildBaseRequest(req);
         req.setPayPrice("1.01");
 
-        long userId = req.getUserId();
-        // 删除用户的签约记录
-        cmbAggrementRepository.deleteByUserId(userId);
-
-        // 确认记录已经删除
-        CmbAggrementPo findInitAggrement = cmbAggrementRepository.findInitAggrement(userId);
-        assertNull(findInitAggrement);
-
-        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
-        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
-
-        assertEquals("验证返回码", 0, res.getErrorCode());
-        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
-        assertEquals("验证ResultType", "Form", res.getResultType());
+        MockHttpServletRequest servletRequest = payAndBaseAssert(req);
 
         BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
         assertNotNull("验证商户订单", bo);
@@ -920,6 +835,56 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         assertEquals("ok", executeRefund);
 
         System.out.println(payment.getPaymentId());
+    }
+
+    @Test
+    public void testPaymentNotifyFromCMBTest() throws UnsupportedEncodingException {
+        String requestBody =
+                "jsonRequestData=%7B%22noticeData%22%3A%7B%22branchNo%22%3A%220021%22%2C%22AccountType%22%3A%22DebitCard%22%2C%22merchantPara%22%3A%22Pay%22%2C%22httpMethod%22%3A%22POST%22%2C%22merchantNo%22%3A%22000157%22%2C%22bankDate%22%3A%2220161125%22%2C%22discountFlag%22%3A%22N%22%2C%22noticeSerialNo%22%3A%220021000157201611251603213576%22%2C%22date%22%3A%2220161125%22%2C%22orderNo%22%3A%221603213576%22%2C%22bankSerialNo%22%3A%2216312531000000000020%22%2C%22noticeType%22%3A%22BKPAYRTN%22%2C%22noticeUrl%22%3A%22http%3A%2F%2F116.228.41.4%3A8081%2FcmbPayNotify%22%2C%22amount%22%3A%2297.00%22%2C%22discountAmount%22%3A%220.00%22%2C%22dateTime%22%3A%2220161125183627%22%7D%2C%22signType%22%3A%22RSA%22%2C%22version%22%3A%221.0%22%2C%22charset%22%3A%22UTF-8%22%2C%22sign%22%3A%220Rk6IXyj1g7Ja6nuUPPwWLkZlTad32zJ8mtbSGBkmkaRlVBrUkOZbihYKiwIlI%2BE5Hjd3JIFNM5%2B%2BGwFdztakfJH518BzIEnTkQUyaTcwjXvNwo88Ajr4Ex3aElqFr8ypawGhbSIp6f8ff809O%2FEe1NMatUtMBecdPbTTkgtukU%3D%22%7D";
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        servletRequest.setContent(requestBody.getBytes("utf-8"));
+
+        Response cmbPayNotify = paymentNotifyResource.cmbPayNotify(servletRequest);
+        assertEquals(200, cmbPayNotify.getStatus());
+    }
+
+    @Test
+    public void testPaymentNotifyFromCMBTestWithWrongPubKey() throws UnsupportedEncodingException {
+        String requestBody =
+                "jsonRequestData=%7B%22noticeData%22%3A%7B%22branchNo%22%3A%220021%22%2C%22AccountType%22%3A%22DebitCard%22%2C%22merchantPara%22%3A%22Pay%22%2C%22httpMethod%22%3A%22POST%22%2C%22merchantNo%22%3A%22000157%22%2C%22bankDate%22%3A%2220161125%22%2C%22discountFlag%22%3A%22N%22%2C%22noticeSerialNo%22%3A%220021000157201611251603213576%22%2C%22date%22%3A%2220161125%22%2C%22orderNo%22%3A%221603213576%22%2C%22bankSerialNo%22%3A%2216312531000000000020%22%2C%22noticeType%22%3A%22BKPAYRTN%22%2C%22noticeUrl%22%3A%22http%3A%2F%2F116.228.41.4%3A8081%2FcmbPayNotify%22%2C%22amount%22%3A%2297.00%22%2C%22discountAmount%22%3A%220.00%22%2C%22dateTime%22%3A%2220161125183627%22%7D%2C%22signType%22%3A%22RSA%22%2C%22version%22%3A%221.0%22%2C%22charset%22%3A%22UTF-8%22%2C%22sign%22%3A%220Rk6IXyj1g7Ja6nuUPPwWLkZlTad32zJ8mtbSGBkmkaRlVBrUkOZbihYKiwIlI%2BE5Hjd3JIFNM5%2B%2BGwFdztakfJH518BzIEnTkQUyaTcwjXvNwo88Ajr4Ex3aElqFr8ypawGhbSIp6f8ff809O%2FEe1NMatUtMBecdPbTTkgtukU%3D%22%7D";
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        servletRequest.setContent(requestBody.getBytes("utf-8"));
+        servletRequest.addHeader("mock", "1"); // 此处使用MOCK会导致使用码头内部的公钥而不是招行测试环境的公钥验签，而报文来自招行测试环境，因此会出现验签失败
+
+        Response cmbPayNotify = paymentNotifyResource.cmbPayNotify(servletRequest);
+        assertEquals(500, cmbPayNotify.getStatus());
+    }
+
+    @Test
+    public void testSignNotifyFromCMBTest() throws UnsupportedEncodingException {
+        String requestBody =
+                "jsonRequestData=%7B%22noticeData%22%3A%7B%22branchNo%22%3A%220021%22%2C%22userID%22%3A%2220000312%22%2C%22merchantNo%22%3A%22000157%22%2C%22httpMethod%22%3A%22Post%22%2C%22noPwdPay%22%3A%22N%22%2C%22noticeSerialNo%22%3A%22844Y611250000202xCXNTTKRJHRFVYUJSVKEZTL%22%2C%22agrNo%22%3A%22208%22%2C%22userPidHash%22%3A%22129468525030254567040075172085%22%2C%22noticeType%22%3A%22BKQY%22%2C%22rspMsg%22%3A%22%E7%AD%BE%E7%BD%B2%E5%8D%8F%E8%AE%AE%E6%88%90%E5%8A%9F%22%2C%22noticeUrl%22%3A%22http%3A%2F%2F116.228.41.4%3A8081%2FcmbSignNotify%22%2C%22noticePara%22%3A%22Sign%22%2C%22userPidType%22%3A%221%22%2C%22dateTime%22%3A%2220161125173139%22%2C%22rspCode%22%3A%22SUC0000%22%7D%2C%22signType%22%3A%22RSA%22%2C%22version%22%3A%221.0%22%2C%22charset%22%3A%22UTF-8%22%2C%22sign%22%3A%22AGtHxxahOTsK4gJtuK1PwtHa6OcggXUSdVVb%2Fdd1m4fglGQ4HILBlW0qD%2BAsLQMMKh3DAb4UpGIKA8I0vu9fZLoTyxhQAtN%2Bf1qa1ipAojOxOEYzl0%2FPbphEGIVVW6rs%2BBCIWwjq64T%2B1LorEKFeXb72QfYevHYeF3QOCXr0dz8%3D%22%7D";
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        servletRequest.setContent(requestBody.getBytes("utf-8"));
+
+        Response cmbSignNotify = signNotifyResource.cmbSignNotify(servletRequest);
+        assertEquals(200, cmbSignNotify.getStatus());
+    }
+
+    @Test
+    public void testSignNotifyFromCMBTestWithWrongPubKey() throws UnsupportedEncodingException {
+        String requestBody =
+                "jsonRequestData=%7B%22noticeData%22%3A%7B%22branchNo%22%3A%220021%22%2C%22userID%22%3A%2220000312%22%2C%22merchantNo%22%3A%22000157%22%2C%22httpMethod%22%3A%22Post%22%2C%22noPwdPay%22%3A%22N%22%2C%22noticeSerialNo%22%3A%22844Y611250000202xCXNTTKRJHRFVYUJSVKEZTL%22%2C%22agrNo%22%3A%22208%22%2C%22userPidHash%22%3A%22129468525030254567040075172085%22%2C%22noticeType%22%3A%22BKQY%22%2C%22rspMsg%22%3A%22%E7%AD%BE%E7%BD%B2%E5%8D%8F%E8%AE%AE%E6%88%90%E5%8A%9F%22%2C%22noticeUrl%22%3A%22http%3A%2F%2F116.228.41.4%3A8081%2FcmbSignNotify%22%2C%22noticePara%22%3A%22Sign%22%2C%22userPidType%22%3A%221%22%2C%22dateTime%22%3A%2220161125173139%22%2C%22rspCode%22%3A%22SUC0000%22%7D%2C%22signType%22%3A%22RSA%22%2C%22version%22%3A%221.0%22%2C%22charset%22%3A%22UTF-8%22%2C%22sign%22%3A%22AGtHxxahOTsK4gJtuK1PwtHa6OcggXUSdVVb%2Fdd1m4fglGQ4HILBlW0qD%2BAsLQMMKh3DAb4UpGIKA8I0vu9fZLoTyxhQAtN%2Bf1qa1ipAojOxOEYzl0%2FPbphEGIVVW6rs%2BBCIWwjq64T%2B1LorEKFeXb72QfYevHYeF3QOCXr0dz8%3D%22%7D";
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        servletRequest.setContent(requestBody.getBytes("utf-8"));
+        servletRequest.addHeader("mock", "1"); // 此处使用MOCK会导致使用码头内部的公钥而不是招行测试环境的公钥验签，而报文来自招行测试环境，因此会出现验签失败
+
+        Response cmbSignNotify = signNotifyResource.cmbSignNotify(servletRequest);
+        assertEquals(500, cmbSignNotify.getStatus());
     }
 
 

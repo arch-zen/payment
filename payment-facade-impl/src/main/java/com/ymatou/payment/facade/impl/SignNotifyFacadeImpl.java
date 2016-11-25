@@ -73,8 +73,11 @@ public class SignNotifyFacadeImpl implements SignNotifyFacade {
 
         // 获取公钥 验签
         String pubKey = cmbPublicKeyRepository.getPublicKey(req.getMockHeader());
-        boolean isSignValidate = CmbSignature.isValidSignature(cmbSigNotifyRequest.buildSignString(),
-                cmbSigNotifyRequest.getSign(), pubKey);
+        String signString = CmbSignature.buildSignString(reqData, "noticeData");
+        String sign = cmbSigNotifyRequest.getSign();
+
+        // 验签
+        boolean isSignValidate = CmbSignature.isValidSignature(signString, sign, pubKey);
         if (!isSignValidate) {
             throw new BizException(ErrorCode.SIGN_NOT_MATCH, "aggId:" + cmbSigNotifyRequest.getNoticeData().getAgrNo());
         }
@@ -111,7 +114,7 @@ public class SignNotifyFacadeImpl implements SignNotifyFacade {
             cmbAggrementRepository.update(aggrementPo);
 
         } else {
-            logger.error(String.format("aggid:% status:%s, not init when sign notify.", aggrementPo.getAggId(),
+            logger.error(String.format("aggid:%d status:%d, not init when sign notify.", aggrementPo.getAggId(),
                     aggrementPo.getAggStatus()));
         }
 

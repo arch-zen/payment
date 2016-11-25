@@ -52,7 +52,11 @@ public class CmbAcquireOrderServiceImpl implements AcquireOrderService {
         InstitutionConfig instConfig = instConfigManager.getConfig(payment.getPayType());
 
         // 签约记录
-        CmbAggrementPo aggrement = cmbAggrementRepository.signAggrement(payment.getBussinessOrder().getUserId());
+        Integer userId = payment.getBussinessOrder().getUserId();
+        CmbAggrementPo aggrement = cmbAggrementRepository.findSignAggrement(userId);
+        if (aggrement == null) { // 如果没有签约记录
+            aggrement = cmbAggrementRepository.signAggrement(userId);
+        }
 
         // 构建支付请求
         CmbPayRequest payRequest = buildPayReq(payment, instConfig, aggrement);

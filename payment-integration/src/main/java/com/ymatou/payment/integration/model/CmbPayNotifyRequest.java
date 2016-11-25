@@ -5,6 +5,9 @@
  */
 package com.ymatou.payment.integration.model;
 
+import com.alibaba.fastjson.JSONObject;
+import com.ymatou.payment.integration.common.CmbSignature;
+
 /**
  * 招行支付成功通知报文
  * 
@@ -15,15 +18,17 @@ public class CmbPayNotifyRequest extends CmbDTO {
 
     @Override
     public String buildSignString() {
-        return String.format(
-                "amount=%s&bankDate=%s&bankSerialNo=%s&branchNo=%s&dateTime=%s&discountAmount=%s&discountFlag=%s&httpMethod=%s&merchantNo=%s&merchantPara=%s&noticeSerialNo=%s&noticeType=%s&noticeUrl=%s&orderNo=%s",
-                noticeData.getAmount(), noticeData.getBankDate(), noticeData.getBankSerialNo(),
-                noticeData.getBranchNo(),
-                noticeData.getDateTime(), noticeData.getDiscountAmount(), noticeData.getDiscountFlag(),
-                noticeData.getHttpMethod(),
-                noticeData.getMerchantNo(), noticeData.getMerchantPara(), noticeData.getNoticeSerialNo(),
-                noticeData.getNoticeType(),
-                noticeData.getNoticeUrl(), noticeData.getOrderNo()).replace("null", "");
+        return CmbSignature.buildSignString(JSONObject.toJSONString(this), "noticeData");
+
+        // return String.format(
+        // "amount=%s&bankDate=%s&bankSerialNo=%s&branchNo=%s&dateTime=%s&discountAmount=%s&discountFlag=%s&httpMethod=%s&merchantNo=%s&merchantPara=%s&noticeSerialNo=%s&noticeType=%s&noticeUrl=%s&orderNo=%s",
+        // noticeData.getAmount(), noticeData.getBankDate(), noticeData.getBankSerialNo(),
+        // noticeData.getBranchNo(),
+        // noticeData.getDateTime(), noticeData.getDiscountAmount(), noticeData.getDiscountFlag(),
+        // noticeData.getHttpMethod(),
+        // noticeData.getMerchantNo(), noticeData.getMerchantPara(), noticeData.getNoticeSerialNo(),
+        // noticeData.getNoticeType(),
+        // noticeData.getNoticeUrl(), noticeData.getOrderNo()).replace("null", "");
     }
 
     /**
