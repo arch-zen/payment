@@ -122,6 +122,8 @@ public class PaymentNotifyService {
             case WeiXinApp:
             case WeiXinJSAPI:
                 return "Weixin";
+            case CmbApp:
+                return "CmbPay";
             default:
                 return payTypeEnum.toString();
         }

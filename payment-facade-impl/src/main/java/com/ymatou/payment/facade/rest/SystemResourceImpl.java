@@ -38,7 +38,7 @@ public class SystemResourceImpl implements SystemResource {
         return "{"
                 + "\"1.0.0\":\"2016-09-23.1 first add version.\","
                 + "\"1.0.1\":\"2016-11-14.2 validate merchant id.\","
-                + "\"1.1.0\":\"2016-11-28.1 add cmb pay.\""
+                + "\"1.1.0\":\"2016-11-28.2 add cmb pay.\""
                 + "}";
     }
 

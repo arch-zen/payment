@@ -6,6 +6,8 @@ package com.ymatou.payment.facade.rest;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
+import com.ymatou.payment.facade.model.CmbCancelAggrementReq;
+
 /**
  * 提供测试
  * 
@@ -38,4 +40,12 @@ public interface TestPaymentResource {
      * @return
      */
     String cmbpay(HttpServletRequest servletRequest);
+
+    /**
+     * 一网通 取消协议DEMO
+     * 
+     * @param servletRequest
+     * @return
+     */
+    String cmbCancelAggrement(CmbCancelAggrementReq req, HttpServletRequest servletRequest);
 }

@@ -18,6 +18,7 @@ import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.model.AcquireOrderPackageResp;
 import com.ymatou.payment.domain.channel.service.AcquireOrderService;
+import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.domain.channel.util.CmbFormBuilder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.repository.CmbAggrementRepository;
@@ -44,6 +45,9 @@ public class CmbAcquireOrderServiceImpl implements AcquireOrderService {
     private IntegrationConfig integrationConfig;
 
     @Resource
+    private SignatureService signatureService;
+
+    @Resource
     private CmbAggrementRepository cmbAggrementRepository;
 
     @Override
@@ -62,7 +66,9 @@ public class CmbAcquireOrderServiceImpl implements AcquireOrderService {
         CmbPayRequest payRequest = buildPayReq(payment, instConfig, aggrement);
 
         // 签名
-        String sign = CmbSignature.shaSign(instConfig.getMd5Key(), payRequest.buildSignString());
+        String md5Key =
+                integrationConfig.isMock(mockHeader) ? signatureService.getMd5MockKey() : instConfig.getMd5Key();
+        String sign = CmbSignature.shaSign(md5Key, payRequest.buildSignString());
         payRequest.setSign(sign);
 
         // 拼装请求报文
