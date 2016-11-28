@@ -19,16 +19,6 @@ public class CmbPayNotifyRequest extends CmbDTO {
     @Override
     public String buildSignString() {
         return CmbSignature.buildSignString(JSONObject.toJSONString(this), "noticeData");
-
-        // return String.format(
-        // "amount=%s&bankDate=%s&bankSerialNo=%s&branchNo=%s&dateTime=%s&discountAmount=%s&discountFlag=%s&httpMethod=%s&merchantNo=%s&merchantPara=%s&noticeSerialNo=%s&noticeType=%s&noticeUrl=%s&orderNo=%s",
-        // noticeData.getAmount(), noticeData.getBankDate(), noticeData.getBankSerialNo(),
-        // noticeData.getBranchNo(),
-        // noticeData.getDateTime(), noticeData.getDiscountAmount(), noticeData.getDiscountFlag(),
-        // noticeData.getHttpMethod(),
-        // noticeData.getMerchantNo(), noticeData.getMerchantPara(), noticeData.getNoticeSerialNo(),
-        // noticeData.getNoticeType(),
-        // noticeData.getNoticeUrl(), noticeData.getOrderNo()).replace("null", "");
     }
 
     /**

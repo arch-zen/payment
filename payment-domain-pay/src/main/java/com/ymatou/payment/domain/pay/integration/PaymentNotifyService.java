@@ -121,6 +121,7 @@ public class PaymentNotifyService {
                 return "Alipay";
             case WeiXinApp:
             case WeiXinJSAPI:
+            case WeiXinPc:
                 return "Weixin";
             case CmbApp:
                 return "CmbPay";

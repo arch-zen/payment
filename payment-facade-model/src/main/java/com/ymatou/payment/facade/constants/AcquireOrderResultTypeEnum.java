@@ -12,5 +12,23 @@ package com.ymatou.payment.facade.constants;
  *
  */
 public enum AcquireOrderResultTypeEnum {
-    Form, JSON, Query
+    /**
+     * HTML表单
+     */
+    Form,
+
+    /**
+     * JSON字符串
+     */
+    JSON,
+
+    /**
+     * URL
+     */
+    Query,
+
+    /**
+     * 二位码内容，客户端需要将其转为二维码图片
+     */
+    QRCode
 }

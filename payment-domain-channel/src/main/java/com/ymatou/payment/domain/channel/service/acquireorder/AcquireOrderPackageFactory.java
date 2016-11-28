@@ -39,6 +39,9 @@ public class AcquireOrderPackageFactory {
     private WeiXinJSAPIAcquireOrderServiceImpl weiXinJSAPIAcquireOrderServiceImpl;
 
     @Resource
+    private WeiXinPCAcquireOrderServiceImpl weiXinPCAcquireOrderServiceImpl;
+
+    @Resource
     private CmbAcquireOrderServiceImpl cmbAcquireOrderServiceImpl;
 
     /**
@@ -59,6 +62,8 @@ public class AcquireOrderPackageFactory {
                 return weiXinJSAPIAcquireOrderServiceImpl;
             case WeiXinApp:
                 return weiXinAppAcquireOrderServiceImpl;
+            case WeiXinPc:
+                return weiXinPCAcquireOrderServiceImpl;
             case CmbApp:
                 return cmbAcquireOrderServiceImpl;
             default:

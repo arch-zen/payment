@@ -21,6 +21,10 @@
 	<config payType="15" merchantId="1234079001" signType="MD5"
 		instName="Weixin" md5Key="c5781df6b8f149adca6094cdac4ac684" appId="wxf51a439c0416f182"
 		md5KeyConnector="&amp;key=" />
+	<!--WeiXin PC -->
+	<config payType="16" merchantId="1278350701" signType="MD5"
+		instName="Weixin" md5Key="es839gnc8451lp0s943n568xzskjgdbv" appId="wxa06ebe9f39751792"
+		md5KeyConnector="&amp;key=" />
 	<!--cmb App-->	
 	<config payType="50" merchantId="000157" branchNo="0021" signType="SHA" md5Key="Ymatou2016123456"
 		instName="Cmb" md5KeyConnector="&amp;" operatorNo="9999" operatorPwd="000157" />

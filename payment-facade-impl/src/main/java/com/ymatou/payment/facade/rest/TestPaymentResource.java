@@ -34,6 +34,14 @@ public interface TestPaymentResource {
     Response aliwap(HttpServletRequest servletRequest);
 
     /**
+     * 微信 PC DEMO
+     * 
+     * @param servletRequest
+     * @return
+     */
+    Response wxpc(HttpServletRequest servletRequest);
+
+    /**
      * 一网通 DEMO
      * 
      * @param servletRequest

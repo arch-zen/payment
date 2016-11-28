@@ -28,6 +28,8 @@ public enum PayTypeEnum {
 
     WeiXinApp("15"),
 
+    WeiXinPc("16"),
+
     CmbApp("50");
 
     private String code;
@@ -61,6 +63,8 @@ public enum PayTypeEnum {
                 return WeiXinJSAPI;
             case "15":
                 return WeiXinApp;
+            case "16":
+                return WeiXinPc;
             case "50":
                 return CmbApp;
             default:

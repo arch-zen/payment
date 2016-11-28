@@ -45,6 +45,8 @@ public class RefundQueryServiceFactory {
                 return weiXinRefundQueryServiceImpl;
             case WeiXinApp:
                 return weiXinRefundQueryServiceImpl;
+            case WeiXinPc:
+                return weiXinRefundQueryServiceImpl;
             case CmbApp:
                 return cmbRefundQueryServiceImpl;
             default:

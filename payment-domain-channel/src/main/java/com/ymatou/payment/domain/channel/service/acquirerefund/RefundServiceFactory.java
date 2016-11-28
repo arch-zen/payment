@@ -47,6 +47,8 @@ public class RefundServiceFactory {
                 return weixinRefundServiceImpl;
             case WeiXinApp:
                 return weixinRefundServiceImpl;
+            case WeiXinPc:
+                return weixinRefundServiceImpl;
             case CmbApp:
                 return cmbRefundServiceImpl;
             default:

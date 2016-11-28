@@ -41,6 +41,8 @@ public class PaymentQueryServiceFactory {
                 return weiXinPaymentQueryServiceImpl;
             case WeiXinApp:
                 return weiXinPaymentQueryServiceImpl;
+            case WeiXinPc:
+                return weiXinPaymentQueryServiceImpl;
             case CmbApp:
                 return cmbPaymentQueryServiceImpl;
             default:

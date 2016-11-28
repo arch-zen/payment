@@ -65,7 +65,7 @@ public class TestPaymentResourceImpl implements TestPaymentResource {
         AcquireOrderReq req = new AcquireOrderReq();
         buildBaseRequest(req);
 
-        req.setPayType("10");
+        req.setPayType(PayTypeEnum.AliPayPc.getCode());
         req.setPayPrice("0.02");
 
         AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
@@ -80,12 +80,26 @@ public class TestPaymentResourceImpl implements TestPaymentResource {
         AcquireOrderReq req = new AcquireOrderReq();
         buildBaseRequest(req);
 
-        req.setPayType("11");
+        req.setPayType(PayTypeEnum.AliPayWap.getCode());
         req.setPayPrice("0.02");
 
         AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
 
         return Response.status(Status.FOUND).header("location", res.getResult()).build();
+    }
+
+    @GET
+    @Path("/wxpc")
+    public Response wxpc(@Context HttpServletRequest servletRequest) {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+
+        req.setPayType(PayTypeEnum.WeiXinPc.getCode());
+        req.setPayPrice("0.02");
+
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        return Response.status(Status.OK).entity(res.getResult()).build();
     }
 
     @Override

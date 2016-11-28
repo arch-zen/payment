@@ -53,6 +53,8 @@ public class PaymentNotifyMessageResolverFactory {
                 return weiXinPaymentNotifyServiceImpl;
             case WeiXinApp:
                 return weiXinPaymentNotifyServiceImpl;
+            case WeiXinPc:
+                return weiXinPaymentNotifyServiceImpl;
             case CmbApp:
                 return cmbPaymentNotifyServiceImpl;
             default:
