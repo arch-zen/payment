@@ -11,6 +11,8 @@ import static org.junit.Assert.assertNull;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -723,6 +725,25 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
     public void testDoRefundFast()
             throws UnsupportedEncodingException, InvalidKeyException, NoSuchAlgorithmException,
             InvalidKeySpecException, SignatureException {
+
+        // 由于存在优惠金额，当招行支付 140 ，优惠10，码头余额入账150 发生快速退款
+        // 此时支付网关 应该退用户 140， 码头余额出账 150
+        // 如果发生部分的快速退款 130， 码头余额出账 (130 / 140) * 10 + 130
+        BigDecimal refundAmount = new BigDecimal(140);
+        BigDecimal actualAmount = new BigDecimal(140);
+        BigDecimal discountAmount = new BigDecimal(10);
+        BigDecimal accountAmount = refundAmount.divide(actualAmount, MathContext.DECIMAL64).multiply(discountAmount)
+                .add(refundAmount).setScale(2, RoundingMode.DOWN);
+
+        assertEquals(new BigDecimal(150.00).setScale(2, RoundingMode.DOWN), accountAmount);
+
+        refundAmount = new BigDecimal(130);
+        accountAmount = refundAmount.divide(actualAmount, MathContext.DECIMAL64).multiply(discountAmount)
+                .add(refundAmount).setScale(2, RoundingMode.DOWN);
+
+        assertEquals("139.28", accountAmount.toString());
+
+
         AcquireOrderReq req = new AcquireOrderReq();
         buildBaseRequest(req);
         req.setPayPrice("1.01");

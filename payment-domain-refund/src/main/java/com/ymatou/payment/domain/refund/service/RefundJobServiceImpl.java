@@ -5,6 +5,8 @@ package com.ymatou.payment.domain.refund.service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,6 +34,7 @@ import com.ymatou.payment.facade.constants.CurrencyTypeEnum;
 import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
+import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.infrastructure.db.mapper.AccountingLogMapper;
 import com.ymatou.payment.infrastructure.db.model.AccountingLogPo;
 import com.ymatou.payment.infrastructure.db.model.PaymentPo;
@@ -147,7 +150,7 @@ public class RefundJobServiceImpl implements RefundJobService {
             RefundRequestPo refundRequest, HashMap<String, String> header) {
         AccountingRequest request = generateRequest(refundRequest, payment, bussinessOrder);
         AccountingResponse response = accountService.accounting(request, header);
-        saveAccoutingLog(bussinessOrder, refundRequest, response);
+        saveAccoutingLog(bussinessOrder, refundRequest, response, request);
         logger.info("accounting result. StatusCode:{}, Message:{}", response.getStatusCode(),
                 response.getMessage());
 
@@ -155,10 +158,10 @@ public class RefundJobServiceImpl implements RefundJobService {
     }
 
     private void saveAccoutingLog(BussinessOrder bussinessOrder, RefundRequestPo refundRequest,
-            AccountingResponse response) {
+            AccountingResponse response, AccountingRequest accountingRequest) {
         AccountingLogPo log = new AccountingLogPo();
         log.setCreatedTime(new Date());
-        log.setAccoutingAmt(refundRequest.getRefundAmount());
+        log.setAccoutingAmt(new Money(accountingRequest.getAccountingItems().get(0).getAmount()).getAmount());
         log.setAccountingType("Refund");
         log.setUserId((long) bussinessOrder.getUserId().intValue());
         log.setBizNo(String.valueOf(refundRequest.getRefundId()));
@@ -177,7 +180,17 @@ public class RefundJobServiceImpl implements RefundJobService {
         AccountingItem item = new AccountingItem();
         item.setUserId(bussinessOrder.getUserId());
         item.setCurrencyType(CurrencyTypeEnum.CNY.code());
-        item.setAmount(refundRequest.getRefundAmount().toString());
+
+        // 由于存在优惠金额，当招行支付 140 ，优惠10，码头余额入账150 发生快速退款
+        // 此时支付网关 应该退用户 140， 码头余额出账 150
+        // 如果发生部分的快速退款 130， 码头余额出账 (130 / 140) * 10 + 130
+        BigDecimal refundAmount = refundRequest.getRefundAmount();
+        BigDecimal actualAmount = payment.getActualPayPrice().getAmount();
+        BigDecimal discountAmount = payment.getDiscountAmt().getAmount();
+        BigDecimal accountAmount = refundAmount.divide(actualAmount, MathContext.DECIMAL64).multiply(discountAmount)
+                .add(refundAmount).setScale(2, RoundingMode.DOWN);
+
+        item.setAmount(accountAmount.toString());
         item.setAccountOperateType(AccountOperateTypeEnum.Fundout.code());
         item.setAccountType(AccountTypeEnum.RmbAccount.code());
         item.setAccountingDate(new Date());
