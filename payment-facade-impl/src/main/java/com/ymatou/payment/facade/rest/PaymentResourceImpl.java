@@ -90,7 +90,7 @@ public class PaymentResourceImpl implements PaymentResource {
     @POST
     @Path("/{SyncCmbPublicKey:(?i:SyncCmbPublicKey)}")
     @Produces({"text/xml"})
-    public String syncCmbPublicKeyReq(SyncCmbPublicKeyReq req, HttpServletRequest servletRequest) {
+    public String syncCmbPublicKeyReq(SyncCmbPublicKeyReq req, @Context HttpServletRequest servletRequest) {
         req.setMockHeader(getMockHttpHeader(servletRequest));
         SyncCmbPublicKeyResp resp = paymentFacade.syncCmbPublicKey(req);
         if (resp.getIsSuccess()) {

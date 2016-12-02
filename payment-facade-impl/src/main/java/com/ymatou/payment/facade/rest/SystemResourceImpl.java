@@ -40,7 +40,7 @@ public class SystemResourceImpl implements SystemResource {
                 + "\"1.0.1\":\"2016-11-14.2 validate merchant id.\","
                 + "\"1.1.0\":\"2016-11-28.2 add cmb pay(50).\","
                 + "\"1.1.1\":\"2016-11-28.1 add weixin pc pay(16).\","
-                + "\"1.1.2\":\"2016-11-30.1 fix accounting amount when cmb fast refund.\""
+                + "\"1.1.2\":\"2016-12-02.1 fix accounting amount when cmb fast refund.\""
                 + "}";
     }
 

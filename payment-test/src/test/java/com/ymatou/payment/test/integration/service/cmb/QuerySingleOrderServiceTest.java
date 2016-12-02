@@ -18,6 +18,7 @@ import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.integration.common.CmbSignature;
 import com.ymatou.payment.integration.model.CmbQuerySingleOrderRequest;
 import com.ymatou.payment.integration.model.CmbQuerySingleOrderResponse;
+import com.ymatou.payment.integration.model.CmbQuerySingleOrderResponse.QuerySingleOrderRspData;
 import com.ymatou.payment.integration.service.cmb.QuerySingleOrderService;
 import com.ymatou.payment.test.RestBaseTest;
 
@@ -73,4 +74,44 @@ public class QuerySingleOrderServiceTest extends RestBaseTest {
         assertEquals("MSS3411", response.getRspData().getRspCode());
     }
 
+    @Test
+    public void testDoServiceForAcceptance() throws Exception {
+        InstitutionConfig config = instConfigManager.getConfig(PayTypeEnum.CmbApp);
+        CmbQuerySingleOrderRequest req = new CmbQuerySingleOrderRequest();
+        req.getReqData().setType("B");
+        req.getReqData().setBranchNo(config.getBranchNo());
+        req.getReqData().setMerchantNo(config.getMerchantId());
+        req.getReqData().setOrderNo("1603214620");
+        req.getReqData().setDate("20161130");
+
+        String sign = CmbSignature.shaSign(config.getMd5Key(), req.buildSignString());
+        req.setSign(sign);
+
+        CmbQuerySingleOrderResponse response = querySingleOrderService.doService(req, null);
+
+        assertNotNull(response.getRspData());
+        assertEquals("SUC0000", response.getRspData().getRspCode());
+    }
+
+    @Test
+    public void testDoServiceForAcceptanceHasDiscount() throws Exception {
+        InstitutionConfig config = instConfigManager.getConfig(PayTypeEnum.CmbApp);
+        CmbQuerySingleOrderRequest req = new CmbQuerySingleOrderRequest();
+        req.getReqData().setType("B");
+        req.getReqData().setBranchNo(config.getBranchNo());
+        req.getReqData().setMerchantNo(config.getMerchantId());
+        req.getReqData().setOrderNo("1603215036");
+        req.getReqData().setDate("20161130");
+
+        String sign = CmbSignature.shaSign(config.getMd5Key(), req.buildSignString());
+        req.setSign(sign);
+
+        CmbQuerySingleOrderResponse response = querySingleOrderService.doService(req, null);
+
+        QuerySingleOrderRspData rspData = response.getRspData();
+        assertNotNull(rspData);
+        assertEquals("SUC0000", rspData.getRspCode());
+        assertEquals("10.00", rspData.getDiscountAmount());
+        assertEquals("440.00", rspData.getOrderAmount());
+    }
 }
