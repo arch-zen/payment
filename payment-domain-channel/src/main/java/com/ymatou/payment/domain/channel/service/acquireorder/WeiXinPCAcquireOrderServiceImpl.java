@@ -5,7 +5,6 @@
  */
 package com.ymatou.payment.domain.channel.service.acquireorder;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,7 +33,6 @@ import com.ymatou.payment.infrastructure.util.StringUtil;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.model.UnifiedOrderRequest;
 import com.ymatou.payment.integration.model.UnifiedOrderResponse;
-import com.ymatou.payment.integration.model.UserServiceResponse;
 import com.ymatou.payment.integration.service.wxpay.UnifiedOrderService;
 import com.ymatou.payment.integration.service.ymatou.UserService;
 
@@ -103,7 +101,7 @@ public class WeiXinPCAcquireOrderServiceImpl implements AcquireOrderService {
             request.setNotify_url(
                     String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPayType()));
             request.setTrade_type("NATIVE");
-            request.setOpenid(getOpenId(payment, mockHeader));
+            // request.setOpenid(getOpenId(payment, mockHeader));
 
             request.setTime_start(StringUtil.getDateFormatString("yyyyMMddHHmmss"));
             Calendar calendar = Calendar.getInstance();
@@ -134,25 +132,6 @@ public class WeiXinPCAcquireOrderServiceImpl implements AcquireOrderService {
         }
     }
 
-    /**
-     * 获取到OpenId
-     * 
-     * @return
-     */
-    private String getOpenId(Payment payment, HashMap<String, String> mockHeader) {
-        try {
-            Integer userId = payment.getBussinessOrder().getUserId();
-            UserServiceResponse response = userService.doService(String.valueOf(userId), "Wap", mockHeader);
-            if ("true".equals(response.getSuccess()))
-                return response.getResult();
-            else
-                throw new BizException(ErrorCode.FAIL, "not exist openId. PaymentId: " + payment.getPaymentId());
-
-        } catch (IOException e) {
-            logger.error("call user service for open id failed. PaymentId: " + payment.getPaymentId(), e);
-            throw new BizException(ErrorCode.FAIL, "call user service for open id failed.", e);
-        }
-    }
 
     /**
      * 将对象字段名映射成签名的字段
