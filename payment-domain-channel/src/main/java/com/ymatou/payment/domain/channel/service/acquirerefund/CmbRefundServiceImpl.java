@@ -13,7 +13,6 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
@@ -22,10 +21,14 @@ import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.service.AcquireRefundService;
 import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.domain.pay.model.Payment;
+import com.ymatou.payment.facade.constants.PayStatusEnum;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
+import com.ymatou.payment.infrastructure.db.mapper.PaymentMapper;
 import com.ymatou.payment.infrastructure.db.mapper.RefundMiscRequestLogMapper;
 import com.ymatou.payment.infrastructure.db.mapper.RefundRequestMapper;
+import com.ymatou.payment.infrastructure.db.model.PaymentExample;
+import com.ymatou.payment.infrastructure.db.model.PaymentPo;
 import com.ymatou.payment.infrastructure.db.model.RefundMiscRequestLogWithBLOBs;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestExample;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
@@ -57,8 +60,11 @@ public class CmbRefundServiceImpl implements AcquireRefundService {
     @Resource
     private SignatureService singatureService;
 
-    @Autowired
+    @Resource
     private RefundRequestMapper refundRequestMapper;
+
+    @Resource
+    private PaymentMapper paymentMapper;
 
     @Override
     public RefundStatusEnum notifyRefund(RefundRequestPo refundRequest, Payment payment,
@@ -71,6 +77,15 @@ public class CmbRefundServiceImpl implements AcquireRefundService {
             CmbDoRefundResponse response = doRefundService.doService(cmbDoRefundRequest, header);// 提交退款申请
             saveRefundMiscRequestLog(refundRequest, requestTime, cmbDoRefundRequest, response, null);// 保存退款应答
             RefundStatusEnum refundStatus = generateRefundStatus(response, config);
+
+            // 如果银行返回状态为退款成功，直接更新支付单状态
+            // 招行不提供单笔订单退款查询，所以在提交退款的时候就要更新支付单状态
+            if (RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) {
+                updatePaymentRefund(refundRequest, payment);
+            }
+
+            // TODO:后期需要根据实际运作情况判断COMPLETE_FAILED的情况，此时需要扣除RefundAmt
+
             updateRefundRequestStatus(refundRequest, refundStatus);// 更新退款状态
 
             return refundStatus;
@@ -140,5 +155,25 @@ public class CmbRefundServiceImpl implements AcquireRefundService {
         example.createCriteria().andRefundBatchNoEqualTo(refundRequest.getRefundBatchNo());
 
         refundRequestMapper.updateByExampleSelective(record, example);
+    }
+
+    /**
+     * 更新支付单状态和退款完成金额
+     * 
+     * @param refundRequest
+     * @param payment
+     */
+    private void updatePaymentRefund(RefundRequestPo refundRequest, Payment payment) {
+        PaymentPo paymentPo = new PaymentPo();
+        BigDecimal refundAmt = payment.getCompletedRefundAmt() == null ? refundRequest.getRefundAmount()
+                : refundRequest.getRefundAmount().add(payment.getCompletedRefundAmt());
+
+        paymentPo.setPaymentId(payment.getPaymentId());
+        paymentPo.setPayStatus(PayStatusEnum.Refunded.getIndex());
+        paymentPo.setCompletedRefundAmt(refundAmt); // 更新退款完成金额
+
+        PaymentExample example = new PaymentExample();
+        example.createCriteria().andPaymentIdEqualTo(paymentPo.getPaymentId());
+        paymentMapper.updateByExampleSelective(paymentPo, example);
     }
 }
