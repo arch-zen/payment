@@ -145,6 +145,8 @@ public class AliPayRefundQueryResponse {
      * is_success=T&result_details=201510160000000001^20151016210010640^2.40^SUCCESS^false^null
      * is_success=T&result_details=201607130000409537^20151016210010640^252.00^TRADE_HAS_CLOSED^
      * false^null
+     * is_success=T&result_details=201612030000706479^2016111821001004690283673855^1879.00^
+     * SELLER_BALANCE_NOT_ENOUGH^false^null
      * is_success=F&error_code=REFUND_NOT_EXIST
      */
     public RefundDetailData resolveResultDetails() {
@@ -172,6 +174,8 @@ public class AliPayRefundQueryResponse {
                     refundStatus = RefundStatusEnum.THIRDPART_REFUND_SUCCESS;
                 } else if ("TRADE_HAS_CLOSED".equalsIgnoreCase(refundDetailTempData[3])) {
                     refundStatus = RefundStatusEnum.COMPLETE_FAILED;
+                } else if ("SELLER_BALANCE_NOT_ENOUGH".equalsIgnoreCase(refundDetailTempData[3])) { // 商家余额不足，此时需要将退款单设置为初始化转态，等待重新提交
+                    refundStatus = RefundStatusEnum.INIT;
                 } else {
                     refundStatus = RefundStatusEnum.REFUND_FAILED;
                 }

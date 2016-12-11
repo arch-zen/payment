@@ -42,7 +42,7 @@ public class SystemResourceImpl implements SystemResource {
                 + "\"1.1.1\":\"2016-11-28.1 add weixin pc pay(16).\","
                 + "\"1.1.2\":\"2016-12-02.1 fix accounting amount when cmb fast refund.\","
                 + "\"1.1.3\":\"2016-12-06.1 not set openid when weixin pc pay.\","
-                + "\"1.1.4\":\"2016-12-12.1 update payment status and complete refund amount when cmb refund success.\""
+                + "\"1.1.4\":\"2016-12-12.2 update payment status and complete refund amount when cmb refund success.\""
                 + "}";
     }
 

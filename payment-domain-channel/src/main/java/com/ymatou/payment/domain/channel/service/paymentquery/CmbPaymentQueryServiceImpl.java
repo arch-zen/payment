@@ -91,6 +91,9 @@ public class CmbPaymentQueryServiceImpl implements PaymentQueryService {
                 resp = generateResponse(response);
                 resp.setPayStatus(PayStatusEnum.Paied);
                 return resp;
+            } else if ("MSS3206".equals(rspData.getRspCode())) {// MSS3206.支付系统处理失败，请联系客服中心[DJ120224],这种情况无法知道支付的实际状态
+                resp.setPayStatus(PayStatusEnum.UNKNOW);
+                return resp;
             } else {
                 resp.setPayStatus(PayStatusEnum.Failed);
                 return resp;
