@@ -191,6 +191,17 @@ public class RefundPository {
     }
 
     /**
+     * 根据退款申请号查询退款申请列表
+     * 
+     * @param query
+     * @return
+     */
+    public List<RefundRequestPo> queryRefundByRefundNo(List<String> refundNoList) {
+        return sqlSession.selectList("ext-refundrequest.queryRefundByRefundNo", refundNoList);
+    }
+
+
+    /**
      * 保存退款回调日志
      * 
      * @param list

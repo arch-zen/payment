@@ -5,6 +5,7 @@ package com.ymatou.payment.domain.refund.service;
 
 import java.util.List;
 
+import com.ymatou.payment.facade.model.QueryRefundByRefundNoReq;
 import com.ymatou.payment.facade.model.QueryRefundDetail;
 import com.ymatou.payment.facade.model.QueryRefundRequest;
 
@@ -23,4 +24,12 @@ public interface QueryRefundService {
      * @return
      */
     public List<QueryRefundDetail> queryRefundRequest(QueryRefundRequest req);
+
+    /**
+     * 查询退款列表
+     * 
+     * @param req
+     * @return
+     */
+    public List<QueryRefundDetail> queryRefundByRefundNo(QueryRefundByRefundNoReq req);
 }

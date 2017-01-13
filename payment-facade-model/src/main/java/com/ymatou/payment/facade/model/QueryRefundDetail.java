@@ -83,6 +83,11 @@ public class QueryRefundDetail extends PrintFriendliness {
      */
     private int tradeType;
 
+    /**
+     * 支付网关是否拦截
+     */
+    private Boolean isIntercept;
+
     public String getTradeNo() {
         return tradeNo;
     }
@@ -209,5 +214,19 @@ public class QueryRefundDetail extends PrintFriendliness {
 
     public void setTradeType(int tradeType) {
         this.tradeType = tradeType;
+    }
+
+    /**
+     * @return the isIntercept
+     */
+    public Boolean getIsIntercept() {
+        return isIntercept;
+    }
+
+    /**
+     * @param isIntercept the isIntercept to set
+     */
+    public void setIsIntercept(Boolean isIntercept) {
+        this.isIntercept = isIntercept;
     }
 }

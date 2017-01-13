@@ -34,7 +34,6 @@ import com.ymatou.payment.infrastructure.util.HttpUtil;
  * @author qianmin 2016年5月16日 下午5:10:16
  * 
  */
-
 @Path("/{RefundNotify:(?i:RefundNotify)}")
 @Component("refundNotifyResource")
 public class RefundNotifyResourceImpl implements RefundNotifyResource {

@@ -50,6 +50,16 @@
 		where rownumber > ${pageSize} * (${pageIndex} - 1)
 	</select>
 	
+	<select id="queryRefundByRefundNo" resultMap="BaseResultMap"
+		parameterType="java.util.List">
+		select <include refid="Base_Column_List" /> 
+		from  RefundRequest where TraceId in
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+          #{item, jdbcType=VARCHAR}
+        </foreach>
+        order by refundId 
+	</select>
+	
 	<select id="genRefundBatchNoSeq" statementType="CALLABLE" parameterMap="genRefundBatchNoSeqMap">
 		<![CDATA[
           CALL csp_GenerateSeed(?,?)
