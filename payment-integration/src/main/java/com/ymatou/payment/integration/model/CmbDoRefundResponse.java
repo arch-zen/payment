@@ -32,8 +32,12 @@ public class CmbDoRefundResponse extends CmbDTO {
         private String rspMesg;
 
         /**
-         * 银行返回该数据的时间
-         * 格式：yyyyMMddHHmmss
+         * 响应信息-兼容字段
+         */
+        private String rspMsg;
+
+        /**
+         * 银行返回该数据的时间 格式：yyyyMMddHHmmss
          * 
          */
         private String dateTime;
@@ -70,8 +74,7 @@ public class CmbDoRefundResponse extends CmbDTO {
 
 
         /**
-         * 商户自定义参数
-         * 商户在支付接口中传送的payNoticePara参数，超过100字节自动截断
+         * 商户自定义参数 商户在支付接口中传送的payNoticePara参数，超过100字节自动截断
          */
         private String merchantPara;
 
@@ -101,6 +104,15 @@ public class CmbDoRefundResponse extends CmbDTO {
          */
         public final void setRspMesg(String rspMesg) {
             this.rspMesg = rspMesg;
+        }
+
+
+        public String getRspMsg() {
+            return rspMsg;
+        }
+
+        public void setRspMsg(String rspMsg) {
+            this.rspMsg = rspMsg;
         }
 
         /**

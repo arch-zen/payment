@@ -3,8 +3,6 @@
  */
 package com.ymatou.payment.facade.constants;
 
-import javax.validation.constraints.Null;
-
 /**
  * 支付通知状态枚举
  * 

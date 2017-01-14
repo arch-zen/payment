@@ -16,6 +16,10 @@ import com.baidu.disconf.client.common.annotations.DisconfFileItem;
  * @author qianmin 2016年5月9日 上午10:42:18
  *
  */
+/**
+ * @author Administrator 2017年1月14日 上午10:49:34
+ *
+ */
 @Component
 @DisconfFile(fileName = "integration.properties")
 public class IntegrationConfig {
@@ -45,6 +49,7 @@ public class IntegrationConfig {
     private String cmbQuerySingleOrderUrl; // 一网通单笔订单查询
     private String cmbDoRefundUrl;// 一网通退款
     private String cmbPayUrl; // 一网通支付
+    private String cmbQuerySettledOrderUrl; // 一网通按商户日期查询已结账订单
     private String ymtCmbPaymentBaseUrl; // 洋码头一网通通知支付url基路径
 
     private String openMock;
@@ -67,7 +72,37 @@ public class IntegrationConfig {
     private String cmbQuerySingleOrderUrlMock; // 一网通单笔订单查询（mock）
     private String cmbDoRefundUrlMock;// 一网通退款(mock)
     private String cmbPayUrlMock; // 一网通支付
+    private String cmbQuerySettledOrderUrlMock; // 一网通按商户日期查询已结账订单
     private String ymtCmbPaymentBaseUrlMock; // 洋码头一网通通知支付url基路径
+
+
+
+    @DisconfFileItem(name = "cmb.querysettledorder.url")
+    public String getCmbQuerySettledOrderUrl() {
+        return cmbQuerySettledOrderUrl;
+    }
+
+    public void setCmbQuerySettledOrderUrl(String cmbQuerySettledOrderUrl) {
+        this.cmbQuerySettledOrderUrl = cmbQuerySettledOrderUrl;
+    }
+
+
+    @DisconfFileItem(name = "cmb.querysettledorder.url.mock")
+    public String getCmbQuerySettledOrderUrlMock() {
+        return cmbQuerySettledOrderUrlMock;
+    }
+
+    public void setCmbQuerySettledOrderUrlMock(String cmbQuerySettledOrderUrlMock) {
+        this.cmbQuerySettledOrderUrlMock = cmbQuerySettledOrderUrlMock;
+    }
+
+    public String getCmbQuerySettledOrderUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getCmbQuerySettledOrderUrlMock();
+        } else {
+            return getCmbQuerySettledOrderUrl();
+        }
+    }
 
 
     public String getYmtTriggerOrderRefundUrl(HashMap<String, String> header) {
