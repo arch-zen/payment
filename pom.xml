@@ -52,8 +52,8 @@
 		<joda-time.verson>2.9.3</joda-time.verson>
 
 		<el-api.version>2.2</el-api.version>
-		<errorreporter.version>1.0.1</errorreporter.version>
-		<performance.monitor.client.version>1.0.5</performance.monitor.client.version>
+		<errorreporter.version>1.0.8</errorreporter.version>
+		<performance.monitor.client.version>1.1.4</performance.monitor.client.version>
 
 		<thoughtworks.xstream.version>1.4.7</thoughtworks.xstream.version>
 		<dom4j.version>1.6.1</dom4j.version>
@@ -70,7 +70,7 @@
 		<!--API最终确定后，版本号修改为“1.0.0YyyyMmDd”并release。客户端最终必须都是使用release版。 -->
 		<payment-facade.version>1.0.0.20160701</payment-facade.version>
 
-		<messagebus.version>1.0.6</messagebus.version>
+		<messagebus.version>1.1.0</messagebus.version>
 
 	</properties>
 	<dependencyManagement>
