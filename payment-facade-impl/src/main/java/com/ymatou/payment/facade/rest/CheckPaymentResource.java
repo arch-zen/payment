@@ -5,6 +5,7 @@ package com.ymatou.payment.facade.rest;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.ymatou.payment.facade.model.CheckCmbPaymentReq;
 import com.ymatou.payment.facade.model.CheckPaymentRequset;
 
 /**
@@ -22,4 +23,12 @@ public interface CheckPaymentResource {
      * @return
      */
     public String checkPayment(CheckPaymentRequset req, HttpServletRequest servletRequest);
+
+    /**
+     * 招行反向对账
+     * 
+     * @param req
+     * @return
+     */
+    public String checkCmbPayment(CheckCmbPaymentReq req);
 }

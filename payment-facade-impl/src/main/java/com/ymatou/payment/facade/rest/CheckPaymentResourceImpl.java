@@ -15,7 +15,10 @@ import javax.ws.rs.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSONObject;
+import com.ymatou.payment.facade.BaseResponse;
 import com.ymatou.payment.facade.CheckPaymentFacade;
+import com.ymatou.payment.facade.model.CheckCmbPaymentReq;
 import com.ymatou.payment.facade.model.CheckPaymentRequset;
 
 /**
@@ -58,6 +61,19 @@ public class CheckPaymentResourceImpl implements CheckPaymentResource {
                 header.put(headerName, servletRequest.getHeader(headerName));
         }
         return header;
+    }
+
+    @POST
+    @Path("/{CheckCmbPayment:(?i:CheckCmbPayment)}")
+    @Override
+    public String checkCmbPayment(CheckCmbPaymentReq req) {
+        BaseResponse response = checkPaymentFacade.checkCmbPayment(req);
+
+        if (response.getIsSuccess()) {
+            return "ok";
+        } else {
+            return JSONObject.toJSONString(response);
+        }
     }
 
 }

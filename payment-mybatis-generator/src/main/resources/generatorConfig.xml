@@ -87,6 +87,14 @@
 		<table tableName="PP_CmbAggrement" domainObjectName="CmbAggrement">
 			<property name="useActualColumnNames" value="true"/>
 		</table>
+		
+		<table tableName="PP_PaymentCheck" domainObjectName="PaymentCheck">
+			<property name="useActualColumnNames" value="true"/>
+		</table>
+		
+		<table tableName="PP_PaymentCheckDetail" domainObjectName="PaymentCheckDetail">
+			<property name="useActualColumnNames" value="true"/>
+		</table>
 	</context>
 
 </generatorConfiguration>

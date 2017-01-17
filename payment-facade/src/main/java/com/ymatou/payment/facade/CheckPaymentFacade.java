@@ -3,6 +3,7 @@
  */
 package com.ymatou.payment.facade;
 
+import com.ymatou.payment.facade.model.CheckCmbPaymentReq;
 import com.ymatou.payment.facade.model.CheckPaymentRequset;
 
 /**
@@ -20,4 +21,12 @@ public interface CheckPaymentFacade {
      * @return
      */
     public BaseResponse checkPayment(CheckPaymentRequset req);
+
+    /**
+     * 招行反向对账
+     * 
+     * @param req
+     * @return
+     */
+    public BaseResponse checkCmbPayment(CheckCmbPaymentReq req);
 }

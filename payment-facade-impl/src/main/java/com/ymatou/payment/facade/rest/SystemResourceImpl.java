@@ -44,7 +44,8 @@ public class SystemResourceImpl implements SystemResource {
                 + "\"1.1.3\":\"2016-12-06.1 not set openid when weixin pc pay.\","
                 + "\"1.1.4\":\"2016-12-12.2 update payment status and complete refund amount when cmb refund success.\","
                 + "\"1.1.5\":\"2017-01-13.1 add refund query by refundno.\","
-                + "\"1.1.6\":\"2017-01-14.1 add cmb settled order query api.\""
+                + "\"1.1.6\":\"2017-01-14.1 add cmb settled order query api.\","
+                + "\"1.1.7\":\"2017-01-17.1 add cmb check order api.\""
                 + "}";
     }
 
