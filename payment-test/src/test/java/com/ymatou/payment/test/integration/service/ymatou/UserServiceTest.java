@@ -19,7 +19,7 @@ public class UserServiceTest extends RestBaseTest {
     @Test
     public void testDoServiceSuccess() throws IOException {
         HashMap<String, String> header = new HashMap<>();
-        UserServiceResponse response = userService.doService("3790800", "Wap", header);
+        UserServiceResponse response = userService.doService("30152658", "Wap", header);
         Assert.assertNotNull(response);
         Assert.assertEquals("true", response.getSuccess());
         Assert.assertEquals("ok", response.getSuccessMessage());

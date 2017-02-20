@@ -249,7 +249,7 @@ public class PaymentResourceImplTest extends RestBaseTest {
 
         req.setPayType("14");
         req.setPayPrice("1.01");
-        req.setUserId(3790800L);
+        req.setUserId(30152658L);
 
         MockHttpServletRequest servletRequest = new MockHttpServletRequest();
         AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
