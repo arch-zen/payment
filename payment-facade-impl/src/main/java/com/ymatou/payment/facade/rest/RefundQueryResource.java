@@ -5,6 +5,8 @@
  */
 package com.ymatou.payment.facade.rest;
 
+import com.ymatou.payment.facade.model.QueryRefundByBizNoReq;
+import com.ymatou.payment.facade.model.QueryRefundByBizNoResp;
 import com.ymatou.payment.facade.model.QueryRefundByRefundNoReq;
 import com.ymatou.payment.facade.model.QueryRefundByRefundNoResp;
 
@@ -22,4 +24,12 @@ public interface RefundQueryResource {
      * @return
      */
     QueryRefundByRefundNoResp queryRefundByRefundNo(QueryRefundByRefundNoReq req);
+
+    /**
+     * 根据退款单号查询退款信息
+     * 
+     * @param req
+     * @return
+     */
+    QueryRefundByBizNoResp queryRefundByBizNo(QueryRefundByBizNoReq req);
 }

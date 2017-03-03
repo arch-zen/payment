@@ -13,6 +13,8 @@ import javax.ws.rs.Produces;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.facade.RefundQueryFacade;
+import com.ymatou.payment.facade.model.QueryRefundByBizNoReq;
+import com.ymatou.payment.facade.model.QueryRefundByBizNoResp;
 import com.ymatou.payment.facade.model.QueryRefundByRefundNoReq;
 import com.ymatou.payment.facade.model.QueryRefundByRefundNoResp;
 
@@ -35,6 +37,13 @@ public class RefundQueryResourceImpl implements RefundQueryResource {
     @Override
     public QueryRefundByRefundNoResp queryRefundByRefundNo(QueryRefundByRefundNoReq req) {
         return refundQueryFacade.queryRefundByRefundNo(req);
+    }
+
+    @POST
+    @Path("/queryRefundByBizNo")
+    @Override
+    public QueryRefundByBizNoResp queryRefundByBizNo(QueryRefundByBizNoReq req) {
+        return refundQueryFacade.queryRefundByBizNo(req);
     }
 
 }

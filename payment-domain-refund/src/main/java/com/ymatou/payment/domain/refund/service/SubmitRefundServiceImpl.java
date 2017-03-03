@@ -127,6 +127,7 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
                 refundrequest.setInstPaymentId(tradeRefundDetail.getInstPaymentId());
                 refundrequest.setTradeNo(tradeRefundDetail.getTradeNo());
                 refundrequest.setOrderId(req.getOrderId());
+                refundrequest.setBizNo(req.getBizNo());
                 refundrequest.setTraceId(req.getTraceId());
                 refundrequest.setAppId(req.getAppId());
                 refundrequest.setPayType(tradeRefundDetail.getPayType());

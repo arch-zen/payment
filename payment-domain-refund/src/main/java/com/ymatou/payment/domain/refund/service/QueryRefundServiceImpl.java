@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import com.ymatou.payment.domain.refund.constants.RefundConstants;
 import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
+import com.ymatou.payment.facade.model.QueryRefundByBizNoReq;
 import com.ymatou.payment.facade.model.QueryRefundByRefundNoReq;
 import com.ymatou.payment.facade.model.QueryRefundDetail;
 import com.ymatou.payment.facade.model.QueryRefundRequest;
@@ -110,6 +111,14 @@ public class QueryRefundServiceImpl implements QueryRefundService {
     public List<QueryRefundDetail> queryRefundByRefundNo(QueryRefundByRefundNoReq req) {
         List<RefundRequestPo> refundrequestPos = refundPository.queryRefundByRefundNo(req.getRefundNoList());
         logger.info("query queryRefundByRefundNo result count: {}", String.valueOf(refundrequestPos.size()));
+
+        return generateRefundDetail(refundrequestPos);
+    }
+
+    @Override
+    public List<QueryRefundDetail> queryRefundByBizNo(QueryRefundByBizNoReq req) {
+        List<RefundRequestPo> refundrequestPos = refundPository.queryRefundByBizNo(req.getBizNoList());
+        logger.info("query queryRefundByBizNo result count: {}", String.valueOf(refundrequestPos.size()));
 
         return generateRefundDetail(refundrequestPos);
     }

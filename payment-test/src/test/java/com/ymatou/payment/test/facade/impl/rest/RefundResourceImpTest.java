@@ -3,6 +3,8 @@
  */
 package com.ymatou.payment.test.facade.impl.rest;
 
+import static org.junit.Assert.*;
+
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -319,12 +321,21 @@ public class RefundResourceImpTest extends RestBaseTest {
         request.setAppId(bussinessOrderPo.getAppId());
         request.setOrderId(bussinessOrderPo.getBussinessOrderId());
         request.setRefundNo(RandomStringUtils.randomAlphabetic(8));
+        request.setBizNo(RandomStringUtils.randomAlphabetic(8));
         request.setTradeNo(bussinessOrderPo.getOrderId());
         request.setTradeType(1);
         request.setRefundAmt(new BigDecimal(20));
 
         AcquireRefundPlusResponse response = refundResource.acquireRefund(request, new MockHttpServletRequest());
         Assert.assertEquals(0, response.getErrorCode());
+
+        RefundRequestExample example = new RefundRequestExample();
+        example.createCriteria().andTraceIdEqualTo(request.getRefundNo());
+        List<RefundRequestPo> selectByExample = refundRequestMapper.selectByExample(example);
+
+        assertNotNull(selectByExample);
+        assertEquals(1, selectByExample.size());
+        assertEquals(request.getBizNo(), selectByExample.get(0).getBizNo());
     }
 
     @Test

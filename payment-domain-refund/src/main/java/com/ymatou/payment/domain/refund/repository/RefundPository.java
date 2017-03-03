@@ -202,6 +202,16 @@ public class RefundPository {
 
 
     /**
+     * 根据退款单号查询退款申请列表
+     * 
+     * @param query
+     * @return
+     */
+    public List<RefundRequestPo> queryRefundByBizNo(List<String> bizNoList) {
+        return sqlSession.selectList("ext-refundrequest.queryRefundByBizNo", bizNoList);
+    }
+
+    /**
      * 保存退款回调日志
      * 
      * @param list

@@ -61,6 +61,11 @@ public class AcquireRefundPlusRequest extends BaseRequest {
     @Min(1)
     private int tradeType;
 
+    /**
+     * 退款凭据，交易传入退款单号
+     */
+    private String bizNo;
+
     private HashMap<String, String> header;
 
     public String getAppId() {
@@ -117,5 +122,13 @@ public class AcquireRefundPlusRequest extends BaseRequest {
 
     public void setHeader(HashMap<String, String> header) {
         this.header = header;
+    }
+
+    public String getBizNo() {
+        return bizNo;
+    }
+
+    public void setBizNo(String bizNo) {
+        this.bizNo = bizNo;
     }
 }

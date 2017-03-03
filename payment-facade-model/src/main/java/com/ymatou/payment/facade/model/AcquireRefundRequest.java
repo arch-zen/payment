@@ -48,6 +48,11 @@ public class AcquireRefundRequest extends BaseRequest {
      */
     private String sign;
 
+    /**
+     * 退款凭据，交易传入退款单号
+     */
+    private String bizNo;
+
     private HashMap<String, String> header;
 
     public String getOrderId() {
@@ -96,6 +101,14 @@ public class AcquireRefundRequest extends BaseRequest {
 
     public void setHeader(HashMap<String, String> header) {
         this.header = header;
+    }
+
+    public String getBizNo() {
+        return bizNo;
+    }
+
+    public void setBizNo(String bizNo) {
+        this.bizNo = bizNo;
     }
 
 }
