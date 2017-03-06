@@ -29,11 +29,11 @@ public class AliPayPaymentQueryServiceImplTest extends RestBaseTest {
         CheckPaymentRequset requset = new CheckPaymentRequset();
         requset.setFinalCheck(false);
         requset.setHeader(null);
-        requset.setPaymentId("21936002900209026");
+        requset.setPaymentId("16112719404074649");
         requset.setPayType("13");
         requset.setRequestId("");
         PaymentQueryResp response = service.queryPayment(requset.getPaymentId(), requset.getPayType(), null);
-        Assert.assertEquals(new BigDecimal("20.00"), response.getActualPayPrice());
+        Assert.assertEquals(new BigDecimal("48.00"), response.getActualPayPrice());
     }
 
     @Test

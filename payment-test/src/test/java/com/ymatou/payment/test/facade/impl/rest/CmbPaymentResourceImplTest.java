@@ -550,7 +550,7 @@ public class CmbPaymentResourceImplTest extends RestBaseTest {
         CmbPublicKeyPo cmbPublicKeyPo = cmbPublicKeyExtMapper.selectLatestOne();
 
         assertNotNull(cmbPublicKeyPo);
-        assertEquals(true, Math.abs(System.currentTimeMillis() - cmbPublicKeyPo.getCreatedTime().getTime()) < 2000);
+        assertEquals(true, Math.abs(System.currentTimeMillis() - cmbPublicKeyPo.getCreatedTime().getTime()) < 3000);
     }
 
 
