@@ -15,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.ymatou.payment.infrastructure.util.NetUtil;
 import com.ymatou.payment.integration.IntegrationConfig;
 
 /**
@@ -36,6 +37,7 @@ public class SystemResourceImpl implements SystemResource {
     @Override
     public String version() {
         return "{"
+                + "\"ip\":\"" + NetUtil.getHostIp() + "\","
                 + "\"1.0.0\":\"2016-09-23.1 first add version.\","
                 + "\"1.0.1\":\"2016-11-14.2 validate merchant id.\","
                 + "\"1.1.0\":\"2016-11-28.2 add cmb pay(50).\","

@@ -118,7 +118,7 @@ public class RefundQueryResourceTest extends RestBaseTest {
 
         QueryRefundByBizNoReq req = new QueryRefundByBizNoReq();
         List<String> refundNoList = new ArrayList<>();
-        refundNoList.add("58772bd8ef2e884d59ef76ce");
+        refundNoList.add(request.getBizNo());
 
         req.setBizNoList(refundNoList);
         QueryRefundByBizNoResp resp = refundQueryResource.queryRefundByBizNo(req);
