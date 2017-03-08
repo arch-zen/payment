@@ -50,7 +50,7 @@ public class SystemResourceImpl implements SystemResource {
                 + "\"1.1.7\":\"2017-01-17.1 add cmb check order api.\","
                 + "\"1.1.8\":\"2017-02-20.1 change user wap openid query api url.\","
                 + "\"1.1.9\":\"2017-03-03.1 add refund query by bizno api.\","
-                + "\"1.1.10\":\"2017-03-08.2 change pc payment form meta.\""
+                + "\"1.1.10\":\"2017-03-08.4 change pc payment form meta.\""
                 + "}";
     }
 

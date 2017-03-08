@@ -51,6 +51,7 @@ public class PaymentFacadeImplTest extends RestBaseTest {
         req.setExt("{\"IsHangZhou\":0}");
         req.setUserId(12864011L);
         req.setUserIp("10.12.101.45");
+        req.setBankId("");
         AcquireOrderResp resp = paymentFacade.acquireOrder(req);
 
         assertEquals("验证Success", true, resp.getIsSuccess());
