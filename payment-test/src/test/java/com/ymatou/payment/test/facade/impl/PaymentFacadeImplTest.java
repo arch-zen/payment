@@ -43,16 +43,14 @@ public class PaymentFacadeImplTest extends RestBaseTest {
         req.setNotifyUrl("http://operate.trading.iapi.ymatou.com/api/trading/orderPayCallBack");
         req.setOrderId(getDateFormatString("yyyyMMddHHmmssSSS"));
         req.setOrderTime(getDateFormatString("yyyyMMddHHmmss"));
-        req.setPayPrice("29.00");
+        req.setPayPrice("59.00");
         req.setPayType("10");
-        req.setProductName("tonywang_efun的订单");
-        req.setProductDesc("");
-        req.setProductUrl("www.ymatou.com");
+        req.setProductName("灯叔的订单");
         req.setMemo("备注");
         req.setSignMethod("MD5");
         req.setExt("{\"IsHangZhou\":0}");
         req.setUserId(12864011L);
-        req.setUserIp("180.166.117.42");
+        req.setUserIp("10.12.101.45");
         AcquireOrderResp resp = paymentFacade.acquireOrder(req);
 
         assertEquals("验证Success", true, resp.getIsSuccess());

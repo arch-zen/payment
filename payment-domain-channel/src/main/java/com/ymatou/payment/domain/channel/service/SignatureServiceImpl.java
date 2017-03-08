@@ -13,6 +13,8 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.ymatou.payment.domain.channel.InstitutionConfig;
@@ -32,6 +34,8 @@ import com.ymatou.payment.integration.IntegrationConfig;
  */
 @Component
 public class SignatureServiceImpl implements SignatureService {
+
+    private static Logger logger = LoggerFactory.getLogger(SignatureServiceImpl.class);
 
     /**
      * Mock MD5Key
@@ -164,6 +168,8 @@ public class SignatureServiceImpl implements SignatureService {
             String md5keyConnector =
                     StringUtils.isBlank(instConfig.getMd5KeyConnector()) ? "" : instConfig.getMd5KeyConnector();
             String targetMessage = rawMessage + md5keyConnector + md5Key;
+
+            logger.info("md5rawString:" + targetMessage);
 
             // getMd5KeyConnector不为空说明是微信的渠道，需要对签转大写
             if (StringUtils.isBlank(instConfig.getMd5KeyConnector()))

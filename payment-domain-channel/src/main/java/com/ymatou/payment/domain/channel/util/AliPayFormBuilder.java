@@ -21,10 +21,6 @@ import com.ymatou.payment.facade.ErrorCode;
  * @author wangxudong 2016年5月13日 下午2:34:57
  *
  */
-/**
- * @author wangxudong 2016年5月13日 下午2:39:45
- *
- */
 public final class AliPayFormBuilder {
     private static Logger logger = LoggerFactory.getLogger(AliPayFormBuilder.class);
 

@@ -5,6 +5,7 @@
  */
 package com.ymatou.payment.infrastructure.security;
 
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -54,12 +55,13 @@ public class MD5Util {
      * @param origin 原始字符串
      * @return 经过MD5加密之后的结果
      * @throws NoSuchAlgorithmException
+     * @throws UnsupportedEncodingException
      */
-    public static String encode(String origin) throws NoSuchAlgorithmException {
+    public static String encode(String origin) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         String resultString = null;
         resultString = origin;
         MessageDigest md = MessageDigest.getInstance("MD5");
-        resultString = byteArrayToHexString(md.digest(resultString.getBytes()));
+        resultString = byteArrayToHexString(md.digest(resultString.getBytes("utf-8")));
         return resultString;
     }
 }

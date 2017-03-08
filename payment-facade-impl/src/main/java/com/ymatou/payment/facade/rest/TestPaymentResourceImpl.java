@@ -136,7 +136,7 @@ public class TestPaymentResourceImpl implements TestPaymentResource {
         req.setOrderTime(getDateFormatString("yyyyMMddHHmmss"));
         req.setPayPrice("0.01");
         req.setPayType("10");
-        req.setProductName("tonywang_efun的订单");
+        req.setProductName("灯叔的订单");
         req.setProductDesc("");
         req.setProductUrl("www.ymatou.com");
         req.setMemo("备注");
