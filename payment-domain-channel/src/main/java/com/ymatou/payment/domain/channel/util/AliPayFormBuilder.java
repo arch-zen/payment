@@ -37,7 +37,10 @@ public final class AliPayFormBuilder {
     /**
      * Meta
      */
-    private final static String metaFormat = "<meta content=\"charset=utf-8\" />";
+    // private final static String metaFormat = "<meta content=\"charset=utf-8\" />";
+
+    private final static String metaFormat =
+            "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />";
 
     /**
      * Input
