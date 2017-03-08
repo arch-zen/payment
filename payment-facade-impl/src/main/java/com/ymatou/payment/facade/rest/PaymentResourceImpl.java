@@ -12,11 +12,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSON;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.PaymentFacade;
 import com.ymatou.payment.facade.model.AcquireOrderReq;
@@ -38,7 +35,6 @@ import com.ymatou.payment.facade.model.SyncCmbPublicKeyResp;
 @Consumes({MediaType.APPLICATION_JSON})
 public class PaymentResourceImpl implements PaymentResource {
 
-    private static Logger logger = LoggerFactory.getLogger(PaymentResourceImpl.class);
     /**
      * 支付接口
      */
