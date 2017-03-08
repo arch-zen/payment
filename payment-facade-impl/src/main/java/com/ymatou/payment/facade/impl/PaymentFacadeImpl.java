@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSON;
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.model.AcquireOrderPackageResp;
@@ -63,6 +64,8 @@ public class PaymentFacadeImpl implements PaymentFacade {
      */
     @Override
     public AcquireOrderResp acquireOrder(AcquireOrderReq req) {
+        String rawString = JSON.toJSONString(req);
+        logger.info("receive acquire order request: {}", rawString);
 
         // 校验请求参数
         validateReqParam(req);

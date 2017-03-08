@@ -57,6 +57,13 @@ public class PaymentFacadeImplTest extends RestBaseTest {
         assertEquals("验证Success", true, resp.getIsSuccess());
     }
 
+    @Test
+    public void acquireOrderTest1() {
+        String key = "";
+
+        assertEquals(true, key == "");
+    }
+
     /**
      * 构造日期字符串
      * 

@@ -54,9 +54,6 @@ public class PaymentResourceImpl implements PaymentResource {
     public AcquireOrderResp acquireOrder(AcquireOrderReq req, @Context HttpServletRequest servletRequest) {
         req.setMockHeader(getMockHttpHeader(servletRequest));
 
-        String rawString = JSON.toJSONString(req);
-        logger.info("receive acquire order request: {}", rawString);
-
         AcquireOrderResp resp = paymentFacade.acquireOrder(req);
         resp.setAppId(req.getAppId());
         resp.setTraceId(req.getTraceId());
