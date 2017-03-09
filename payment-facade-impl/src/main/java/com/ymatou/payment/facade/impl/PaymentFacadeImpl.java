@@ -65,7 +65,7 @@ public class PaymentFacadeImpl implements PaymentFacade {
     @Override
     public AcquireOrderResp acquireOrder(AcquireOrderReq req) {
         String rawString = JSON.toJSONString(req);
-        logger.info("receive acquire order request: {}", rawString);
+        logger.info("receive 1 acquire order request: {}", rawString);
 
         // 校验请求参数
         validateReqParam(req);

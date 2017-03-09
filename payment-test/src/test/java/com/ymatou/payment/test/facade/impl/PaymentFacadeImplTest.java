@@ -35,7 +35,7 @@ public class PaymentFacadeImplTest extends RestBaseTest {
         req.setVersion(1);
         req.setBizCode(3);
         req.setOriginAppId("1");
-        req.setAppId("AutoTest");
+        req.setAppId("AutoTestTony");
         req.setCallbackUrl("http://www.ymatou.com/shopping/payup");
         req.setTraceId(UUID.randomUUID().toString());
         req.setCurrency("CNY");
