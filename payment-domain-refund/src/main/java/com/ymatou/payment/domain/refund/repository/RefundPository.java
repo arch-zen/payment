@@ -76,6 +76,7 @@ public class RefundPository {
         refundrequest.setTradeNo(bussinessorder.getOrderId());
 
         refundrequest.setOrderId(refundInfo.getOrderIdList().get(0));
+        refundrequest.setBizNo(refundInfo.getOrderIdList().get(0)); // 业务单据便于管理后台查询，正常传退款单号，快速退款没有退款单号就用订单号
         refundrequest.setTraceId(refundInfo.getTraceId());
         refundrequest.setAppId(refundInfo.getAppId());
         refundrequest.setPayType(payment.getPayType().getCode());

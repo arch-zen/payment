@@ -88,7 +88,7 @@ public class EmailService {
         String[] toMailAddress = emailConfig.getToMailAddress().split(";");
 
         sendHtmlMail(toMailAddress, "退款无法原路退回【微信用户账户异常或已注销】请告知用户",
-                "Hi，杨大班： <br> <br>如下订单无法原路退回，原因是：用户账户异常或已注销，请告知用户，谢谢！。<br> <br> <br>订单号：" + orderId);
+                "Hi，洋大班： <br> <br>如下订单无法原路退回，原因是：用户账户异常或已注销，请告知用户，谢谢！。<br> <br> <br>订单号：" + orderId);
     }
 
 

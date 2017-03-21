@@ -54,7 +54,7 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
         HashMap<String, String> header = request.getHeader();
         ExecuteRefundResponse response = new ExecuteRefundResponse();
 
-        // 查询、校验RefundRequest
+        // 根据RefundRequest.RefundStatus判断是否要继续退款流程
         logger.info("Step 1: query refundRequest, payment, businessOrder. {}", refundId);
         RefundRequestPo refundRequest = refundJobService.getRefundRequestByRefundId(refundId);
         boolean isContinue = refundJobService.isContinueExecute(refundRequest);
