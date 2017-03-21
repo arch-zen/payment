@@ -51,7 +51,7 @@ public class SystemResourceImpl implements SystemResource {
                 + "\"1.1.8\":\"2017-02-20.1 change user wap openid query api url.\","
                 + "\"1.1.9\":\"2017-03-03.1 add refund query by bizno api.\","
                 + "\"1.1.10\":\"2017-03-08.6 change pc payment form meta.\","
-                + "\"1.1.11\":\"2017-03-21.1 call trading when wx refund return USER_ACCOUNT_ABNORMAL.\""
+                + "\"1.1.11\":\"2017-03-22.1 call trading when wx refund return USER_ACCOUNT_ABNORMAL.\""
                 + "}";
     }
 
