@@ -16,10 +16,6 @@ import com.baidu.disconf.client.common.annotations.DisconfFileItem;
  * @author qianmin 2016年5月9日 上午10:42:18
  *
  */
-/**
- * @author Administrator 2017年1月14日 上午10:49:34
- *
- */
 @Component
 @DisconfFile(fileName = "integration.properties")
 public class IntegrationConfig {

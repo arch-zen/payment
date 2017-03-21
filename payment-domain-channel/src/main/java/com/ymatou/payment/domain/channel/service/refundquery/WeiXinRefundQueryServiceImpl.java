@@ -136,7 +136,7 @@ public class WeiXinRefundQueryServiceImpl implements RefundQueryService {
         if ("USER_ACCOUNT_ABNORMAL".equals(response.getErr_code())) {
             logger.error("{}, weixin refund query not find refundbatchNo:{}", response.getErr_code(),
                     refundRequest.getRefundBatchNo());
-            return RefundStatusEnum.COMPLETE_FAILED;
+            return RefundStatusEnum.COMPLETE_FAILED_WX_USER_ABNORMAL;
         }
 
         // 从退款单列表找出对应的退款批次号

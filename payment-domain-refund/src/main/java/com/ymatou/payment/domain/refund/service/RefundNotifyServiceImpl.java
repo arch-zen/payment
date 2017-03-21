@@ -89,7 +89,7 @@ public class RefundNotifyServiceImpl implements RefundNotifyService {
                     refundJobService.updateRefundRequestAndPayment(refundRequest, payment, refundStatus);// 更新退款状态
                     if (RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) {
 
-                        if (refundJobService.callbackTradingSystem(refundRequest, payment, header)) {// 通知交易
+                        if (refundJobService.callbackTradingSystem(refundRequest, payment, true, header)) {// 通知交易
                             refundJobService.updateRefundRequestToCompletedSuccess(refundRequest);
                         }
                     }

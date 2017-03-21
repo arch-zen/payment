@@ -24,6 +24,7 @@ import com.ymatou.payment.facade.model.ExecuteRefundRequest;
 import com.ymatou.payment.facade.model.ExecuteRefundResponse;
 import com.ymatou.payment.facade.model.RefundSuccessNotifyReq;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
+import com.ymatou.payment.integration.service.ymatou.EmailService;
 
 /**
  * 
@@ -40,6 +41,9 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
 
     @Autowired
     private PayService payService;
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private MessageBusClient messageBusClient;
@@ -79,6 +83,22 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
                 response.setRefundResult(String.valueOf(refundStatus.getCode()));
             }
 
+            // 微信退款发现用户账户异常或已注销，调用交易系统告知原路退回失败，交易系统返钱至用户码头余额
+            if (RefundStatusEnum.COMPLETE_FAILED_WX_USER_ABNORMAL.equals(refundStatus)) {
+
+                logger.info("Step 4: callback trading system refund fail.");
+                if (refundJobService.callbackTradingSystem(refundRequest, payment, false, header)) {
+
+                    logger.info("Step 5: update refundRequest to return to trading.");
+                    refundJobService.updateRefundRequestToReturnToTrading(refundRequest);
+                    response.setRefundResult(String.valueOf(RefundStatusEnum.RETURN_TRANSACTION.getCode()));
+
+                    logger.info("Step 6: send email to customer service.");
+                    emailService.sendWxRefundFailEmail(refundRequest.getOrderId());
+                }
+            }
+
+
         } else {// 提交第三方退款查询
             if (!RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) {
                 logger.info("Step 4: submit third party refund query.");
@@ -90,8 +110,8 @@ public class RefundJobFacadeImpl implements RefundJobFacade {
             }
 
             if (RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) {
-                logger.info("Step 6: callback trading system.");
-                if (refundJobService.callbackTradingSystem(refundRequest, payment, header)) {
+                logger.info("Step 6: callback trading system refund success.");
+                if (refundJobService.callbackTradingSystem(refundRequest, payment, true, header)) {
 
                     logger.info("Step 7: update refundRequest to completed suceess.");
                     refundJobService.updateRefundRequestToCompletedSuccess(refundRequest);

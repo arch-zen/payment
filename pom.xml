@@ -61,6 +61,7 @@
 		<junit-toolbox.version>1.5</junit-toolbox.version>
 		<fastjson.version>1.2.11</fastjson.version>
 		<beanutils.version>1.9.2</beanutils.version>
+		<javax.mail.version>1.4.7</javax.mail.version>
 
 		<!-- self version -->
 		<payment.version>1.0.0</payment.version>
@@ -358,6 +359,11 @@
 				<groupId>commons-beanutils</groupId>
 				<artifactId>commons-beanutils</artifactId>
 				<version>${beanutils.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.mail</groupId>
+				<artifactId>mail</artifactId>
+				<version>${javax.mail.version}</version>
 			</dependency>
 
 			<!-- 消息总线 -->

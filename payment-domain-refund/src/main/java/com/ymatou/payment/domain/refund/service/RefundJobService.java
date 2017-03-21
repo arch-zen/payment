@@ -81,7 +81,7 @@ public interface RefundJobService {
      * @param refundRequest
      * @param payment
      */
-    public boolean callbackTradingSystem(RefundRequestPo refundRequest, Payment payment,
+    public boolean callbackTradingSystem(RefundRequestPo refundRequest, Payment payment, Boolean refundSuccess,
             HashMap<String, String> header);
 
     /**
@@ -90,4 +90,11 @@ public interface RefundJobService {
      * @param refundRequest
      */
     public void updateRefundRequestToCompletedSuccess(RefundRequestPo refundRequest);
+
+    /**
+     * 更新退款状态为返回交易
+     * 
+     * @param refundRequest
+     */
+    public void updateRefundRequestToReturnToTrading(RefundRequestPo refundRequest);
 }

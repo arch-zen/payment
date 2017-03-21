@@ -10,9 +10,27 @@ package com.ymatou.payment.facade.constants;
  * 
  */
 public enum RefundStatusEnum {
+    // 微信用户账户异常或已注销
+    COMPLETE_FAILED_WX_USER_ABNORMAL(-3),
 
-    COMPLETE_FAILED(-2), REFUND_FAILED(-1), INIT(0), COMMIT(1), WAIT_THIRDPART_REFUND(2), THIRDPART_REFUND_SUCCESS(
-            3), COMPLETE_SUCCESS(4), RETURN_TRANSACTION(5), RETURN_BALANCE(6);
+    COMPLETE_FAILED(-2),
+
+    REFUND_FAILED(-1),
+
+    INIT(0),
+
+    COMMIT(1),
+
+    WAIT_THIRDPART_REFUND(2),
+
+    THIRDPART_REFUND_SUCCESS(3),
+
+    COMPLETE_SUCCESS(4),
+
+    RETURN_TRANSACTION(5),
+
+    RETURN_BALANCE(6);
+
     private int code;
 
     private RefundStatusEnum(int code) {

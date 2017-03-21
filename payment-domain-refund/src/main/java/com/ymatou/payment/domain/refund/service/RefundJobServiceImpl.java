@@ -56,7 +56,11 @@ public class RefundJobServiceImpl implements RefundJobService {
 
     private static final Logger logger = LoggerFactory.getLogger(RefundJobServiceImpl.class);
 
+    // 原路退回成功
     private static final int REFUND_SUCCESS_OPT_TYPE = 10;
+
+    // 原路退回失败
+    private static final int REFUND_FAIL_OPT_TYPE = 20;
 
     @Autowired
     private AccountService accountService;
@@ -234,12 +238,12 @@ public class RefundJobServiceImpl implements RefundJobService {
     }
 
     @Override
-    public boolean callbackTradingSystem(RefundRequestPo refundRequest, Payment payment,
+    public boolean callbackTradingSystem(RefundRequestPo refundRequest, Payment payment, Boolean refundSuccess,
             HashMap<String, String> header) {
         RefundCallbackRequest request = new RefundCallbackRequest();
         request.setActualRefundAmount(refundRequest.getRefundAmount());
         request.setAuditor(refundRequest.getApprovedUser());
-        request.setOptType(REFUND_SUCCESS_OPT_TYPE);
+        request.setOptType(Boolean.TRUE.equals(refundSuccess) ? REFUND_SUCCESS_OPT_TYPE : REFUND_FAIL_OPT_TYPE);
         request.setOrderID(Long.valueOf(refundRequest.getOrderId()));
 
         // 避免出现NULL的现象
@@ -269,6 +273,16 @@ public class RefundJobServiceImpl implements RefundJobService {
         refundRequestPo.setRefundTime(new Date());
         refundRequestPo.setRefundBatchNo(refundRequest.getRefundBatchNo());
         refundRequestPo.setRefundStatus(RefundStatusEnum.COMPLETE_SUCCESS.getCode());
+
+        refundPository.updateRefundRequest(refundRequestPo);
+    }
+
+    @Override
+    public void updateRefundRequestToReturnToTrading(RefundRequestPo refundRequest) {
+        RefundRequestPo refundRequestPo = new RefundRequestPo();
+        refundRequestPo.setRefundTime(new Date());
+        refundRequestPo.setRefundBatchNo(refundRequest.getRefundBatchNo());
+        refundRequestPo.setRefundStatus(RefundStatusEnum.RETURN_TRANSACTION.getCode());
 
         refundPository.updateRefundRequest(refundRequestPo);
     }
