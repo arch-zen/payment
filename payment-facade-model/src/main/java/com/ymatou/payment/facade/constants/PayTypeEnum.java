@@ -1,6 +1,6 @@
 /**
  * (C) Copyright 2016 Ymatou (http://www.ymatou.com/).
- *
+ * <p>
  * All rights reserved.
  */
 package com.ymatou.payment.facade.constants;
@@ -12,9 +12,8 @@ import com.ymatou.payment.facade.ErrorCode;
 
 /**
  * 支付渠道枚举
- * 
- * @author wangxudong 2016年5月20日 上午11:08:41
  *
+ * @author wangxudong 2016年5月20日 上午11:08:41
  */
 public enum PayTypeEnum {
 
@@ -30,7 +29,9 @@ public enum PayTypeEnum {
 
     WeiXinPc("16"),
 
-    CmbApp("50");
+    CmbApp("50"),
+
+    ApplePay("60");
 
     private String code;
 
@@ -67,6 +68,8 @@ public enum PayTypeEnum {
                 return WeiXinPc;
             case "50":
                 return CmbApp;
+            case "60":
+                return ApplePay;
             default:
                 throw new BizException(ErrorCode.INVALID_PAY_TYPE, code);
         }
@@ -80,6 +83,8 @@ public enum PayTypeEnum {
                 return "Alipay";
             case CmbApp:
                 return "CmbPay";
+            case ApplePay:
+                return "ApplePay";
             default:
                 return "Weixin";
         }
@@ -93,6 +98,8 @@ public enum PayTypeEnum {
                 return ChannelTypeEnum.AliPay;
             case CmbApp:
                 return ChannelTypeEnum.CmbPay;
+            case ApplePay:
+                return ChannelTypeEnum.ApplePay;
             default:
                 return ChannelTypeEnum.WeiXinPay;
         }
@@ -104,6 +111,8 @@ public enum PayTypeEnum {
             return ChannelTypeEnum.AliPay;
         } else if (payType.equals(PayTypeEnum.CmbApp.getCode())) {
             return ChannelTypeEnum.CmbPay;
+        } else if (PayTypeEnum.ApplePay.getCode().equals(payType)) {
+            return ChannelTypeEnum.ApplePay;
         } else {
             return ChannelTypeEnum.WeiXinPay;
         }
