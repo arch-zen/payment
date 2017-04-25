@@ -7,11 +7,13 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import com.ymatou.payment.facade.constants.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,14 +28,6 @@ import com.ymatou.payment.domain.channel.service.refundquery.RefundQueryServiceF
 import com.ymatou.payment.domain.pay.model.BussinessOrder;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.refund.repository.RefundPository;
-import com.ymatou.payment.facade.constants.AccountOperateTypeEnum;
-import com.ymatou.payment.facade.constants.AccountTypeEnum;
-import com.ymatou.payment.facade.constants.AccountingStatusEnum;
-import com.ymatou.payment.facade.constants.ApproveStatusEnum;
-import com.ymatou.payment.facade.constants.CurrencyTypeEnum;
-import com.ymatou.payment.facade.constants.PayStatusEnum;
-import com.ymatou.payment.facade.constants.PayTypeEnum;
-import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.infrastructure.db.mapper.AccountingLogMapper;
 import com.ymatou.payment.infrastructure.db.model.AccountingLogPo;
@@ -212,29 +206,56 @@ public class RefundJobServiceImpl implements RefundJobService {
 
     public void updateRefundRequestAndPayment(RefundRequestPo refundRequest, Payment payment,
             RefundStatusEnum refundStatus) {
+        // 赋值需要更新的字段 退款单
         RefundRequestPo refundRequestPo = new RefundRequestPo();
-        PaymentPo paymentPo = new PaymentPo();
-
         refundRequestPo.setRefundTime(new Date());
+        refundRequestPo.setRefundId(refundRequest.getRefundId());
+        refundRequestPo.setRefundBatchNo(refundRequest.getRefundBatchNo());
+        refundRequestPo.setRefundStatus(refundStatus.getCode());
+
+        // 赋值需要更新的字段 支付单
+        PaymentPo paymentPo = new PaymentPo();
         paymentPo.setPaymentId(payment.getPaymentId());
-        if (RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) {
-            refundRequestPo.setRefundBatchNo(refundRequest.getRefundBatchNo());
-            refundRequestPo.setRefundStatus(refundStatus.getCode());
+
+        if (RefundStatusEnum.THIRDPART_REFUND_SUCCESS.equals(refundStatus)) { // 更新退款完成金额
             BigDecimal refundAmt = payment.getCompletedRefundAmt() == null ? refundRequest.getRefundAmount()
                     : refundRequest.getRefundAmount().add(payment.getCompletedRefundAmt());
             paymentPo.setPayStatus(PayStatusEnum.Refunded.getIndex());
-            paymentPo.setCompletedRefundAmt(refundAmt); // 更新退款完成金额
-        } else if (RefundStatusEnum.COMPLETE_FAILED.equals(refundStatus)) {
-            refundRequestPo.setRefundBatchNo(refundRequest.getRefundBatchNo());
-            refundRequestPo.setRefundStatus(refundStatus.getCode());
+            paymentPo.setCompletedRefundAmt(refundAmt);
+
+        } else if (RefundStatusEnum.COMPLETE_FAILED.equals(refundStatus)) { // 更新退款申请金额
             BigDecimal refundAmt = payment.getRefundAmt().subtract(refundRequest.getRefundAmount());
-            paymentPo.setRefundAmt(refundAmt); // 更新退款申请金额
-        } else {
-            refundRequestPo.setRefundBatchNo(refundRequest.getRefundBatchNo());
-            refundRequestPo.setRefundStatus(refundStatus.getCode());
+            paymentPo.setRefundAmt(refundAmt);
+
+        } else if(RefundStatusEnum.INIT.equals(refundStatus)){ // 更新退款批次号, 只有支付宝渠道的退款需要更新退款批次号
+            ChannelTypeEnum channelType = PayTypeEnum.getChannelType(refundRequest.getPayType());
+            if(ChannelTypeEnum.AliPay.equals(channelType))
+            {
+                updateRefundBatchNo(refundRequestPo);
+            }
         }
 
         refundPository.updateRefundRequestAndPayment(refundRequestPo, paymentPo);
+    }
+
+    /**
+     * 更新退款批次号（只有支付宝对退款批次号有时间上的要求）
+     *
+     * 如果跨天还需要把退款批次号设置为当天，避免造成无法提交
+     * is_success=T&result_details=201704070000978622^2017040721001004570278175064^88.00^SELLER_BALANCE_NOT_ENOUGH^false^null
+     * is_success=T&result_details=201704129000978622^2017040721001004570278175064^88.00^SUCCESS^false^null
+     * @param refundRequest
+     */
+    private void updateRefundBatchNo(RefundRequestPo refundRequest){
+        SimpleDateFormat simpleDateFormat= new SimpleDateFormat("yyyyMMdd");
+        String today = simpleDateFormat.format(new Date());
+
+        // 如果退款批次号的前八位不是当天，则需要将退款批次号更换为当天
+        if(!today.equals(StringUtils.left(refundRequest.getRefundBatchNo(), 8))){
+            // + "9" 的目的是避免和当天的退款单号发生重复
+            String newRefundBatchNo = today + "9" + StringUtils.substring(refundRequest.getRefundBatchNo(), 9);
+            refundRequest.setRefundBatchNo(newRefundBatchNo);
+        }
     }
 
     @Override

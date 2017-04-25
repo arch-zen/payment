@@ -126,7 +126,7 @@ public class AliPayRefundQueryServiceImpl implements RefundQueryService {
     /**
      * 组装微信退款查询Request
      * 
-     * @param refundRefund
+     * @param refundRequest
      * @param payment
      * @param config
      * @param header

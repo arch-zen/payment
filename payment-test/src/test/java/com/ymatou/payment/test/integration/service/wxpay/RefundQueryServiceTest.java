@@ -39,7 +39,7 @@ public class RefundQueryServiceTest extends RestBaseTest {
         // header.put("mockId", "888888");
         QueryRefundResponse response = refundQueryService.doService(request, header);
         Assert.assertNotNull(response);
-        Assert.assertEquals("REFUNDNOTEXIST", response.getErr_code());
+        Assert.assertEquals("TRANSACTION_ID_INVALID", response.getErr_code());
     }
 
     @Test
