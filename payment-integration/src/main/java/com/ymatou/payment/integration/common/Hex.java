@@ -1,9 +1,11 @@
 /**
  * (C) Copyright 2016 Ymatou (http://www.ymatou.com/).
- *
+ * <p>
  * All rights reserved.
  */
 package com.ymatou.payment.integration.common;
+
+import com.ymatou.payment.facade.BizException;
 
 public class Hex {
     /**
@@ -31,7 +33,7 @@ public class Hex {
     /**
      * 将字节数组转换为十六进制字符数组
      *
-     * @param data byte[]
+     * @param data        byte[]
      * @param toLowerCase <code>true</code> 传换成小写格式 ， <code>false</code> 传换成大写格式
      * @return 十六进制char[]
      */
@@ -42,7 +44,7 @@ public class Hex {
     /**
      * 将字节数组转换为十六进制字符数组
      *
-     * @param data byte[]
+     * @param data     byte[]
      * @param toDigits 用于控制输出的char[]
      * @return 十六进制char[]
      */
@@ -70,7 +72,7 @@ public class Hex {
     /**
      * 将字节数组转换为十六进制字符串
      *
-     * @param data byte[]
+     * @param data        byte[]
      * @param toLowerCase <code>true</code> 传换成小写格式 ， <code>false</code> 传换成大写格式
      * @return 十六进制String
      */
@@ -81,7 +83,7 @@ public class Hex {
     /**
      * 将字节数组转换为十六进制字符串
      *
-     * @param data byte[]
+     * @param data     byte[]
      * @param toDigits 用于控制输出的char[]
      * @return 十六进制String
      */
@@ -121,7 +123,7 @@ public class Hex {
     /**
      * 将十六进制字符转换成一个整数
      *
-     * @param ch 十六进制char
+     * @param ch    十六进制char
      * @param index 十六进制字符在字符数组中的位置
      * @return 一个整数
      * @throws RuntimeException 当ch不是一个合法的十六进制字符时，抛出运行时异常
@@ -134,4 +136,85 @@ public class Hex {
         }
         return digit;
     }
+
+    /**
+     * 字节数组转换为16进制形式的字符串
+     * @param data
+     * @return
+     */
+    public static String toHexString(byte[] data) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < data.length; i++) {
+            String hexString = Integer.toHexString(0xFF & data[i]);
+
+            if (hexString.length() == 1) {
+                stringBuilder.append("0").append(hexString);
+            } else {
+                stringBuilder.append(hexString);
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    /**
+     * 字节数组转换为16进制形式的字符串后再转换为字节数组
+     * @param data
+     * @param encoding
+     * @return
+     */
+    public static byte[] toHexBytes(byte[] data, String encoding) {
+        String str = toHexString(data);
+        try {
+            return str.getBytes(encoding);
+        } catch (Exception ex) {
+            throw new BizException("toHexBytes exception:", ex);
+
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
