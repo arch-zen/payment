@@ -215,6 +215,61 @@ public class IntegrationConfig {
         this.applePayfileTransferUrlMock = applePayfileTransferUrlMock;
     }
 
+    public String getApplePayConsumeUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getApplePayConsumeUrl();
+        } else {
+            return getApplePayConsumeUrlMock();
+        }
+    }
+
+    public String getApplePayConsumeCallbackUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getApplePayConsumeCallbackUrl();
+        } else {
+            return getApplePayConsumeCallbackUrlMock();
+        }
+    }
+
+    public String getApplePayConsumeQueryUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getApplePayConsumeQueryUrl();
+        } else {
+            return getApplePayConsumeQueryUrlMock();
+        }
+    }
+
+    public String getApplePayRefundUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getApplePayRefundUrl();
+        } else {
+            return getApplePayRefundUrlMock();
+        }
+    }
+
+    public String getApplePayRefundQueryUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getApplePayRefundQueryUrl();
+        } else {
+            return getApplePayRefundQueryUrlMock();
+        }
+    }
+
+    public String getApplePayRefundCallbackUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getApplePayRefundCallbackUrl();
+        } else {
+            return getApplePayRefundCallbackUrlMock();
+        }
+    }
+
+    public String getApplePayfileTransferUrl(HashMap<String, String> header) {
+        if (isMock(header)) {
+            return getApplePayfileTransferUrl();
+        } else {
+            return getApplePayfileTransferUrlMock();
+        }
+    }
 
     //endregion
 
