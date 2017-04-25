@@ -2,8 +2,8 @@ package com.ymatou.payment.integration.service.applepay;
 
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.common.constants.Constants;
-import com.ymatou.payment.integration.model.ApplePayRefundQueryRequest;
-import com.ymatou.payment.integration.model.ApplePayRefundQueryResponse;
+import com.ymatou.payment.integration.model.ApplePayFileTransferRequest;
+import com.ymatou.payment.integration.model.ApplePayFileTransferResponse;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -22,9 +22,9 @@ import java.util.HashMap;
 
 /**
  * Created by zhangxiaoming on 2017/4/24.
- * ApplePay退款查询
+ * 获取对账文件交易
  */
-public class ApplePayRefundQueryService implements InitializingBean {
+public class ApplePayFileTransferService implements InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(ApplePayRefundQueryService.class);
 
@@ -34,7 +34,7 @@ public class ApplePayRefundQueryService implements InitializingBean {
     private IntegrationConfig integrationConfig;
 
 
-    public ApplePayRefundQueryResponse doService(ApplePayRefundQueryRequest request, HashMap<String, String> header)
+    public ApplePayFileTransferResponse doService(ApplePayFileTransferRequest request, HashMap<String, String> header)
             throws Exception {
 
         return null;
