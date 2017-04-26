@@ -71,19 +71,13 @@ public class IntegrationConfig {
 
     //region applePay
     private String applePayConsumeUrl;//applePay消费接口地址 (支付收单)
-    private String applePayConsumeCallbackUrl;///applePay消费通知接口地址(支付回调)
-    private String applePayConsumeQueryUrl;//applePay交易状态查询接口(单笔支付查询)
+    private String applePayTradeQueryUrl;//applePay交易状态查询接口(单笔支付查询)
     private String applePayRefundUrl;//applePay退货接口地址(退款申请)
-    private String applePayRefundQueryUrl;//applePay交易状态查询接口(退款查询)
-    private String applePayRefundCallbackUrl;//applePay退货通知(退款回调)
     private String applePayfileTransferUrl;//applePay对账文件传输接口(正向对账)
 
     private String applePayConsumeUrlMock;//applePay消费接口地址 (支付收单)
-    private String applePayConsumeCallbackUrlMock;///applePay消费通知接口地址(支付回调)
-    private String applePayConsumeQueryUrlMock;//applePay交易状态查询接口(单笔支付查询)
+    private String applePayTradeQueryUrlMock;//applePay交易状态查询接口(单笔支付查询)
     private String applePayRefundUrlMock;//applePay退货接口地址(退款申请)
-    private String applePayRefundQueryUrlMock;//applePay交易状态查询接口(退款查询)
-    private String applePayRefundCallbackUrlMock;//applePay退货通知(退款回调)
     private String applePayfileTransferUrlMock;//applePay对账文件传输接口(正向对账)
 
 
@@ -96,22 +90,13 @@ public class IntegrationConfig {
         this.applePayConsumeUrl = applePayConsumeUrl;
     }
 
-    @DisconfFileItem(name = "applePay.consume.callback.url")
-    public String getApplePayConsumeCallbackUrl() {
-        return applePayConsumeCallbackUrl;
+    @DisconfFileItem(name = "applePay.trade.query.url")
+    public String getApplePayTradeQueryUrl() {
+        return applePayTradeQueryUrl;
     }
 
-    public void setApplePayConsumeCallbackUrl(String applePayConsumeCallbackUrl) {
-        this.applePayConsumeCallbackUrl = applePayConsumeCallbackUrl;
-    }
-
-    @DisconfFileItem(name = "applePay.consume.query.url")
-    public String getApplePayConsumeQueryUrl() {
-        return applePayConsumeQueryUrl;
-    }
-
-    public void setApplePayConsumeQueryUrl(String applePayConsumeQueryUrl) {
-        this.applePayConsumeQueryUrl = applePayConsumeQueryUrl;
+    public void setApplePayTradeQueryUrl(String applePayTradeQueryUrl) {
+        this.applePayTradeQueryUrl = applePayTradeQueryUrl;
     }
 
     @DisconfFileItem(name = "applePay.refund.url")
@@ -123,23 +108,6 @@ public class IntegrationConfig {
         this.applePayRefundUrl = applePayRefundUrl;
     }
 
-    @DisconfFileItem(name = "applePay.refund.query.url")
-    public String getApplePayRefundQueryUrl() {
-        return applePayRefundQueryUrl;
-    }
-
-    public void setApplePayRefundQueryUrl(String applePayRefundQueryUrl) {
-        this.applePayRefundQueryUrl = applePayRefundQueryUrl;
-    }
-
-    @DisconfFileItem(name = "applePay.refund.callback.url")
-    public String getApplePayRefundCallbackUrl() {
-        return applePayRefundCallbackUrl;
-    }
-
-    public void setApplePayRefundCallbackUrl(String applePayRefundCallbackUrl) {
-        this.applePayRefundCallbackUrl = applePayRefundCallbackUrl;
-    }
 
     @DisconfFileItem(name = "applePay.filetransfer.url")
     public String getApplePayfileTransferUrl() {
@@ -160,23 +128,17 @@ public class IntegrationConfig {
         this.applePayConsumeUrlMock = applePayConsumeUrlMock;
     }
 
-    @DisconfFileItem(name = "applePay.consume.callback.url.mock")
-    public String getApplePayConsumeCallbackUrlMock() {
-        return applePayConsumeCallbackUrlMock;
+    @DisconfFileItem(name = "applePay.trade.query.url.mock")
+    public String getApplePayTradeQueryUrlMock() {
+        return applePayTradeQueryUrlMock;
     }
 
-    public void setApplePayConsumeCallbackUrlMock(String applePayConsumeCallbackUrlMock) {
-        this.applePayConsumeCallbackUrlMock = applePayConsumeCallbackUrlMock;
+    public void setApplePayTradeQueryUrlMock(String applePayTradeQueryUrlMock) {
+        this.applePayTradeQueryUrlMock = applePayTradeQueryUrlMock;
     }
 
-    @DisconfFileItem(name = "applePay.consume.query.url.mock")
-    public String getApplePayConsumeQueryUrlMock() {
-        return applePayConsumeQueryUrlMock;
-    }
 
-    public void setApplePayConsumeQueryUrlMock(String applePayConsumeQueryUrlMock) {
-        this.applePayConsumeQueryUrlMock = applePayConsumeQueryUrlMock;
-    }
+
 
     @DisconfFileItem(name = "applePay.refund.url.mock")
     public String getApplePayRefundUrlMock() {
@@ -188,24 +150,6 @@ public class IntegrationConfig {
     }
 
 
-    @DisconfFileItem(name = "applePay.refund.query.url.mock")
-    public String getApplePayRefundQueryUrlMock() {
-        return applePayRefundQueryUrlMock;
-    }
-
-    public void setApplePayRefundQueryUrlMock(String applePayRefundQueryUrlMock) {
-        this.applePayRefundQueryUrlMock = applePayRefundQueryUrlMock;
-    }
-
-    @DisconfFileItem(name = "applePay.refund.callback.url.mock")
-    public String getApplePayRefundCallbackUrlMock() {
-        return applePayRefundCallbackUrlMock;
-    }
-
-    public void setApplePayRefundCallbackUrlMock(String applePayRefundCallbackUrlMock) {
-        this.applePayRefundCallbackUrlMock = applePayRefundCallbackUrlMock;
-    }
-
     @DisconfFileItem(name = "applePay.filetransfer.url.mock")
     public String getApplePayfileTransferUrlMock() {
         return applePayfileTransferUrlMock;
@@ -215,56 +159,37 @@ public class IntegrationConfig {
         this.applePayfileTransferUrlMock = applePayfileTransferUrlMock;
     }
 
+
     public String getApplePayConsumeUrl(HashMap<String, String> header) {
-        if (isMock(header)) {
+        if (isMock(header) == false) {
             return getApplePayConsumeUrl();
         } else {
             return getApplePayConsumeUrlMock();
         }
     }
 
-    public String getApplePayConsumeCallbackUrl(HashMap<String, String> header) {
-        if (isMock(header)) {
-            return getApplePayConsumeCallbackUrl();
-        } else {
-            return getApplePayConsumeCallbackUrlMock();
-        }
-    }
 
-    public String getApplePayConsumeQueryUrl(HashMap<String, String> header) {
-        if (isMock(header)) {
-            return getApplePayConsumeQueryUrl();
+
+    public String getApplePayTradeQueryUrl(HashMap<String, String> header) {
+        if (isMock(header) == false) {
+            return getApplePayTradeQueryUrl();
         } else {
-            return getApplePayConsumeQueryUrlMock();
+            return getApplePayTradeQueryUrlMock();
         }
     }
 
     public String getApplePayRefundUrl(HashMap<String, String> header) {
-        if (isMock(header)) {
+        if (isMock(header) == false) {
             return getApplePayRefundUrl();
         } else {
             return getApplePayRefundUrlMock();
         }
     }
 
-    public String getApplePayRefundQueryUrl(HashMap<String, String> header) {
-        if (isMock(header)) {
-            return getApplePayRefundQueryUrl();
-        } else {
-            return getApplePayRefundQueryUrlMock();
-        }
-    }
 
-    public String getApplePayRefundCallbackUrl(HashMap<String, String> header) {
-        if (isMock(header)) {
-            return getApplePayRefundCallbackUrl();
-        } else {
-            return getApplePayRefundCallbackUrlMock();
-        }
-    }
 
     public String getApplePayfileTransferUrl(HashMap<String, String> header) {
-        if (isMock(header)) {
+        if (isMock(header) == false) {
             return getApplePayfileTransferUrl();
         } else {
             return getApplePayfileTransferUrlMock();

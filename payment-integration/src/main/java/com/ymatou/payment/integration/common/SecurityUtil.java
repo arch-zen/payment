@@ -20,11 +20,19 @@ public class SecurityUtil {
      * 算法常量： SHA1
      */
     private static final String SHA1 = "SHA-1";
+    /**
+     * 算法常量： SHA256
+     */
+    private static final String SHA256 = "SHA-256";
 
     /**
      * 算法常量：SHA1withRSA
      */
     private static final String SHA1RSA = "SHA1withRSA";
+    /**
+     * 算法常量：SHA256withRSA
+     */
+    private static final String SHA256RSA = "SHA256withRSA";
 
     /**
      * 根据字符串生成私钥(RSA)
@@ -37,7 +45,7 @@ public class SecurityUtil {
             byte[] base64Bytes = Base64.getDecoder().decode(priKey);
 
             PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(base64Bytes);
-            KeyFactory keyFactory = KeyFactory.getInstance(RSA, "BC");
+            KeyFactory keyFactory = KeyFactory.getInstance(RSA);
 
             PrivateKey privateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec);
 
@@ -55,7 +63,7 @@ public class SecurityUtil {
      */
     public static PublicKey genPublicKeyWithRsa(String pubKey) {
         try {
-            KeyFactory keyFactory = KeyFactory.getInstance(RSA, "BC");
+            KeyFactory keyFactory = KeyFactory.getInstance(RSA);
             byte[] encodedKey = Base64.getDecoder().decode(pubKey);
             return keyFactory.generatePublic(new X509EncodedKeySpec(encodedKey));
 
@@ -65,38 +73,74 @@ public class SecurityUtil {
     }
 
     /**
-     * rsa签名
+     * rsa签名 with sha1rsa
      *
      * @param privateKey
      * @param data
      * @return
      */
-    public static byte[] signWithRsa(PrivateKey privateKey, byte[] data) {
+    public static byte[] signWithSha1Rsa(PrivateKey privateKey, byte[] data) {
         try {
-            java.security.Signature st = java.security.Signature.getInstance(SHA1RSA, "BC");
+            java.security.Signature st = java.security.Signature.getInstance(SHA1RSA);
             st.initSign(privateKey);
             st.update(data);
             return st.sign();
         } catch (Exception ex) {
-            throw new BizException("signWithRsa exception", ex);
+            throw new BizException("signWithSha1Rsa exception", ex);
         }
     }
 
     /**
-     * 验签
+     * 验签 with sha1rsa
      * @param publicKey
      * @param signData
      * @param digestData
      * @return
      */
-    public static boolean validateSignWithRsa(PublicKey publicKey, byte[] signData, byte[] digestData) {
+    public static boolean validateSignWithSha1Rsa(PublicKey publicKey, byte[] signData, byte[] digestData) {
         try {
-            java.security.Signature st = java.security.Signature.getInstance(SHA1RSA, "BC");
+            java.security.Signature st = java.security.Signature.getInstance(SHA1RSA);
             st.initVerify(publicKey);
             st.update(digestData);
             return st.verify(signData);
         } catch (Exception ex) {
-            throw new BizException("validateSignWithRsa exception", ex);
+            throw new BizException("validateSignWithSha1Rsa exception", ex);
+        }
+    }
+
+    /**
+     * rsa签名 with sha256rsa
+     *
+     * @param privateKey
+     * @param data
+     * @return
+     */
+    public static byte[] signWithSha256Rsa(PrivateKey privateKey, byte[] data) {
+        try {
+            java.security.Signature st = java.security.Signature.getInstance(SHA256RSA);
+            st.initSign(privateKey);
+            st.update(data);
+            return st.sign();
+        } catch (Exception ex) {
+            throw new BizException("signWithSha256Rsa exception", ex);
+        }
+    }
+
+    /**
+     * 验签 with sha256rsa
+     * @param publicKey
+     * @param signData
+     * @param digestData
+     * @return
+     */
+    public static boolean validateSignWithSha256Rsa(PublicKey publicKey, byte[] signData, byte[] digestData) {
+        try {
+            java.security.Signature st = java.security.Signature.getInstance(SHA256RSA);
+            st.initVerify(publicKey);
+            st.update(digestData);
+            return st.verify(signData);
+        } catch (Exception ex) {
+            throw new BizException("validateSignWithSha256Rsa exception", ex);
         }
     }
 
@@ -115,6 +159,24 @@ public class SecurityUtil {
             return md.digest();
         } catch (Exception ex) {
             throw new BizException("sha1 exception, with data:" + data + ",encoding:" + encoding, ex);
+        }
+    }
+
+    /**
+     * sha256
+     *
+     * @param data
+     * @param encoding
+     * @return
+     */
+    public static byte[] sha256(String data, String encoding) {
+        try {
+            MessageDigest md = MessageDigest.getInstance(SHA256);
+            md.reset();
+            md.update(data.getBytes(encoding));
+            return md.digest();
+        } catch (Exception ex) {
+            throw new BizException("sha256 exception, with data:" + data + ",encoding:" + encoding, ex);
         }
     }
 

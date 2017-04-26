@@ -96,6 +96,18 @@ public class InstitutionConfig {
     @XmlAttribute(name = "operatorPwd")
     private String operatorPwd;
 
+    @XmlAttribute(name = "certId")
+    private String certId;
+
+
+    public String getCertId() {
+        return certId;
+    }
+
+    public void setCertId(String certId) {
+        this.certId = certId;
+    }
+
     /**
      * @return the payType
      */

@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * Created by gejianhua on 2017/4/25.
  */
-public class ApplyPayUtil {
+public class ApplePayUtil {
     /**
      * 过滤请求报文中的空字符串或者空字符串
      *
@@ -47,7 +47,7 @@ public class ApplyPayUtil {
 
         while (it.hasNext()) {
             Map.Entry<String, String> en = it.next();
-            if (ApplyPayConstants.param_signature.equals(en.getKey().trim())) {
+            if (ApplePayConstants.param_signature.equals(en.getKey().trim())) {
                 continue;
             }
             tree.put(en.getKey(), en.getValue());
@@ -58,8 +58,8 @@ public class ApplyPayUtil {
 
         while (it.hasNext()) {
             Map.Entry<String, String> en = it.next();
-            sf.append(en.getKey() + ApplyPayConstants.EQUAL + en.getValue()
-                    + ApplyPayConstants.AMPERSAND);
+            sf.append(en.getKey() + ApplePayConstants.EQUAL + en.getValue()
+                    + ApplePayConstants.AMPERSAND);
         }
         return sf.substring(0, sf.length() - 1);
     }
@@ -84,9 +84,9 @@ public class ApplyPayUtil {
                     continue;
                 }
                 String value = en.getValue().trim();
-                value = URLEncoder.encode(value, ApplyPayConstants.encoding);
+                value = URLEncoder.encode(value, ApplePayConstants.encoding);
 
-                sf.append(en.getKey() + ApplyPayConstants.EQUAL + value + ApplyPayConstants.AMPERSAND);
+                sf.append(en.getKey() + ApplePayConstants.EQUAL + value + ApplePayConstants.AMPERSAND);
             } catch (Exception ex) {
                 throw new BizException("genRequestParamMessage exception:", ex);
             }
