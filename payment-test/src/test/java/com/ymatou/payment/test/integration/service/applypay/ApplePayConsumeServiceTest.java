@@ -38,9 +38,6 @@ public class ApplePayConsumeServiceTest extends RestBaseTest {
 
 
         ApplePayConsumeRequest request = new ApplePayConsumeRequest();
-        request.setVersion(ApplePayConstants.version);
-        request.setEncoding(ApplePayConstants.encoding);
-        request.setSignMethod(ApplePayConstants.signMethod);
         request.setTxnType("01");
         request.setTxnSubType("01");
         request.setBizType("000201");

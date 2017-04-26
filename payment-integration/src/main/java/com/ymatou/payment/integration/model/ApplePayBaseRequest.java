@@ -2,6 +2,7 @@ package com.ymatou.payment.integration.model;
 
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.PrintFriendliness;
+import com.ymatou.payment.integration.service.applepay.common.ApplePayConstants;
 import org.apache.commons.beanutils.BeanUtils;
 
 import java.util.Map;
@@ -16,11 +17,11 @@ public class ApplePayBaseRequest extends PrintFriendliness{
     /**
      * 版本号
      */
-    private String version;
+    private String version = ApplePayConstants.version;
     /**
      * 编码方式
      */
-    private String encoding;
+    private String encoding = ApplePayConstants.encoding;
     /**
      * 证书ID
      */
@@ -28,7 +29,7 @@ public class ApplePayBaseRequest extends PrintFriendliness{
     /**
      * 签名方法
      */
-    private String signMethod;
+    private String signMethod = ApplePayConstants.signMethod;
 
     /**
      * 签名
@@ -54,7 +55,7 @@ public class ApplePayBaseRequest extends PrintFriendliness{
         return version;
     }
 
-    public void setVersion(String version) {
+    private void setVersion(String version) {
         this.version = version;
     }
 
@@ -62,7 +63,7 @@ public class ApplePayBaseRequest extends PrintFriendliness{
         return encoding;
     }
 
-    public void setEncoding(String encoding) {
+    private void setEncoding(String encoding) {
         this.encoding = encoding;
     }
 
@@ -78,7 +79,7 @@ public class ApplePayBaseRequest extends PrintFriendliness{
         return signMethod;
     }
 
-    public void setSignMethod(String signMethod) {
+    private void setSignMethod(String signMethod) {
         this.signMethod = signMethod;
     }
 
