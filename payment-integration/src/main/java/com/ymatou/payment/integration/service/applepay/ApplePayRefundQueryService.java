@@ -2,8 +2,8 @@ package com.ymatou.payment.integration.service.applepay;
 
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.common.constants.Constants;
-import com.ymatou.payment.integration.model.ApplePayRefundQueryRequest;
-import com.ymatou.payment.integration.model.ApplePayRefundQueryResponse;
+import com.ymatou.payment.integration.model.ApplePayTradeQueryRequest;
+import com.ymatou.payment.integration.model.ApplePayTradeQueryResponse;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -34,7 +34,7 @@ public class ApplePayRefundQueryService implements InitializingBean {
     private IntegrationConfig integrationConfig;
 
 
-    public ApplePayRefundQueryResponse doService(ApplePayRefundQueryRequest request, HashMap<String, String> header)
+    public ApplePayTradeQueryResponse doService(ApplePayTradeQueryRequest request, HashMap<String, String> header)
             throws Exception {
 
         return null;

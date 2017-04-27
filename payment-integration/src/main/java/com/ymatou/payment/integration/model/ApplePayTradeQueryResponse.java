@@ -1,11 +1,11 @@
 package com.ymatou.payment.integration.model;
 
 /**
- * Created by gejianhua on 2017/4/25.
- * 消费通知
+ * Created by zhangxiaoming on 2017/4/24.
+ * applepay交易查询响应信息
  */
-public class ApplePayConsumeNotifyRequest extends ApplePayBaseResponse {
-    /////////////订单信息///////////////////////////////
+public class ApplePayTradeQueryResponse extends  ApplePayBaseResponse {
+/////////////订单信息///////////////////////////////
     /**
      * 商户订单号
      */
@@ -42,6 +42,11 @@ public class ApplePayConsumeNotifyRequest extends ApplePayBaseResponse {
     private String payCardType;
 
     /**
+     * 绑定关系标识号
+     */
+    private String bindId;
+
+    /**
      * 请求方自定义域
      */
     private String reqReserved;
@@ -52,7 +57,13 @@ public class ApplePayConsumeNotifyRequest extends ApplePayBaseResponse {
     private String reserved;
 
 
+
     ///////////////通知信息//////////////////////////////////////////
+
+    /**
+     * 发卡机构识别模式
+     */
+    private String issuerIdentifyMode;
 
     /**
      * 查询流水号
@@ -85,6 +96,26 @@ public class ApplePayConsumeNotifyRequest extends ApplePayBaseResponse {
     private String settleAmt;
 
     /**
+     * 清算汇率
+     */
+    private String exchangeRate;
+
+    /**
+     * 兑换日期	(MMDD)
+     */
+    private String exchangeDate;
+
+    /**
+     * 原交易应答码
+     */
+    private String origRespCode;
+
+    /**
+     * 原交易应答信息
+     */
+    private String origRespMsg;
+
+    /**
      * 应答码
      */
     private String respCode;
@@ -103,6 +134,14 @@ public class ApplePayConsumeNotifyRequest extends ApplePayBaseResponse {
      * 支付卡名称
      */
     private String payCardIssueName;
+
+
+    ////////////////////其它信息////////////////////////////
+
+    /**
+     * 有卡交易信息域
+     */
+    private String cardTransData;
 
 
 
@@ -169,6 +208,14 @@ public class ApplePayConsumeNotifyRequest extends ApplePayBaseResponse {
         this.payCardType = payCardType;
     }
 
+    public String getBindId() {
+        return bindId;
+    }
+
+    public void setBindId(String bindId) {
+        this.bindId = bindId;
+    }
+
     public String getReqReserved() {
         return reqReserved;
     }
@@ -183,6 +230,14 @@ public class ApplePayConsumeNotifyRequest extends ApplePayBaseResponse {
 
     public void setReserved(String reserved) {
         this.reserved = reserved;
+    }
+
+    public String getIssuerIdentifyMode() {
+        return issuerIdentifyMode;
+    }
+
+    public void setIssuerIdentifyMode(String issuerIdentifyMode) {
+        this.issuerIdentifyMode = issuerIdentifyMode;
     }
 
     public String getQueryId() {
@@ -233,6 +288,38 @@ public class ApplePayConsumeNotifyRequest extends ApplePayBaseResponse {
         this.settleAmt = settleAmt;
     }
 
+    public String getExchangeRate() {
+        return exchangeRate;
+    }
+
+    public void setExchangeRate(String exchangeRate) {
+        this.exchangeRate = exchangeRate;
+    }
+
+    public String getExchangeDate() {
+        return exchangeDate;
+    }
+
+    public void setExchangeDate(String exchangeDate) {
+        this.exchangeDate = exchangeDate;
+    }
+
+    public String getOrigRespCode() {
+        return origRespCode;
+    }
+
+    public void setOrigRespCode(String origRespCode) {
+        this.origRespCode = origRespCode;
+    }
+
+    public String getOrigRespMsg() {
+        return origRespMsg;
+    }
+
+    public void setOrigRespMsg(String origRespMsg) {
+        this.origRespMsg = origRespMsg;
+    }
+
     public String getRespCode() {
         return respCode;
     }
@@ -265,6 +352,14 @@ public class ApplePayConsumeNotifyRequest extends ApplePayBaseResponse {
         this.payCardIssueName = payCardIssueName;
     }
 
+    public String getCardTransData() {
+        return cardTransData;
+    }
+
+    public void setCardTransData(String cardTransData) {
+        this.cardTransData = cardTransData;
+    }
+
     public String getAcqInsCode() {
         return acqInsCode;
     }
@@ -273,3 +368,48 @@ public class ApplePayConsumeNotifyRequest extends ApplePayBaseResponse {
         this.acqInsCode = acqInsCode;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

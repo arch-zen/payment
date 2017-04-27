@@ -7,7 +7,7 @@ package com.ymatou.payment.integration.model;
 public class ApplePayConsumeRequest extends ApplePayBaseRequest {
 
     ///////////////基本信息////////////////////////
-    //其它的基本信息在ApplyPayBaseRequest类中
+    //其它信息在ApplyPayBaseRequest类中
 
     /**
      * 渠道类型
@@ -18,15 +18,7 @@ public class ApplePayConsumeRequest extends ApplePayBaseRequest {
 
 ///////////////商户信息////////////////////////
 
-    /**
-     * 接入类型
-     */
-    private String accessType;
-    /**
-     * 商户代码
-     */
-    private String merId;
-
+    //其它信息在ApplyPayBaseRequest类中
     /**
      * 后台通知地址
      */
@@ -104,22 +96,6 @@ public class ApplePayConsumeRequest extends ApplePayBaseRequest {
 
     public void setChannelType(String channelType) {
         this.channelType = channelType;
-    }
-
-    public String getAccessType() {
-        return accessType;
-    }
-
-    public void setAccessType(String accessType) {
-        this.accessType = accessType;
-    }
-
-    public String getMerId() {
-        return merId;
-    }
-
-    public void setMerId(String merId) {
-        this.merId = merId;
     }
 
     public String getBackUrl() {

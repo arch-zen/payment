@@ -51,6 +51,20 @@ public class ApplePayBaseRequest extends PrintFriendliness{
     private String bizType;
 
 
+    /////////////商户基本信息/////////////////////////////////////////////////
+
+    /**
+     * 接入类型
+     */
+    private  String accessType;
+
+    /**
+     * 商户代码
+     */
+    private String merId;
+
+
+
     public String getVersion() {
         return version;
     }
@@ -113,6 +127,22 @@ public class ApplePayBaseRequest extends PrintFriendliness{
 
     public void setBizType(String bizType) {
         this.bizType = bizType;
+    }
+
+    public String getAccessType() {
+        return accessType;
+    }
+
+    public void setAccessType(String accessType) {
+        this.accessType = accessType;
+    }
+
+    public String getMerId() {
+        return merId;
+    }
+
+    public void setMerId(String merId) {
+        this.merId = merId;
     }
 
     /**
