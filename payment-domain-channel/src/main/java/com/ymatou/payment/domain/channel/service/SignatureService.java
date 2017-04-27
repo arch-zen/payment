@@ -46,4 +46,16 @@ public interface SignatureService {
      * @return
      */
     String getMd5MockKey();
+
+    /**
+     * 获取 Mock 私钥
+     * @return
+     */
+    String getMockPrivateKey();
+
+    /**
+     * 获取 Mock 公钥
+     * @return
+     */
+    String getMockPublicKey();
 }

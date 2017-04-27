@@ -30,5 +30,9 @@ public enum AcquireOrderResultTypeEnum {
     /**
      * 二位码内容，客户端需要将其转为二维码图片
      */
-    QRCode
+    QRCode,
+    /**
+     * 文本
+     */
+    Text
 }

@@ -1,4 +1,4 @@
-package com.ymatou.payment.test.integration.service.applypay;
+package com.ymatou.payment.test.integration.service.applepay;
 
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
@@ -41,10 +41,8 @@ public class ApplePayConsumeServiceTest extends RestBaseTest {
         request.setTxnType("01");
         request.setTxnSubType("01");
         request.setBizType("000201");
-        request.setChannelType("08");
 
         request.setMerId(config.getMerchantId());
-        request.setAccessType("0");
         request.setOrderId(String.valueOf(10000000 + new Random().nextInt(100000000)));
 
         SimpleDateFormat format = new SimpleDateFormat(ApplePayConstants.time_format);
@@ -52,14 +50,15 @@ public class ApplePayConsumeServiceTest extends RestBaseTest {
         request.setTxnTime(time);
 
         request.setTxnAmt("10000");
-        request.setCurrencyCode("156");
-        request.setBackUrl(this.integrationConfig.getAliPayBaseUrl(null).concat("/pay"));
+        request.setBackUrl(String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), PayTypeEnum.ApplePay));
 
         request.setCertId(config.getCertId());
 
         //sign
         String sign = ApplePaySignatureUtil.sign(request.genMap(), config.getInstYmtPrivateKey());
         request.setSignature(sign);
+
+
 
         ApplePayConsumeResponse response = this.applePayConsumeService.doPost(request, null);
 

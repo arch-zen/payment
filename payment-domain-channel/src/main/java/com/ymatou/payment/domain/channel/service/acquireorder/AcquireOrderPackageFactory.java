@@ -5,14 +5,13 @@
  */
 package com.ymatou.payment.domain.channel.service.acquireorder;
 
-import javax.annotation.Resource;
-
-import org.springframework.stereotype.Component;
-
 import com.ymatou.payment.domain.channel.service.AcquireOrderService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * 收单报文工厂
@@ -44,6 +43,9 @@ public class AcquireOrderPackageFactory {
     @Resource
     private CmbAcquireOrderServiceImpl cmbAcquireOrderServiceImpl;
 
+    @Resource
+    private ApplePayAcquireOrderServiceImpl applePayAcquireOrderService;
+
     /**
      * 获取到收单解析器
      * 
@@ -66,6 +68,8 @@ public class AcquireOrderPackageFactory {
                 return weiXinPCAcquireOrderServiceImpl;
             case CmbApp:
                 return cmbAcquireOrderServiceImpl;
+            case ApplePay:
+                return applePayAcquireOrderService;
             default:
                 throw new BizException(ErrorCode.INVALID_PAY_TYPE, payType.getCode());
 

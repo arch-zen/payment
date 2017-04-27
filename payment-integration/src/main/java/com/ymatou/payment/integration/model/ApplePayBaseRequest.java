@@ -50,20 +50,51 @@ public class ApplePayBaseRequest extends PrintFriendliness{
      */
     private String bizType;
 
+    /**
+     * 渠道类型
+     */
+    private String channelType = ApplePayConstants.channel_type;
+
 
     /////////////商户基本信息/////////////////////////////////////////////////
 
     /**
      * 接入类型
      */
-    private  String accessType;
+    private  String accessType = ApplePayConstants.access_type;
 
     /**
      * 商户代码
      */
     private String merId;
 
+    ////////////订单基本信息////////////////////////////////////
+    /**
+     * 交易币种
+     */
+    private String currencyCode = ApplePayConstants.currency_code;
 
+
+
+
+
+
+    public String getCurrencyCode() {
+        return currencyCode;
+    }
+
+    private void setCurrencyCode(String currencyCode) {
+        this.currencyCode = currencyCode;
+    }
+
+
+    public String getChannelType() {
+        return channelType;
+    }
+
+    private void setChannelType(String channelType) {
+        this.channelType = channelType;
+    }
 
     public String getVersion() {
         return version;
@@ -133,7 +164,7 @@ public class ApplePayBaseRequest extends PrintFriendliness{
         return accessType;
     }
 
-    public void setAccessType(String accessType) {
+    private void setAccessType(String accessType) {
         this.accessType = accessType;
     }
 

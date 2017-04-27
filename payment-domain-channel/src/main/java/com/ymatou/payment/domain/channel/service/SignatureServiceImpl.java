@@ -230,4 +230,14 @@ public class SignatureServiceImpl implements SignatureService {
     public String getMd5MockKey() {
         return mockMd5key;
     }
+
+    @Override
+    public String getMockPrivateKey() {
+        return this.mockYmtPrivateKey;
+    }
+
+    @Override
+    public String getMockPublicKey() {
+        return this.mockPublicKey;
+    }
 }

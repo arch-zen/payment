@@ -5,15 +5,6 @@
  */
 package com.ymatou.payment.domain.channel.service.acquireorder;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-
 import com.ymatou.payment.domain.channel.InstitutionConfig;
 import com.ymatou.payment.domain.channel.InstitutionConfigManager;
 import com.ymatou.payment.domain.channel.model.AcquireOrderPackageResp;
@@ -27,6 +18,13 @@ import com.ymatou.payment.infrastructure.db.model.CmbAggrementPo;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.common.CmbSignature;
 import com.ymatou.payment.integration.model.CmbPayRequest;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  * 招行一网通 收单报文组织（20）
@@ -82,6 +80,7 @@ public class CmbAcquireOrderServiceImpl implements AcquireOrderService {
         return resp;
     }
 
+
     /**
      * 构建支付请求
      * 
@@ -118,4 +117,5 @@ public class CmbAcquireOrderServiceImpl implements AcquireOrderService {
 
         return payRequest;
     }
+
 }

@@ -9,10 +9,7 @@ public class ApplePayConsumeRequest extends ApplePayBaseRequest {
     ///////////////基本信息////////////////////////
     //其它信息在ApplyPayBaseRequest类中
 
-    /**
-     * 渠道类型
-     */
-    private String channelType;
+
 
 
 
@@ -32,10 +29,7 @@ public class ApplePayConsumeRequest extends ApplePayBaseRequest {
      */
     private String orderId;
 
-    /**
-     * 交易币种
-     */
-    private String currencyCode;
+
 
     /**
      * 交易金额
@@ -90,13 +84,7 @@ public class ApplePayConsumeRequest extends ApplePayBaseRequest {
     private String merAbbr;
 
 
-    public String getChannelType() {
-        return channelType;
-    }
 
-    public void setChannelType(String channelType) {
-        this.channelType = channelType;
-    }
 
     public String getBackUrl() {
         return backUrl;
@@ -114,13 +102,7 @@ public class ApplePayConsumeRequest extends ApplePayBaseRequest {
         this.orderId = orderId;
     }
 
-    public String getCurrencyCode() {
-        return currencyCode;
-    }
 
-    public void setCurrencyCode(String currencyCode) {
-        this.currencyCode = currencyCode;
-    }
 
     public String getTxnAmt() {
         return txnAmt;

@@ -178,6 +178,11 @@
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
         </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${joda-time.verson}</version>
+        </dependency>
 
         <!-- 消息总线 -->
         <dependency>
