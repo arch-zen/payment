@@ -25,7 +25,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.util.*;
@@ -33,7 +33,7 @@ import java.util.*;
 /**
  * @author qianmin 2016年5月17日 下午2:55:40
  */
-@Component
+@Service("aliPayRefundNotifyService")
 public class AliPayRefundNotifyServiceImpl implements RefundNotifyService {
 
     private static final Logger logger = LoggerFactory.getLogger(AliPayRefundNotifyServiceImpl.class);
