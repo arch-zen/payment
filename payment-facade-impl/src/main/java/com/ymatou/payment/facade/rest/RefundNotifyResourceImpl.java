@@ -3,11 +3,15 @@
  */
 package com.ymatou.payment.facade.rest;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import com.ymatou.payment.facade.BaseResponse;
+import com.ymatou.payment.facade.BizException;
+import com.ymatou.payment.facade.ErrorCode;
+import com.ymatou.payment.facade.RefundNotifyFacade;
+import com.ymatou.payment.facade.model.RefundNotifyRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.POST;
@@ -16,23 +20,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import com.ymatou.payment.facade.BaseResponse;
-import com.ymatou.payment.facade.BizException;
-import com.ymatou.payment.facade.ErrorCode;
-import com.ymatou.payment.facade.RefundNotifyFacade;
-import com.ymatou.payment.facade.model.AliPayRefundNotifyRequest;
-import com.ymatou.payment.infrastructure.util.HttpUtil;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.HashMap;
 
 /**
- * 
  * @author qianmin 2016年5月16日 下午5:10:16
- * 
  */
 @Path("/{RefundNotify:(?i:RefundNotify)}")
 @Component("refundNotifyResource")
@@ -43,19 +37,37 @@ public class RefundNotifyResourceImpl implements RefundNotifyResource {
     @Autowired
     private RefundNotifyFacade refundNotifyFacade;
 
+
     @POST
     @Path("/{payType}")
     @Produces(MediaType.TEXT_HTML)
     public String refundNotify(@PathParam("payType") String payType,
-            @Context HttpServletRequest servletRequest) {
+                               @Context HttpServletRequest servletRequest) {
+
+//        try {
+//            String body = getHttpBody(servletRequest);
+//            logger.info("receive alipay refund notify {}:{}", payType, body);
+//
+//            AliPayRefundNotifyRequest req = parseFromBody(body, payType);
+//            req.setMockHeader(getMockHttpHeader(servletRequest));
+//            BaseResponse response = refundNotifyFacade.refundNotify(req);
+//            if (response.getIsSuccess()) {
+//                return "success";
+//            } else {
+//                return "fail";
+//            }
+//        } catch (Exception e) {
+//            logger.error(e.getMessage(), e);
+//            return "fail";
+//        }
+
 
         try {
             String body = getHttpBody(servletRequest);
             logger.info("receive alipay refund notify {}:{}", payType, body);
-
-            AliPayRefundNotifyRequest req = parseFromBody(body, payType);
-            req.setMockHeader(getMockHttpHeader(servletRequest));
-            BaseResponse response = refundNotifyFacade.refundNotify(req);
+            RefundNotifyRequest refundNotifyRequest = new RefundNotifyRequest();
+            refundNotifyRequest.setMockHeader(getMockHttpHeader(servletRequest));
+            BaseResponse response = refundNotifyFacade.refundNotify(refundNotifyRequest);
             if (response.getIsSuccess()) {
                 return "success";
             } else {
@@ -67,36 +79,36 @@ public class RefundNotifyResourceImpl implements RefundNotifyResource {
         }
     }
 
-    /**
-     * 从Form中解析出报文
-     * 
-     * @param body
-     * @return
-     */
-    private AliPayRefundNotifyRequest parseFromBody(String body, String payType) {
-        Map<String, String> map = new HashMap<String, String>();
-        AliPayRefundNotifyRequest notifyRequest = new AliPayRefundNotifyRequest();
-        try {
-            map = HttpUtil.parseQueryStringToMap(body);
-            notifyRequest.setPayType(payType);
-            notifyRequest.setBatchNo(map.get("batch_no"));
-            notifyRequest.setNotifyId(map.get("notify_id"));
-            notifyRequest.setNotifyTime(map.get("notify_time"));
-            notifyRequest.setNotifyType(map.get("notify_type"));
-            notifyRequest.setResultDetails(map.get("result_details"));
-            notifyRequest.setSign(map.get("sign"));
-            notifyRequest.setSignType(map.get("sign_type"));
-            notifyRequest.setSuccessNum(map.get("success_num"));
-
-            return notifyRequest;
-        } catch (Exception e) {
-            throw new BizException(ErrorCode.FAIL, "parse post form when receive alipay refund notify.", e);
-        }
-    }
+//    /**
+//     * 从Form中解析出报文
+//     *
+//     * @param body
+//     * @return
+//     */
+//    private AliPayRefundNotifyRequest parseFromBody(String body, String payType) {
+//        Map<String, String> map = new HashMap<String, String>();
+//        AliPayRefundNotifyRequest notifyRequest = new AliPayRefundNotifyRequest();
+//        try {
+//            map = HttpUtil.parseQueryStringToMap(body);
+//            notifyRequest.setPayType(payType);
+//            notifyRequest.setBatchNo(map.get("batch_no"));
+//            notifyRequest.setNotifyId(map.get("notify_id"));
+//            notifyRequest.setNotifyTime(map.get("notify_time"));
+//            notifyRequest.setNotifyType(map.get("notify_type"));
+//            notifyRequest.setResultDetails(map.get("result_details"));
+//            notifyRequest.setSign(map.get("sign"));
+//            notifyRequest.setSignType(map.get("sign_type"));
+//            notifyRequest.setSuccessNum(map.get("success_num"));
+//
+//            return notifyRequest;
+//        } catch (Exception e) {
+//            throw new BizException(ErrorCode.FAIL, "parse post form when receive alipay refund notify.", e);
+//        }
+//    }
 
     /**
      * 获取请求中的HttpMockHeader
-     * 
+     *
      * @param servletRequest
      * @return
      */
@@ -113,7 +125,7 @@ public class RefundNotifyResourceImpl implements RefundNotifyResource {
 
     /**
      * 获取到HTTP Body
-     * 
+     *
      * @param servletRequest
      * @return
      */
@@ -136,7 +148,7 @@ public class RefundNotifyResourceImpl implements RefundNotifyResource {
 
     /**
      * 从InputStream获取到字节流
-     * 
+     *
      * @param is
      * @param contentLen
      * @return
@@ -162,6 +174,6 @@ public class RefundNotifyResourceImpl implements RefundNotifyResource {
                 throw new BizException(ErrorCode.FAIL, "parse http body where read bytes failed", e);
             }
         }
-        return new byte[] {};
+        return new byte[]{};
     }
 }

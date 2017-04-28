@@ -1,9 +1,16 @@
 package com.ymatou.payment.integration.service.applepay;
 
+import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.integration.IntegrationConfig;
+import com.ymatou.payment.integration.common.HttpClientUtil;
 import com.ymatou.payment.integration.common.constants.Constants;
+import com.ymatou.payment.integration.common.utils.CompressUtil;
 import com.ymatou.payment.integration.model.ApplePayFileTransferRequest;
 import com.ymatou.payment.integration.model.ApplePayFileTransferResponse;
+import com.ymatou.payment.integration.service.applepay.common.ApplePayConstants;
+import com.ymatou.payment.integration.service.applepay.common.ApplePayMessageUtil;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -19,6 +26,7 @@ import javax.net.ssl.X509TrustManager;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by zhangxiaoming on 2017/4/24.
@@ -26,7 +34,7 @@ import java.util.HashMap;
  */
 public class ApplePayFileTransferService implements InitializingBean {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApplePayRefundQueryService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApplePayFileTransferService.class);
 
     private CloseableHttpClient httpClient;
 
@@ -34,10 +42,23 @@ public class ApplePayFileTransferService implements InitializingBean {
     private IntegrationConfig integrationConfig;
 
 
-    public ApplePayFileTransferResponse doService(ApplePayFileTransferRequest request, HashMap<String, String> header)
-            throws Exception {
+    public ApplePayFileTransferResponse doService(ApplePayFileTransferRequest request, HashMap<String, String> header) {
 
-        return null;
+        try {
+            String body = ApplePayMessageUtil.genRequestMessage(request.genMap());
+            String url = this.integrationConfig.getApplePayfileTransferUrl(header);
+            String result = HttpClientUtil.sendPost(url, body, ApplePayConstants.content_type, header, httpClient);
+            Map<String, String> resultMap = ApplePayMessageUtil.genResponseMessage(result);
+            ApplePayFileTransferResponse response = ApplePayFileTransferResponse.loadProperty(resultMap, ApplePayFileTransferResponse.class);
+            if (response != null && !StringUtils.isBlank(response.getFileContent())) {
+                byte[] bytes = response.getFileContent().getBytes(response.getEncoding());
+                String content = new String(CompressUtil.inflater(Base64.decodeBase64(bytes)));
+                response.setFileContent(content);
+            }
+            return response;
+        } catch (Exception ex) {
+            throw new BizException("ApplePayFileTransferService.doPost Exception", ex);
+        }
     }
 
     @Override
