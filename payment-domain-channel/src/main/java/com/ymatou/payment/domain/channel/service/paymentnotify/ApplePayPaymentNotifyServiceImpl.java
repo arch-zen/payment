@@ -7,23 +7,30 @@ import com.ymatou.payment.domain.channel.service.PaymentNotifyService;
 import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.BizException;
+import com.ymatou.payment.facade.constants.PayStatusEnum;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.PaymentNotifyType;
 import com.ymatou.payment.facade.model.PaymentNotifyReq;
+import com.ymatou.payment.infrastructure.Money;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.model.ApplePayConsumeNotifyRequest;
 import com.ymatou.payment.integration.service.applepay.common.ApplePayConstants;
 import com.ymatou.payment.integration.service.applepay.common.ApplePayMessageUtil;
 import com.ymatou.payment.integration.service.applepay.common.ApplePaySignatureUtil;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by gejianhua on 2017/4/27.
  */
+@Service
 public class ApplePayPaymentNotifyServiceImpl implements PaymentNotifyService {
 
 
@@ -45,16 +52,36 @@ public class ApplePayPaymentNotifyServiceImpl implements PaymentNotifyService {
         ApplePayConsumeNotifyRequest consumeNotifyRequest = new ApplePayConsumeNotifyRequest();
         consumeNotifyRequest.loadProperty(map);
 
-        //验证报文，商户号，验签
+        //获取配置
+        InstitutionConfig config = this.institutionConfigManager.getConfig(PayTypeEnum.ApplePay);
 
+        //验证执行是否成功，商户号，验签
+        this.validateMessage(consumeNotifyRequest, config, notifyRequest.getMockHeader());
 
+        //构建PaymentNotifyMessage
+        PaymentNotifyMessage notifyMessage = new PaymentNotifyMessage();
+        notifyMessage.setPaymentId(consumeNotifyRequest.getOrderId());
+        notifyMessage.setInstitutionPaymentId(consumeNotifyRequest.getQueryId());
+        notifyMessage.setActualPayPrice(new Money(consumeNotifyRequest.getSettleAmt()));
+        notifyMessage.setActualPayCurrency(consumeNotifyRequest.getSettleCurrencyCode());
+        notifyMessage.setDiscountAmt(new Money(0));
+        notifyMessage.setPayerId("");
+        notifyMessage.setPayerEmail("");
+        notifyMessage.setBankId("");
 
-
-
-
-
-
-        return null;
+        // FIXME: 2017/4/27 txntime or traceTime
+        String payTime = consumeNotifyRequest.getTxnTime();
+        try {
+            notifyMessage.setPayTime(DateUtils.parseDate(payTime, ApplePayConstants.standard_time_format));
+        }catch(Exception ex){
+            logger.error("pare date when process applepay notify with date string:" + payTime, ex);
+            notifyMessage.setPayTime(new Date());
+        }
+        
+        notifyMessage.setPayStatus(PayStatusEnum.Paied);
+        // FIXME: 2017/4/27 是否可以采用traceno
+        notifyMessage.setTraceId(consumeNotifyRequest.getTraceNo());
+        return notifyMessage;
     }
 
     @Override
@@ -97,7 +124,6 @@ public class ApplePayPaymentNotifyServiceImpl implements PaymentNotifyService {
                     request.getRespCode(),
                     request.getRespMsg()));
         }
-
     }
 }
 

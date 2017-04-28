@@ -27,8 +27,18 @@ public class ApplePayConstants {
     public static final String EQUAL = "=";
     public static final String AMPERSAND = "&";
 
+    /**
+     * YYYYMMddHHmmss
+     */
     public static final String time_format = "YYYYMMddHHmmss";
+    /**
+     * application/x-www-form-urlencoded
+     */
     public static final String content_type = "application/x-www-form-urlencoded";
+    /**
+     * yyyy-MM-dd HH:mm:ss
+     */
+    public static final String standard_time_format = "yyyy-MM-dd HH:mm:ss";
 
 
 

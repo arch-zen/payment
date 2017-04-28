@@ -5,14 +5,13 @@
  */
 package com.ymatou.payment.domain.channel.service.paymentnotify;
 
-import javax.annotation.Resource;
-
-import org.springframework.stereotype.Component;
-
 import com.ymatou.payment.domain.channel.service.PaymentNotifyService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * 支付回调解析器工厂
@@ -34,6 +33,9 @@ public class PaymentNotifyMessageResolverFactory {
 
     @Resource
     private CmbPaymentNotifyServiceImpl cmbPaymentNotifyServiceImpl;
+
+    @Resource
+    private ApplePayPaymentNotifyServiceImpl applePayPaymentNotifyService;
 
     /**
      * 获取到支付回调解析器
@@ -57,6 +59,8 @@ public class PaymentNotifyMessageResolverFactory {
                 return weiXinPaymentNotifyServiceImpl;
             case CmbApp:
                 return cmbPaymentNotifyServiceImpl;
+            case ApplePay:
+                return applePayPaymentNotifyService;
             default:
                 throw new BizException(ErrorCode.INVALID_PAY_TYPE, payType);
         }

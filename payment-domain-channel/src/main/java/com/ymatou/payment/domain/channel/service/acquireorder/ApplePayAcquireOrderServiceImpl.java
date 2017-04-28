@@ -17,6 +17,7 @@ import com.ymatou.payment.integration.service.applepay.common.ApplePayConstants;
 import com.ymatou.payment.integration.service.applepay.common.ApplePaySignatureUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import java.util.HashMap;
  * Created by gejianhua on 2017/4/27.
  * applepay acquire order
  */
+@Service
 public class ApplePayAcquireOrderServiceImpl implements AcquireOrderService {
 
     private static Logger logger = LoggerFactory.getLogger(AliPayAppAcquireOrderServiceImpl.class);
