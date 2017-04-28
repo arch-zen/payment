@@ -75,9 +75,7 @@ public class ApplePayUtil {
         if (requestParam == null || requestParam.size() == 0) {
             return "";
         }
-
-        StringBuffer sf = new StringBuffer("");
-
+        StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> en : requestParam.entrySet()) {
             try {
                 if (StringUtils.isBlank(en.getValue())) {
@@ -85,13 +83,12 @@ public class ApplePayUtil {
                 }
                 String value = en.getValue().trim();
                 value = URLEncoder.encode(value, ApplePayConstants.encoding);
-
-                sf.append(en.getKey() + ApplePayConstants.EQUAL + value + ApplePayConstants.AMPERSAND);
+                sb.append(en.getKey() + ApplePayConstants.EQUAL + value + ApplePayConstants.AMPERSAND);
             } catch (Exception ex) {
                 throw new BizException("genRequestParamMessage exception:", ex);
             }
         }
-        return sf.substring(0, sf.length() - 1);
+        return sb.substring(0, sb.length() - 1);
     }
 
     /**

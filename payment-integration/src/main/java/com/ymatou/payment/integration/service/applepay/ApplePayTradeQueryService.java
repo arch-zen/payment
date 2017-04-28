@@ -14,7 +14,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -28,7 +28,8 @@ import java.util.Map;
  * Created by gejianhua on 2017/4/27.
  * applepay交易查询服务
  */
-@Component
+
+@Service
 public class ApplePayTradeQueryService implements InitializingBean {
 
     private CloseableHttpClient httpClient;
