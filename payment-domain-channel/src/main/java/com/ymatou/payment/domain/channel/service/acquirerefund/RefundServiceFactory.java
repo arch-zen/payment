@@ -11,10 +11,10 @@ import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 
+import javax.annotation.Resource;
+
 /**
- * 
  * @author qianmin 2016年6月7日 下午5:57:15
- *
  */
 @Component
 public class RefundServiceFactory {
@@ -28,6 +28,9 @@ public class RefundServiceFactory {
 
     @Autowired
     private CmbRefundServiceImpl cmbRefundServiceImpl;
+
+    @Resource
+    private ApplePayRefundServiceImpl applePayRefundServiceImpl;
 
     public AcquireRefundService getInstanceByPayType(String payType) {
 
@@ -51,6 +54,8 @@ public class RefundServiceFactory {
                 return weixinRefundServiceImpl;
             case CmbApp:
                 return cmbRefundServiceImpl;
+            case ApplePay:
+                return applePayRefundServiceImpl;
             default:
                 throw new BizException(ErrorCode.INVALID_PAY_TYPE, payType.getCode());
         }

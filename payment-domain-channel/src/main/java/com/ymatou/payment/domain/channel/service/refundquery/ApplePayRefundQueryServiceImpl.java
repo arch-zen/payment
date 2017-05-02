@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 /**
  * Created by zhangxiaoming on 2017/4/28.
  */
+@Service
 public class ApplePayRefundQueryServiceImpl implements RefundQueryService {
     private static final Logger logger = LoggerFactory.getLogger(ApplePayRefundQueryServiceImpl.class);
     @Resource
