@@ -13,6 +13,7 @@ import com.ymatou.payment.integration.service.applepay.common.ApplePayConstants;
 import com.ymatou.payment.integration.service.applepay.common.ApplePaySignatureUtil;
 import com.ymatou.payment.test.RestBaseTest;
 import org.joda.time.DateTime;
+import org.junit.Assert;
 import org.junit.Test;
 
 import javax.annotation.Resource;
@@ -63,7 +64,13 @@ public class ApplePayRefundServiceTest extends RestBaseTest {
         String sign = ApplePaySignatureUtil.sign(applePayRefundRequest.genMap(), privateKey);
         applePayRefundRequest.setSignature(sign);
 
-        ApplePayRefundResponse response = applePayRefundService.doService(request, null);
+        header.put("mock", "1");
+        header.put("MockResult-ApplePay-respCode", "00");
+        ApplePayRefundResponse response = applePayRefundService.doService(request, header);
+        Assert.assertEquals("00", response.getRespCode());
 
+        header.put("MockResult-ApplePay-respCode", "01");
+        response = applePayRefundService.doService(request, header);
+        Assert.assertEquals("01", response.getRespCode());
     }
 }
