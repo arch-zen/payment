@@ -65,12 +65,9 @@ public class ApplePayAcquireOrderServiceImpl implements AcquireOrderService {
     private ApplePayConsumeRequest buildRequest(Payment payment, InstitutionConfig config, HashMap<String, String> mockHeader) {
         ApplePayConsumeRequest request = new ApplePayConsumeRequest();
 
-        request.setTxnType("01");
-        request.setTxnSubType("01");
-        request.setBizType("000201");
         request.setMerId(config.getMerchantId());
         request.setOrderId(payment.getPaymentId());
-        request.setTxnTime(StringUtil.getDateFormatString());
+        request.setTxnTime(payment.getBussinessOrder().getOrderTime());
         request.setTxnAmt(String.valueOf(payment.getPayPrice().getCent()));
         request.setBackUrl(String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPayType()));
         request.setCertId(config.getCertId());

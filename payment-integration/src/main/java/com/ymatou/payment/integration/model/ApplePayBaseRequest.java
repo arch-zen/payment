@@ -140,7 +140,7 @@ public class ApplePayBaseRequest extends PrintFriendliness{
         return txnType;
     }
 
-    public void setTxnType(String txnType) {
+    protected void setTxnType(String txnType) {
         this.txnType = txnType;
     }
 
@@ -148,7 +148,7 @@ public class ApplePayBaseRequest extends PrintFriendliness{
         return txnSubType;
     }
 
-    public void setTxnSubType(String txnSubType) {
+    protected void setTxnSubType(String txnSubType) {
         this.txnSubType = txnSubType;
     }
 
@@ -156,7 +156,7 @@ public class ApplePayBaseRequest extends PrintFriendliness{
         return bizType;
     }
 
-    public void setBizType(String bizType) {
+    protected void setBizType(String bizType) {
         this.bizType = bizType;
     }
 

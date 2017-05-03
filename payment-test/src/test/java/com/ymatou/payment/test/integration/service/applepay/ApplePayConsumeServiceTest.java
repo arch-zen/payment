@@ -38,9 +38,6 @@ public class ApplePayConsumeServiceTest extends RestBaseTest {
 
 
         ApplePayConsumeRequest request = new ApplePayConsumeRequest();
-        request.setTxnType("01");
-        request.setTxnSubType("01");
-        request.setBizType("000201");
 
         request.setMerId(config.getMerchantId());
         request.setOrderId(String.valueOf(10000000 + new Random().nextInt(100000000)));
@@ -58,17 +55,19 @@ public class ApplePayConsumeServiceTest extends RestBaseTest {
         String sign = ApplePaySignatureUtil.sign(request.genMap(), config.getInstYmtPrivateKey());
         request.setSignature(sign);
 
-
-
         ApplePayConsumeResponse response = this.applePayConsumeService.doPost(request, null);
+        System.out.println(response.getRespCode());
+        System.out.println(response.getRespMsg());
+
+        Assert.assertEquals(ApplePayConstants.response_success_code, response.getRespCode());
+
 
         //validate sign
         boolean flag = ApplePaySignatureUtil.validate(response.getOriginMap(), config.getInstPublicKey());
         Assert.assertEquals(true, flag);
-
-
-
     }
+
+
 
 }
 
