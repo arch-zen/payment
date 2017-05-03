@@ -66,6 +66,8 @@ public class RefundNotifyResourceImpl implements RefundNotifyResource {
             String body = getHttpBody(servletRequest);
             logger.info("receive alipay refund notify {}:{}", payType, body);
             RefundNotifyRequest refundNotifyRequest = new RefundNotifyRequest();
+            refundNotifyRequest.setPayType(payType);
+            refundNotifyRequest.setBody(body);
             refundNotifyRequest.setMockHeader(getMockHttpHeader(servletRequest));
             BaseResponse response = refundNotifyFacade.refundNotify(refundNotifyRequest);
             if (response.getIsSuccess()) {

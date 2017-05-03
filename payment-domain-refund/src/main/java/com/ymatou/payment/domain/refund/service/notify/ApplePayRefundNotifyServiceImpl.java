@@ -70,8 +70,13 @@ public class ApplePayRefundNotifyServiceImpl implements RefundNotifyService {
 
         String refundBatchNo = applePayRefundNotifyRequest.getOrderId();
         RefundRequestPo refundRequest = refundPository.getRefundRequestByRefundBatchNo(refundBatchNo);
+        if (refundRequest == null) {
+            throw new BizException(String.format("退款批次号为：%s 的单据不存在！", refundBatchNo));
+        }
         Payment payment = payService.getPaymentByPaymentId(refundRequest.getPaymentId());
-
+        if (payment == null) {
+            throw new BizException(String.format("支付单号为：%s 的单据不存在！", refundRequest.getPaymentId()));
+        }
         if (!StringUtils.equals(refundRequest.getRefundBatchNo(), applePayRefundNotifyRequest.getOrderId())) {
             throw new BizException("单号不匹配！");
         }
