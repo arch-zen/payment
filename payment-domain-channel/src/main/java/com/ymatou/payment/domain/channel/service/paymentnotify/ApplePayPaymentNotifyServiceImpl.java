@@ -17,12 +17,12 @@ import com.ymatou.payment.integration.model.ApplePayConsumeNotifyRequest;
 import com.ymatou.payment.integration.service.applepay.common.ApplePayConstants;
 import com.ymatou.payment.integration.service.applepay.common.ApplePayMessageUtil;
 import com.ymatou.payment.integration.service.applepay.common.ApplePaySignatureUtil;
-import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,24 +62,23 @@ public class ApplePayPaymentNotifyServiceImpl implements PaymentNotifyService {
         PaymentNotifyMessage notifyMessage = new PaymentNotifyMessage();
         notifyMessage.setPaymentId(consumeNotifyRequest.getOrderId());
         notifyMessage.setInstitutionPaymentId(consumeNotifyRequest.getQueryId());
-        notifyMessage.setActualPayPrice(new Money(consumeNotifyRequest.getSettleAmt()));
+        notifyMessage.setActualPayPrice(new Money(consumeNotifyRequest.getSettleAmt()).divide(new BigDecimal("100")));
         notifyMessage.setActualPayCurrency(consumeNotifyRequest.getSettleCurrencyCode());
         notifyMessage.setDiscountAmt(new Money(0));
         notifyMessage.setPayerId("");
         notifyMessage.setPayerEmail("");
         notifyMessage.setBankId("");
 
-        // FIXME: 2017/4/27 txntime or traceTime
-        String payTime = consumeNotifyRequest.getTxnTime();
         try {
-            notifyMessage.setPayTime(DateUtils.parseDate(payTime, ApplePayConstants.standard_time_format));
-        }catch(Exception ex){
-            logger.error("pare date when process applepay notify with date string:" + payTime, ex);
-            notifyMessage.setPayTime(new Date());
+            Integer cardType = Integer.parseInt(consumeNotifyRequest.getPayCardType());
+            notifyMessage.setCardType(cardType);
         }
-        
+        catch(Exception ex){
+            logger.error("paycardtype convert to integer exception, with paycardtype:" + consumeNotifyRequest.getPayCardType());
+        }
+
+        notifyMessage.setPayTime(new Date());
         notifyMessage.setPayStatus(PayStatusEnum.Paied);
-        // FIXME: 2017/4/27 是否可以采用traceno
         notifyMessage.setTraceId(consumeNotifyRequest.getTraceNo());
         return notifyMessage;
     }

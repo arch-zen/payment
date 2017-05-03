@@ -100,7 +100,7 @@ public class RefundPository {
     /**
      * 根据refundNo获取Refundrequest
      * 
-     * @param paymentId
+     * @param refundBatchNo
      * @return
      */
     public RefundRequestPo getRefundRequestByRefundBatchNo(String refundBatchNo) {
@@ -147,7 +147,8 @@ public class RefundPository {
     /**
      * 保存RefundRequest, 更新退款金额
      * 
-     * @param refundrequestWithBLOBs
+     * @param refundrequest
+     * @param payment
      */
     @Transactional
     public void saveRefundRequestAndUpdateRefundAmt(RefundRequestPo refundrequest, Payment payment) {
@@ -194,7 +195,7 @@ public class RefundPository {
     /**
      * 根据退款申请号查询退款申请列表
      * 
-     * @param query
+     * @param refundNoList
      * @return
      */
     public List<RefundRequestPo> queryRefundByRefundNo(List<String> refundNoList) {
@@ -205,7 +206,7 @@ public class RefundPository {
     /**
      * 根据退款单号查询退款申请列表
      * 
-     * @param query
+     * @param bizNoList
      * @return
      */
     public List<RefundRequestPo> queryRefundByBizNo(List<String> bizNoList) {
@@ -242,7 +243,9 @@ public class RefundPository {
     @Transactional
     public void updateRefundRequestAndPayment(RefundRequestPo refundRequestPo, PaymentPo paymentPo) {
         RefundRequestExample example = new RefundRequestExample();
-        example.createCriteria().andRefundBatchNoEqualTo(refundRequestPo.getRefundBatchNo());
+        example.createCriteria().andRefundIdEqualTo(refundRequestPo.getRefundId());
+
+        refundRequestPo.setRefundId(null);
         refundRequestMapper.updateByExampleSelective(refundRequestPo, example);
 
         PaymentExample example2 = new PaymentExample();
@@ -254,7 +257,6 @@ public class RefundPository {
      * 更新退款状态
      * 
      * @param refundRequestPo
-     * @param paymentPo
      */
     @Transactional
     public void updateRefundRequest(RefundRequestPo refundRequestPo) {

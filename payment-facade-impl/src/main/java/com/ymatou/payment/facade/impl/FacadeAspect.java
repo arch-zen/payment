@@ -1,8 +1,10 @@
 package com.ymatou.payment.facade.impl;
 
-import java.sql.SQLException;
-import java.util.UUID;
-
+import com.alibaba.dubbo.common.utils.StringUtils;
+import com.ymatou.payment.facade.BaseRequest;
+import com.ymatou.payment.facade.BaseResponse;
+import com.ymatou.payment.facade.BizException;
+import com.ymatou.payment.facade.ErrorCode;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -14,11 +16,8 @@ import org.slf4j.MDC;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.dubbo.common.utils.StringUtils;
-import com.ymatou.payment.facade.BaseRequest;
-import com.ymatou.payment.facade.BaseResponse;
-import com.ymatou.payment.facade.BizException;
-import com.ymatou.payment.facade.ErrorCode;
+import java.sql.SQLException;
+import java.util.UUID;
 
 /**
  * Facade实现方法的AOP.
@@ -77,6 +76,7 @@ public class FacadeAspect {
                     e.getErrorCode().getMessage() + "|" + e.getLocalizedMessage());
             logger.warn("Failed to execute request: {}, Error:{}", req.getRequestId(),
                     e.getErrorCode() + "|" + e.getErrorCode().getMessage() + "|" + e.getLocalizedMessage());
+
 
             // FIXME：可以不需要特殊处理吗？
         } catch (SQLException | DataIntegrityViolationException e) {

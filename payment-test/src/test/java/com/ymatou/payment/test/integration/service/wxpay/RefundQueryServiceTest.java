@@ -1,19 +1,18 @@
 package com.ymatou.payment.test.integration.service.wxpay;
 
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.Random;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.ymatou.payment.integration.common.Signature;
 import com.ymatou.payment.integration.model.QueryRefundRequest;
 import com.ymatou.payment.integration.model.QueryRefundResponse;
 import com.ymatou.payment.integration.model.RefundOrderData;
 import com.ymatou.payment.integration.service.wxpay.WxRefundQueryService;
 import com.ymatou.payment.test.RestBaseTest;
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.Random;
 
 public class RefundQueryServiceTest extends RestBaseTest {
 
@@ -39,7 +38,7 @@ public class RefundQueryServiceTest extends RestBaseTest {
         // header.put("mockId", "888888");
         QueryRefundResponse response = refundQueryService.doService(request, header);
         Assert.assertNotNull(response);
-        Assert.assertEquals("REFUNDNOTEXIST", response.getErr_code());
+        Assert.assertEquals("TRANSACTION_ID_INVALID", response.getErr_code());
     }
 
     @Test

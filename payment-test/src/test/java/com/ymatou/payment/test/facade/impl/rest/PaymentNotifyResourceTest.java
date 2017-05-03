@@ -1,20 +1,42 @@
 /**
  * (C) Copyright 2016 Ymatou (http://www.ymatou.com/).
- *
+ * <p>
  * All rights reserved.
  */
 package com.ymatou.payment.test.facade.impl.rest;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import javax.annotation.Resource;
 import javax.ws.rs.core.Response;
 
+import com.ymatou.payment.domain.pay.model.BussinessOrder;
+import com.ymatou.payment.domain.pay.model.Payment;
+import com.ymatou.payment.domain.pay.service.PayService;
+import com.ymatou.payment.facade.BizException;
+import com.ymatou.payment.facade.ErrorCode;
+import com.ymatou.payment.facade.constants.AcquireOrderResultTypeEnum;
+import com.ymatou.payment.facade.constants.PayStatusEnum;
+import com.ymatou.payment.facade.constants.PaymentNotifyStatusEnum;
+import com.ymatou.payment.facade.model.AcquireOrderReq;
+import com.ymatou.payment.facade.model.AcquireOrderResp;
+import com.ymatou.payment.facade.model.CheckPaymentRequset;
+import com.ymatou.payment.facade.rest.PaymentResource;
+import com.ymatou.payment.infrastructure.Money;
+import com.ymatou.payment.integration.model.ApplePayConsumeNotifyRequest;
+import com.ymatou.payment.integration.service.applepay.common.ApplePayConstants;
+import com.ymatou.payment.integration.service.applepay.common.ApplePayMessageUtil;
+import com.ymatou.payment.integration.service.applepay.common.ApplePaySignatureUtil;
+import org.apache.commons.beanutils.BeanUtils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
@@ -31,9 +53,8 @@ import com.ymatou.payment.test.RestBaseTest;
 
 /**
  * 支付回调测试
- * 
- * @author wangxudong 2016年5月19日 上午11:54:27
  *
+ * @author wangxudong 2016年5月19日 上午11:54:27
  */
 public class PaymentNotifyResourceTest extends RestBaseTest {
 
@@ -48,6 +69,10 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
 
     @Resource
     private AlipayNotifyLogMapper alipaynotifylogMapper;
+    @Resource
+    private PaymentResource paymentResource;
+    @Resource
+    private PayService payService;
 
     @Test
     public void testAliPayPCNotify() throws UnsupportedEncodingException {
@@ -179,6 +204,7 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
         MockHttpServletRequest servletRequest = new MockHttpServletRequest();
         servletRequest.setRequestURI("/notify/" + payType);
         servletRequest.addHeader("mock", "1");
+
         servletRequest.setContent(reqRawBody.getBytes("utf-8"));
 
         String response = paymentNotifyResource.notify(payType, servletRequest);
@@ -290,6 +316,68 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
         assertEquals("验证报文插入表中", 0, poList.size());
     }
 
+    @Test
+    public void testPaymentNotifyForApplePay() throws UnsupportedEncodingException {
+        //创建一个消费单
+        AcquireOrderReq acquireOrderReq = new AcquireOrderReq();
+
+        PaymentResourceImplTest paymentResourceImplTest = new PaymentResourceImplTest();
+        paymentResourceImplTest.buildBaseRequest(acquireOrderReq);
+
+        acquireOrderReq.setPayType(PayTypeEnum.ApplePay.getCode());
+        acquireOrderReq.setPayPrice("1.01");
+        acquireOrderReq.setNotifyUrl("http://mockforpay.iapi.ymatou.com/api/Trading/NotifyTradingEvent");
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+
+        AcquireOrderResp acquireOrderResp = this.paymentResource.acquireOrder(acquireOrderReq, servletRequest);
+        Assert.assertNotNull(acquireOrderResp.getResult());
+        System.out.println("result:" + acquireOrderResp.getResult());
+        Assert.assertEquals(true, acquireOrderResp.getIsSuccess());
+
+        BussinessOrder bo = payService.getBussinessOrderByOrderId(acquireOrderReq.orderId);
+        assertNotNull("验证商户订单", bo);
+        System.out.println(bo.getOrderId());
+        System.out.println(bo.getBussinessOrderId());
+
+        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        Assert.assertNotNull(payment);
+
+
+        //构造通知报文
+        ApplePayConsumeNotifyRequest notifyRequest = this.buildNotifyMessageForApplePay();
+        notifyRequest.setOrderId(payment.getPaymentId());
+        notifyRequest.setTxnAmt(String.valueOf(new Money(acquireOrderReq.getPayPrice()).getCent()));
+        notifyRequest.setSettleAmt(notifyRequest.getTxnAmt());
+
+        Map<String, String> notifyMap = this.genMap(notifyRequest);
+
+        //签名
+        String sign = ApplePaySignatureUtil.sign(notifyMap, this.signatureService.getMockPrivateKey());
+        notifyMap.put("signature", sign);
+        System.out.println("notify sign:" + sign);
+
+        String payType = "60";
+        String notifyMessage = ApplePayMessageUtil.genRequestMessage(notifyMap);
+        notifyMessage = URLDecoder.decode(notifyMessage, ApplePayConstants.encoding);
+
+        servletRequest = new MockHttpServletRequest();
+        servletRequest.setRequestURI("/notify/" + payType);
+        servletRequest.setContent(notifyMessage.getBytes("utf-8"));
+        servletRequest.addHeader("mock", "1");
+
+        String result = this.paymentNotifyResource.notify(payType, servletRequest);
+        System.out.println(result);
+        Assert.assertEquals("ok", result);
+
+        bo = payService.getBussinessOrderByOrderId(acquireOrderReq.orderId);
+        Assert.assertEquals(PayStatusEnum.Paied.getIndex(), bo.getOrderStatus().intValue());
+
+        payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        Assert.assertEquals(PayStatusEnum.Paied.getIndex(), payment.getPayStatus().getIndex());
+        Assert.assertEquals(PaymentNotifyStatusEnum.NOTIFIED, payment.getNotifyStatus());
+    }
+
     private String buildMockQueryString(String originString, String payType) throws UnsupportedEncodingException {
         InstitutionConfig instConfig = institutionConfigManager.getConfig(PayTypeEnum.parse(payType));
         Map<String, String> map = HttpUtil.parseQueryStringToMap(originString);
@@ -300,4 +388,114 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
 
         return HttpUtil.parseMapToQueryString(map);
     }
+
+    private ApplePayConsumeNotifyRequest buildNotifyMessageForApplePay() {
+        InstitutionConfig config = this.institutionConfigManager.getConfig(PayTypeEnum.ApplePay);
+
+        ApplePayConsumeNotifyRequest request = new ApplePayConsumeNotifyRequest();
+        request.setVersion(ApplePayConstants.version);
+        request.setEncoding(ApplePayConstants.encoding);
+        request.setSignMethod(ApplePayConstants.signMethod);
+        request.setTxnType("01");
+        request.setTxnSubType("01");
+        request.setBizType("000201");
+        request.setAccessType("0");
+        request.setMerId(config.getMerchantId());
+        request.setCurrencyCode(ApplePayConstants.currency_code);
+        request.setSettleCurrencyCode(ApplePayConstants.currency_code);
+        request.setPayCardType("01");
+        request.setQueryId(String.valueOf(10000000 + new Random().nextInt(100000000)));
+        request.setTraceNo(request.getQueryId());
+        request.setTxnTime(getDateFormatString("yyyyMMddHHmmss"));
+
+        //需后赋值
+        request.setTxnAmt("100");
+        request.setOrderId(getDateFormatString("yyyyMMddHHmmssSSS"));
+        request.setSettleAmt("100");
+        request.setRespCode("00");
+        request.setRespMsg("paysuccess");
+
+        return request;
+
+    }
+
+    /**
+     * 构造日期字符串
+     *
+     * @return
+     */
+    private String getDateFormatString(String format) {
+        DateFormat dateFormat = new SimpleDateFormat(format);
+
+        return dateFormat.format(new Date());
+    }
+
+    private Map<String, String> genMap(Object bean) {
+        try {
+            Map<String, String> map = BeanUtils.describe(bean);
+            if (map.containsKey("class")) {
+                map.remove("class");
+            }
+            return map;
+        } catch (Exception ex) {
+            throw new BizException("genMap exception", ex);
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -16,6 +16,8 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import com.ymatou.payment.facade.constants.AcquireOrderResultTypeEnum;
+import com.ymatou.payment.facade.constants.PayTypeEnum;
 import org.apache.http.client.utils.DateUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -157,6 +159,42 @@ public class PaymentResourceImplTest extends RestBaseTest {
         assertEquals("验证返回码", 0, res.getErrorCode());
         assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
         assertEquals("验证ResultType", "JSON", res.getResultType());
+        assertNotNull("验证Result", res.getResult());
+
+        BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
+        assertNotNull("验证商户订单", bo);
+
+        System.out.println(bo.getOrderId());
+        System.out.println(bo.getBussinessOrderId());
+
+        assertEquals("验证PayType", req.getPayType(), bo.getPayType());
+
+        Payment payment = payService.getPaymentByBussinessOrderId(bo.getBussinessOrderId());
+        assertNotNull("验证支付单不为空", payment);
+
+        assertEquals("验证PayType", req.getPayType(), payment.getPayType().getCode());
+        assertEquals("验证PayPrice", new BigDecimal(req.getPayPrice()).doubleValue(),
+                payment.getPayPrice().getAmount().doubleValue(),
+                0.000001);
+        assertEquals("验证PayStatus", 0, payment.getPayStatus().getIndex());
+    }
+
+    @Test
+    public void testAcquireOrderApplePay() {
+        AcquireOrderReq req = new AcquireOrderReq();
+        buildBaseRequest(req);
+
+        req.setPayType(PayTypeEnum.ApplePay.getCode());
+        req.setPayPrice("1.01");
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        AcquireOrderResp res = paymentResource.acquireOrder(req, servletRequest);
+
+        System.out.println("result:" + res.getResult());
+
+        assertEquals("验证返回码", 0, res.getErrorCode());
+        assertEquals("验证TraceId", req.getTraceId(), res.getTraceId());
+        assertEquals("验证ResultType", AcquireOrderResultTypeEnum.Text.name(), res.getResultType());
         assertNotNull("验证Result", res.getResult());
 
         BussinessOrder bo = payService.getBussinessOrderByOrderId(req.orderId);
@@ -594,7 +632,7 @@ public class PaymentResourceImplTest extends RestBaseTest {
      * 
      * @param req
      */
-    private void buildBaseRequest(AcquireOrderReq req) {
+    public void buildBaseRequest(AcquireOrderReq req) {
         req.setVersion(1);
         req.setBizCode(3);
         req.setOriginAppId("JavaTest");
