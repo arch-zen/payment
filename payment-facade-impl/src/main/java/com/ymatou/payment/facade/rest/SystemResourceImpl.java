@@ -5,18 +5,16 @@
  */
 package com.ymatou.payment.facade.rest;
 
-import java.io.File;
+import com.ymatou.payment.infrastructure.util.NetUtil;
+import com.ymatou.payment.integration.IntegrationConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import com.ymatou.payment.infrastructure.util.NetUtil;
-import com.ymatou.payment.integration.IntegrationConfig;
+import java.io.File;
 
 /**
  * 系统消息实现
@@ -53,6 +51,7 @@ public class SystemResourceImpl implements SystemResource {
                 + "\"1.1.10\":\"2017-03-08.6 change pc payment form meta.\","
                 + "\"1.1.11\":\"2017-03-22.1 call trading when wx refund return USER_ACCOUNT_ABNORMAL.\""
                 + "\"1.1.12\":\"2017-04-25.1 update refund batchno when query return SELLER_BALANCE_NOT_ENOUGH and afterday.\""
+                + "\"1.1.13\":\"2017-05-03.1 add applypay.\""
                 + "}";
     }
 
