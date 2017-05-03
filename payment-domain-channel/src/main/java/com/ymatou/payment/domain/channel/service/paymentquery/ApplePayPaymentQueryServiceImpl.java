@@ -157,17 +157,16 @@ public class ApplePayPaymentQueryServiceImpl implements PaymentQueryService {
                     response.getRespMsg(),
                     response.getMerId()));
         }
-        //验签
-        String pubkey = config.getInstPublicKey();
-        if (this.integrationConfig.isMock(header)) {
-            pubkey = this.signatureService.getMockPublicKey();
-        }
-        boolean flag = ApplePaySignatureUtil.validate(response.getOriginMap(), pubkey);
-        if (flag == false) {
-            throw new BizException(String.format("applepay consumeQuery validate sign fail:paymentId:%s, code:%s, msg:%s",
-                    request.getOrderId(),
-                    response.getRespCode(),
-                    response.getRespMsg()));
+        //验签，如果是mock不验签
+        if (this.integrationConfig.isMock(header) == false) {
+            String pubkey = config.getInstPublicKey();
+            boolean flag = ApplePaySignatureUtil.validate(response.getOriginMap(), pubkey);
+            if (flag == false) {
+                throw new BizException(String.format("applepay consumeQuery validate sign fail:paymentId:%s, code:%s, msg:%s",
+                        request.getOrderId(),
+                        response.getRespCode(),
+                        response.getRespMsg()));
+            }
         }
 
         return response;

@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,7 +62,7 @@ public class ApplePayPaymentNotifyServiceImpl implements PaymentNotifyService {
         PaymentNotifyMessage notifyMessage = new PaymentNotifyMessage();
         notifyMessage.setPaymentId(consumeNotifyRequest.getOrderId());
         notifyMessage.setInstitutionPaymentId(consumeNotifyRequest.getQueryId());
-        notifyMessage.setActualPayPrice(new Money(consumeNotifyRequest.getSettleAmt()));
+        notifyMessage.setActualPayPrice(new Money(consumeNotifyRequest.getSettleAmt()).divide(new BigDecimal("100")));
         notifyMessage.setActualPayCurrency(consumeNotifyRequest.getSettleCurrencyCode());
         notifyMessage.setDiscountAmt(new Money(0));
         notifyMessage.setPayerId("");

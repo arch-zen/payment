@@ -7,7 +7,7 @@ package com.ymatou.payment.integration.model;
 public class ApplePayConsumeQueryRequest extends ApplePayTradeQueryRequest {
 
     public ApplePayConsumeQueryRequest(){
-        this.setTxnSubType("00");
+        this.setTxnType("00");
         this.setTxnSubType("00");
         this.setBizType("000201");
     }
