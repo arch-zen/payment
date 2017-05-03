@@ -103,18 +103,18 @@ public class ApplePayAcquireOrderServiceImpl implements AcquireOrderService {
                     response.getRespMsg(),
                     response.getMerId()));
         }
-        //验签
-        String pubkey = config.getInstPublicKey();
-        if (this.integrationConfig.isMock(mockHeader)) {
-            pubkey = this.signatureService.getMockPublicKey();
+        //验签，如果是mock则不验签
+        if (this.integrationConfig.isMock(mockHeader) == false) {
+            String pubkey = config.getInstPublicKey();
+            boolean flag = ApplePaySignatureUtil.validate(response.getOriginMap(), pubkey);
+            if(flag == false){
+                throw new BizException(String.format("applepay acquireorder validate sign fail:paymentId:%s, code:%s, msg:%s",
+                        request.getOrderId(),
+                        response.getRespCode(),
+                        response.getRespMsg()));
+            }
         }
-        boolean flag = ApplePaySignatureUtil.validate(response.getOriginMap(), pubkey);
-        if(flag == false){
-            throw new BizException(String.format("applepay acquireorder validate sign fail:paymentId:%s, code:%s, msg:%s",
-                    request.getOrderId(),
-                    response.getRespCode(),
-                    response.getRespMsg()));
-        }
+
 
         return response;
     }
