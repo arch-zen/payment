@@ -75,7 +75,7 @@ public class FacadeAspect {
             resp = builErrorResponse(joinPoint, e.getErrorCode(),
                     e.getErrorCode().getMessage() + "|" + e.getLocalizedMessage());
             logger.warn("Failed to execute request: {}, Error:{}", req.getRequestId(),
-                    e.getErrorCode() + "|" + e.getErrorCode().getMessage() + "|" + e.getLocalizedMessage());
+                    e.getErrorCode() + "|" + e.getErrorCode().getMessage() + "|" + e);
 
 
             // FIXME：可以不需要特殊处理吗？
