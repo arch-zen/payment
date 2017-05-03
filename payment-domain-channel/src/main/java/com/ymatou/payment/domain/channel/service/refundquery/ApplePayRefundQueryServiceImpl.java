@@ -73,7 +73,7 @@ public class ApplePayRefundQueryServiceImpl implements RefundQueryService {
 
     private ApplePayRefundQueryRequest generateRequest(RefundRequestPo refundRequest, Payment payment,
                                                        InstitutionConfig config, HashMap<String, String> header) {
-        String txnTime = new DateTime().toString(ApplePayConstants.time_format);
+        String txnTime = new DateTime(refundRequest.getCreatedTime()).toString(ApplePayConstants.time_format);
         ApplePayRefundQueryRequest request = new ApplePayRefundQueryRequest();
         request.setOrderId(refundRequest.getRefundBatchNo());
         request.setTxnTime(txnTime);
