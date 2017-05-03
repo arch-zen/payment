@@ -3,13 +3,14 @@
  */
 package com.ymatou.payment.domain.channel.service.paymentquery;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.ymatou.payment.domain.channel.service.PaymentQueryService;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * 
@@ -27,6 +28,8 @@ public class PaymentQueryServiceFactory {
 
     @Autowired
     private CmbPaymentQueryServiceImpl cmbPaymentQueryServiceImpl;
+    @Resource
+    private ApplePayPaymentQueryServiceImpl applePayPaymentQueryService;
 
     public PaymentQueryService getInstanceByPayType(String payType) {
 
@@ -45,6 +48,8 @@ public class PaymentQueryServiceFactory {
                 return weiXinPaymentQueryServiceImpl;
             case CmbApp:
                 return cmbPaymentQueryServiceImpl;
+            case ApplePay:
+                return applePayPaymentQueryService;
             default:
                 throw new BizException(ErrorCode.INVALID_PAY_TYPE, payType);
 
