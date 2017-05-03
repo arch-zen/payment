@@ -8,6 +8,7 @@ import com.ymatou.payment.domain.channel.service.SignatureService;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.constants.AcquireOrderResultTypeEnum;
+import com.ymatou.payment.infrastructure.util.StringUtil;
 import com.ymatou.payment.integration.IntegrationConfig;
 import com.ymatou.payment.integration.model.ApplePayConsumeRequest;
 import com.ymatou.payment.integration.model.ApplePayConsumeResponse;
@@ -64,9 +65,12 @@ public class ApplePayAcquireOrderServiceImpl implements AcquireOrderService {
     private ApplePayConsumeRequest buildRequest(Payment payment, InstitutionConfig config, HashMap<String, String> mockHeader) {
         ApplePayConsumeRequest request = new ApplePayConsumeRequest();
 
+        request.setTxnType("01");
+        request.setTxnSubType("01");
+        request.setBizType("000201");
         request.setMerId(config.getMerchantId());
         request.setOrderId(payment.getPaymentId());
-        request.setTxnTime(payment.getBussinessOrder().getOrderTime());
+        request.setTxnTime(StringUtil.getDateFormatString());
         request.setTxnAmt(String.valueOf(payment.getPayPrice().getCent()));
         request.setBackUrl(String.format("%s/notify/%s", integrationConfig.getYmtPaymentBaseUrl(), payment.getPayType()));
         request.setCertId(config.getCertId());

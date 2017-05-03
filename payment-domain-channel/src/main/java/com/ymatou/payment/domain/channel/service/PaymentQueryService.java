@@ -3,9 +3,9 @@
  */
 package com.ymatou.payment.domain.channel.service;
 
-import com.ymatou.payment.domain.channel.model.PaymentQueryResp;
-
 import java.util.HashMap;
+
+import com.ymatou.payment.domain.channel.model.PaymentQueryResp;
 
 /**
  * 调用第三方的支付单查询接口
@@ -20,8 +20,8 @@ public interface PaymentQueryService {
      * 
      * @param paymentId
      * @param payType
-     * @param header
+     * @param finalCheck
      * @return
      */
-    public PaymentQueryResp queryPayment(String paymentId, String payType, HashMap<String, String> header);
+    public PaymentQueryResp queryPayment(String payType, String paymentId, HashMap<String, String> header);
 }

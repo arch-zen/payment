@@ -28,7 +28,6 @@ import java.util.Map;
  * Created by gejianhua on 2017/4/27.
  * applepay交易查询服务
  */
-
 @Service
 public class ApplePayTradeQueryService implements InitializingBean {
 

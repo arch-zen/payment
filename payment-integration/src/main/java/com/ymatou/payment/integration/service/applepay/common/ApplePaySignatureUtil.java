@@ -62,7 +62,7 @@ public class ApplePaySignatureUtil {
 
         //生成明文
         String plaintext = ApplePayUtil.genPlaintext(respMessage);
-        logger.info("待验签报文串：{}", plaintext);
+        logger.info("待签名报文串：{}", plaintext);
 
         //生成签名摘要
         byte[] signDigest = SecurityUtil.sha1(plaintext, ApplePayConstants.encoding);

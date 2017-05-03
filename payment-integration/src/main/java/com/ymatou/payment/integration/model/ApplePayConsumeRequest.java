@@ -6,12 +6,6 @@ package com.ymatou.payment.integration.model;
  */
 public class ApplePayConsumeRequest extends ApplePayBaseRequest {
 
-    public ApplePayConsumeRequest(){
-        this.setTxnType("01");
-        this.setTxnSubType("01");
-        this.setBizType("000201");
-    }
-
     ///////////////基本信息////////////////////////
     //其它信息在ApplyPayBaseRequest类中
 

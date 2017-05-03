@@ -23,6 +23,7 @@ import com.ymatou.payment.integration.service.applepay.common.ApplePaySignatureU
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 /**
  * Created by zhangxiaoming on 2017/4/27.
  */
+@Service
 public class ApplePayRefundServiceImpl implements AcquireRefundService {
     private static final Logger logger = LoggerFactory.getLogger(ApplePayRefundServiceImpl.class);
 
