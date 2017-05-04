@@ -94,10 +94,10 @@ public class SignNotifyFacadeImpl implements SignNotifyFacade {
 
         CmbAggrementPo aggrementPo = cmbAggrementRepository.getByAggId(Long.parseLong(signNoticeData.getAgrNo()));
         if (aggrementPo == null) {
-            throw new BizException(String.format("aggid:% not exist when sign notify.", signNoticeData.getAgrNo()));
+            throw new BizException(String.format("aggid:%s not exist when sign notify.", signNoticeData.getAgrNo()));
         }
 
-        if (CmbAggrementStatusEnum.INIT.code().equals(Integer.valueOf(aggrementPo.getAggStatus()))) {
+        if (CmbAggrementStatusEnum.INIT.code().equals(aggrementPo.getAggStatus())) {
             if ("SUC0000".equals(signNoticeData.getRspCode())) {
                 aggrementPo.setAggStatus(CmbAggrementStatusEnum.SIGN.code());
             } else {

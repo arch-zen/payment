@@ -27,6 +27,6 @@ public class NotifyUserServiceTest extends RestBaseTest {
         request.setOrderId("1000022765");
         String result = notifyUserService.sendTradingMessage(request, null);
 
-        assertEquals("\"ok\"", result);
+        assertEquals("ok", result);
     }
 }

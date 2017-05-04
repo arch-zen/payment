@@ -43,9 +43,6 @@ public enum RefundStatusEnum {
         return code;
     }
 
-    public void setCode(int code) {
-        this.code = code;
-    }
 
     public static RefundStatusEnum withCode(int code) {
         switch (code) {

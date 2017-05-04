@@ -83,7 +83,7 @@ public final class StringUtil {
      * @param maxLen
      * @return
      */
-    public static String TrimMax(String rawStr, int maxLen) {
+    public static String trimMax(String rawStr, int maxLen) {
         if (!StringUtils.isBlank(rawStr) && rawStr.length() > maxLen) {
             return rawStr.substring(0, maxLen);
         } else {

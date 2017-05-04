@@ -97,7 +97,7 @@ public class QueryRefundServiceImpl implements QueryRefundService {
             detail.setRefundTime(rq.getRefundTime());
             detail.setRefundBatchNo(rq.getRefundBatchNo());
             detail.setPaymentId(rq.getPaymentId());
-            detail.setPayChannel(Integer.valueOf(PayTypeEnum.getChannelType(rq.getPayType()).getCode()));
+            detail.setPayChannel(Integer.parseInt(PayTypeEnum.getChannelType(rq.getPayType()).getCode()));
             detail.setTradeType(rq.getTradeType());
             detail.setIsIntercept(rq.getSoftDeleteFlag());
 
