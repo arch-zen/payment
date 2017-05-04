@@ -81,7 +81,8 @@ public class ApplePayPaymentQueryServiceImpl implements PaymentQueryService {
 
         } else if ("03".equals(tradeQueryResponse.getOrigRespCode())
                 || "04".equals(tradeQueryResponse.getOrigRespCode())
-                || "05".equals(tradeQueryResponse.getOrigRespCode())) {
+                || "05".equals(tradeQueryResponse.getOrigRespCode())
+                || "12".equals(tradeQueryResponse.getOrigRespCode())) {
 
             PaymentQueryResp resp = new PaymentQueryResp();
             resp.setOriginMessage(tradeQueryResponse.toString());
