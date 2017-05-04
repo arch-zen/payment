@@ -359,7 +359,8 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
 
         String payType = "60";
         String notifyMessage = ApplePayMessageUtil.genRequestMessage(notifyMap);
-        notifyMessage = URLDecoder.decode(notifyMessage, ApplePayConstants.encoding);
+        //notifyMessage = URLDecoder.decode(notifyMessage, ApplePayConstants.encoding);
+        System.out.println("notifyMessage:" + notifyMessage);
 
         servletRequest = new MockHttpServletRequest();
         servletRequest.setRequestURI("/notify/" + payType);

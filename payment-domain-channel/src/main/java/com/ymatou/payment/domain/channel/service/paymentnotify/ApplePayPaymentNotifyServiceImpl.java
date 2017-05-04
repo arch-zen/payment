@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +49,12 @@ public class ApplePayPaymentNotifyServiceImpl implements PaymentNotifyService {
     @Override
     public PaymentNotifyMessage resloveNotifyMessage(PaymentNotifyReq notifyRequest) {
         //result转换为response
-        Map<String, String> map = ApplePayMessageUtil.genResponseMessage(notifyRequest.getRawString());
+        Map<String, String> map = null;
+        try {
+            map = ApplePayMessageUtil.genResponseMessage(URLDecoder.decode(notifyRequest.getRawString(), ApplePayConstants.encoding));
+        }catch(Exception ex){
+            throw new BizException("resloveNotifyMessage urldecode exception", ex);
+        }
         ApplePayConsumeNotifyRequest consumeNotifyRequest = new ApplePayConsumeNotifyRequest();
         consumeNotifyRequest.loadProperty(map);
 
