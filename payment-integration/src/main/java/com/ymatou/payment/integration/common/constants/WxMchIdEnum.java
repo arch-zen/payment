@@ -22,8 +22,4 @@ public enum WxMchIdEnum {
     public String getMchId() {
         return mchId;
     }
-
-    public void setMchId(String mchId) {
-        this.mchId = mchId;
-    }
 }

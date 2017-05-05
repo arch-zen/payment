@@ -22,7 +22,7 @@ public class CmbQuerySettledOrderRequest extends CmbDTO {
     @Override
     public String buildSignString() {
         return String.format(
-                "beginDate=%s&branchNo=%s&dateTime=%s&endDate=%s&merchantNo=%s&nextKeyValue=%s&operatorNo=9999",
+                "beginDate=%s&branchNo=%s&dateTime=%s&endDate=%s&merchantNo=%s&nextKeyValue=%s&operatorNo=%s",
                 reqData.getBeginDate(), reqData.getBranchNo(), reqData.getDateTime(), reqData.getEndDate(),
                 reqData.getMerchantNo(), reqData.getNextKeyValue(), reqData.getOperatorNo());
     }

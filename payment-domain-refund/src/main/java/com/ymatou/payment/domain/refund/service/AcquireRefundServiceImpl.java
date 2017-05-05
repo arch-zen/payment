@@ -51,7 +51,7 @@ public class AcquireRefundServiceImpl implements AcquireRefundService {
     @Override
     public boolean acquireRefund(AcquireRefundPlusRequest req) {
         String refundSupportDaysStr = domainConfig.getRefundSupportDays(); // 获取退款允许的天数
-        int refundSupportDays = StringUtils.isBlank(refundSupportDaysStr) ? 90 : Integer.valueOf(refundSupportDaysStr);
+        int refundSupportDays = StringUtils.isBlank(refundSupportDaysStr) ? 90 : Integer.parseInt(refundSupportDaysStr);
         LocalDate validDate = LocalDate.now().minusDays(refundSupportDays); // 获取有效的订单日期
 
         // 根据tradeNo获取已支付，退款有效期内的BussinessOrder

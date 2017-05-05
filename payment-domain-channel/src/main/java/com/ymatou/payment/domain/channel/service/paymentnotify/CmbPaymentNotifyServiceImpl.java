@@ -95,7 +95,7 @@ public class CmbPaymentNotifyServiceImpl implements PaymentNotifyService {
         try {
             paymentNotifyMessage.setPayTime(simpleDateFormat.parse(noticeData.getDateTime()));
         } catch (Exception e) {
-            logger.error(String.format("parse PayTime String faild, paymentid:{}, paytime:{}", noticeData.getOrderNo(),
+            logger.error(String.format("parse PayTime String faild, paymentid:%s, paytime:%s", noticeData.getOrderNo(),
                     noticeData.getDateTime()), e);
             paymentNotifyMessage.setPayTime(new Date());
         }

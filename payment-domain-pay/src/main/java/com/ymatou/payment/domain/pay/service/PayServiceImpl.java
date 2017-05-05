@@ -130,7 +130,7 @@ public class PayServiceImpl implements PayService {
         bo.setCodePage(req.getEncoding());
         bo.setCurrencyType(req.getCurrency());
         bo.setExt(req.getExt());
-        bo.setMemo(StringUtil.TrimMax(req.getMemo(), 512));
+        bo.setMemo(StringUtil.trimMax(req.getMemo(), 512));
         bo.setNotifyUrl(req.getNotifyUrl());
         bo.setOrderId(req.getOrderId());
         bo.setOrderPrice(new BigDecimal(req.getPayPrice()));

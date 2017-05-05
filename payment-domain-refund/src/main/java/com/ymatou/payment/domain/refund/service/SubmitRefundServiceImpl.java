@@ -61,7 +61,7 @@ public class SubmitRefundServiceImpl implements SubmitRefundService {
         List<TradeRefundDetail> tradeRefundDetails = new ArrayList<>();
 
         String refundSupportDaysStr = domainConfig.getRefundSupportDays(); // 获取退款允许的天数
-        int refundSupportDays = StringUtils.isBlank(refundSupportDaysStr) ? 90 : Integer.valueOf(refundSupportDaysStr);
+        int refundSupportDays = StringUtils.isBlank(refundSupportDaysStr) ? 90 : Integer.parseInt(refundSupportDaysStr);
         LocalDate validDate = LocalDate.now().minusDays(refundSupportDays); // 获取有效的订单日期
 
         logger.info("generate tradeRefundDetailList begin.");
