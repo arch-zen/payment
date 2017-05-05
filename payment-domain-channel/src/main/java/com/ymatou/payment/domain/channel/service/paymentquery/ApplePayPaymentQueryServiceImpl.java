@@ -142,7 +142,8 @@ public class ApplePayPaymentQueryServiceImpl implements PaymentQueryService {
     private ApplePayTradeQueryResponse consumeQuery(ApplePayConsumeQueryRequest request, HashMap<String, String> header) {
         ApplePayTradeQueryResponse response = this.applePayTradeQueryService.doPost(request, header);
 
-        if (ApplePayConstants.response_success_code.equals(response.getRespCode()) == false) {
+        if (ApplePayConstants.response_success_code.equals(response.getRespCode()) == false
+                && "34".equals(response.getRespCode()) == false) {
             throw new BizException(String.format("applepay consumeQuery fail:paymentId:%s, code:%s, msg:%s",
                     request.getOrderId(),
                     response.getRespCode(),
