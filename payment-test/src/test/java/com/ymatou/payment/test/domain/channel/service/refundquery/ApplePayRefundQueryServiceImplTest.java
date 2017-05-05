@@ -30,7 +30,7 @@ public class ApplePayRefundQueryServiceImplTest extends RestBaseTest {
     private InstitutionConfigManager configManager;
 
     @Test
-    public void queryRefundTest() {
+    public void queryRefundMockTest() {
         RefundQueryService refundQueryService = refundQueryServiceFactory.getInstanceByPayType(PayTypeEnum.ApplePay);
         Assert.assertNotNull(refundQueryService);
 
@@ -54,5 +54,19 @@ public class ApplePayRefundQueryServiceImplTest extends RestBaseTest {
         refundStatusEnum = refundQueryService.queryRefund(refundRequestPo, payment, header);
         Assert.assertEquals(RefundStatusEnum.THIRDPART_REFUND_SUCCESS, refundStatusEnum);
 
+    }
+
+    @Test
+    public void queryRefundTest() {
+        RefundQueryService refundQueryService = refundQueryServiceFactory.getInstanceByPayType(PayTypeEnum.ApplePay);
+        Assert.assertNotNull(refundQueryService);
+
+        RefundRequestPo refundRequestPo = getRefundRequestBy(RefundStatusEnum.REFUND_FAILED);
+        Payment payment = paymentRepository.getByPaymentId(refundRequestPo.getPaymentId());
+        refundRequestPo.setPayType(PayTypeEnum.ApplePay.getCode());
+        payment.setPayType(PayTypeEnum.ApplePay);
+        HashMap<String, String> header = new HashMap<>();
+        RefundStatusEnum refundStatusEnum = refundQueryService.queryRefund(refundRequestPo, payment, header);
+        Assert.assertEquals(RefundStatusEnum.REFUND_FAILED, refundStatusEnum);
     }
 }

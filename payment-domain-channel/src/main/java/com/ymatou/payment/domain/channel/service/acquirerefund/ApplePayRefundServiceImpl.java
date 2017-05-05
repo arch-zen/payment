@@ -86,6 +86,7 @@ public class ApplePayRefundServiceImpl implements AcquireRefundService {
         String txnTime = new DateTime(refundRequest.getCreatedTime()).toString(ApplePayConstants.time_format);
         ApplePayRefundRequest applePayRefundRequest = new ApplePayRefundRequest();
         applePayRefundRequest.setMerId(config.getMerchantId());
+        applePayRefundRequest.setCertId(config.getCertId());
         applePayRefundRequest.setBackUrl(url);
         applePayRefundRequest.setOrderId(refundRequest.getRefundBatchNo());
         applePayRefundRequest.setOrigQryId(refundRequest.getInstPaymentId());
@@ -126,8 +127,7 @@ public class ApplePayRefundServiceImpl implements AcquireRefundService {
             requestLog.setExceptionDetail(e.toString());
         }
         if (response != null) {
-            String responseMessage = ApplePayMessageUtil.genRequestMessage(response.getOriginMap());
-            requestLog.setResponseData(responseMessage);
+            requestLog.setResponseData(response.getOriginalResponse());
         }
         requestLog.setRefundBatchNo(refundRequest.getRefundBatchNo());
         refundMiscRequestLogMapper.insertSelective(requestLog);

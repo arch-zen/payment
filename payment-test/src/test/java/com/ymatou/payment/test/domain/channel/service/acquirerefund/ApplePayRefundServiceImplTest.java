@@ -25,7 +25,7 @@ public class ApplePayRefundServiceImplTest extends RestBaseTest {
     private PaymentRepository paymentRepository;
 
     @Test
-    public void notifyRefundTest() {
+    public void notifyRefundMockTest() {
         AcquireRefundService acquireRefundService = refundServiceFactory.getInstanceByPayType(PayTypeEnum.ApplePay);
         Assert.assertNotNull(acquireRefundService);
 
@@ -40,5 +40,20 @@ public class ApplePayRefundServiceImplTest extends RestBaseTest {
         header.put("MockResult-ApplePay-respCode", "01");
         refundStatusEnum = acquireRefundService.notifyRefund(refundRequestPo, payment, header);
         Assert.assertEquals(RefundStatusEnum.REFUND_FAILED, refundStatusEnum);
+    }
+
+    @Test
+    public void notifyRefundTest() {
+        AcquireRefundService acquireRefundService = refundServiceFactory.getInstanceByPayType(PayTypeEnum.ApplePay);
+        Assert.assertNotNull(acquireRefundService);
+
+        RefundRequestPo refundRequestPo = getRefundRequestBy(RefundStatusEnum.REFUND_FAILED);
+        Payment payment = paymentRepository.getByPaymentId(refundRequestPo.getPaymentId());
+        HashMap<String, String> header = new HashMap<>();
+        refundRequestPo.setPayType(PayTypeEnum.ApplePay.getCode());
+        payment.setPayType(PayTypeEnum.ApplePay);
+        RefundStatusEnum refundStatusEnum = acquireRefundService.notifyRefund(refundRequestPo, payment, header);
+        Assert.assertEquals(RefundStatusEnum.REFUND_FAILED, refundStatusEnum);
+
     }
 }

@@ -45,7 +45,9 @@ public class ApplePayTradeQueryService implements InitializingBean {
             String result = HttpClientUtil.sendPost(url, body, ApplePayConstants.content_type, header, httpClient);
 
             Map<String, String> resultMap = ApplePayMessageUtil.genResponseMessage(result);
-            return ApplePayTradeQueryResponse.loadProperty(resultMap, ApplePayTradeQueryResponse.class);
+            ApplePayTradeQueryResponse response = ApplePayTradeQueryResponse.loadProperty(resultMap, ApplePayTradeQueryResponse.class);
+            response.setOriginalResponse(result);
+            return response;
 
         } catch (Exception ex) {
             throw new BizException("ApplePayTradeQueryService.doPost Exception", ex);

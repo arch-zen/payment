@@ -46,7 +46,9 @@ public class ApplePayRefundService implements InitializingBean {
             String url = this.integrationConfig.getApplePayRefundUrl(header);
             String result = HttpClientUtil.sendPost(url, body, ApplePayConstants.content_type, header, httpClient);
             Map<String, String> resultMap = ApplePayMessageUtil.genResponseMessage(result);
-            return ApplePayRefundResponse.loadProperty(resultMap, ApplePayRefundResponse.class);
+            ApplePayRefundResponse response = ApplePayRefundResponse.loadProperty(resultMap, ApplePayRefundResponse.class);
+            response.setOriginalResponse(result);
+            return response;
         } catch (Exception ex) {
             throw new BizException("ApplePayRefundService.doPost Exception", ex);
         }

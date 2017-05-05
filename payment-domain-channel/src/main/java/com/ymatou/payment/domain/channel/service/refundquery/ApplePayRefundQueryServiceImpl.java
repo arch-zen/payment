@@ -127,8 +127,7 @@ public class ApplePayRefundQueryServiceImpl implements RefundQueryService {
             requestLog.setExceptionDetail(e.toString());
         }
         if (response != null) {
-            String responseMessage = ApplePayMessageUtil.genRequestMessage(response.getOriginMap());
-            requestLog.setResponseData(responseMessage);
+            requestLog.setResponseData(response.getOriginalResponse());
         }
         requestLog.setRefundBatchNo(refundRequest.getRefundBatchNo());
         refundMiscRequestLogMapper.insertSelective(requestLog);
