@@ -22,7 +22,7 @@ public class ApplePayUtil {
             throw new BizException("filterBlank exception: map is null!");
         }
         Map<String, String> submitFromData = new HashMap<String, String>();
-        for (Map.Entry<String, String> entry:contentData.entrySet()) {
+        for (Map.Entry<String, String> entry : contentData.entrySet()) {
             String value = entry.getValue();
             if (StringUtils.isNotBlank(value)) {
                 // 对value值进行去除前后空处理
@@ -86,7 +86,12 @@ public class ApplePayUtil {
                 throw new BizException("genRequestParamMessage exception:", ex);
             }
         }
-        return sb.substring(0, sb.length() - 1);
+        String result = sb.toString();
+        if (!StringUtils.isBlank(result) && result.endsWith(ApplePayConstants.AMPERSAND)) {
+            return result.substring(0, result.length() - 1);
+        } else {
+            return result;
+        }
     }
 
     /**

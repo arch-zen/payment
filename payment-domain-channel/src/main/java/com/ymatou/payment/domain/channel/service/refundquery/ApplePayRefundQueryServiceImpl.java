@@ -78,7 +78,7 @@ public class ApplePayRefundQueryServiceImpl implements RefundQueryService {
         request.setOrderId(refundRequest.getRefundBatchNo());
         request.setTxnTime(txnTime);
         request.setMerId(config.getMerchantId());
-        request.setMerId(config.getCertId());
+        request.setCertId(config.getCertId());
 
         String privateKey = config.getInstYmtPrivateKey();
         if (integrationConfig.isMock(header)) {
