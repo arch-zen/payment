@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.util.Date;
@@ -49,12 +50,19 @@ public class ApplePayPaymentNotifyServiceImpl implements PaymentNotifyService {
     @Override
     public PaymentNotifyMessage resloveNotifyMessage(PaymentNotifyReq notifyRequest) {
         //result转换为response
-        Map<String, String> map = null;
-        try {
-            map = ApplePayMessageUtil.genResponseMessage(URLDecoder.decode(notifyRequest.getRawString(), ApplePayConstants.encoding));
-        }catch(Exception ex){
-            throw new BizException("resloveNotifyMessage urldecode exception", ex);
-        }
+        Map<String, String> tmpMap = ApplePayMessageUtil.genResponseMessage(notifyRequest.getRawString());
+        Map<String, String> map = new HashMap<>();
+
+        //urldecode
+        tmpMap.forEach((key, value) -> {
+            try {
+                map.put(key, URLDecoder.decode(value, ApplePayConstants.encoding));
+            } catch (UnsupportedEncodingException e) {
+                throw new BizException("resloveNotifyMessage urldecode exception", e);
+            }
+        });
+
+
         ApplePayConsumeNotifyRequest consumeNotifyRequest = new ApplePayConsumeNotifyRequest();
         consumeNotifyRequest.loadProperty(map);
 
@@ -78,8 +86,7 @@ public class ApplePayPaymentNotifyServiceImpl implements PaymentNotifyService {
         try {
             Integer cardType = Integer.parseInt(consumeNotifyRequest.getPayCardType());
             notifyMessage.setCardType(cardType);
-        }
-        catch(Exception ex){
+        } catch (Exception ex) {
             logger.error("paycardtype convert to integer exception, with paycardtype:" + consumeNotifyRequest.getPayCardType());
         }
 
@@ -96,11 +103,12 @@ public class ApplePayPaymentNotifyServiceImpl implements PaymentNotifyService {
 
     /**
      * 验证报文
+     *
      * @param request
      * @param config
      * @param mockHeader
      */
-    private void validateMessage(ApplePayConsumeNotifyRequest request, InstitutionConfig config, HashMap<String, String> mockHeader){
+    private void validateMessage(ApplePayConsumeNotifyRequest request, InstitutionConfig config, HashMap<String, String> mockHeader) {
         //验证respcode
         if (ApplePayConstants.response_success_code.equals(request.getRespCode()) == false
                 && ApplePayConstants.response_success_defect_code.equals(request.getRespCode()) == false) {
@@ -110,7 +118,7 @@ public class ApplePayPaymentNotifyServiceImpl implements PaymentNotifyService {
                     request.getRespMsg()));
         }
         //验商户号
-        if(config.getMerchantId().equals(request.getMerId()) == false){
+        if (config.getMerchantId().equals(request.getMerId()) == false) {
             throw new BizException(String.format("applepay paynotify merchantId error:paymentId:%s, code:%s, msg:%s, merchantId:%s",
                     request.getOrderId(),
                     request.getRespCode(),
@@ -123,7 +131,7 @@ public class ApplePayPaymentNotifyServiceImpl implements PaymentNotifyService {
             pubkey = this.signatureService.getMockPublicKey();
         }
         boolean flag = ApplePaySignatureUtil.validate(request.getOriginMap(), pubkey);
-        if(flag == false){
+        if (flag == false) {
             throw new BizException(String.format("applepay paynotify validate sign fail:paymentId:%s, code:%s, msg:%s",
                     request.getOrderId(),
                     request.getRespCode(),
