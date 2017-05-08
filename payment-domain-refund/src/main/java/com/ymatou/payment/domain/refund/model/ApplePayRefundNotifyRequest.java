@@ -4,9 +4,12 @@ import com.ymatou.payment.facade.BizException;
 import com.ymatou.payment.facade.ErrorCode;
 import com.ymatou.payment.facade.PrintFriendliness;
 import com.ymatou.payment.facade.model.RefundNotifyRequest;
+import com.ymatou.payment.integration.service.applepay.common.ApplePayConstants;
 import com.ymatou.payment.integration.service.applepay.common.ApplePayMessageUtil;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -329,42 +332,19 @@ public class ApplePayRefundNotifyRequest extends PrintFriendliness {
      */
     private void parseFromBody(String body) {
         try {
+
             Map<String, String> map = ApplePayMessageUtil.genResponseMessage(body);
-            this.setRawMap(map);
-            BeanUtils.populate(this, map);
-
-//            this.setVersion(map.get("version"));
-//            this.setEncoding(map.get("encoding"));
-//            this.setSignMethod(map.get("signMethod"));
-//            this.setSignature(map.get("signature"));
-//            this.setTxnType(map.get("txnType"));
-//            this.setTxnSubType(map.get("txnSubType"));
-//            this.setBizType(map.get("bizType"));
-//            this.setSignPubKeyCert(map.get("signPubKeyCert"));
-//
-//            this.setAccessType(map.get("accessType"));
-//            this.setMerId(map.get("merId"));
-//
-//            this.setOrderId(map.get("orderId"));
-//            this.setCurrencyCode(map.get("currencyCode"));
-//            this.setTxnAmt(map.get("txnAmt"));
-//            this.setTxnTime(map.get("txnTime"));
-//            this.setReqReserved(map.get("reqReserved"));
-//            this.setReserved(map.get("reserved"));
-//
-//            this.setQueryId(map.get("queryId"));
-//            this.setOrigQryId(map.get("origQryId"));
-//            this.setTraceNo(map.get("traceNo"));
-//            this.setTraceNo(map.get("traceTime"));
-//            this.setSettleDate(map.get("settleDate"));
-//            this.setSettleCurrencyCode(map.get("settleCurrencyCode"));
-//            this.setSettleAmt(map.get("settleAmt"));
-//            this.setExchangeRate(map.get("exchangeRate"));
-//            this.setExchangeDate(map.get("exchangeDate"));
-//            this.setRespCode(map.get("respCode"));
-//            this.setRespMsg(map.get("respMsg"));
-
-
+            Map<String, String> deCodeMap = new HashMap<>();
+            for (Map.Entry<String, String> item : map.entrySet()) {
+                if (StringUtils.isBlank(item.getValue())) {
+                    deCodeMap.put(item.getKey(), item.getValue());
+                } else {
+                    String value = URLDecoder.decode(item.getValue(), ApplePayConstants.encoding);
+                    deCodeMap.put(item.getKey(), value);
+                }
+            }
+            this.setRawMap(deCodeMap);
+            BeanUtils.populate(this, deCodeMap);
         } catch (Exception e) {
             throw new BizException(ErrorCode.FAIL,
                     String.format("parse post form when receive applePay refund notify.payType=%s,body=%s", payType, body), e);

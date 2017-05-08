@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,7 +69,7 @@ public class ApplePayRefundNotifyServiceImplTest extends RestBaseTest {
         String sign = ApplePaySignatureUtil.sign(parameters, privateKey);
         parameters.put("signature", sign);
         String body = ApplePayMessageUtil.genRequestMessage(parameters);
-        body = URLDecoder.decode(body, ApplePayConstants.encoding);
+        //body = URLDecoder.decode(body, ApplePayConstants.encoding);
         request.setBody(body);
 
         RefundNotifyService refundNotifyService = refundNotifyServiceFactory.createRefundNotifyService(request);
@@ -88,7 +87,7 @@ public class ApplePayRefundNotifyServiceImplTest extends RestBaseTest {
         sign = ApplePaySignatureUtil.sign(parameters, privateKey);
         parameters.put("signature", sign);
         body = ApplePayMessageUtil.genRequestMessage(parameters);
-        body = URLDecoder.decode(body, ApplePayConstants.encoding);
+        //body = URLDecoder.decode(body, ApplePayConstants.encoding);
         request.setBody(body);
 
         try {
@@ -103,7 +102,7 @@ public class ApplePayRefundNotifyServiceImplTest extends RestBaseTest {
         sign = ApplePaySignatureUtil.sign(parameters, privateKey);
         parameters.put("signature", sign);
         body = ApplePayMessageUtil.genRequestMessage(parameters);
-        body = URLDecoder.decode(body, ApplePayConstants.encoding);
+        //body = URLDecoder.decode(body, ApplePayConstants.encoding);
         request.setBody(body);
 
         try {
@@ -119,7 +118,7 @@ public class ApplePayRefundNotifyServiceImplTest extends RestBaseTest {
         sign = ApplePaySignatureUtil.sign(parameters, privateKey);
         parameters.put("signature", sign);
         body = ApplePayMessageUtil.genRequestMessage(parameters);
-        body = URLDecoder.decode(body, ApplePayConstants.encoding);
+        //body = URLDecoder.decode(body, ApplePayConstants.encoding);
         request.setBody(body);
 
         try {
@@ -133,7 +132,7 @@ public class ApplePayRefundNotifyServiceImplTest extends RestBaseTest {
         sign = ApplePaySignatureUtil.sign(parameters, privateKey);
         parameters.put("signature", sign);
         body = ApplePayMessageUtil.genRequestMessage(parameters);
-        body = URLDecoder.decode(body, ApplePayConstants.encoding);
+        //body = URLDecoder.decode(body, ApplePayConstants.encoding);
         request.setBody(body);
 
         try {
