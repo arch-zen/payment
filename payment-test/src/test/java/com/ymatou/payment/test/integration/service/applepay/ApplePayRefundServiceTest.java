@@ -37,7 +37,7 @@ public class ApplePayRefundServiceTest extends RestBaseTest {
     private SignatureService singatureService;
 
     @Test
-    public void doServiceTest() {
+    public void doServiceMockTest() {
         InstitutionConfig config = instConfigManager.getConfig(PayTypeEnum.ApplePay);
         ApplePayRefundRequest request = new ApplePayRefundRequest();
         HashMap<String, String> header = new HashMap<>();
@@ -49,6 +49,7 @@ public class ApplePayRefundServiceTest extends RestBaseTest {
         String txnTime = new DateTime().toString(ApplePayConstants.time_format);
         ApplePayRefundRequest applePayRefundRequest = new ApplePayRefundRequest();
         applePayRefundRequest.setMerId(config.getMerchantId());
+        applePayRefundRequest.setCertId(config.getCertId());
         applePayRefundRequest.setBackUrl(url);
         applePayRefundRequest.setOrderId(refundBatchNo);
         applePayRefundRequest.setOrigQryId(instPaymentId);
@@ -73,4 +74,31 @@ public class ApplePayRefundServiceTest extends RestBaseTest {
         response = applePayRefundService.doService(request, header);
         Assert.assertEquals("01", response.getRespCode());
     }
+
+    @Test
+    public void doServiceTest() {
+        InstitutionConfig config = instConfigManager.getConfig(PayTypeEnum.ApplePay);
+        HashMap<String, String> header = new HashMap<>();
+        String refundBatchNo = UUID.randomUUID().toString().replace("-", "");
+        String instPaymentId = UUID.randomUUID().toString().replace("-", "");
+        BigDecimal amount = new BigDecimal("20.56");
+        String url = new StringBuilder().append(integrationConfig.getYmtPaymentBaseUrl(header))
+                .append("/RefundNotify/").append(PayTypeEnum.ApplePay.getCode()).toString();
+        String txnTime = new DateTime().toString(ApplePayConstants.time_format);
+        ApplePayRefundRequest applePayRefundRequest = new ApplePayRefundRequest();
+        applePayRefundRequest.setMerId(config.getMerchantId());
+        applePayRefundRequest.setBackUrl(url);
+        applePayRefundRequest.setOrderId(refundBatchNo);
+        applePayRefundRequest.setOrigQryId(instPaymentId);
+        applePayRefundRequest.setTxnTime(txnTime);
+        applePayRefundRequest.setCertId(config.getCertId());
+        Money money = new Money(amount);
+        applePayRefundRequest.setTxnAmt(String.valueOf(money.getCent()));
+        String privateKey = config.getInstYmtPrivateKey();
+        String sign = ApplePaySignatureUtil.sign(applePayRefundRequest.genMap(), privateKey);
+        applePayRefundRequest.setSignature(sign);
+        ApplePayRefundResponse response = applePayRefundService.doService(applePayRefundRequest, header);
+        Assert.assertFalse("Invalid request.".equals(response.getOriginalResponse()));
+    }
+
 }

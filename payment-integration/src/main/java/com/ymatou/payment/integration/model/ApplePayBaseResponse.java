@@ -12,6 +12,8 @@ import java.util.Map;
  */
 public class ApplePayBaseResponse extends PrintFriendliness {
 
+    private String originalResponse;
+
     ///////////////基本信息////////////////////////
     /**
      * 版本号
@@ -66,6 +68,14 @@ public class ApplePayBaseResponse extends PrintFriendliness {
      */
     private String merId;
 
+
+    public String getOriginalResponse() {
+        return originalResponse;
+    }
+
+    public void setOriginalResponse(String originalResponse) {
+        this.originalResponse = originalResponse;
+    }
 
     public String getVersion() {
         return version;
