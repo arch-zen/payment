@@ -379,6 +379,32 @@ public class PaymentNotifyResourceTest extends RestBaseTest {
         Assert.assertEquals(PaymentNotifyStatusEnum.NOTIFIED, payment.getNotifyStatus());
     }
 
+    @Test
+    public void testApplePayNotifyWithTestEnvData() throws UnsupportedEncodingException {
+        String payType = "60";
+        String paymentId = "17051016525241145";
+        String reqBody =
+                "accessType=0&bizType=000201&certId=68759585097&currencyCode=156&encoding=UTF-8&merId=308310053994237&orderId=17051016525241145&queryId=201705101652524968648&respCode=00&respMsg=Success!&settleAmt=1&settleCurrencyCode=156&settleDate=0510&signMethod=01&traceNo=496864&traceTime=0510165252&txnAmt=1&txnSubType=01&txnTime=20170510165252&txnType=01&version=5.0.0&signature=rynqAyFmOLaQSjqiaYmdTxCXk1s%2fw2S7XgJS7nUYRRpsNnvPSJ%2f42jLkcEf6noRnY%2bvOHjAdcbp9c8aPwtxhaivEiWD%2b39wvpz3%2bOQo5Pmr5D1Ta6NPYhbRq%2bwOH4yKs%2bi1Fwp6Ec6wtJeyypS7S2d3oq2fDRh9rSOj6J7EXsDO4FMO4r0FmCWYAghTchu5JfkrFHMWxjAum%2f2vmbVcrDPrOWlxmd0BC4WMFlBPz0Y049T0A7FQEyQKTTm31EwKpHFvWmA5utc2KWFp%2fzhbilDjY6%2f%2bjJAMY7AOdILy5DMN3gEFn46czPkiVv7HQZ5M5fWhThjXcsxWOb5umpBitjg%3d%3d";
+
+        // 删除旧数据
+        AlipayNotifyLogExample example = new AlipayNotifyLogExample();
+        example.createCriteria().andBizNoEqualTo(paymentId);
+        alipaynotifylogMapper.deleteByExample(example);
+
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        servletRequest.setRequestURI("/notify/" + payType);
+
+        servletRequest.setContent(reqBody.getBytes("utf-8"));
+        String response = paymentNotifyResource.notify(payType, servletRequest);
+
+        assertEquals("验证返回值", "ok", response);
+
+        List<AlipayNotifyLogPo> poList = alipaynotifylogMapper.selectByExample(example);
+
+        assertEquals("验证报文插入表中", 1, poList.size());
+    }
+
+
     private String buildMockQueryString(String originString, String payType) throws UnsupportedEncodingException {
         InstitutionConfig instConfig = institutionConfigManager.getConfig(PayTypeEnum.parse(payType));
         Map<String, String> map = HttpUtil.parseQueryStringToMap(originString);

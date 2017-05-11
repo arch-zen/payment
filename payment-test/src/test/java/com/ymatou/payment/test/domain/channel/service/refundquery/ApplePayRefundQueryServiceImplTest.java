@@ -6,9 +6,11 @@ import com.ymatou.payment.domain.channel.service.RefundQueryService;
 import com.ymatou.payment.domain.channel.service.refundquery.RefundQueryServiceFactory;
 import com.ymatou.payment.domain.pay.model.Payment;
 import com.ymatou.payment.domain.pay.repository.PaymentRepository;
+import com.ymatou.payment.domain.refund.repository.RefundPository;
 import com.ymatou.payment.facade.constants.PayTypeEnum;
 import com.ymatou.payment.facade.constants.RefundStatusEnum;
 import com.ymatou.payment.infrastructure.Money;
+import com.ymatou.payment.infrastructure.db.model.RefundRequestExample;
 import com.ymatou.payment.infrastructure.db.model.RefundRequestPo;
 import com.ymatou.payment.test.RestBaseTest;
 import org.junit.Assert;
@@ -28,6 +30,9 @@ public class ApplePayRefundQueryServiceImplTest extends RestBaseTest {
     private PaymentRepository paymentRepository;
     @Resource
     private InstitutionConfigManager configManager;
+
+    @Resource
+    private RefundPository refundPository;
 
     @Test
     public void queryRefundMockTest() {
@@ -69,4 +74,19 @@ public class ApplePayRefundQueryServiceImplTest extends RestBaseTest {
         RefundStatusEnum refundStatusEnum = refundQueryService.queryRefund(refundRequestPo, payment, header);
         Assert.assertEquals(RefundStatusEnum.REFUND_FAILED, refundStatusEnum);
     }
+
+    @Test
+    public void queryRefundInTestEnv() {
+        RefundQueryService refundQueryService = refundQueryServiceFactory.getInstanceByPayType(PayTypeEnum.ApplePay);
+        Assert.assertNotNull(refundQueryService);
+
+        RefundRequestPo refundRequestPo = refundPository.getRefundRequestByRefundId(20742);
+        Payment payment = paymentRepository.getByPaymentId(refundRequestPo.getPaymentId());
+        refundRequestPo.setPayType(PayTypeEnum.ApplePay.getCode());
+        payment.setPayType(PayTypeEnum.ApplePay);
+        HashMap<String, String> header = new HashMap<>();
+        RefundStatusEnum refundStatusEnum = refundQueryService.queryRefund(refundRequestPo, payment, header);
+        Assert.assertEquals(RefundStatusEnum.THIRDPART_REFUND_SUCCESS, refundStatusEnum);
+    }
+
 }

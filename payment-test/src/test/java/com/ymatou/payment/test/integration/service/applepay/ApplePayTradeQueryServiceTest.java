@@ -17,6 +17,8 @@ import org.junit.Test;
 import javax.annotation.Resource;
 import java.util.Random;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Created by gejianhua on 2017/4/28.
  */
@@ -55,7 +57,36 @@ public class ApplePayTradeQueryServiceTest extends RestBaseTest {
 
         //验签
         boolean flag = ApplePaySignatureUtil.validate(response.getOriginMap(), config.getInstPublicKey());
-        Assert.assertEquals(true, flag);
+        assertEquals(true, flag);
+    }
+
+    @Test
+    public void testTradeQueryOrderExists() {
+        InstitutionConfig config = this.instConfigManager.getConfig(PayTypeEnum.ApplePay);
+
+        ApplePayConsumeQueryRequest request = new ApplePayConsumeQueryRequest();
+        request.setTxnTime("20170510165252");
+        request.setOrderId("17051016525241145");
+        request.setMerId(config.getMerchantId());
+        request.setCertId(config.getCertId());
+
+        String sign = ApplePaySignatureUtil.sign(request.genMap(), config.getInstYmtPrivateKey());
+        request.setSignature(sign);
+
+        ApplePayTradeQueryResponse response =
+                this.applePayTradeQueryService.doPost(request, null);
+
+        System.out.println("respcode:" + response.getRespCode());
+        System.out.println("respmsg:" + response.getRespMsg());
+        System.out.println("originrespcode:" + response.getOrigRespCode());
+        System.out.println("originrespmsg:" + response.getOrigRespMsg());
+
+        assertEquals(ApplePayConstants.response_success_code, response.getRespCode());
+        assertEquals("1", response.getTxnAmt());
+
+        //验签
+        boolean flag = ApplePaySignatureUtil.validate(response.getOriginMap(), config.getInstPublicKey());
+        assertEquals(true, flag);
     }
 }
 
