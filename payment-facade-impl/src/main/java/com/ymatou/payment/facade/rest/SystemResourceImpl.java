@@ -52,7 +52,7 @@ public class SystemResourceImpl implements SystemResource {
                 + "\"1.1.11\":\"2017-03-22.1 call trading when wx refund return USER_ACCOUNT_ABNORMAL.\","
                 + "\"1.1.12\":\"2017-04-25.1 update refund batchno when query return SELLER_BALANCE_NOT_ENOUGH and afterday.\","
                 + "\"1.1.13\":\"2017-05-05.1 add applypay and review code.\","
-                + "\"1.1.14\":\"2017-05-11.1 fix refund query api.\","
+                + "\"1.1.14\":\"2017-05-12.1 fix refund query api and notify applePay channel.\""
                 + "}";
     }
 

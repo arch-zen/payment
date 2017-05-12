@@ -100,35 +100,14 @@ public class PaymentNotifyService {
 
         // 此字段专门为数据科学部使用，作为风控关键要素
         request.setExternalPayerId(payment.getPayerId());
-        request.setPayChannel(convertPayChannel(payment.getPayType()));
+        request.setPayChannel(PayTypeEnum.getThirdPartyName(payment.getPayType()));
         request.setPayType(bussinessOrder.getPayType());
         request.setSign(sign(request));
 
         return request;
     }
 
-    /**
-     * PayType转PayChannel
-     * 
-     * @param payTypeEnum
-     * @return
-     */
-    private String convertPayChannel(PayTypeEnum payTypeEnum) {
-        switch (payTypeEnum) {
-            case AliPayApp:
-            case AliPayPc:
-            case AliPayWap:
-                return "Alipay";
-            case WeiXinApp:
-            case WeiXinJSAPI:
-            case WeiXinPc:
-                return "Weixin";
-            case CmbApp:
-                return "CmbPay";
-            default:
-                return payTypeEnum.toString();
-        }
-    }
+
 
     /**
      * 过滤支付宝内部账号
@@ -200,7 +179,6 @@ public class PaymentNotifyService {
      * 将NotifyMesssage转成String
      * 
      * @param map
-     * @param instConfig
      * @return
      */
     private String flatNotifyMessage(Map<String, String> map) {

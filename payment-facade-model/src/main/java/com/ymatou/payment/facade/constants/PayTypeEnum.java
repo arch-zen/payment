@@ -77,16 +77,20 @@ public enum PayTypeEnum {
 
     public static String getThirdPartyName(PayTypeEnum payType) {
         switch (payType) {
+            case AliPayApp:
             case AliPayPc:
             case AliPayWap:
-            case AliPayApp:
                 return "Alipay";
+            case WeiXinApp:
+            case WeiXinJSAPI:
+            case WeiXinPc:
+                return "Weixin";
             case CmbApp:
                 return "CmbPay";
             case ApplePay:
                 return "ApplePay";
             default:
-                return "Weixin";
+                return payType.toString();
         }
     }
 
